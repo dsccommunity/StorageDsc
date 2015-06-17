@@ -1,4 +1,4 @@
-[![Build status](https://ci.appveyor.com/api/projects/status/1j95juvceu39ekm7/branch/master?svg=true)](https://ci.appveyor.com/project/PowerShell/xstorage/branch/master)
+﻿[![Build status](https://ci.appveyor.com/api/projects/status/1j95juvceu39ekm7/branch/master?svg=true)](https://ci.appveyor.com/project/PowerShell/xstorage/branch/master)
 
 
 # xStorage
@@ -88,16 +88,11 @@ Versions
 
 This module was previously named **xDisk**, the version is regressing to a ".1" release with the addition of xMountImage.
 
-**1.0** (as xDisk)
-
-*   Initial release with the following resources 
-    *   xDisk
-    *   xWaitforDisk
-
-**0.1.0.0** (revert to version 0.1 as updated standard for new modules and rename to xStorage)
-
-- Introduce new resource
-	- xMountImage
+### 1.0.0.0
+* Initial release of xStorage module with following resources (contains resources from deprecated xDisk module):
+* xDisk (from xDisk)
+* xMountImage
+* xWaitForDisk (from xDisk)
 
 Examples
 --------
