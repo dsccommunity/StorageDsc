@@ -156,26 +156,34 @@ function Test-TargetResource
     }
 
     # DriveLetter
-    $Partition = Get-Partition -DriveLetter $DriveLetter -ErrorAction SilentlyContinue
-    if ( -not $Partition)
+    if ($DriveLetter)
     {
-        Write-Error "Drive $DriveLetter was not found"
-        return $false
+        $Partition = Get-Partition -DriveLetter $DriveLetter -ErrorAction SilentlyContinue
+        if ( -not $Partition)
+        {
+            Write-Error "Drive $DriveLetter was not found"
+        }    return $false
     }
 
     # Drive size
-    if ($Partition.Size -ne $Size)
+    if ($Size)
     {
-        Write-Error "Drive $DriveLetter size does not match defined value"
-        return $false
+        if ($Partition.Size -ne $Size)
+        {
+            Write-Error "Drive $DriveLetter size does not match defined value"
+            return $false
+        }
     }
 
     # Volume label
-    $Label = Get-Volume -DriveLetter $DriveLetter -ErrorAction SilentlyContinue | Select-Object -ExpandProperty FileSystemLabel
-    if ($FSLabel -ne $Label)
+    if ($FSLabel)
     {
-        Write-Error "Volume $DriveLetter label does not match defined value"
-        return $false
+        $Label = Get-Volume -DriveLetter $DriveLetter -ErrorAction SilentlyContinue | Select-Object -ExpandProperty FileSystemLabel
+        if ($Label -ne $FSLabel)
+        {
+            Write-Error "Volume $DriveLetter label does not match defined value"
+            return $false
+        }
     }
 
     return $true
