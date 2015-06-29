@@ -1,4 +1,4 @@
-﻿[![Build status](https://ci.appveyor.com/api/projects/status/1j95juvceu39ekm7/branch/master?svg=true)](https://ci.appveyor.com/project/PowerShell/xstorage/branch/master)
+[![Build status](https://ci.appveyor.com/api/projects/status/1j95juvceu39ekm7/branch/master?svg=true)](https://ci.appveyor.com/project/PowerShell/xstorage/branch/master)
 
 
 # xStorage
@@ -7,7 +7,7 @@
 
 This module contains the **xMountImage, xDisk, and xWaitForDisk** resources.  The xMountImage resource can be used to mount or unmount an ISO/VHD disk image to the local file system, with simple declarative language.  The xDisk and xWaitforDisk resources enable you to wait for a disk to become available and then initialize, format, and bring it online using PowerShell DSC.
 
-**NOTE:** The xDisk resource follows a process to detect the existance of a RAW disk, initialize the disk, create a volume of maximum size, and then format the new volume.
+**NOTE:** The xDisk resource follows a process to detect the existance of a RAW disk, initialize the disk, create a volume, assign a drive letter of specific size (if provided) or maximum size, then format the new volume using NTFS and assign a volume label if one is provided.
 Before beginning that operation, the disk is marked 'Online' and if it is set to 'Read-Only', that property is removed.
 While this is intended to be non-destructive, as with all expiremental resources the scripts contained should be thoroughly evaluated and well understood before implementing in a production environment or where disk modifications could result in lost data.
 
@@ -55,6 +55,8 @@ Details
 
 *   **DiskNumber**: Specifies the identifier for which disk to modify.
 *   **DriveLetter**: Specifies the preffered letter to assign to the disk volume.
+*   **Size**: Specifies the size of new volume (use all available space on disk if not provided).
+*   **FSLabel**: Define volume label if required.
 
 
 **xWaitforDisk** resource has following properties:
@@ -88,6 +90,9 @@ Versions
 
 This module was previously named **xDisk**, the version is regressing to a ".1" release with the addition of xMountImage.
 
+### Unreleased
+* Added support for multiple partitions per disk, -DiskSize and -FSLabel in xDisk
+
 ### 1.0.0.0
 * Initial release of xStorage module with following resources (contains resources from deprecated xDisk module):
 * xDisk (from xDisk)
@@ -97,14 +102,14 @@ This module was previously named **xDisk**, the version is regressing to a ".1" 
 Examples
 --------
 
-**Example 1**:  Wait for disk 2 to become available, and then make the disk available as a new formatted volume.
+**Example 1**:  Wait for disk 2 to become available, and then make the disk available as two new formatted volumes, with J using all available space after 'G' has been created.
 
 
 ```powershell
 Configuration DataDisk
 {
     
-    Import-DSCResource -ModuleName xDisk
+    Import-DSCResource -ModuleName xStorage
  
     Node localhost
     {
@@ -118,6 +123,14 @@ Configuration DataDisk
         {
              DiskNumber = 2
              DriveLetter = 'G'
+			 Size = 10GB
+        }
+        xDisk JVolume
+        {
+             DiskNumber = 2
+             DriveLetter = 'J'
+			 FSLabel = 'Data
+			 DependsOn = [xDisk]GVolume
         }
     }
 }
@@ -128,10 +141,11 @@ Start-DscConfiguration -Path C:\DataDisk -Wait -Force -Verbose
 
 **Example 2**:  Mount ISO as local drive S
 
-	    # Mount ISO
+```powershell
+    # Mount ISO
     configuration MountISO
     {
-        Import-DscResource -ModuleName xDiskImage
+        Import-DscResource -ModuleName xStorage
             xMountImage ISO
             {
                Name = 'SQL Disk'
@@ -146,10 +160,11 @@ Start-DscConfiguration -Path C:\DataDisk -Wait -Force -Verbose
 
 **Example 3**:  UnMount ISO file and remove drive letter
 
+```powershell
     # UnMount ISO
     configuration UnMountISO
     {
-        Import-DscResource -ModuleName xDiskImage
+        Import-DscResource -ModuleName xStorage
             xMountImage ISO
             {
                Name = 'SQL Disk'
