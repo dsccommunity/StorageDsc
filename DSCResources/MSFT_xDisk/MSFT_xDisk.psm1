@@ -9,7 +9,10 @@ function Get-TargetResource
     (
         [parameter(Mandatory)]
         [uint32] $DiskNumber,
+
+        [parameter(Mandatory)]
         [string] $DriveLetter,
+
         [UInt64] $Size,
         [string] $FSLabel
     )
@@ -36,7 +39,10 @@ function Set-TargetResource
     (
         [parameter(Mandatory)]
         [uint32] $DiskNumber,
+
+        [parameter(Mandatory)]
         [string] $DriveLetter,
+
         [UInt64] $Size,
         [string] $FSLabel
     )
@@ -76,39 +82,45 @@ function Set-TargetResource
         }
 
         Write-Verbose -Message "Creating the partition..."
-        if ($DriveLetter -and $Size )
+        $PartParams = @{
+                        DriveLetter = $DriveLetter;
+                        DiskNumber = $DiskNumber
+                        }
+        if ($Size)
         {
-            $Partition = $Disk | New-Partition -DriveLetter $DriveLetter -Size $Size
-        }
-        elseif ($DriveLetter -and (-not $Size))
-        {
-            $Partition = $Disk | New-Partition -DriveLetter $DriveLetter -UseMaximumSize
-        }
-        elseif ($Size -and (-not $DriveLetter))
-        {
-            $Partition = $Disk | New-Partition -AssignDriveLetter -Size $Size
+            $PartParams["Size"] = $Size
         }
         else
         {
-            $Partition = $Disk | New-Partition -AssignDriveLetter -UseMaximumSize
+            $PartParams["UseMaximumSize"] = $true
         }
 
+        $Partition = New-Partition @PartParams
+        
         # Sometimes the disk will still be read-only after the call to New-Partition returns.
         Start-Sleep -Seconds 5
 
         Write-Verbose -Message "Formatting the volume..."
+        $VolParams = @{
+                      FileSystem = "NTFS";
+                      Confirm = $false
+                      }
+
         if ($FSLabel)
         {
-            $Volume = $Partition | Format-Volume -FileSystem NTFS -NewFileSystemLabel $FSLabel -Confirm:$false 
-        }
-        else
-        {
-            $Volume = $Partition | Format-Volume -FileSystem NTFS -Confirm:$false
+            $VolParams["NewFileSystemLabel"] = $FSLabel
         }
 
-        Write-Verbose -Message "Successfully initialized disk number '$($DiskNumber)'."
+        $Volume = $Partition | Format-Volume @VolParams
+
+
+        if ($Volume)
+        {
+            Write-Verbose -Message "Successfully initialized '$($DriveLetter)'."
+        }
         
-        $global:DSCMachineStatus = 1
+        # Rebooting the node is not required
+        # $global:DSCMachineStatus = 1
     }
     catch
     {
@@ -119,11 +131,15 @@ function Set-TargetResource
 function Test-TargetResource
 {
     [OutputType([System.Boolean])]
+    [cmdletbinding()]
     param
     (
         [parameter(Mandatory)]
         [uint32] $DiskNumber,
+
+        [parameter(Mandatory)]
         [string] $DriveLetter,
+
         [UInt64] $Size,
         [string] $FSLabel
     )
@@ -133,36 +149,33 @@ function Test-TargetResource
 
     if (-not $Disk)
     {
-        Write-Error "Disk number '$($DiskNumber)' does not exist."
+        Write-Verbose "Disk number '$($DiskNumber)' was not found."
         return $false
     }
 
     if ($Disk.IsOffline -eq $true)
     {
-        Write-Error 'Disk is not Online'
+        Write-Verbose 'Disk is not Online'
         return $false
     }
     
     if ($Disk.IsReadOnly -eq $true)
     {
-        Write-Error 'Disk set as ReadOnly'
+        Write-Verbose 'Disk set as ReadOnly'
         return $false
     }
 
     if ($Disk.PartitionStyle -ne "GPT")
     {
-        Write-Error "Disk '$($DiskNumber)' is initialised with '$($Disk.PartitionStyle)' partition style"
+        Write-Verbose "Disk '$($DiskNumber)' is initialised with '$($Disk.PartitionStyle)' partition style"
         return $false
     }
 
-    # DriveLetter
-    if ($DriveLetter)
+    $Partition = Get-Partition -DriveLetter $DriveLetter -ErrorAction SilentlyContinue
+    if (-not $Partition.DriveLetter -eq $DriveLetter)
     {
-        $Partition = Get-Partition -DriveLetter $DriveLetter -ErrorAction SilentlyContinue
-        if ( -not $Partition)
-        {
-            Write-Error "Drive $DriveLetter was not found"
-        }    return $false
+        Write-Verbose "Drive $DriveLetter was not found"
+        return $false
     }
 
     # Drive size
@@ -170,18 +183,18 @@ function Test-TargetResource
     {
         if ($Partition.Size -ne $Size)
         {
-            Write-Error "Drive $DriveLetter size does not match defined value"
+            Write-Verbose "Drive $DriveLetter size does not match defined value"
             return $false
         }
     }
 
     # Volume label
-    if ($FSLabel)
+    if (-not [string]::IsNullOrEmpty($FSLabel))
     {
         $Label = Get-Volume -DriveLetter $DriveLetter -ErrorAction SilentlyContinue | Select-Object -ExpandProperty FileSystemLabel
         if ($Label -ne $FSLabel)
         {
-            Write-Error "Volume $DriveLetter label does not match defined value"
+            Write-Verbose "Volume $DriveLetter label does not match defined value"
             return $false
         }
     }
@@ -191,4 +204,3 @@ function Test-TargetResource
 
 
 Export-ModuleMember -Function *-TargetResource
-
