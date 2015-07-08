@@ -118,9 +118,6 @@ function Set-TargetResource
         {
             Write-Verbose -Message "Successfully initialized '$($DriveLetter)'."
         }
-        
-        # Rebooting the node is not required
-        # $global:DSCMachineStatus = 1
     }
     catch
     {
@@ -183,7 +180,7 @@ function Test-TargetResource
     {
         if ($Partition.Size -ne $Size)
         {
-            Write-Verbose "Drive $DriveLetter size does not match defined value"
+            Write-Verbose "Drive $DriveLetter size does not match expected value. Current: $Size Expected: $($Partition.Size)  "
             return $false
         }
     }
@@ -194,7 +191,7 @@ function Test-TargetResource
         $Label = Get-Volume -DriveLetter $DriveLetter -ErrorAction SilentlyContinue | Select-Object -ExpandProperty FileSystemLabel
         if ($Label -ne $FSLabel)
         {
-            Write-Verbose "Volume $DriveLetter label does not match defined value"
+            Write-Verbose "Volume $DriveLetter label does not match expected value. Current: $Label Expected: $FSLabel)"
             return $false
         }
     }
