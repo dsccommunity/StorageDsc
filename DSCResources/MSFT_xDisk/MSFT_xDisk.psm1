@@ -180,7 +180,7 @@ function Test-TargetResource
     {
         if ($Partition.Size -ne $Size)
         {
-            Write-Verbose "Drive $DriveLetter size does not match expected value. Current: $Size Expected: $($Partition.Size)  "
+            Write-Verbose "Drive $DriveLetter size does not match expected value. Current: $($Partition.Size) Expected: $Size"
             return $false
         }
     }
