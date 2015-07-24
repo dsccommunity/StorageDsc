@@ -1,4 +1,4 @@
-[![Build status](https://ci.appveyor.com/api/projects/status/1j95juvceu39ekm7/branch/master?svg=true)](https://ci.appveyor.com/project/PowerShell/xstorage/branch/master)
+﻿[![Build status](https://ci.appveyor.com/api/projects/status/1j95juvceu39ekm7/branch/master?svg=true)](https://ci.appveyor.com/project/PowerShell/xstorage/branch/master)
 
 
 # xStorage
@@ -91,7 +91,11 @@ Versions
 This module was previously named **xDisk**, the version is regressing to a ".1" release with the addition of xMountImage.
 
 ### Unreleased
-* Added support for multiple partitions per disk, -DiskSize and -FSLabel in xDisk
+
+
+### 2.0.0.0
+
+* Breaking change: Added support for following properties: DriveLetter, Size, FSLabel. DriveLetter is a new key property.
 
 ### 1.0.0.0
 * Initial release of xStorage module with following resources (contains resources from deprecated xDisk module):
