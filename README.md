@@ -90,14 +90,16 @@ Versions
 
 This module was previously named **xDisk**, the version is regressing to a ".1" release with the addition of xMountImage.
 
-### Unreleased
+### 2.1.0.0
 
+* Fixed encoding
 
 ### 2.0.0.0
 
 * Breaking change: Added support for following properties: DriveLetter, Size, FSLabel. DriveLetter is a new key property.
 
 ### 1.0.0.0
+
 * Initial release of xStorage module with following resources (contains resources from deprecated xDisk module):
 * xDisk (from xDisk)
 * xMountImage
