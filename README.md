@@ -63,7 +63,7 @@ Details
 
 *   **DiskNumber**: Specifies the identifer for which disk to wait for.
 *   **RetryIntervalSec**: Specifies the number of secods to wait for the disk to become available.
-*   **Count**: The number of times to loop the retry interval while waiting for the disk.
+*   **RetryCount**: The number of times to loop the retry interval while waiting for the disk.
 
 Renaming Requirements
 ---------------------
@@ -89,6 +89,9 @@ Versions
 --------
 
 This module was previously named **xDisk**, the version is regressing to a ".1" release with the addition of xMountImage.
+
+### Unreleased
+* Updated documentation (changed parameter name Count to RetryCount in xWaitForDisk resource)
 
 ### 2.1.0.0
 
