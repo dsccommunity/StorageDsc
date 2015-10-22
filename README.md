@@ -90,8 +90,9 @@ Versions
 
 This module was previously named **xDisk**, the version is regressing to a ".1" release with the addition of xMountImage.
 
-### Unreleased
-* Updated documentation (changed parameter name Count to RetryCount in xWaitForDisk resource)
+### 2.2.0.0
+
+* Updated documentation: changed parameter name Count to RetryCount in xWaitForDisk resource
 
 ### 2.1.0.0
 
