@@ -14,7 +14,8 @@ function Get-TargetResource
         [string] $DriveLetter,
 
         [UInt64] $Size,
-        [string] $FSLabel
+        [string] $FSLabel,
+        [UInt32] $AllocationUnitSize
     )
 
     $Disk = Get-Disk -Number $DiskNumber -ErrorAction SilentlyContinue
@@ -23,12 +24,17 @@ function Get-TargetResource
 
     $FSLabel = Get-Volume -DriveLetter $DriveLetter -ErrorAction SilentlyContinue | Select-Object -ExpandProperty FileSystemLabel
 
+    $BlockSize = Get-WmiObject -Query "SELECT BlockSize from Win32_Volume WHERE DriveLetter = '$($DriveLetter):'" -ErrorAction SilentlyContinue  | select BlockSize
+    if($BlockSize){
+        $AllocationUnitSize = $BlockSize.BlockSize
+    }
 
     $returnValue = @{
         DiskNumber = $Disk.Number
         DriveLetter = $Partition.DriveLetter
         Size = $Partition.Size
         FSLabel = $FSLabel
+        AllocationUnitSize = $AllocationUnitSize
     }
     $returnValue
 }
@@ -44,7 +50,8 @@ function Set-TargetResource
         [string] $DriveLetter,
 
         [UInt64] $Size,
-        [string] $FSLabel
+        [string] $FSLabel,
+        [UInt32] $AllocationUnitSize
     )
     
     try
@@ -110,6 +117,10 @@ function Set-TargetResource
         {
             $VolParams["NewFileSystemLabel"] = $FSLabel
         }
+        if($AllocationUnitSize)
+        {
+            $VolParams["AllocationUnitSize"] = $AllocationUnitSize 
+        }
 
         $Volume = $Partition | Format-Volume @VolParams
 
@@ -138,7 +149,8 @@ function Test-TargetResource
         [string] $DriveLetter,
 
         [UInt64] $Size,
-        [string] $FSLabel
+        [string] $FSLabel,
+        [UInt32] $AllocationUnitSize
     )
 
     Write-Verbose -Message "Checking if disk number '$($DiskNumber)' is initialized..."
@@ -183,6 +195,15 @@ function Test-TargetResource
             Write-Verbose "Drive $DriveLetter size does not match expected value. Current: $($Partition.Size) Expected: $Size"
             return $false
         }
+    }
+    $BlockSize = Get-WmiObject -Query "SELECT BlockSize from Win32_Volume WHERE DriveLetter = '$($DriveLetter):'" -ErrorAction SilentlyContinue  | select BlockSize
+    if($BlockSize)
+    {
+        if($AllocationUnitSize -ne $BlockSize.BlockSize)
+        {
+            # Just write a warning, we will not try to reformat a drive due to invalid allocation unit sizes
+            Write-Verbose "Drive $DriveLetter allocation unit size does not match expected value. Current: $($BlockSize.BlockSize/1kb)kb Expected: $($AllocationUnitSize/1kb)kb"
+        }    
     }
 
     # Volume label
