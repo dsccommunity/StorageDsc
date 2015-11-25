@@ -91,6 +91,10 @@ Versions
 
 This module was previously named **xDisk**, the version is regressing to a ".1" release with the addition of xMountImage.
 
+### Unreleased
+
+-  Added support for `AllocationUnitSize` in `xDisk`.
+
 ### 2.2.0.0
 
 * Updated documentation: changed parameter name Count to RetryCount in xWaitForDisk resource
