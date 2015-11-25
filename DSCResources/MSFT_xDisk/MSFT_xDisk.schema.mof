@@ -6,4 +6,5 @@ class MSFT_xDisk : OMI_BaseResource
     [required,write] uint32 DiskNumber;
     [write] uint64 Size;
     [write] string FSLabel;
+    [write] uint32 AllocationUnitSize;
 };

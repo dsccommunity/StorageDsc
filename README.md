@@ -57,6 +57,7 @@ Details
 *   **DriveLetter**: Specifies the preffered letter to assign to the disk volume.
 *   **Size**: Specifies the size of new volume (use all available space on disk if not provided).
 *   **FSLabel**: Define volume label if required.
+*   **AllocationUnitSize**: Specifies the allocation unit size to use when formatting the volume.
 
 
 **xWaitforDisk** resource has following properties:
@@ -89,6 +90,10 @@ Versions
 --------
 
 This module was previously named **xDisk**, the version is regressing to a ".1" release with the addition of xMountImage.
+
+### Unreleased
+
+-  Added support for `AllocationUnitSize` in `xDisk`.
 
 ### 2.2.0.0
 
@@ -135,12 +140,21 @@ Configuration DataDisk
              DriveLetter = 'G'
 			 Size = 10GB
         }
+        
         xDisk JVolume
         {
              DiskNumber = 2
              DriveLetter = 'J'
 			 FSLabel = 'Data
 			 DependsOn = [xDisk]GVolume
+        }
+        
+        xDisk DataVolume
+        {
+             DiskNumber = 3
+             DriveLetter = 'S'
+			 Size = 100GB
+             AllocationUnitSize = 64kb
         }
     }
 }
