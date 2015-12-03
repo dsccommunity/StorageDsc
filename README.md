@@ -93,7 +93,8 @@ This module was previously named **xDisk**, the version is regressing to a ".1" 
 
 ### Unreleased
 
--  Added support for `AllocationUnitSize` in `xDisk`.
+### 2.3.0.0
+* Added support for `AllocationUnitSize` in `xDisk`.
 
 ### 2.2.0.0
 
