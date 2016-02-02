@@ -86,14 +86,12 @@ choice
 
 We reserve resource and module names without prefixes ("x" or "c") for future use (e.g. "MSFT_Resource"). If the next version of Windows Server ships with a "DiskImage" resource, we don't want to break any configurations that use any community modifications. Please keep a prefix such as "c" on all community modifications.
 
-Versions
---------
-
-This module was previously named **xDisk**, the version is regressing to a ".1" release with the addition of xMountImage.
+## Versions
 
 ### Unreleased
 
 ### 2.3.0.0
+
 * Added support for `AllocationUnitSize` in `xDisk`.
 
 ### 2.2.0.0
@@ -109,11 +107,13 @@ This module was previously named **xDisk**, the version is regressing to a ".1" 
 * Breaking change: Added support for following properties: DriveLetter, Size, FSLabel. DriveLetter is a new key property.
 
 ### 1.0.0.0
+This module was previously named **xDisk**, the version is regressing to a "1.0.0.0" release with the addition of xMountImage.
 
 * Initial release of xStorage module with following resources (contains resources from deprecated xDisk module):
 * xDisk (from xDisk)
 * xMountImage
 * xWaitForDisk (from xDisk)
+
 
 Examples
 --------
