@@ -1,9 +1,9 @@
-﻿[![Build status](https://ci.appveyor.com/api/projects/status/1j95juvceu39ekm7/branch/master?svg=true)](https://ci.appveyor.com/project/PowerShell/xstorage/branch/master)
+[![Build status](https://ci.appveyor.com/api/projects/status/1j95juvceu39ekm7/branch/master?svg=true)](https://ci.appveyor.com/project/PowerShell/xstorage/branch/master)
 
 
 # xStorage
 
-﻿The **xStorage** module is a part of the Windows PowerShell Desired State Configuration (DSC) Resource Kit, which is a collection of DSC Resources.
+?The **xStorage** module is a part of the Windows PowerShell Desired State Configuration (DSC) Resource Kit, which is a collection of DSC Resources.
 
 This module contains the **xMountImage, xDisk, and xWaitForDisk** resources.  The xMountImage resource can be used to mount or unmount an ISO/VHD disk image to the local file system, with simple declarative language.  The xDisk and xWaitforDisk resources enable you to wait for a disk to become available and then initialize, format, and bring it online using PowerShell DSC.
 
@@ -86,14 +86,16 @@ choice
 
 We reserve resource and module names without prefixes ("x" or "c") for future use (e.g. "MSFT_Resource"). If the next version of Windows Server ships with a "DiskImage" resource, we don't want to break any configurations that use any community modifications. Please keep a prefix such as "c" on all community modifications.
 
-Versions
---------
-
-This module was previously named **xDisk**, the version is regressing to a ".1" release with the addition of xMountImage.
+## Versions
 
 ### Unreleased
 
+### 2.4.0.0
+
+* Fixed bug where AllocationUnitSize was not used
+
 ### 2.3.0.0
+
 * Added support for `AllocationUnitSize` in `xDisk`.
 
 ### 2.2.0.0
@@ -109,11 +111,13 @@ This module was previously named **xDisk**, the version is regressing to a ".1" 
 * Breaking change: Added support for following properties: DriveLetter, Size, FSLabel. DriveLetter is a new key property.
 
 ### 1.0.0.0
+This module was previously named **xDisk**, the version is regressing to a "1.0.0.0" release with the addition of xMountImage.
 
 * Initial release of xStorage module with following resources (contains resources from deprecated xDisk module):
 * xDisk (from xDisk)
 * xMountImage
 * xWaitForDisk (from xDisk)
+
 
 Examples
 --------
