@@ -27,7 +27,7 @@ To install **xstorage** module
 
 -   If you are using WMF4 / PowerShell Version 4: Unzip the content under $env:ProgramFilesWindowsPowerShellModules folder
 
--   If you are using WMF5 Preview: From an elevated PowerShell session run ‘Install-Module xDiskImage’
+-   If you are using WMF5 Preview: From an elevated PowerShell session run â€˜Install-Module xDiskImageâ€™
 
 To confirm installation
 
@@ -91,6 +91,8 @@ We reserve resource and module names without prefixes ("x" or "c") for future us
 ### Unreleased
 
 ### 2.4.0.0
+
+* Fixed bug where AllocationUnitSize was not used
 
 ### 2.3.0.0
 
