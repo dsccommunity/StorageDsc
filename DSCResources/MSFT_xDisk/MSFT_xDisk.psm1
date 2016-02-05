@@ -197,7 +197,7 @@ function Test-TargetResource
         }
     }
     $BlockSize = Get-WmiObject -Query "SELECT BlockSize from Win32_Volume WHERE DriveLetter = '$($DriveLetter):'" -ErrorAction SilentlyContinue  | select BlockSize
-    if($BlockSize -gt 0 -and $AllocationUnitSize -ne 0)
+    if($BlockSize.BlockSize -gt 0 -and $AllocationUnitSize -ne 0)
     {
         if($AllocationUnitSize -ne $BlockSize.BlockSize)
         {
