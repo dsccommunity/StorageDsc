@@ -9,11 +9,8 @@
    Future and therefore should not be altered if possible.
 #>
 
-
-# TODO: Customize these parameters...
 $Global:DSCModuleName      = 'xDisk' # Example xNetworking
 $Global:DSCResourceName    = 'MSFT_xDisk' # Example MSFT_xFirewall
-# /TODO
 
 #region HEADER
 [String] $moduleRoot = Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $Script:MyInvocation.MyCommand.Path))
@@ -46,6 +43,20 @@ try
     InModuleScope $Global:DSCResourceName {
 
         #region Pester Test Initialization
+        $global:mockedDisk0 = [pscustomobject] @{
+                Number=0
+                IsOffline = $false
+                IsReadOnly = $false
+                PartitionStyle = 'GPT'
+            }
+        $global:mockedWmi = [pscustomobject] @{BlockSize=4096}
+        $Global:mockedPartition = [pscustomobject] @{
+                    DriveLetter='F'
+                    Size=123
+                }
+        $global:mockedVolume = [pscustomobject] @{
+                    FileSystemLabel='myLabel'
+                }
         # TODO: Optopnal Load Mock for use in Pester tests here...
         #endregion
 
@@ -53,18 +64,13 @@ try
         #region Function Get-TargetResource
         Describe "$($Global:DSCResourceName)\Get-TargetResource" {
             Mock Get-WmiObject -mockwith {return [pscustomobject] @{BlockSize=4096}} -verifiable
-            Mock Get-Disk -mockwith {@{Number=0}} -verifiable
+            Mock Get-Disk -mockwith {return $global:mockedDisk0} -verifiable
             Mock Get-Partition -mockwith {
-                return [pscustomobject] @{
-                    DriveLetter='F'
-                    Size=123
-                }
+                return $Global:mockedPartition
             } -verifiable
             
             Mock Get-Volume -mockwith {
-                return [pscustomobject] @{
-                    FileSystemLabel='myLabel'
-                }
+                return $global:mockedVolume
             } -verifiable
             
             $resource = Get-TargetResource -DiskNumber 0 -DriveLetter 'G' -verbose
@@ -93,24 +99,14 @@ try
 
         #region Function Test-TargetResource
         Describe "$($Global:DSCResourceName)\Test-TargetResource" {
-            Mock Get-WmiObject -mockwith {return [pscustomobject] @{BlockSize=4096}} -verifiable
-            Mock Get-Disk -mockwith {@{
-                Number=0
-                IsOffline = $false
-                IsReadOnly = $false
-                PartitionStyle = 'GPT'
-            }} -verifiable
+            Mock Get-WmiObject -mockwith {return $global:mockedWmi} -verifiable
+            Mock Get-Disk -mockwith {return $global:mockedDisk0} -verifiable
             Mock Get-Partition -mockwith {
-                return [pscustomobject] @{
-                    DriveLetter='F'
-                    Size=123
-                }
+                return $Global:mockedPartition
             } -verifiable
             
             Mock Get-Volume -mockwith {
-                return [pscustomobject] @{
-                    FileSystemLabel='myLabel'
-                }
+                return $global:mockedVolume
             } 
             
             $script:result = $null
