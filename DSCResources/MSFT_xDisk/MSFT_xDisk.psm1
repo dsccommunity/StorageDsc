@@ -24,9 +24,10 @@ function Get-TargetResource
 
     $FSLabel = Get-Volume -DriveLetter $DriveLetter -ErrorAction SilentlyContinue | Select-Object -ExpandProperty FileSystemLabel
 
-    $BlockSize = Get-WmiObject -Query "SELECT BlockSize from Win32_Volume WHERE DriveLetter = '$($DriveLetter):'" -ErrorAction SilentlyContinue  | select BlockSize
+    $BlockSize = Get-WmiObject -Query "SELECT BlockSize from Win32_Volume WHERE DriveLetter = '$($DriveLetter):'" -ErrorAction SilentlyContinue | select -ExpandProperty BlockSize
+    
     if($BlockSize){
-        $AllocationUnitSize = $BlockSize.BlockSize
+        $AllocationUnitSize = $BlockSize
     }
 
     $returnValue = @{
@@ -196,10 +197,12 @@ function Test-TargetResource
             return $false
         }
     }
-    $BlockSize = Get-WmiObject -Query "SELECT BlockSize from Win32_Volume WHERE DriveLetter = '$($DriveLetter):'" -ErrorAction SilentlyContinue  | select BlockSize
+
+    $BlockSize = Get-WmiObject -Query "SELECT BlockSize from Win32_Volume WHERE DriveLetter = '$($DriveLetter):'" -ErrorAction SilentlyContinue  | select -ExpandProperty BlockSize
+    
     if($BlockSize -gt 0 -and $AllocationUnitSize -ne 0)
     {
-        if($AllocationUnitSize -ne $BlockSize.BlockSize)
+        if($AllocationUnitSize -ne $BlockSize)
         {
             # Just write a warning, we will not try to reformat a drive due to invalid allocation unit sizes
             Write-Verbose "Drive $DriveLetter allocation unit size does not match expected value. Current: $($BlockSize.BlockSize/1kb)kb Expected: $($AllocationUnitSize/1kb)kb"
