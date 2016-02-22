@@ -67,15 +67,11 @@ try
 
         #region Function Get-TargetResource
         Describe "$($Global:DSCResourceName)\Get-TargetResource" {
+            # verifiable (should be called) mocks 
             Mock Get-WmiObject -mockwith {return $global:mockedWmi} -verifiable
             Mock Get-Disk -mockwith {return $global:mockedDisk0} -verifiable
-            Mock Get-Partition -mockwith {
-                return $Global:mockedPartition
-            } -verifiable
-            
-            Mock Get-Volume -mockwith {
-                return $global:mockedVolume
-            } -verifiable
+            Mock Get-Partition -mockwith {return $Global:mockedPartition} -verifiable
+            Mock Get-Volume -mockwith {return $global:mockedVolume} -verifiable
             
             $resource = Get-TargetResource -DiskNumber 0 -DriveLetter 'G' -verbose
             it "DiskNumber should be 0" {
@@ -109,15 +105,13 @@ try
         #region Function Test-TargetResource
         Describe "$($Global:DSCResourceName)\Test-TargetResource" {
             context 'Test matching AllocationUnitSize' {
+                # verifiable (should be called) mocks 
                 Mock Get-WmiObject -mockwith {return $global:mockedWmi} -verifiable
                 Mock Get-Disk -mockwith {return $global:mockedDisk0} -verifiable
-                Mock Get-Partition -mockwith {
-                    return $Global:mockedPartition
-                } -verifiable
-                
-                Mock Get-Volume -mockwith {
-                    return $global:mockedVolume
-                } 
+                Mock Get-Partition -mockwith {return $Global:mockedPartition} -verifiable               
+
+                # mocks that should not be called
+                Mock Get-Volume -mockwith {return $global:mockedVolume} 
                 
                 $script:result = $null
                 
@@ -135,15 +129,13 @@ try
                 }
             }
             context 'Test mismatched AllocationUnitSize' {
+                # verifiable (should be called) mocks 
                 Mock Get-WmiObject -mockwith {return $global:mockedWmi} -verifiable
                 Mock Get-Disk -mockwith {return $global:mockedDisk0} -verifiable
-                Mock Get-Partition -mockwith {
-                    return $Global:mockedPartition
-                } -verifiable
-                
-                Mock Get-Volume -mockwith {
-                    return $global:mockedVolume
-                } 
+                Mock Get-Partition -mockwith {return $Global:mockedPartition} -verifiable
+
+                # mocks that should not be called
+                Mock Get-Volume -mockwith {return $global:mockedVolume} 
                 
                 $script:result = $null
                 
@@ -168,18 +160,16 @@ try
         #region Function Set-TargetResource
         Describe "$($Global:DSCResourceName)\Set-TargetResource" {
             context 'Online Unformated disk' {
-                Mock Get-WmiObject -mockwith {return $global:mockedWmi}
-                Mock Get-Disk -mockwith {return $global:mockedDisk0Raw} -verifiable
-                Mock Get-Partition -mockwith {
-                    return $Global:mockedPartition
-                } 
-                
-                Mock Get-Volume -mockwith {
-                    return $global:mockedVolume
-                } 
-                Mock New-Partition -mockwith { return [pscustomobject] @{DriveLetter='Z'}} -verifiable
+                # verifiable (should be called) mocks 
                 Mock Format-Volume -mockwith {} -verifiable
+                Mock Get-Disk -mockwith {return $global:mockedDisk0Raw} -verifiable
                 Mock Initialize-Disk -mockwith {} -verifiable
+                Mock New-Partition -mockwith {return [pscustomobject] @{DriveLetter='Z'}} -verifiable
+
+                # mocks that should not be called
+                Mock Get-WmiObject -mockwith {return $global:mockedWmi}
+                Mock Get-Partition -mockwith {return $Global:mockedPartition} 
+                Mock Get-Volume -mockwith {return $global:mockedVolume} 
                 Mock Set-Disk -mockwith {}
                 
                 it 'Should not throw' {
