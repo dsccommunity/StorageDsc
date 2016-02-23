@@ -90,6 +90,8 @@ We reserve resource and module names without prefixes ("x" or "c") for future us
 
 ### Unreleased
 
+* Fixed bug related to BlockSize comparison with 0 and added related tests.
+
 ### 2.4.0.0
 
 * Fixed bug where AllocationUnitSize was not used
