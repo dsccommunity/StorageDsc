@@ -24,7 +24,9 @@ function Get-TargetResource
 
     $FSLabel = Get-Volume -DriveLetter $DriveLetter -ErrorAction SilentlyContinue | Select-Object -ExpandProperty FileSystemLabel
 
-    $BlockSize = Get-WmiObject -Query "SELECT BlockSize from Win32_Volume WHERE DriveLetter = '$($DriveLetter):'" -ErrorAction SilentlyContinue  | select -ExpandProperty BlockSize
+
+    $BlockSize = Get-WmiObject -Query "SELECT BlockSize from Win32_Volume WHERE DriveLetter = '$($DriveLetter):'" -ErrorAction SilentlyContinue | select -ExpandProperty BlockSize
+    
     if($BlockSize){
         $AllocationUnitSize = $BlockSize
     }
@@ -209,7 +211,10 @@ function Test-TargetResource
             return $false
         }
     }
+
     $BlockSize = Get-WmiObject -Query "SELECT BlockSize from Win32_Volume WHERE DriveLetter = '$($DriveLetter):'" -ErrorAction SilentlyContinue  | select -ExpandProperty BlockSize
+    
+
     if($BlockSize -gt 0 -and $AllocationUnitSize -ne 0)
     {
         if($AllocationUnitSize -ne $BlockSize)
