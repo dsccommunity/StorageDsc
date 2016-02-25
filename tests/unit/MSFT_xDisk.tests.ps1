@@ -61,6 +61,7 @@ try
                 }
         $global:mockedVolume = [pscustomobject] @{
                     FileSystemLabel='myLabel'
+                    DriveLetter='F'
                 }
         #endregion
 
