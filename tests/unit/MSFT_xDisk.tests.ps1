@@ -43,13 +43,15 @@ try
 
         #region Pester Test Initialization
         $global:mockedDisk0 = [pscustomobject] @{
-                Number=0
+                Number = 0
+                DiskNumber = 0
                 IsOffline = $false
                 IsReadOnly = $false
                 PartitionStyle = 'GPT'
             }
         $global:mockedDisk0Raw = [pscustomobject] @{
                 Number=0
+                DiskNumber = 0
                 IsOffline = $false
                 IsReadOnly = $false
                 PartitionStyle = 'Raw'
@@ -61,6 +63,7 @@ try
                 }
         $global:mockedVolume = [pscustomobject] @{
                     FileSystemLabel='myLabel'
+                    DriveLetter='F'
                 }
         #endregion
 
@@ -161,27 +164,29 @@ try
         Describe "$($Global:DSCResourceName)\Set-TargetResource" {
             context 'Online Unformated disk' {
                 # verifiable (should be called) mocks 
-                Mock Format-Volume -mockwith {} -verifiable
+                Mock Format-Volume -mockwith {} 
                 Mock Get-Disk -mockwith {return $global:mockedDisk0Raw} -verifiable
                 Mock Initialize-Disk -mockwith {} -verifiable
-                Mock New-Partition -mockwith {return [pscustomobject] @{DriveLetter='Z'}} -verifiable
-
+                Mock New-Partition -mockwith {return [pscustomobject] @{DriveLetter='Z'}}
+                Mock Set-Partition -MockWith {} 
                 # mocks that should not be called
                 Mock Get-WmiObject -mockwith {return $global:mockedWmi}
-                Mock Get-Partition -mockwith {return $Global:mockedPartition} 
-                Mock Get-Volume -mockwith {return $global:mockedVolume} 
+                Mock Get-Partition -mockwith {return $Global:mockedPartition}  -verifiable
+                Mock Get-Volume -mockwith {return $global:mockedVolume} -verifiable
                 Mock Set-Disk -mockwith {}
+
                 
                 it 'Should not throw' {
-                    {Set-targetResource -diskNumber 0 -driveletter F -verbose} | should not throw
+                    {Set-targetResource -diskNumber 0 -driveletter G -verbose} | should not throw
                 }
 
                 it "the correct mocks were called" {
                     Assert-VerifiableMocks
-                    Assert-MockCalled -CommandName Get-Volume -Times 0
-                    Assert-MockCalled -CommandName Get-Partition -Times 0
+                    Assert-MockCalled -CommandName Set-Partition -Times 1 -ParameterFilter { $DriveLetter -eq 'F' -and $NewDriveLetter -eq 'G' }
+                    Assert-MockCalled -CommandName Format-Volume -Times 0
                     Assert-MockCalled -CommandName Set-Disk -Times 0
                     Assert-MockCalled -CommandName Get-WmiObject -Times 0
+                    Assert-MockCalled -CommandName New-Partition -Times 0
                 }
             }
             
