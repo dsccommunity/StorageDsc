@@ -198,7 +198,7 @@ try
                  Mock Get-Disk -mockwith {return $global:mockedDisk0Raw} -verifiable 
                  Mock Initialize-Disk -mockwith {} -verifiable 
                  Mock New-Partition -mockwith {return [pscustomobject] @{DriveLetter='Z'}} 
-                 Mock Get-Volume -mockwith {return $null} -verifiable 
+                 Mock Get-Volume -mockwith {} -verifiable 
                  
                  # mocks that should not be called 
                  Mock Get-WmiObject -mockwith {return $global:mockedWmi} 
@@ -218,7 +218,8 @@ try
                      Assert-MockCalled -CommandName Set-Partition -Times 0
                      Assert-MockCalled -CommandName Set-Disk -Times 0 
                      Assert-MockCalled -CommandName Get-WmiObject -Times 0 
-
+                     Assert-MockCalled -CommandName Initialize-Disk -Times 1
+                     Assert-MockCalled -CommandName Get-Disk -Times 1
                  } 
             }
             # TODO: Complete Tests...
