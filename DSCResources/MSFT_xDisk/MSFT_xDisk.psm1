@@ -146,7 +146,8 @@ function Set-TargetResource
     }    
     catch
     {
-        Throw "Disk Set-TargetResource failed with the following error: '$($Error[0])'"
+        $message = $_.Exception.Message
+        Throw "Disk Set-TargetResource failed with the following error: '$($message)'"
     }
 }
 
