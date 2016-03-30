@@ -24,9 +24,10 @@ function Get-TargetResource
 
     $FSLabel = Get-Volume -DriveLetter $DriveLetter -ErrorAction SilentlyContinue | Select-Object -ExpandProperty FileSystemLabel
 
-    $BlockSize = Get-WmiObject -Query "SELECT BlockSize from Win32_Volume WHERE DriveLetter = '$($DriveLetter):'" -ErrorAction SilentlyContinue  | select BlockSize
+    $BlockSize = Get-WmiObject -Query "SELECT BlockSize from Win32_Volume WHERE DriveLetter = '$($DriveLetter):'" -ErrorAction SilentlyContinue | select -ExpandProperty BlockSize
+    
     if($BlockSize){
-        $AllocationUnitSize = $BlockSize.BlockSize
+        $AllocationUnitSize = $BlockSize
     }
 
     $returnValue = @{
@@ -88,48 +89,61 @@ function Set-TargetResource
             }
         }
 
-        Write-Verbose -Message "Creating the partition..."
-        $PartParams = @{
-                        DriveLetter = $DriveLetter;
-                        DiskNumber = $DiskNumber
-                        }
-        if ($Size)
-        {
-            $PartParams["Size"] = $Size
-        }
-        else
-        {
-            $PartParams["UseMaximumSize"] = $true
-        }
-
-        $Partition = New-Partition @PartParams
+        # Check if existing partition already has file system on it
         
-        # Sometimes the disk will still be read-only after the call to New-Partition returns.
-        Start-Sleep -Seconds 5
-
-        Write-Verbose -Message "Formatting the volume..."
-        $VolParams = @{
-                      FileSystem = "NTFS";
-                      Confirm = $false
-                      }
-
-        if ($FSLabel)
+        if (($Disk | Get-Partition | Get-Volume ) -eq $null)
         {
-            $VolParams["NewFileSystemLabel"] = $FSLabel
+
+
+            Write-Verbose -Message "Creating the partition..."
+            $PartParams = @{
+                            DriveLetter = $DriveLetter;
+                            DiskNumber = $DiskNumber
+                            }
+            if ($Size)
+            {
+                $PartParams["Size"] = $Size
+            }
+            else
+            {
+                $PartParams["UseMaximumSize"] = $true
+            }
+
+            $Partition = New-Partition @PartParams
+            
+            # Sometimes the disk will still be read-only after the call to New-Partition returns.
+            Start-Sleep -Seconds 5
+
+            Write-Verbose -Message "Formatting the volume..."
+            $VolParams = @{
+                        FileSystem = "NTFS";
+                        Confirm = $false
+                        }
+
+            if ($FSLabel)
+            {
+                $VolParams["NewFileSystemLabel"] = $FSLabel
+            }
+            if($AllocationUnitSize)
+            {
+                $VolParams["AllocationUnitSize"] = $AllocationUnitSize 
+            }
+
+            $Volume = $Partition | Format-Volume @VolParams
+
+
+            if ($Volume)
+            {
+                Write-Verbose -Message "Successfully initialized '$($DriveLetter)'."
+            }
         }
-        if($AllocationUnitSize)
+        else 
         {
-            $VolParams["AllocationUnitSize"] = $AllocationUnitSize 
+            Write-Verbose -Message "The volume already exists, adjusting drive letter..."
+            $VolumeDriveLetter = ($Disk | Get-Partition | Get-Volume).driveletter
+            Set-Partition -DriveLetter $VolumeDriveLetter -NewDriveLetter $DriveLetter
         }
-
-        $Volume = $Partition | Format-Volume @VolParams
-
-
-        if ($Volume)
-        {
-            Write-Verbose -Message "Successfully initialized '$($DriveLetter)'."
-        }
-    }
+    }    
     catch
     {
         Throw "Disk Set-TargetResource failed with the following error: '$($Error[0])'"
@@ -196,10 +210,12 @@ function Test-TargetResource
             return $false
         }
     }
-    $BlockSize = Get-WmiObject -Query "SELECT BlockSize from Win32_Volume WHERE DriveLetter = '$($DriveLetter):'" -ErrorAction SilentlyContinue  | select BlockSize
+
+    $BlockSize = Get-WmiObject -Query "SELECT BlockSize from Win32_Volume WHERE DriveLetter = '$($DriveLetter):'" -ErrorAction SilentlyContinue  | select -ExpandProperty BlockSize
+    
     if($BlockSize -gt 0 -and $AllocationUnitSize -ne 0)
     {
-        if($AllocationUnitSize -ne $BlockSize.BlockSize)
+        if($AllocationUnitSize -ne $BlockSize)
         {
             # Just write a warning, we will not try to reformat a drive due to invalid allocation unit sizes
             Write-Verbose "Drive $DriveLetter allocation unit size does not match expected value. Current: $($BlockSize.BlockSize/1kb)kb Expected: $($AllocationUnitSize/1kb)kb"
