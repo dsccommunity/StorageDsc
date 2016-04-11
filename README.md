@@ -95,6 +95,7 @@ We reserve resource and module names without prefixes ("x" or "c") for future us
 * added test for existing file system to allow simple drive letter assignment in MSFT_xDisk.psm1 
 * modified Test verbose message to correctly reflect blocksize value in MSFT_xDisk.psm1 line 217
 * added unit test for new volume with out existing partition for MSFT_xDisk.psm1 
+* Fixed error propagation
 
 ### 2.4.0.0
 
