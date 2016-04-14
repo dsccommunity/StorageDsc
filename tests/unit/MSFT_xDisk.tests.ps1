@@ -71,7 +71,8 @@ try
         #region Function Get-TargetResource
         Describe "$($Global:DSCResourceName)\Get-TargetResource" {
             # verifiable (should be called) mocks 
-            Mock Get-WmiObject -mockwith {return $global:mockedWmi} -verifiable
+            Mock Get-WmiObject -mockwith {return $global:mockedWmi}
+            Mock Get-CimInstance -mockwith {return $global:mockedWmi} 
             Mock Get-Disk -mockwith {return $global:mockedDisk0} -verifiable
             Mock Get-Partition -mockwith {return $Global:mockedPartition} -verifiable
             Mock Get-Volume -mockwith {return $global:mockedVolume} -verifiable
@@ -109,7 +110,8 @@ try
         Describe "$($Global:DSCResourceName)\Test-TargetResource" {
             context 'Test matching AllocationUnitSize' {
                 # verifiable (should be called) mocks 
-                Mock Get-WmiObject -mockwith {return $global:mockedWmi} -verifiable
+                Mock Get-WmiObject -mockwith {return $global:mockedWmi} 
+                Mock Get-CimInstance -mockwith {return $global:mockedWmi} 
                 Mock Get-Disk -mockwith {return $global:mockedDisk0} -verifiable
                 Mock Get-Partition -mockwith {return $Global:mockedPartition} -verifiable               
 
@@ -133,7 +135,8 @@ try
             }
             context 'Test mismatched AllocationUnitSize' {
                 # verifiable (should be called) mocks 
-                Mock Get-WmiObject -mockwith {return $global:mockedWmi} -verifiable
+                Mock Get-WmiObject -mockwith {return $global:mockedWmi} 
+                Mock Get-CimInstance -mockwith {return $global:mockedWmi} 
                 Mock Get-Disk -mockwith {return $global:mockedDisk0} -verifiable
                 Mock Get-Partition -mockwith {return $Global:mockedPartition} -verifiable
 
@@ -172,6 +175,7 @@ try
                 
                 # mocks that should not be called
                 Mock Get-WmiObject -mockwith {return $global:mockedWmi}
+                Mock Get-CimInstance -mockwith {return $global:mockedWmi}
                 Mock Get-Partition -mockwith {return $Global:mockedPartition}  -verifiable
                 Mock Get-Volume -mockwith {return $global:mockedVolume} -verifiable
                 Mock Set-Disk -mockwith {}
@@ -202,6 +206,7 @@ try
                  
                  # mocks that should not be called 
                  Mock Get-WmiObject -mockwith {return $global:mockedWmi} 
+                 Mock Get-CimInstance -mockwith {return $global:mockedWmi} 
                  Mock Get-Partition -mockwith {return $Global:mockedPartition}  -verifiable 
                  Mock Set-Disk -mockwith {} 
                  Mock Set-Partition -MockWith {}  
