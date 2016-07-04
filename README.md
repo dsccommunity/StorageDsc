@@ -11,7 +11,7 @@ This module contains the **xMountImage, xDisk, and xWaitForDisk** resources.  Th
 Before beginning that operation, the disk is marked 'Online' and if it is set to 'Read-Only', that property is removed.
 While this is intended to be non-destructive, as with all expiremental resources the scripts contained should be thoroughly evaluated and well understood before implementing in a production environment or where disk modifications could result in lost data.
 
-**All of the resources in the DSC Resource Kit are provided AS IS, and are not supported through any Microsoft standard support program or service. The "x" in xDiskImage stands for experimental**, which means that these resources will be **fix forward** and monitored by the module owner(s).
+**All of the resources in the DSC Resource Kit are provided AS IS, and are not supported through any Microsoft standard support program or service. The "x" in xStorage stands for experimental**, which means that these resources will be **fix forward** and monitored by the module owner(s).
 
 Please leave comments, feature requests, and bug reports in the Q & A tab for
 this module.
@@ -27,7 +27,7 @@ To install **xstorage** module
 
 -   If you are using WMF4 / PowerShell Version 4: Unzip the content under $env:ProgramFilesWindowsPowerShellModules folder
 
--   If you are using WMF5 Preview: From an elevated PowerShell session run ‘Install-Module xDiskImage’
+-   If you are using WMF5 Preview: From an elevated PowerShell session run ‘Install-Module xStorage’
 
 To confirm installation
 
