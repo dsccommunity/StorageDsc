@@ -9,7 +9,7 @@
    Future and therefore should not be altered if possible.
 #>
 
-$Global:DSCModuleName      = 'xDisk' # Example xNetworking
+$Global:DSCModuleName      = 'xStorage' # Example xNetworking
 $Global:DSCResourceName    = 'MSFT_xDisk' # Example MSFT_xFirewall
 
 #region HEADER
