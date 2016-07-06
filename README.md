@@ -1,4 +1,4 @@
-[![Build status](https://ci.appveyor.com/api/projects/status/1j95juvceu39ekm7/branch/master?svg=true)](https://ci.appveyor.com/project/PowerShell/xstorage/branch/master)
+﻿[![Build status](https://ci.appveyor.com/api/projects/status/1j95juvceu39ekm7/branch/master?svg=true)](https://ci.appveyor.com/project/PowerShell/xstorage/branch/master)
 
 
 # xStorage
@@ -92,6 +92,7 @@ For more information see the [Code of Conduct FAQ](https://opensource.microsoft.
 ## Versions
 
 ### Unreleased
+* Converted appveyor.yml to install Pester from PSGallery instead of from Chocolatey.
 
 ### 2.6.0.0
 * MSFT_xDisk: Replaced Get-WmiObject with Get-CimInstance
