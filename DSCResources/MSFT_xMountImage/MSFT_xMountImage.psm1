@@ -91,7 +91,7 @@ function Set-TargetResource
         }
 
         #Verify drive letter        
-        $CimVolume = Get-CimInstance -ClassName Win32_Volume | where {$_.DeviceId -eq $Image.ObjectId}
+        $CimVolume = Get-CimInstance -ClassName Win32_Volume | where {$_.Name -eq "$($Image.DriveLetter):\"}
         If($CimVolume.DriveLetter -ne $DriveLetter)
         {
             Write-Verbose "Drive letter does not match expected value. Expected DriveLetter $DriveLetter Actual DriverLetter $($CimVolume.DriveLetter)"
@@ -152,7 +152,7 @@ function Test-TargetResource
         }
 
         #Verify drive letter        
-        $CimVolume = Get-CimInstance -ClassName Win32_Volume | where {$_.DeviceId -eq $Image.ObjectId}
+        $CimVolume = Get-CimInstance -ClassName Win32_Volume | where {$_.Name -eq "$($Image.DriveLetter):\"}
         If($CimVolume.DriveLetter -ne $DriveLetter)
         {
             Write-Verbose "Drive letter does not match expected value. Expected DriveLetter $DriveLetter Actual DriverLetter $($CimVolume.DriveLetter)"
