@@ -143,9 +143,20 @@ function Set-TargetResource
         }
         else 
         {
-            Write-Verbose -Message "The volume already exists, adjusting drive letter..."
-            $VolumeDriveLetter = ($Disk | Get-Partition | Get-Volume).driveletter
-            Set-Partition -DriveLetter $VolumeDriveLetter -NewDriveLetter $DriveLetter
+            $Volume = $Disk | Get-Partition | Get-Volume
+            
+            if ($Volume.DriveLetter -ne $DriveLetter)
+            {
+
+                Write-Verbose -Message "The drive letter has changed, resetting drive letter"
+                Set-Partition -DriveLetter $Volume.DriveLetter -NewDriveLetter $DriveLetter
+            }
+
+            if ($Volume.FileSystemLabel -ne $FSLabel)
+            {
+                Write-Verbose -Message "The volume label has changed, resetting label"
+                Set-Volume -FileSystemLabel $Volume.FileSystemLabel -NewFileSystemLabel $FSLabel
+            }
         }
     }    
     catch
