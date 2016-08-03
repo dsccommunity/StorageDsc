@@ -10,7 +10,7 @@
 # RootModule = ''
 
 # Version number of this module.
-ModuleVersion = '2.4.0.0'
+ModuleVersion = '2.6.0.0'
 
 # ID used to uniquely identify this module
 GUID = '00d73ca1-58b5-46b7-ac1a-5bfcf5814faf'
@@ -102,7 +102,9 @@ PrivateData = @{
         # IconUri = ''
 
         # ReleaseNotes of this module
-        # ReleaseNotes = ''
+        ReleaseNotes = '* MSFT_xDisk: Replaced Get-WmiObject with Get-CimInstance
+
+'
 
     } # End of PSData hashtable
 

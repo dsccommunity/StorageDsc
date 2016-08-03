@@ -1,9 +1,9 @@
-[![Build status](https://ci.appveyor.com/api/projects/status/1j95juvceu39ekm7/branch/master?svg=true)](https://ci.appveyor.com/project/PowerShell/xstorage/branch/master)
+﻿[![Build status](https://ci.appveyor.com/api/projects/status/1j95juvceu39ekm7/branch/master?svg=true)](https://ci.appveyor.com/project/PowerShell/xstorage/branch/master)
 
 
 # xStorage
 
-?The **xStorage** module is a part of the Windows PowerShell Desired State Configuration (DSC) Resource Kit, which is a collection of DSC Resources.
+The **xStorage** module is a part of the Windows PowerShell Desired State Configuration (DSC) Resource Kit, which is a collection of DSC Resources.
 
 This module contains the **xMountImage, xDisk, and xWaitForDisk** resources.  The xMountImage resource can be used to mount or unmount an ISO/VHD disk image to the local file system, with simple declarative language.  The xDisk and xWaitforDisk resources enable you to wait for a disk to become available and then initialize, format, and bring it online using PowerShell DSC.
 
@@ -11,7 +11,7 @@ This module contains the **xMountImage, xDisk, and xWaitForDisk** resources.  Th
 Before beginning that operation, the disk is marked 'Online' and if it is set to 'Read-Only', that property is removed.
 While this is intended to be non-destructive, as with all expiremental resources the scripts contained should be thoroughly evaluated and well understood before implementing in a production environment or where disk modifications could result in lost data.
 
-**All of the resources in the DSC Resource Kit are provided AS IS, and are not supported through any Microsoft standard support program or service. The "x" in xDiskImage stands for experimental**, which means that these resources will be **fix forward** and monitored by the module owner(s).
+**All of the resources in the DSC Resource Kit are provided AS IS, and are not supported through any Microsoft standard support program or service. The "x" in xStorage stands for experimental**, which means that these resources will be **fix forward** and monitored by the module owner(s).
 
 Please leave comments, feature requests, and bug reports in the Q & A tab for
 this module.
@@ -27,7 +27,7 @@ To install **xstorage** module
 
 -   If you are using WMF4 / PowerShell Version 4: Unzip the content under $env:ProgramFilesWindowsPowerShellModules folder
 
--   If you are using WMF5 Preview: From an elevated PowerShell session run ‘Install-Module xDiskImage’
+-   If you are using WMF5 Preview: From an elevated PowerShell session run ‘Install-Module xStorage’
 
 To confirm installation
 
@@ -86,13 +86,23 @@ choice
 
 We reserve resource and module names without prefixes ("x" or "c") for future use (e.g. "MSFT_Resource"). If the next version of Windows Server ships with a "DiskImage" resource, we don't want to break any configurations that use any community modifications. Please keep a prefix such as "c" on all community modifications.
 
+This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/).
+For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
+
 ## Versions
 
 ### Unreleased
+* Converted appveyor.yml to install Pester from PSGallery instead of from Chocolatey.
+
+### 2.6.0.0
+* MSFT_xDisk: Replaced Get-WmiObject with Get-CimInstance
+
+### 2.5.0.0
 
 * added test for existing file system to allow simple drive letter assignment in MSFT_xDisk.psm1 
 * modified Test verbose message to correctly reflect blocksize value in MSFT_xDisk.psm1 line 217
 * added unit test for new volume with out existing partition for MSFT_xDisk.psm1 
+* Fixed error propagation
 
 ### 2.4.0.0
 
