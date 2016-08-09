@@ -146,6 +146,7 @@ function Set-TargetResource
             Write-Verbose -Message "The volume already exists, adjusting drive letter..."
 
             $VolumeDriveLetter = ($Disk | Get-Partition | Get-Volume).driveletter
+            
             if ($VolumeDriveLetter -ne $null) 
             {
                 Set-Partition -DriveLetter $VolumeDriveLetter -NewDriveLetter $DriveLetter
