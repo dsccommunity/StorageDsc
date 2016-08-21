@@ -1,6 +1,25 @@
-#
-# xWaitForDisk: DSC resource to wait for a disk to be available
-#
+#region localizeddata
+if (Test-Path "${PSScriptRoot}\${PSUICulture}")
+{
+    Import-LocalizedData `
+        -BindingVariable LocalizedData `
+        -Filename MSFT_xWaitForDisk.strings.psd1 `
+        -BaseDirectory "${PSScriptRoot}\${PSUICulture}"
+}
+else
+{
+    #fallback to en-US
+    Import-LocalizedData `
+        -BindingVariable LocalizedData `
+        -Filename MSFT_xWaitForDisk.strings.psd1 `
+        -BaseDirectory "${PSScriptRoot}\en-US"
+}
+#endregion
+
+# Import the common storage functions
+Import-Module -Name ( Join-Path `
+    -Path (Split-Path -Path $PSScriptRoot -Parent) `
+    -ChildPath '\MSFT_xStorageCommon\MSFT_xStorageCommon.psm1' )
 
 function Get-TargetResource
 {
@@ -8,7 +27,7 @@ function Get-TargetResource
     param
     (
         [parameter(Mandatory)]
-        [uint32] $DiskNumber,        
+        [uint32] $DiskNumber,
 
         [UInt64]$RetryIntervalSec = 10,
 
@@ -28,7 +47,7 @@ function Set-TargetResource
     param
     (
         [parameter(Mandatory)]
-        [uint32] $DiskNumber,        
+        [uint32] $DiskNumber,
 
         [UInt64]$RetryIntervalSec = 10,
 
@@ -67,7 +86,7 @@ function Test-TargetResource
     param
     (
         [parameter(Mandatory)]
-        [uint32] $DiskNumber,        
+        [uint32] $DiskNumber,
 
         [UInt64]$RetryIntervalSec = 10,
 

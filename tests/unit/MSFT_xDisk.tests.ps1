@@ -1,14 +1,3 @@
-<#
-.Synopsis
-   Unit tests for xDisk
-.DESCRIPTION
-   Unit tests for xDisk
-
-.NOTES
-   Code in HEADER and FOOTER regions are standard and may be moved into DSCResource.Tools in
-   Future and therefore should not be altered if possible.
-#>
-
 $Global:DSCModuleName      = 'xStorage' # Example xNetworking
 $Global:DSCResourceName    = 'MSFT_xDisk' # Example MSFT_xFirewall
 
@@ -27,7 +16,7 @@ Import-Module (Join-Path -Path $moduleRoot -ChildPath 'DSCResource.Tests\TestHel
 $TestEnvironment = Initialize-TestEnvironment `
     -DSCModuleName $Global:DSCModuleName `
     -DSCResourceName $Global:DSCResourceName `
-    -TestType Unit 
+    -TestType Unit
 #endregion
 
 
@@ -75,17 +64,17 @@ try
 
         #region Function Get-TargetResource
         Describe "$($Global:DSCResourceName)\Get-TargetResource" {
-            # verifiable (should be called) mocks 
+            # verifiable (should be called) mocks
             Mock Get-WmiObject -mockwith {return $global:mockedWmi}
-            Mock Get-CimInstance -mockwith {return $global:mockedWmi} 
+            Mock Get-CimInstance -mockwith {return $global:mockedWmi}
             Mock Get-Disk -mockwith {return $global:mockedDisk0} -verifiable
             Mock Get-Partition -mockwith {return $Global:mockedPartition} -verifiable
             Mock Get-Volume -mockwith {return $global:mockedVolume} -verifiable
-            
+
             $resource = Get-TargetResource -DiskNumber 0 -DriveLetter 'G' -verbose
             it "DiskNumber should be 0" {
                 $resource.DiskNumber | should be 0
-            } 
+            }
 
             it "DriveLetter should be F" {
                 $resource.DriveLetter | should be 'F'
@@ -106,7 +95,7 @@ try
             it "all the get mocks should be called" {
                 Assert-VerifiableMocks
             }
-            
+
         }
         #endregion
 
@@ -114,24 +103,24 @@ try
         #region Function Test-TargetResource
         Describe "$($Global:DSCResourceName)\Test-TargetResource" {
             context 'Test matching AllocationUnitSize' {
-                # verifiable (should be called) mocks 
-                Mock Get-WmiObject -mockwith {return $global:mockedWmi} 
-                Mock Get-CimInstance -mockwith {return $global:mockedWmi} 
+                # verifiable (should be called) mocks
+                Mock Get-WmiObject -mockwith {return $global:mockedWmi}
+                Mock Get-CimInstance -mockwith {return $global:mockedWmi}
                 Mock Get-Disk -mockwith {return $global:mockedDisk0} -verifiable
-                Mock Get-Partition -mockwith {return $Global:mockedPartition} -verifiable               
+                Mock Get-Partition -mockwith {return $Global:mockedPartition} -verifiable
 
                 # mocks that should not be called
-                Mock Get-Volume -mockwith {return $global:mockedVolume} 
-                
+                Mock Get-Volume -mockwith {return $global:mockedVolume}
+
                 $script:result = $null
-                
+
                 it 'calling test should not throw' {
                     {$script:result = Test-TargetResource -DiskNumber 0 -DriveLetter 'F' -AllocationUnitSize 4096 -verbose} | should not throw
                 }
 
                 it "result should be true" {
                     $script:result | should be $true
-                } 
+                }
 
                 it "the correct mocks were called" {
                     Assert-VerifiableMocks
@@ -139,17 +128,17 @@ try
                 }
             }
             context 'Test mismatched AllocationUnitSize' {
-                # verifiable (should be called) mocks 
-                Mock Get-WmiObject -mockwith {return $global:mockedWmi} 
-                Mock Get-CimInstance -mockwith {return $global:mockedWmi} 
+                # verifiable (should be called) mocks
+                Mock Get-WmiObject -mockwith {return $global:mockedWmi}
+                Mock Get-CimInstance -mockwith {return $global:mockedWmi}
                 Mock Get-Disk -mockwith {return $global:mockedDisk0} -verifiable
                 Mock Get-Partition -mockwith {return $Global:mockedPartition} -verifiable
 
                 # mocks that should not be called
-                Mock Get-Volume -mockwith {return $global:mockedVolume} 
-                
+                Mock Get-Volume -mockwith {return $global:mockedVolume}
+
                 $script:result = $null
-                
+
                 it 'calling test should not throw' {
                     {$script:result = Test-TargetResource -DiskNumber 0 -DriveLetter 'F' -AllocationUnitSize 4097 -verbose} | should not throw
                 }
@@ -157,7 +146,7 @@ try
                 # skipped due to:  https://github.com/PowerShell/xStorage/issues/22
                 it "result should be true" -skip {
                     $script:result | should be $false
-                } 
+                }
 
                 it "the correct mocks were called" {
                     Assert-VerifiableMocks
@@ -171,21 +160,21 @@ try
         #region Function Set-TargetResource
         Describe "$($Global:DSCResourceName)\Set-TargetResource" {
             context 'Online Formatted disk' {
-                # verifiable (should be called) mocks 
+                # verifiable (should be called) mocks
                 Mock Get-Disk -mockwith {return $global:mockedDisk0Raw} -verifiable
-                Mock Set-Partition -MockWith {} 
+                Mock Set-Partition -MockWith {}
                 Mock Get-Partition -mockwith {return $Global:mockedPartition}  -verifiable
                 Mock Get-Volume -mockwith {return $global:mockedVolume} -verifiable
-                
+
                 # mocks that should not be called
                 Mock Get-WmiObject -mockwith {return $global:mockedWmi}
                 Mock Get-CimInstance -mockwith {return $global:mockedWmi}
                 Mock Set-Disk -mockwith {}
-                Mock Format-Volume -mockwith {} 
+                Mock Format-Volume -mockwith {}
                 Mock Initialize-Disk -mockwith {} -verifiable
                 Mock New-Partition -mockwith {return [pscustomobject] @{DriveLetter='Z'}}
 
-                
+
                 it 'Should not throw' {
                     {Set-targetResource -diskNumber 0 -driveletter G -verbose} | should not throw
                 }
@@ -203,11 +192,11 @@ try
             }
 
             context 'Online Formatted disk No Drive Letter' {
-                # verifiable (should be called) mocks 
+                # verifiable (should be called) mocks
                 Mock Get-Disk -mockwith {return $global:mockedDisk0Raw} -verifiable
                 Mock Get-Partition -mockwith {return $Global:mockedPartition}  -verifiable
                 Mock Get-Volume -mockwith {return $global:mockedVolumeNoLetter} -verifiable
-                Mock Set-Partition -MockWith {} 
+                Mock Set-Partition -MockWith {}
 
 
                 # mocks that should not be called
@@ -215,10 +204,10 @@ try
                 Mock Get-CimInstance -mockwith {return $global:mockedWmi}
                 Mock Set-Disk -mockwith {}
                 Mock New-Partition -mockwith {return [pscustomobject] @{DriveLetter='Z'}}
-                Mock Format-Volume -mockwith {} 
+                Mock Format-Volume -mockwith {}
                 Mock Initialize-Disk -mockwith {} -verifiable
 
-                
+
                 it 'Should not throw' {
                     {Set-targetResource -diskNumber 0 -driveletter G -verbose} | should not throw
                 }
@@ -234,36 +223,36 @@ try
                     Assert-MockCalled -CommandName New-Partition -Times 0
                 }
             }
-            context 'Online Unformatted disk' { 
-                 # verifiable (should be called) mocks  
-                 Mock Format-Volume -mockwith {}  
-                 Mock Get-Disk -mockwith {return $global:mockedDisk0Raw} -verifiable 
-                 Mock Initialize-Disk -mockwith {} -verifiable 
-                 Mock New-Partition -mockwith {return [pscustomobject] @{DriveLetter='Z'}} 
-                 Mock Get-Volume -mockwith {} -verifiable 
-                 
-                 # mocks that should not be called 
-                 Mock Get-WmiObject -mockwith {return $global:mockedWmi} 
-                 Mock Get-CimInstance -mockwith {return $global:mockedWmi} 
-                 Mock Get-Partition -mockwith {return $Global:mockedPartition}  -verifiable 
-                 Mock Set-Disk -mockwith {} 
-                 Mock Set-Partition -MockWith {}  
- 
-                  
-                 it 'Should not throw' { 
-                     {Set-targetResource -diskNumber 0 -driveletter G -verbose} | should not throw 
-                 } 
- 
-                  it "the correct mocks were called" { 
+            context 'Online Unformatted disk' {
+                 # verifiable (should be called) mocks
+                 Mock Format-Volume -mockwith {}
+                 Mock Get-Disk -mockwith {return $global:mockedDisk0Raw} -verifiable
+                 Mock Initialize-Disk -mockwith {} -verifiable
+                 Mock New-Partition -mockwith {return [pscustomobject] @{DriveLetter='Z'}}
+                 Mock Get-Volume -mockwith {} -verifiable
+
+                 # mocks that should not be called
+                 Mock Get-WmiObject -mockwith {return $global:mockedWmi}
+                 Mock Get-CimInstance -mockwith {return $global:mockedWmi}
+                 Mock Get-Partition -mockwith {return $Global:mockedPartition}  -verifiable
+                 Mock Set-Disk -mockwith {}
+                 Mock Set-Partition -MockWith {}
+
+
+                 it 'Should not throw' {
+                     {Set-targetResource -diskNumber 0 -driveletter G -verbose} | should not throw
+                 }
+
+                  it "the correct mocks were called" {
                      Assert-VerifiableMocks
-                     Assert-MockCalled -CommandName New-Partition -Times 1  
-                     Assert-MockCalled -CommandName Format-Volume -Times 1                     
+                     Assert-MockCalled -CommandName New-Partition -Times 1
+                     Assert-MockCalled -CommandName Format-Volume -Times 1
                      Assert-MockCalled -CommandName Set-Partition -Times 0
-                     Assert-MockCalled -CommandName Set-Disk -Times 0 
-                     Assert-MockCalled -CommandName Get-WmiObject -Times 0 
+                     Assert-MockCalled -CommandName Set-Disk -Times 0
+                     Assert-MockCalled -CommandName Get-WmiObject -Times 0
                      Assert-MockCalled -CommandName Initialize-Disk -Times 1
                      Assert-MockCalled -CommandName Get-Disk -Times 1
-                 } 
+                 }
             }
             # TODO: Complete Tests...
         }

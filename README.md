@@ -1,110 +1,62 @@
 ﻿[![Build status](https://ci.appveyor.com/api/projects/status/1j95juvceu39ekm7/branch/master?svg=true)](https://ci.appveyor.com/project/PowerShell/xstorage/branch/master)
 
-
 # xStorage
 
 The **xStorage** module is a part of the Windows PowerShell Desired State Configuration (DSC) Resource Kit, which is a collection of DSC Resources.
 
-This module contains the **xMountImage, xDisk, and xWaitForDisk** resources.  The xMountImage resource can be used to mount or unmount an ISO/VHD disk image to the local file system, with simple declarative language.  The xDisk and xWaitforDisk resources enable you to wait for a disk to become available and then initialize, format, and bring it online using PowerShell DSC.
-
-**NOTE:** The xDisk resource follows a process to detect the existance of a RAW disk, initialize the disk, create a volume, assign a drive letter of specific size (if provided) or maximum size, then format the new volume using NTFS and assign a volume label if one is provided.
-Before beginning that operation, the disk is marked 'Online' and if it is set to 'Read-Only', that property is removed.
-While this is intended to be non-destructive, as with all expiremental resources the scripts contained should be thoroughly evaluated and well understood before implementing in a production environment or where disk modifications could result in lost data.
-
-**All of the resources in the DSC Resource Kit are provided AS IS, and are not supported through any Microsoft standard support program or service. The "x" in xStorage stands for experimental**, which means that these resources will be **fix forward** and monitored by the module owner(s).
-
-Please leave comments, feature requests, and bug reports in the Q & A tab for
-this module.
-
-If you would like to modify this module, feel free. When modifying, please update the module name, resource friendly name, and MOF class name (instructions below). As specified in the license, you may copy or modify this resource as long as they are used on the Windows Platform.
-
-For more information about Windows PowerShell Desired State Configuration, check out the blog posts on the [PowerShell Blog](http://blogs.msdn.com/b/powershell/) ([this](http://blogs.msdn.com/b/powershell/archive/2013/11/01/configuration-in-a-devops-world-windows-powershell-desired-state-configuration.aspx) is a good starting point). There are also great community resources, such as [PowerShell.org](http://powershell.org/wp/tag/dsc/), or [PowerShell Magazine](http://www.powershellmagazine.com/tag/dsc/). For more information on the DSC Resource Kit, checkout [this blog post](http://go.microsoft.com/fwlink/?LinkID=389546).
-
-Installation
-------------
-
-To install **xstorage** module
-
--   If you are using WMF4 / PowerShell Version 4: Unzip the content under $env:ProgramFilesWindowsPowerShellModules folder
-
--   If you are using WMF5 Preview: From an elevated PowerShell session run ‘Install-Module xStorage’
-
-To confirm installation
-
--   Run Get-DSCResource to see that the resources listed above are among the DSC Resources displayed
-
-Requirements
-------------
-
-This module requires the latest version of PowerShell (v4.0, which ships in
-Windows 8.1 or Windows Server 2012R2). To easily use PowerShell 4.0 on older
-operating systems, install WMF 4.0. Please read the installation instructions
-that are present on both the download page and the release notes for WMF 4.0.
-
-Details
--------
-
-**xMountImage** resource has following properties
-
-- **Name**: This setting provides a unique name for the configuration
-- **ImagePath**: Specifies the path of the VHD or ISO file
-- **DriveLetter**: Specifies the drive letter after the ISO is mounted
-- **Ensure**: Determines whether the setting should be applied or removed
-
-**xDisk** resource has following properties:
-
-*   **DiskNumber**: Specifies the identifier for which disk to modify.
-*   **DriveLetter**: Specifies the preffered letter to assign to the disk volume.
-*   **Size**: Specifies the size of new volume (use all available space on disk if not provided).
-*   **FSLabel**: Define volume label if required.
-*   **AllocationUnitSize**: Specifies the allocation unit size to use when formatting the volume.
-
-
-**xWaitforDisk** resource has following properties:
-
-*   **DiskNumber**: Specifies the identifer for which disk to wait for.
-*   **RetryIntervalSec**: Specifies the number of secods to wait for the disk to become available.
-*   **RetryCount**: The number of times to loop the retry interval while waiting for the disk.
-
-Renaming Requirements
----------------------
-
-When making changes to these resources, we suggest the following practice
-
-1. Update the following names by replacing MSFT with your company/community name
-and replacing the **"x" with **"c" (short for "Community") or another prefix of your
-choice
- -	Module name (ex: xModule becomes cModule)
- -	Resource folder (ex: MSFT\_xResource becomes Contoso\_xResource)
- -	Resource Name (ex: MSFT\_xResource becomes Contoso\_cResource)
- -	Resource Friendly Name (ex: xResource becomes cResource)
- -	MOF class name (ex: MSFT\_xResource becomes Contoso\_cResource)
- -	Filename for the <resource\>.schema.mof (ex: MSFT\_xResource.schema.mof becomes Contoso\_cResource.schema.mof)
-
-2. Update module and metadata information in the module manifest  
-3. Update any configuration that use these resources
-
-We reserve resource and module names without prefixes ("x" or "c") for future use (e.g. "MSFT_Resource"). If the next version of Windows Server ships with a "DiskImage" resource, we don't want to break any configurations that use any community modifications. Please keep a prefix such as "c" on all community modifications.
-
 This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/).
 For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
+
+## Contributing
+Please check out common DSC Resources [contributing guidelines](https://github.com/PowerShell/DscResource.Kit/blob/master/CONTRIBUTING.md).
+
+## Requirements
+This module requires the latest version of PowerShell (v4.0, which ships in Windows 8.1 or Windows Server 2012R2).
+To easily use PowerShell 4.0 on older operating systems, install WMF 4.0.
+Please read the installation instructions that are present on both the download page and the release notes for WMF 4.0.
+
+## Resources
+* **xMountImage**: used to mount or unmount an ISO/VHD disk image to the local file system, with simple declarative language.
+* **xDisk**: used to initialize, format and mount the partition as a drive letter.
+* **xWaitForDisk** wait for a disk to become available.
+
+### xMountImage
+
+* **[String] Name**: This setting provides a unique name for the configuration. Key.
+* **[String] ImagePath**: Specifies the path of the VHD or ISO file. Required.
+* **[String] DriveLetter**: Specifies the drive letter after the ISO is mounted. Optional.
+* **[String] Ensure**: Determines whether the setting should be applied or removed. Optional. { *Present* | Absent }. Defaults to Present.
+
+### xDisk
+
+* **[UInt32] DiskNumber**: Specifies the identifier for which disk to modify. Key.
+* **[String] DriveLetter**: Specifies the preferred letter to assign to the disk volume. Required.
+* **[Uint64] Size**: Specifies the size of new volume (use all available space on disk if not provided). Optional.
+* **[String] FSLabel**: Define volume label if required. Optional.
+* **[UInt32] AllocationUnitSize**: Specifies the allocation unit size to use when formatting the volume. Optional.
+
+### xWaitforDisk
+
+*   **[UInt32] DiskNumber**: Specifies the identifier for which disk to wait for. Key.
+*   **[UInt64] RetryIntervalSec**: Specifies the number of seconds to wait for the disk to become available. Optional.
+*   **[UInt32] RetryCount**: The number of times to loop the retry interval while waiting for the disk. Optional.
 
 ## Versions
 
 ### Unreleased
 * Converted appveyor.yml to install Pester from PSGallery instead of from Chocolatey.
-* added test for existing file system and no drive letter assignment to allow simple drive letter assignment in MSFT_xDisk.psm1 
-* added unit test for volume with existing partition and no drive letter assigned for MSFT_xDisk.psm1 
-
+* added test for existing file system and no drive letter assignment to allow simple drive letter assignment in MSFT_xDisk.psm1
+* added unit test for volume with existing partition and no drive letter assigned for MSFT_xDisk.psm1
+* Updated to meet HQRM guidelines.
 
 ### 2.6.0.0
 * MSFT_xDisk: Replaced Get-WmiObject with Get-CimInstance
 
 ### 2.5.0.0
 
-* added test for existing file system to allow simple drive letter assignment in MSFT_xDisk.psm1 
+* added test for existing file system to allow simple drive letter assignment in MSFT_xDisk.psm1
 * modified Test verbose message to correctly reflect blocksize value in MSFT_xDisk.psm1 line 217
-* added unit test for new volume with out existing partition for MSFT_xDisk.psm1 
+* added unit test for new volume with out existing partition for MSFT_xDisk.psm1
 * Fixed error propagation
 
 ### 2.4.0.0
@@ -136,18 +88,16 @@ This module was previously named **xDisk**, the version is regressing to a "1.0.
 * xWaitForDisk (from xDisk)
 
 
-Examples
---------
+## Examples
 
 **Example 1**:  Wait for disk 2 to become available, and then make the disk available as two new formatted volumes, with J using all available space after 'G' has been created.
-
 
 ```powershell
 Configuration DataDisk
 {
-    
+
     Import-DSCResource -ModuleName xStorage
- 
+
     Node localhost
     {
         xWaitforDisk Disk2
@@ -162,7 +112,7 @@ Configuration DataDisk
              DriveLetter = 'G'
 			 Size = 10GB
         }
-        
+
         xDisk JVolume
         {
              DiskNumber = 2
@@ -170,7 +120,7 @@ Configuration DataDisk
 			 FSLabel = 'Data
 			 DependsOn = [xDisk]GVolume
         }
-        
+
         xDisk DataVolume
         {
              DiskNumber = 3
@@ -180,7 +130,7 @@ Configuration DataDisk
         }
     }
 }
- 
+
 DataDisk -outputpath C:\DataDisk
 Start-DscConfiguration -Path C:\DataDisk -Wait -Force -Verbose
 ```
