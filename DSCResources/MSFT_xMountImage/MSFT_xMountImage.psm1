@@ -44,15 +44,10 @@ function Get-TargetResource
         $ImagePath
     )
 
-    # Validate driveletter has a ":"
-    if ($DriveLetter -match "^[A-Za-z][:]$")
-    {
-        Write-Verbose "DriveLetter validation passed."
-    }
-    else
-    {
-        Throw "DriveLetter did not pass validation.  Ensure DriveLetter contains a letter and a colon."
-    } # if
+    Write-Verbose -Message ( @(
+            "$($MyInvocation.MyCommand): "
+            $($LocalizedData.GettingMountedImageMessage -f $DriveLetter)
+        ) -join '' )
 
     # Test for Image mounted. If not mounted mount
     $Image = Get-DiskImage -ImagePath $ImagePath | Get-Volume
@@ -62,7 +57,7 @@ function Get-TargetResource
         $EnsureResult = 'Present'
         $Name = $Name
     }
-    Eese
+    else
     {
         $EnsureResult = 'Absent'
         $Name = $null
@@ -110,6 +105,11 @@ function Set-TargetResource
         [System.String]
         $Ensure = 'Present'
     )
+
+    Write-Verbose -Message ( @(
+            "$($MyInvocation.MyCommand): "
+            $($LocalizedData.SettingMountedImageMessage -f $DriveLetter)
+        ) -join '' )
 
     # Validate driveletter has a ":"
     if ($DriveLetter -match "^[A-Za-z][:]$")
@@ -183,6 +183,11 @@ function Test-TargetResource
         [System.String]
         $Ensure = 'Present'
     )
+
+    Write-Verbose -Message ( @(
+            "$($MyInvocation.MyCommand): "
+            $($LocalizedData.SettingMountedImageMessage -f $DriveLetter)
+        ) -join '' )
 
     # Validate driveletter has a ":"
     if ($DriveLetter -match "^[A-Za-z][:]$")

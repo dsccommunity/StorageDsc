@@ -253,7 +253,7 @@ function Set-TargetResource
                 $($LocalizedData.ChangingDriveLetterMessage -f $DriveLetter)
             ) -join '' )
 
-        $VvlumeDriveLetter = ($disk | Get-Partition | Get-Volume).driveletter
+        $VolumeDriveLetter = ($disk | Get-Partition | Get-Volume).driveletter
 
         if ($null -eq $volumeDriveLetter)
         {
@@ -373,8 +373,8 @@ function Test-TargetResource
         {
             Write-Verbose -Message ( @(
                     "$($MyInvocation.MyCommand): "
-                    $($LocalizedData.DriveLetterNotFoundMessage -f `
-                    $DriveLetter,$Partition.Size,$Size)
+                    $($LocalizedData.DriveSizeMismatchMessage -f `
+                        $DriveLetter,$Partition.Size,$Size)
                 ) -join '' )
             return $false
         } # if
@@ -402,7 +402,7 @@ function Test-TargetResource
             Write-Verbose -Message ( @(
                     "$($MyInvocation.MyCommand): "
                     $($LocalizedData.DriveAllocationUnitSizeMismatchMessage -f `
-                        $DriveLetter,$BlockSize.BlockSize/1kb,$AllocationUnitSize/1kb)
+                        $DriveLetter,$($BlockSize.BlockSize/1kb),$($AllocationUnitSize/1kb))
                 ) -join '' )
         } # if
     } # if

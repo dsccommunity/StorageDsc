@@ -1,7 +1,7 @@
 # This configuration will mount an ISO file as drive S:
 configuration Sample_xMountImage_MountISO
 {
-    Import-DscResource -ModuleName xDiskImage
+    Import-DscResource -ModuleName xStorage
     xMountImage ISO
     {
         Name        = 'SQL Disk'

@@ -1,34 +1,31 @@
-$Global:DSCModuleName      = 'xStorage' # Example xNetworking
-$Global:DSCResourceName    = 'MSFT_xDisk' # Example MSFT_xFirewall
+$script:DSCModuleName      = 'xStorage'
+$script:DSCResourceName    = 'MSFT_xDisk'
 
 #region HEADER
-[String] $moduleRoot = Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $Script:MyInvocation.MyCommand.Path))
-if ( (-not (Test-Path -Path (Join-Path -Path $moduleRoot -ChildPath 'DSCResource.Tests'))) -or `
-     (-not (Test-Path -Path (Join-Path -Path $moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1'))) )
-{
-    & git @('clone','https://github.com/PowerShell/DscResource.Tests.git',(Join-Path -Path $moduleRoot -ChildPath '\DSCResource.Tests\'))
-}
-else
-{
-    & git @('-C',(Join-Path -Path $moduleRoot -ChildPath '\DSCResource.Tests\'),'pull')
-}
-Import-Module (Join-Path -Path $moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1') -Force
-$TestEnvironment = Initialize-TestEnvironment `
-    -DSCModuleName $Global:DSCModuleName `
-    -DSCResourceName $Global:DSCResourceName `
-    -TestType Unit
-#endregion
 
+# Unit Test Template Version: 1.1.0
+[String] $script:moduleRoot = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
+if ( (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests'))) -or `
+     (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1'))) )
+{
+    & git @('clone','https://github.com/PowerShell/DscResource.Tests.git',(Join-Path -Path $script:moduleRoot -ChildPath '\DSCResource.Tests\'))
+}
+
+Import-Module (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1') -Force
+$TestEnvironment = Initialize-TestEnvironment `
+    -DSCModuleName $script:DSCModuleName `
+    -DSCResourceName $script:DSCResourceName `
+    -TestType Unit
+#endregion HEADER
 
 # Begin Testing
 try
 {
-
     #region Pester Tests
 
     # The InModuleScope command allows you to perform white-box unit testing on the internal
     # (non-exported) code of a Script Module.
-    InModuleScope $Global:DSCResourceName {
+    InModuleScope $script:DSCResourceName {
 
         #region Pester Test Initialization
         $global:mockedDisk0 = [pscustomobject] @{
@@ -61,9 +58,8 @@ try
                 }
         #endregion
 
-
         #region Function Get-TargetResource
-        Describe "$($Global:DSCResourceName)\Get-TargetResource" {
+        Describe "MSFT_xDisk\Get-TargetResource" {
             # verifiable (should be called) mocks
             Mock Get-WmiObject -mockwith {return $global:mockedWmi}
             Mock Get-CimInstance -mockwith {return $global:mockedWmi}
@@ -95,13 +91,11 @@ try
             it "all the get mocks should be called" {
                 Assert-VerifiableMocks
             }
-
         }
         #endregion
 
-
         #region Function Test-TargetResource
-        Describe "$($Global:DSCResourceName)\Test-TargetResource" {
+        Describe "MSFT_xDisk\Test-TargetResource" {
             context 'Test matching AllocationUnitSize' {
                 # verifiable (should be called) mocks
                 Mock Get-WmiObject -mockwith {return $global:mockedWmi}
@@ -156,9 +150,8 @@ try
         }
         #endregion
 
-
         #region Function Set-TargetResource
-        Describe "$($Global:DSCResourceName)\Set-TargetResource" {
+        Describe "MSFT_xDisk\Set-TargetResource" {
             context 'Online Formatted disk' {
                 # verifiable (should be called) mocks
                 Mock Get-Disk -mockwith {return $global:mockedDisk0Raw} -verifiable
@@ -173,7 +166,6 @@ try
                 Mock Format-Volume -mockwith {}
                 Mock Initialize-Disk -mockwith {} -verifiable
                 Mock New-Partition -mockwith {return [pscustomobject] @{DriveLetter='Z'}}
-
 
                 it 'Should not throw' {
                     {Set-targetResource -diskNumber 0 -driveletter G -verbose} | should not throw
@@ -198,7 +190,6 @@ try
                 Mock Get-Volume -mockwith {return $global:mockedVolumeNoLetter} -verifiable
                 Mock Set-Partition -MockWith {}
 
-
                 # mocks that should not be called
                 Mock Get-WmiObject -mockwith {return $global:mockedWmi}
                 Mock Get-CimInstance -mockwith {return $global:mockedWmi}
@@ -206,7 +197,6 @@ try
                 Mock New-Partition -mockwith {return [pscustomobject] @{DriveLetter='Z'}}
                 Mock Format-Volume -mockwith {}
                 Mock Initialize-Disk -mockwith {} -verifiable
-
 
                 it 'Should not throw' {
                     {Set-targetResource -diskNumber 0 -driveletter G -verbose} | should not throw
@@ -239,11 +229,11 @@ try
                  Mock Set-Partition -MockWith {}
 
 
-                 it 'Should not throw' {
+                it 'Should not throw' {
                      {Set-targetResource -diskNumber 0 -driveletter G -verbose} | should not throw
-                 }
+                }
 
-                  it "the correct mocks were called" {
+                it "the correct mocks were called" {
                      Assert-VerifiableMocks
                      Assert-MockCalled -CommandName New-Partition -Times 1
                      Assert-MockCalled -CommandName Format-Volume -Times 1
@@ -252,17 +242,15 @@ try
                      Assert-MockCalled -CommandName Get-WmiObject -Times 0
                      Assert-MockCalled -CommandName Initialize-Disk -Times 1
                      Assert-MockCalled -CommandName Get-Disk -Times 1
-                 }
+                }
             }
-            # TODO: Complete Tests...
         }
         #endregion
-        }
+    }
 }
 finally
 {
     #region FOOTER
     Restore-TestEnvironment -TestEnvironment $TestEnvironment
     #endregion
-
 }

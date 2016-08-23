@@ -38,8 +38,8 @@ Please read the installation instructions that are present on both the download 
 ### xWaitforDisk
 
 *   **[UInt32] DiskNumber**: Specifies the identifier for which disk to wait for. Key.
-*   **[UInt64] RetryIntervalSec**: Specifies the number of seconds to wait for the disk to become available. Optional.
-*   **[UInt32] RetryCount**: The number of times to loop the retry interval while waiting for the disk. Optional.
+*   **[UInt64] RetryIntervalSec**: Specifies the number of seconds to wait for the disk to become available. Optional. Defaults to 10 seconds.
+*   **[UInt32] RetryCount**: The number of times to loop the retry interval while waiting for the disk. Optional. Defaults to 60 times.
 
 ## Versions
 
@@ -48,6 +48,7 @@ Please read the installation instructions that are present on both the download 
 * added test for existing file system and no drive letter assignment to allow simple drive letter assignment in MSFT_xDisk.psm1
 * added unit test for volume with existing partition and no drive letter assigned for MSFT_xDisk.psm1
 * Updated to meet HQRM guidelines.
+* Fixed examples to import xStorage module.
 
 ### 2.6.0.0
 * MSFT_xDisk: Replaced Get-WmiObject with Get-CimInstance

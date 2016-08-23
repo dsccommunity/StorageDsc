@@ -3,7 +3,7 @@ if (Test-Path "${PSScriptRoot}\${PSUICulture}")
 {
     Import-LocalizedData `
         -BindingVariable LocalizedData `
-        -Filename MSFT_xStorage.strings.psd1 `
+        -Filename MSFT_xStorageCommon.strings.psd1 `
         -BaseDirectory "${PSScriptRoot}\${PSUICulture}"
 }
 else
