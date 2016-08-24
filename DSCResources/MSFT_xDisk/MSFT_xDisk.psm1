@@ -145,10 +145,19 @@ function Set-TargetResource
         {
             $Volume = ($Disk | Get-Partition | Get-Volume)
 
-            if($Volume.DriveLetter -ne $DriveLetter)
+            if ($Volume.DriveLetter)
             {
-                Write-Verbose -Message "The volume already exists, adjusting drive letter..."
-                Set-Partition -DriveLetter $Volume.DriveLetter -NewDriveLetter $DriveLetter
+                if($Volume.DriveLetter -ne $DriveLetter)
+                {
+                    Write-Verbose -Message "The volume already exists, adjusting drive letter..."
+                    Set-Partition -DriveLetter $Volume.DriveLetter -NewDriveLetter $DriveLetter
+                }
+            }
+            else
+            {
+                # volume doesn't have an assigned letter
+                Write-Verbose -Message "Assigning drive letter..."
+                Set-Partition -DiskNumber $DiskNumber -PartitionNumber 2 -NewDriveLetter $DriveLetter
             }
 
             if($PSBoundParameters.ContainsKey('FSLabel'))
