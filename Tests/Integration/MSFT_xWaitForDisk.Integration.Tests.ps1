@@ -42,9 +42,9 @@ try
             $current = Get-DscConfiguration | Where-Object {
                 $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
             }
-            $current.DiskNumber         | Should Be $TestWaitForDisk.DiskNumber
-            $current.RetryIntervalSec   | Should Be $TestWaitForDisk.RetryIntervalSec
-            $current.RetryCount         | Should Be $TestWaitForDisk.RetryCount
+            $current.DiskNumber       | Should Be $TestWaitForDisk.DiskNumber
+            $current.RetryIntervalSec | Should Be $TestWaitForDisk.RetryIntervalSec
+            $current.RetryCount       | Should Be $TestWaitForDisk.RetryCount
         }
     }
     #endregion

@@ -54,7 +54,7 @@ function Get-TargetResource
         RetryIntervalSec = $RetryIntervalSec
         RetryCount       = $RetryCount
     }
-    $returnValue
+    return $returnValue
 } # function Get-TargetResource
 
 <#
