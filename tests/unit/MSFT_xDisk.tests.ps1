@@ -138,6 +138,7 @@ try
                     Assert-MockCalled -CommandName Get-Volume -Times 0
                 }
             }
+            
             context 'Test mismatched AllocationUnitSize' {
                 # verifiable (should be called) mocks 
                 Mock Get-WmiObject -mockwith {return $global:mockedWmi} 
@@ -163,11 +164,12 @@ try
                     Assert-VerifiableMocks
                     Assert-MockCalled -CommandName Get-Volume -Times 0
                 }
-            },
+            }
+            
             context 'Test changed FSLabel' {
                 # verifiable (should be called) mocks 
-                Mock Get-WmiObject -mockwith {return $global:mockedWmi} 
-                Mock Get-CimInstance -mockwith {return $global:mockedWmi} 
+                Mock Get-WmiObject -mockwith {return $global:mockedWmi}
+                Mock Get-CimInstance -mockwith {return $global:mockedWmi}
                 Mock Get-Disk -mockwith {return $global:mockedDisk0} -verifiable
                 Mock Get-Partition -mockwith {return $Global:mockedPartition} -verifiable
                 Mock Get-Volume -mockwith {return $global:mockedVolume}
