@@ -47,6 +47,7 @@ Please read the installation instructions that are present on both the download 
 * Converted appveyor.yml to install Pester from PSGallery instead of from Chocolatey.
 * added test for existing file system and no drive letter assignment to allow simple drive letter assignment in MSFT_xDisk.psm1
 * added unit test for volume with existing partition and no drive letter assigned for MSFT_xDisk.psm1
+* xMountImage: Fixed mounting disk images on Windows 10 Anniversary Edition
 * Updated to meet HQRM guidelines.
 * Fixed examples to import xStorage module.
 
