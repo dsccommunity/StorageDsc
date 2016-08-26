@@ -8,7 +8,6 @@ install:
         Import-Module -Name .\DscResource.Tests\TestHelper.psm1 -Force
         Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
         Install-Module -Name Pester -Repository PSGallery -Force
-        Install-WindowsFeature -Name Hyper-V,Hyper-V-PowerShell
 
 #---------------------------------#
 #      build configuration        #

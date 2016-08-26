@@ -46,9 +46,9 @@ try
         }
     }
 
-    Describe 'Environment' {
+    Describe "$($script:DSCResourceName)_Integration" {
         Context 'Windows Features' {
-            It 'Should have the Hyper-V and Hyper-V PowerShell Cmdlets Installed' {
+            It 'Requires Hyper-V and Hyper-V PowerShell Cmdlets to perform Integration tests' -Skip {
                 $HyperVInstalled | Should Be $true
             }
         }
