@@ -46,15 +46,9 @@ try
         }
     }
 
-    Describe "$($script:DSCResourceName)_Integration" {
-        Context 'Windows Features' {
-            It 'Requires Hyper-V and Hyper-V PowerShell Cmdlets to perform Integration tests' -Skip {
-                $HyperVInstalled | Should Be $true
-            }
-        }
-    }
     if ($HyperVInstalled -eq $false)
     {
+        Write-Verbose -Message "$($script:DSCResourceName) integration tests cannot be run because Hyper-V Components not installed." -Verbose
         Break
     }
 
@@ -67,11 +61,16 @@ try
             # Create a VHDx and attach it to the computer
             $VHDPath = Join-Path -Path $TestEnvironment.WorkingFolder `
                 -ChildPath 'TestDisk.vhdx'
-            New-VHD -Path $VHDPath -SizeBytes 10MB -Dynamic
+            New-VHD -Path $VHDPath -SizeBytes 1GB -Dynamic
             Mount-DiskImage -ImagePath $VHDPath -StorageType VHDX -NoDriveLetter
             $Disk = Get-Disk | Where-Object -FilterScript {
                 $_.Location -eq $VHDPath
             }
+            $FSLabel = 'TestDisk'
+
+            # Get a spare drive letter
+            $LastDrive = ((Get-Volume).DriveLetter | Sort-Object | Select-Object -Last 1)
+            $DriveLetter = [char](([int][char]$LastDrive)+1)
         }
 
         #region DEFAULT TESTS
@@ -81,8 +80,10 @@ try
                 $ConfigData = @{
                     AllNodes = @(
                         @{
-                            NodeName   = 'localhost'
-                            DiskNumber = $Disk.Number
+                            NodeName    = 'localhost'
+                            DriveLetter = $DriveLetter
+                            DiskNumber  = $Disk.Number
+                            FSLabel     = $FSLabel
                         }
                     )
                 }
@@ -90,7 +91,8 @@ try
                 & "$($script:DSCResourceName)_Config" `
                     -OutputPath $TestEnvironment.WorkingFolder `
                     -ConfigurationData $ConfigData
-                Start-DscConfiguration -Path $TestEnvironment.WorkingFolder -ComputerName localhost -Wait -Verbose -Force
+                Start-DscConfiguration -Path $TestEnvironment.WorkingFolder `
+                    -ComputerName localhost -Wait -Verbose -Force
             } | Should not throw
         }
 
@@ -103,9 +105,9 @@ try
             $current = Get-DscConfiguration | Where-Object {
                 $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
             }
-            $current.DiskNumber       | Should Be $TestWaitForDisk.DiskNumber
-            $current.RetryIntervalSec | Should Be $TestWaitForDisk.RetryIntervalSec
-            $current.RetryCount       | Should Be $TestWaitForDisk.RetryCount
+            $current.DiskNumber       | Should Be $Disk.DiskNumber
+            $current.DriveLetter      | Should Be $DriveLetter
+            $current.FSLabel          | Should Be $FSLabel
         }
 
         AfterAll {

@@ -1,17 +1,10 @@
-$TestDisk = [PSObject] @{
-    DriveLetter        = $TestDisk.DriveLetter
-    FSLabel            = $TestDisk.FSLabel
-    AllocationUnitSize = $TestDisk.AllocationUnitSize
-}
-
 configuration MSFT_xDisk_Config {
     Import-DscResource -ModuleName xStorage
-    node $Node.Name {
+    node localhost {
         xDisk Integration_Test {
             DiskNumber         = $Node.DiskNumber
-            DriveLetter        = $TestDisk.DriveLetter
-            FSLabel            = $TestDisk.FSLabel
-            AllocationUnitSize = $TestDisk.AllocationUnitSize
+            DriveLetter        = $Node.DriveLetter
+            FSLabel            = $Node.FSLabel
         }
     }
 }
