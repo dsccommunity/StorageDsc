@@ -26,14 +26,18 @@ try
         1
         {
             # Desktop OS
-            $HyperVInstalled = ((Get-WindowsOptionalFeature `
-                -FeatureName Microsoft-Hyper-V-Management-PowerShell `
-                -Online).State -eq 'Enabled')
+            $HyperVInstalled = (((Get-WindowsOptionalFeature `
+                    -FeatureName Microsoft-Hyper-V `
+                    -Online).State -eq 'Enabled') -and `
+                ((Get-WindowsOptionalFeature `
+                    -FeatureName Microsoft-Hyper-V-Management-PowerShell `
+                    -Online).State -eq 'Enabled'))
         }
         3
         {
             # Server OS
-            $HyperVInstalled = (Get-WindowsFeature -Name Hyper-V-PowerShell).Installed
+            $HyperVInstalled = (((Get-WindowsFeature -Name Hyper-V).Installed) -and `
+                ((Get-WindowsFeature -Name Hyper-V-PowerShell).Installed))
         }
         default
         {
@@ -44,7 +48,7 @@ try
 
     Describe 'Environment' {
         Context 'Windows Features' {
-            It 'Should have the Hyper-V PowerShell Cmdlets Installed' {
+            It 'Should have the Hyper-V and Hyper-V PowerShell Cmdlets Installed' {
                 $HyperVInstalled | Should Be $true
             }
         }
