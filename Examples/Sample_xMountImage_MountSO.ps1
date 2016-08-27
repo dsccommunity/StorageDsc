@@ -1,4 +1,4 @@
-# This configuration will mount an ISO file as drive S:
+# This configuration will mount an ISO file as drive S:.
 configuration Sample_xMountImage_MountISO
 {
     Import-DscResource -ModuleName xStorage

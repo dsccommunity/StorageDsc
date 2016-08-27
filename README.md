@@ -19,6 +19,7 @@ Please read the installation instructions that are present on both the download 
 * **xMountImage**: used to mount or unmount an ISO/VHD disk image to the local file system, with simple declarative language.
 * **xDisk**: used to initialize, format and mount the partition as a drive letter.
 * **xWaitForDisk** wait for a disk to become available.
+* **xWaitForDrive** wait for a drive to be mounted and become available.
 
 ### xMountImage
 
@@ -41,6 +42,12 @@ Please read the installation instructions that are present on both the download 
 *   **[UInt64] RetryIntervalSec**: Specifies the number of seconds to wait for the disk to become available. Optional. Defaults to 10 seconds.
 *   **[UInt32] RetryCount**: The number of times to loop the retry interval while waiting for the disk. Optional. Defaults to 60 times.
 
+### xWaitforDrive
+
+*   **[String] DriveLetter**: Specifies the name of the drive to wait for. Key.
+*   **[UInt64] RetryIntervalSec**: Specifies the number of seconds to wait for the drive to become available. Optional. Defaults to 10 seconds.
+*   **[UInt32] RetryCount**: The number of times to loop the retry interval while waiting for the drive. Optional. Defaults to 60 times.
+
 ## Versions
 
 ### Unreleased
@@ -50,6 +57,7 @@ Please read the installation instructions that are present on both the download 
 * xMountImage: Fixed mounting disk images on Windows 10 Anniversary Edition
 * Updated to meet HQRM guidelines.
 * Fixed examples to import xStorage module.
+* Added xWaitForDrive.
 
 ### 2.6.0.0
 * MSFT_xDisk: Replaced Get-WmiObject with Get-CimInstance
@@ -92,7 +100,8 @@ This module was previously named **xDisk**, the version is regressing to a "1.0.
 
 ## Examples
 
-**Example 1**:  Wait for disk 2 to become available, and then make the disk available as two new formatted volumes, with J using all available space after 'G' has been created.
+### Example 1
+This configuration will wait for disk 2 to become available, and then make the disk available as two new formatted volumes, with J using all available space after 'G' has been created.
 
 ```powershell
 Configuration DataDisk
@@ -112,22 +121,22 @@ Configuration DataDisk
         {
              DiskNumber = 2
              DriveLetter = 'G'
-			 Size = 10GB
+             Size = 10GB
         }
 
         xDisk JVolume
         {
              DiskNumber = 2
              DriveLetter = 'J'
-			 FSLabel = 'Data
-			 DependsOn = [xDisk]GVolume
+             FSLabel = 'Data'
+             DependsOn = '[xDisk]GVolume'
         }
 
         xDisk DataVolume
         {
              DiskNumber = 3
              DriveLetter = 'S'
-			 Size = 100GB
+             Size = 100GB
              AllocationUnitSize = 64kb
         }
     }
@@ -137,7 +146,8 @@ DataDisk -outputpath C:\DataDisk
 Start-DscConfiguration -Path C:\DataDisk -Wait -Force -Verbose
 ```
 
-**Example 2**:  Mount ISO as local drive S
+### Example 2
+This configuration will mount an ISO file as drive S:.
 
 ```powershell
     # Mount ISO
@@ -156,7 +166,8 @@ Start-DscConfiguration -Path C:\DataDisk -Wait -Force -Verbose
     Start-DscConfiguration -Wait -Force -Path c:\DSC\ -Verbose
 ```
 
-**Example 3**:  UnMount ISO file and remove drive letter
+### Example 3
+This configuration will unmount an ISO file that is mounted in S:.
 
 ```powershell
     # UnMount ISO
@@ -176,6 +187,31 @@ Start-DscConfiguration -Path C:\DataDisk -Wait -Force -Verbose
     Start-DscConfiguration -Wait -Force -Path c:\DSC\ -Verbose
 ```
 
+### Example 4
+This configuration will mount a VHD file and wait for it to become available.
+
+```powershell
+configuration Sample_MountVHD
+{
+    Import-DscResource -ModuleName xStorage
+    xMountImage MountVHD
+    {
+        Name        = 'Data1'
+        ImagePath   = 'd:\Data\Disk1.vhdx'
+        DriveLetter = 'V:'
+    }
+
+    xWaitForDrive WaitForVHD
+    {
+        DriveName        = 'V'
+        RetryIntervalSec = 5
+        RetryCount       = 10
+    }
+}
+
+Sample_MountVHD
+Start-DscConfiguration -Path Sample_MountVHD -Wait -Force -Verbose
+```
+
 ## Contributing
 Please check out common DSC Resources [contributing guidelines](https://github.com/PowerShell/DscResource.Kit/blob/master/CONTRIBUTING.md).
-

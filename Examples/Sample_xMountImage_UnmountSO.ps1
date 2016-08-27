@@ -1,4 +1,4 @@
-# This configuration will unmount an ISO file that is mounted in S:
+# This configuration will unmount an ISO file that is mounted in S:.
 configuration Sample_xMountImage_UnmountISO
 {
     Import-DscResource -ModuleName xStorage

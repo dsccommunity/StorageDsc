@@ -1,0 +1,8 @@
+
+[ClassVersion("0.1.0.0"), FriendlyName("xWaitForDrive")]
+class MSFT_xWaitForDrive : OMI_BaseResource
+{
+    [Key, Description("Specifies the name of the drive to wait for.")] String DriveName;
+    [Write, Description("Specifies the number of seconds to wait for the drive to become available.")] Uint32 RetryIntervalSec;
+    [Write, Description("The number of times to loop the retry interval while waiting for the drive.")] Uint32 RetryCount;
+};
