@@ -79,3 +79,43 @@ function New-InvalidArgumentError
         -ArgumentList $exception, $ErrorId, $errorCategory, $null
     throw $errorRecord
 } # end function New-InvalidArgumentError
+
+<#
+ .SYNOPSIS
+ Validates a Drive Letter, removing or adding the trailing colon if required.
+ .PARAMETER DriveLetter
+ The Drive Letter string to validate.
+ .PARAMETER Colon
+ Will ensure the returned string will include or exclude a colon.
+#>
+function Test-DriveLetter
+{
+    [CmdletBinding()]
+    [OutputType([String])]
+    param
+    (
+        [Parameter(Mandatory)]
+        [ValidateNotNullOrEmpty()]
+        [System.String]
+        $DriveLetter,
+
+        [Switch]
+        $Colon
+    )
+
+    $Matches = @([regex]::matches($DriveLetter, '^([A-Za-z]{1})[:]?$', 'IgnoreCase'))
+    if (-not $Matches)
+    {
+        # DriveLetter format is invlid
+        New-InvalidArgumentError `
+            -ErrorId 'InvalidDriveLetterFormatError' `
+            -ErrorMessage $($LocalizedData.InvalidDriveLetterFormatError -f $DriveLetter)
+    }
+    # This is the drive letter without a colon
+    $DriveLetter = $Matches.Groups[1].Value
+    if ($Colon)
+    {
+        $DriveLetter = $DriveLetter + ':'
+    } # if
+    return $DriveLetter
+} # end function Test-DriveLetter

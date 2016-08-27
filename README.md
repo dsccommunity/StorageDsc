@@ -19,7 +19,7 @@ Please read the installation instructions that are present on both the download 
 * **xMountImage**: used to mount or unmount an ISO/VHD disk image to the local file system, with simple declarative language.
 * **xDisk**: used to initialize, format and mount the partition as a drive letter.
 * **xWaitForDisk** wait for a disk to become available.
-* **xWaitForDrive** wait for a drive to be mounted and become available.
+* **xWaitForVolume** wait for a drive to be mounted and become available.
 
 ### xMountImage
 
@@ -42,7 +42,7 @@ Please read the installation instructions that are present on both the download 
 *   **[UInt64] RetryIntervalSec**: Specifies the number of seconds to wait for the disk to become available. Optional. Defaults to 10 seconds.
 *   **[UInt32] RetryCount**: The number of times to loop the retry interval while waiting for the disk. Optional. Defaults to 60 times.
 
-### xWaitforDrive
+### xWaitForVolume
 
 *   **[String] DriveLetter**: Specifies the name of the drive to wait for. Key.
 *   **[UInt64] RetryIntervalSec**: Specifies the number of seconds to wait for the drive to become available. Optional. Defaults to 10 seconds.
@@ -57,7 +57,7 @@ Please read the installation instructions that are present on both the download 
 * xMountImage: Fixed mounting disk images on Windows 10 Anniversary Edition
 * Updated to meet HQRM guidelines.
 * Fixed examples to import xStorage module.
-* Added xWaitForDrive.
+* Added xWaitForVolume.
 
 ### 2.6.0.0
 * MSFT_xDisk: Replaced Get-WmiObject with Get-CimInstance
@@ -158,7 +158,7 @@ This configuration will mount an ISO file as drive S:.
             {
                Name = 'SQL Disk'
                ImagePath = 'c:\Sources\SQL.iso'
-               DriveLetter = 's:'
+               DriveLetter = 'S'
             }
     }
 
@@ -178,7 +178,7 @@ This configuration will unmount an ISO file that is mounted in S:.
             {
                Name = 'SQL Disk'
                ImagePath = 'c:\Sources\SQL.iso'
-               DriveLetter = 's:'
+               DriveLetter = 'S'
                Ensure = 'Absent'
             }
     }
@@ -198,12 +198,12 @@ configuration Sample_MountVHD
     {
         Name        = 'Data1'
         ImagePath   = 'd:\Data\Disk1.vhdx'
-        DriveLetter = 'V:'
+        DriveLetter = 'V'
     }
 
-    xWaitForDrive WaitForVHD
+    xWaitForVolume WaitForVHD
     {
-        DriveName        = 'V'
+        DriveLetter      = 'V'
         RetryIntervalSec = 5
         RetryCount       = 10
     }

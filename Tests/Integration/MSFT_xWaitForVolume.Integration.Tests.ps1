@@ -1,5 +1,5 @@
 $script:DSCModuleName      = 'xStorage'
-$script:DSCResourceName    = 'MSFT_xWaitForDrive'
+$script:DSCResourceName    = 'MSFT_xWaitForVolume'
 
 #region HEADER
 # Integration Test Template Version: 1.1.1
@@ -42,9 +42,9 @@ try
             $current = Get-DscConfiguration | Where-Object {
                 $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
             }
-            $current.DriveLetter      | Should Be $TestWaitForDrive.DriveLetter
-            $current.RetryIntervalSec | Should Be $TestWaitForDrive.RetryIntervalSec
-            $current.RetryCount       | Should Be $TestWaitForDrive.RetryCount
+            $current.DriveLetter      | Should Be $TestWaitForVolume.DriveLetter
+            $current.RetryIntervalSec | Should Be $TestWaitForVolume.RetryIntervalSec
+            $current.RetryCount       | Should Be $TestWaitForVolume.RetryCount
         }
     }
     #endregion

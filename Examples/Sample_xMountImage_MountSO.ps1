@@ -6,7 +6,7 @@ configuration Sample_xMountImage_MountISO
     {
         Name        = 'SQL Disk'
         ImagePath   = 'c:\Sources\SQL.iso'
-        DriveLetter = 'S:'
+        DriveLetter = 'S'
     }
 }
 

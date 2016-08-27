@@ -1,5 +1,5 @@
 $script:DSCModuleName      = 'xStorage'
-$script:DSCResourceName    = 'MSFT_xWaitForDrive'
+$script:DSCResourceName    = 'MSFT_xWaitForVolume'
 
 #region HEADER
 # Unit Test Template Version: 1.1.0
@@ -51,20 +51,20 @@ try
 
         #region Pester Test Initialization
         $mockedDriveC = [pscustomobject] @{
-            Name         = 'C'
+            DriveLetter      = 'C'
         }
         $driveCParameters = @{
-            DriveName        = 'C'
+            DriveLetter      = 'C'
             RetryIntervalSec = 5
             RetryCount       = 20
         }
         #endregion
 
         #region Function Get-TargetResource
-        Describe "MSFT_xWaitForDrive\Get-TargetResource" {
+        Describe "MSFT_xWaitForVolume\Get-TargetResource" {
             $resource = Get-TargetResource @driveCParameters -Verbose
-            It "DriveName Should Be $($driveCParameters.DriveName)" {
-                $resource.DriveName | Should Be $driveCParameters.DriveName
+            It "DriveLetter Should Be $($driveCParameters.DriveLetter)" {
+                $resource.DriveLetter | Should Be $driveCParameters.DriveLetter
             }
 
             It "RetryIntervalSec Should Be $($driveCParameters.RetryIntervalSec)" {
@@ -82,12 +82,13 @@ try
         #endregion
 
         #region Function Set-TargetResource
-        Describe 'MSFT_xWaitForDrive\Set-TargetResource' {
+        Describe 'MSFT_xWaitForVolume\Set-TargetResource' {
             Mock Start-Sleep
+            Mock Get-PSDrive
 
             Context 'drive C is ready' {
                 # verifiable (Should Be called) mocks
-                Mock Get-PSDrive -MockWith { return $mockedDriveC } -Verifiable
+                Mock Get-Volume -MockWith { return $mockedDriveC } -Verifiable
 
                 It 'should not throw' {
                     { Set-targetResource @driveCParameters -Verbose } | Should Not throw
@@ -96,35 +97,39 @@ try
                 It 'the correct mocks were called' {
                     Assert-VerifiableMocks
                     Assert-MockCalled -CommandName Start-Sleep -Times 0
-                    Assert-MockCalled -CommandName Get-PSDrive -Times 1
+                    Assert-MockCalled -CommandName Get-PSDrive -Times 0
+                    Assert-MockCalled -CommandName Get-Volume -Times 1
                 }
             }
             Context 'drive C does not become ready' {
                 # verifiable (Should Be called) mocks
-                Mock Get-PSDrive -MockWith { } -Verifiable
+                Mock Get-Volume -MockWith { } -Verifiable
 
                 $errorRecord = Get-InvalidOperationError `
-                    -ErrorId 'DriveNotFoundAfterError' `
-                    -ErrorMessage $($LocalizedData.DriveNotFoundAfterError -f $driveCParameters.DriveName,$driveCParameters.RetryCount)
+                    -ErrorId 'VolumeNotFoundAfterError' `
+                    -ErrorMessage $($LocalizedData.VolumeNotFoundAfterError -f $driveCParameters.DriveLetter,$driveCParameters.RetryCount)
 
-                It 'should throw DriveNotFoundAfterError' {
+                It 'should throw VolumeNotFoundAfterError' {
                     { Set-targetResource @driveCParameters -Verbose } | Should Throw $errorRecord
                 }
 
                 It 'the correct mocks were called' {
                     Assert-VerifiableMocks
                     Assert-MockCalled -CommandName Start-Sleep -Times $driveCParameters.RetryCount
-                    Assert-MockCalled -CommandName Get-PSDrive -Times 1
+                    Assert-MockCalled -CommandName Get-PSDrive -Times $driveCParameters.RetryCount
+                    Assert-MockCalled -CommandName Get-Volume -Times $driveCParameters.RetryCount
                 }
             }
         }
         #endregion
 
         #region Function Test-TargetResource
-        Describe 'MSFT_xWaitForDrive\Test-TargetResource' {
+        Describe 'MSFT_xWaitForVolume\Test-TargetResource' {
+            Mock Get-PSDrive
+
             Context 'drive C is ready' {
                 # verifiable (Should Be called) mocks
-                Mock Get-PSDrive -MockWith { return $mockedDriveC } -Verifiable
+                Mock Get-Volume -MockWith { return $mockedDriveC } -Verifiable
 
                 $script:result = $null
 
@@ -139,11 +144,12 @@ try
                 It "the correct mocks were called" {
                     Assert-VerifiableMocks
                     Assert-MockCalled -CommandName Get-PSDrive -Times 1
+                    Assert-MockCalled -CommandName Get-Volume -Times 1
                 }
             }
             Context 'drive C is not ready' {
                 # verifiable (Should Be called) mocks
-                Mock Get-PSDrive -MockWith { } -Verifiable
+                Mock Get-Volume -MockWith { } -Verifiable
 
                 $script:result = $null
 
@@ -158,6 +164,7 @@ try
                 It 'the correct mocks were called' {
                     Assert-VerifiableMocks
                     Assert-MockCalled -CommandName Get-PSDrive -Times 1
+                    Assert-MockCalled -CommandName Get-Volume -Times 1
                 }
             }
         }

@@ -3,7 +3,7 @@ if (Test-Path "${PSScriptRoot}\${PSUICulture}")
 {
     Import-LocalizedData `
         -BindingVariable LocalizedData `
-        -Filename MSFT_xWaitForDrive.strings.psd1 `
+        -Filename MSFT_xWaitForVolume.strings.psd1 `
         -BaseDirectory "${PSScriptRoot}\${PSUICulture}"
 }
 else
@@ -11,7 +11,7 @@ else
     #fallback to en-US
     Import-LocalizedData `
         -BindingVariable LocalizedData `
-        -Filename MSFT_xWaitForDrive.strings.psd1 `
+        -Filename MSFT_xWaitForVolume.strings.psd1 `
         -BaseDirectory "${PSScriptRoot}\en-US"
 }
 #endregion
@@ -24,7 +24,7 @@ Import-Module -Name ( Join-Path `
 <#
     .SYNOPSIS
     Returns the current state of the wait for drive resource.
-    .PARAMETER DriveName
+    .PARAMETER DriveLetter
     Specifies the name of the drive to wait for.
     .PARAMETER RetryIntervalSec
     Specifies the number of seconds to wait for the drive to become available.
@@ -37,7 +37,7 @@ function Get-TargetResource
     param
     (
         [parameter(Mandatory)]
-        [String] $DriveName,
+        [String] $DriveLetter,
 
         [UInt32] $RetryIntervalSec = 10,
 
@@ -46,11 +46,13 @@ function Get-TargetResource
 
     Write-Verbose -Message ( @(
             "$($MyInvocation.MyCommand): "
-            $($LocalizedData.GettingWaitForDriveStatusMessage -f $DriveName)
+            $($LocalizedData.GettingWaitForVolumeStatusMessage -f $DriveLetter)
         ) -join '' )
 
+    $DriveLetter = Test-DriveLetter -DriveLetter $DriveLetter
+
     $returnValue = @{
-        DriveName        = $DriveName
+        DriveLetter      = $DriveLetter
         RetryIntervalSec = $RetryIntervalSec
         RetryCount       = $RetryCount
     }
@@ -60,7 +62,7 @@ function Get-TargetResource
 <#
     .SYNOPSIS
     Sets the current state of the wait for drive resource.
-    .PARAMETER DriveName
+    .PARAMETER DriveLetter
     Specifies the name of the drive to wait for.
     .PARAMETER RetryIntervalSec
     Specifies the number of seconds to wait for the drive to become available.
@@ -72,7 +74,7 @@ function Set-TargetResource
     param
     (
         [parameter(Mandatory)]
-        [String] $DriveName,
+        [String] $DriveLetter,
 
         [UInt32] $RetryIntervalSec = 10,
 
@@ -81,47 +83,53 @@ function Set-TargetResource
 
     Write-Verbose -Message ( @(
             "$($MyInvocation.MyCommand): "
-            $($LocalizedData.CheckingForDriveMessage -f $DriveName)
+            $($LocalizedData.CheckingForVolumeStatusMessage -f $DriveLetter)
         ) -join '' )
 
-    $driveFound = $false
+    $DriveLetter = Test-DriveLetter -DriveLetter $DriveLetter
+
+    $volumeFound = $false
 
     for ($count = 0; $count -lt $RetryCount; $count++)
     {
-        $drive = Get-PSDrive -Name $DriveName -ErrorAction SilentlyContinue
-        if ($drive)
+        $volume = Get-Volume -DriveLetter $DriveLetter -ErrorAction SilentlyContinue
+        if ($volume)
         {
             Write-Verbose -Message ( @(
                     "$($MyInvocation.MyCommand): "
-                    $($LocalizedData.DriveFoundMessage -f $DriveName)
+                    $($LocalizedData.VolumeFoundMessage -f $DriveLetter)
                 ) -join '' )
 
-            $driveFound = $true
+            $volumeFound = $true
             break
         }
         else
         {
             Write-Verbose -Message ( @(
                     "$($MyInvocation.MyCommand): "
-                    $($LocalizedData.DriveNotFoundMessage -f $DriveName,$RetryIntervalSec)
+                    $($LocalizedData.VolumeNotFoundMessage -f $DriveLetter,$RetryIntervalSec)
                 ) -join '' )
 
             Start-Sleep -Seconds $RetryIntervalSec
+
+            # This command forces a refresh of the PS Drive subsystem.
+            # So triggers any "missing" drives to show up.
+            $null = Get-PSDrive
         } # if
     } # for
 
-    if (-not $driveFound)
+    if (-not $volumeFound)
     {
         New-InvalidOperationError `
-            -ErrorId 'DriveNotFoundAfterError' `
-            -ErrorMessage $($LocalizedData.DriveNotFoundAfterError -f $DriveName,$RetryCount)
+            -ErrorId 'VolumeNotFoundAfterError' `
+            -ErrorMessage $($LocalizedData.VolumeNotFoundAfterError -f $DriveLetter,$RetryCount)
     } # if
 } # function Set-TargetResource
 
 <#
     .SYNOPSIS
     Tests the current state of the wait for drive resource.
-    .PARAMETER DriveName
+    .PARAMETER DriveLetter
     Specifies the name of the drive to wait for.
     .PARAMETER RetryIntervalSec
     Specifies the number of seconds to wait for the drive to become available.
@@ -134,7 +142,7 @@ function Test-TargetResource
     param
     (
         [parameter(Mandatory)]
-        [String] $DriveName,
+        [String] $DriveLetter,
 
         [UInt32] $RetryIntervalSec = 10,
 
@@ -143,15 +151,21 @@ function Test-TargetResource
 
     Write-Verbose -Message ( @(
             "$($MyInvocation.MyCommand): "
-            $($LocalizedData.CheckingForDriveMessage -f $DriveNumber)
+            $($LocalizedData.TestingWaitForVolumeStatusMessage -f $DriveLetter)
         ) -join '' )
 
-    $drive = Get-PSDrive -Name $DriveName -ErrorAction SilentlyContinue
-    if ($drive)
+    $DriveLetter = Test-DriveLetter -DriveLetter $DriveLetter
+
+    # This command forces a refresh of the PS Drive subsystem.
+    # So triggers any "missing" drives to show up.
+    $null = Get-PSDrive
+
+    $volume = Get-Volume -DriveLetter $DriveLetter -ErrorAction SilentlyContinue
+    if ($volume)
     {
         Write-Verbose -Message ( @(
                 "$($MyInvocation.MyCommand): "
-                $($LocalizedData.DriveFoundMessage -f $DriveName)
+                $($LocalizedData.VolumeFoundMessage -f $DriveLetter)
             ) -join '' )
 
         return $true
@@ -159,7 +173,7 @@ function Test-TargetResource
 
     Write-Verbose -Message ( @(
             "$($MyInvocation.MyCommand): "
-            $($LocalizedData.DriveNotFoundMessage -f $DriveName)
+            $($LocalizedData.VolumeNotFoundMessage -f $DriveLetter)
         ) -join '' )
 
     return $false

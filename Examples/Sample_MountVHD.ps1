@@ -6,12 +6,12 @@ configuration Sample_MountVHD
     {
         Name        = 'Data1'
         ImagePath   = 'd:\Data\Disk1.vhdx'
-        DriveLetter = 'V:'
+        DriveLetter = 'V'
     }
 
-    xWaitForDrive WaitForVHD
+    xWaitForVolume WaitForVHD
     {
-        DriveName        = 'V'
+        DriveLetter      = 'V'
         RetryIntervalSec = 5
         RetryCount       = 10
     }
