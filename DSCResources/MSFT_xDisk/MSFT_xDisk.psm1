@@ -58,12 +58,21 @@ function Get-TargetResource
             $($LocalizedData.GettingDiskMessage -f $DiskNumber,$DriveLetter)
         ) -join '' )
 
-    $disk = Get-Disk -Number $DiskNumber -ErrorAction SilentlyContinue
+    # Validate the DriveLetter parameter
+    $DriveLetter = Test-DriveLetter -DriveLetter $DriveLetter
 
-    $partition = Get-Partition -DriveLetter $DriveLetter -ErrorAction SilentlyContinue
+    $disk = Get-Disk `
+        -Number $DiskNumber `
+        -ErrorAction SilentlyContinue
 
-    $FSLabel = Get-Volume -DriveLetter $DriveLetter -ErrorAction SilentlyContinue |
-        Select-Object -ExpandProperty FileSystemLabel
+    $partition = Get-Partition `
+        -DriveLetter $DriveLetter `
+        -ErrorAction SilentlyContinue
+
+    $FSLabel = Get-Volume `
+        -DriveLetter $DriveLetter `
+        -ErrorAction SilentlyContinue |
+            Select-Object -ExpandProperty FileSystemLabel
 
     $blockSize = Get-CimInstance `
         -Query "SELECT BlockSize from Win32_Volume WHERE DriveLetter = '$($DriveLetter):'" `
@@ -130,6 +139,9 @@ function Set-TargetResource
             $($LocalizedData.SettingDiskMessage -f $DiskNumber,$DriveLetter)
         ) -join '' )
 
+    # Validate the DriveLetter parameter
+    $DriveLetter = Test-DriveLetter -DriveLetter $DriveLetter
+
     $disk = Get-Disk `
         -Number $DiskNumber `
         -ErrorAction Stop
@@ -141,7 +153,9 @@ function Set-TargetResource
                 $($LocalizedData.SetDiskOnlineMessage -f $DiskNumber)
             ) -join '' )
 
-        $disk | Set-Disk -IsOffline $false
+        Set-Disk `
+            -InputObject $disk `
+            -IsOffline $false
     } # if
 
     if ($disk.IsReadOnly -eq $true)
@@ -151,7 +165,9 @@ function Set-TargetResource
                 $($LocalizedData.SetDiskReadwriteMessage -f $DiskNumber)
             ) -join '' )
 
-        $disk | Set-Disk -IsReadOnly $false
+        Set-Disk `
+            -InputObject $disk `
+            -IsReadOnly $false
     } # if
 
     Write-Verbose -Message ( @(
@@ -168,7 +184,10 @@ function Set-TargetResource
                     $($LocalizedData.InitializingDiskMessage -f $DiskNumber)
                 ) -join '' )
 
-            $disk | Initialize-Disk -PartitionStyle "GPT" -PassThru
+            Initialize-Disk `
+                -InputObject $disk `
+                -PartitionStyle "GPT" `
+                -PassThru
         }
         "GPT"
         {
@@ -235,7 +254,9 @@ function Set-TargetResource
                 $($LocalizedData.FormattingVolumeMessage -f $VolParams.FileSystem)
             ) -join '' )
 
-        $volume = $partition | Format-Volume @VolParams
+        $volume = Format-Volume `
+            -InputObject $partition `
+            @VolParams
 
         if ($volume)
         {
@@ -308,6 +329,9 @@ function Test-TargetResource
             "$($MyInvocation.MyCommand): "
             $($LocalizedData.TestingDiskMessage -f $DiskNumber,$DriveLetter)
         ) -join '' )
+
+    # Validate the DriveLetter parameter
+    $DriveLetter = Test-DriveLetter -DriveLetter $DriveLetter
 
     Write-Verbose -Message ( @(
             "$($MyInvocation.MyCommand): "
@@ -393,16 +417,16 @@ function Test-TargetResource
                 Select-Object -ExpandProperty BlockSize
     } # if
 
-    if($BlockSize -gt 0 -and $AllocationUnitSize -ne 0)
+    if($blockSize -gt 0 -and $AllocationUnitSize -ne 0)
     {
-        if($AllocationUnitSize -ne $BlockSize)
+        if($AllocationUnitSize -ne $blockSize)
         {
             # Just write a warning, we will not try to reformat a drive due to invalid allocation
             # unit sizes
             Write-Verbose -Message ( @(
                     "$($MyInvocation.MyCommand): "
                     $($LocalizedData.DriveAllocationUnitSizeMismatchMessage -f `
-                        $DriveLetter,$($BlockSize.BlockSize/1kb),$($AllocationUnitSize/1kb))
+                        $DriveLetter,$($blockSize.BlockSize/1kb),$($AllocationUnitSize/1kb))
                 ) -join '' )
         } # if
     } # if

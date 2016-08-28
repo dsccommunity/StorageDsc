@@ -49,6 +49,7 @@ function Get-TargetResource
             $($LocalizedData.GettingWaitForVolumeStatusMessage -f $DriveLetter)
         ) -join '' )
 
+    # Validate the DriveLetter parameter
     $DriveLetter = Test-DriveLetter -DriveLetter $DriveLetter
 
     $returnValue = @{
@@ -86,6 +87,7 @@ function Set-TargetResource
             $($LocalizedData.CheckingForVolumeStatusMessage -f $DriveLetter)
         ) -join '' )
 
+    # Validate the DriveLetter parameter
     $DriveLetter = Test-DriveLetter -DriveLetter $DriveLetter
 
     $volumeFound = $false
@@ -154,6 +156,7 @@ function Test-TargetResource
             $($LocalizedData.TestingWaitForVolumeStatusMessage -f $DriveLetter)
         ) -join '' )
 
+    # Validate the DriveLetter parameter
     $DriveLetter = Test-DriveLetter -DriveLetter $DriveLetter
 
     # This command forces a refresh of the PS Drive subsystem.
