@@ -11,7 +11,9 @@
     DiskAlreadyInitializedError = Disk number '{0}' is already initialized with {1}.
     FormattingVolumeMessage = Formatting the volume as '{0}'.
     SuccessfullyInitializedMessage = Successfully initialized '{0}'.
-    ChangingDriveLetterMessage = The volume already exists, setting drive letter to '{0}'.
+    ChangingDriveLetterMessage = The volume already exists, changing drive letter '{0}' to '{1}'.
+    AssigningDriveLetterMessage = Assigning drive letter '{0}'.
+    ChangingVolumeLabelMessage = Changing volume '{0}' label to '{1}'.
 
     TestingDiskMessage = Testing Disk '{0}' status for drive letter '{1}'.
     CheckDiskInitializedMessage = Checking if disk number '{0}' is initialized.

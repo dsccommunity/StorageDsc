@@ -120,6 +120,7 @@ try
                     Assert-MockCalled -CommandName Get-Volume -Times 0
                 }
             }
+
             context 'Test mismatched AllocationUnitSize' {
                 # verifiable (should be called) mocks
                 Mock Get-WmiObject -mockwith {return $global:mockedWmi}
@@ -144,6 +145,25 @@ try
                 it "the correct mocks were called" {
                     Assert-VerifiableMocks
                     Assert-MockCalled -CommandName Get-Volume -Times 0
+                }
+            }
+
+            context 'Test changed FSLabel' {
+                # verifiable (should be called) mocks
+                Mock Get-WmiObject -mockwith {return $global:mockedWmi}
+                Mock Get-CimInstance -mockwith {return $global:mockedWmi}
+                Mock Get-Disk -mockwith {return $global:mockedDisk0} -verifiable
+                Mock Get-Partition -mockwith {return $Global:mockedPartition} -verifiable
+                Mock Get-Volume -mockwith {return $global:mockedVolume}
+
+                $script:result = $null
+
+                it 'calling test should not throw' {
+                    {$script:result = Test-TargetResource -DiskNumber 0 -DriveLetter 'F' -FSLabel 'NewLabel' -verbose} | should not throw
+                }
+
+                it "result should be false" {
+                    $script:result | should be $false
                 }
             }
         }
@@ -212,6 +232,7 @@ try
                     Assert-MockCalled -CommandName New-Partition -Times 0
                 }
             }
+
             context 'Online Unformatted disk' {
                  # verifiable (should be called) mocks
                  Mock Format-Volume -mockwith {}
@@ -228,11 +249,11 @@ try
                  Mock Set-Partition -MockWith {}
 
 
-                it 'Should not throw' {
+                 it 'Should not throw' {
                      {Set-targetResource -diskNumber 0 -driveletter G -verbose} | should not throw
-                }
+                 }
 
-                it "the correct mocks were called" {
+                  it "the correct mocks were called" {
                      Assert-VerifiableMocks
                      Assert-MockCalled -CommandName New-Partition -Times 1
                      Assert-MockCalled -CommandName Format-Volume -Times 1
@@ -243,6 +264,41 @@ try
                      Assert-MockCalled -CommandName Get-Disk -Times 1
                 }
             }
+
+            context 'Set changed FSLabel' {
+                # verifiable (should be called) mocks
+                Mock Get-Disk -mockwith {return $global:mockedDisk0Raw} -verifiable
+                Mock Get-Partition -mockwith {return $Global:mockedPartition}  -verifiable
+                Mock Get-Volume -mockwith {return $global:mockedVolume} -verifiable
+                Mock Set-Volume -mockwith {return $null} -verifiable
+
+                # mocks that should not be called
+                Mock Set-Partition -MockWith {}
+                Mock Get-WmiObject -mockwith {return $global:mockedWmi}
+                Mock Get-CimInstance -mockwith {return $global:mockedWmi}
+                Mock Set-Disk -mockwith {}
+                Mock New-Partition -mockwith {return [pscustomobject] @{DriveLetter='Z'}}
+                Mock Format-Volume -mockwith {}
+                Mock Initialize-Disk -mockwith {} -verifiable
+
+
+                it 'Should not throw' {
+                    {Set-targetResource -diskNumber 0 -driveletter F -FsLabel 'NewLabel' -verbose} | should not throw
+                }
+
+                it "the correct mocks were called" {
+                    Assert-VerifiableMocks
+                    Assert-MockCalled -CommandName Set-Volume -Times 1 -ParameterFilter { $NewFileSystemLabel -eq 'NewLabel' }
+                    Assert-MockCalled -CommandName Set-Partition -Times 0
+                    Assert-MockCalled -CommandName Format-Volume -Times 0
+                    Assert-MockCalled -CommandName Get-Volume -Times 2
+                    Assert-MockCalled -CommandName Get-Partition -Times 2
+                    Assert-MockCalled -CommandName Set-Disk -Times 0
+                    Assert-MockCalled -CommandName Get-WmiObject -Times 0
+                    Assert-MockCalled -CommandName New-Partition -Times 0
+                }
+            }
+            # TODO: Complete Tests...
         }
         #endregion
     }

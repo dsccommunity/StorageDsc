@@ -56,8 +56,20 @@ Please read the installation instructions that are present on both the download 
 * added unit test for volume with existing partition and no drive letter assigned for MSFT_xDisk.psm1
 * xMountImage: Fixed mounting disk images on Windows 10 Anniversary Edition
 * Updated to meet HQRM guidelines.
+* Moved all strings into locaization files.
 * Fixed examples to import xStorage module.
-* Added xWaitForVolume.
+* xWaitForVolume:
+  - Added new resource.
+* xStorageCommon:
+  - Added helper function module.
+* xDisk:
+  - Added validation of DriveLetter parameter.
+  - Added support for setting DriveLetter parameter with or without colon.
+  - Removed obfuscation of drive/partition errors by eliminating try/catch block.
+  - Improved code commenting.
+* xMountImage:
+  - Added validation of DriveLetter parameter.
+  - Added support for setting DriveLetter parameter with or without colon.
 
 ### 2.6.0.0
 * MSFT_xDisk: Replaced Get-WmiObject with Get-CimInstance
