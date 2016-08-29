@@ -67,6 +67,7 @@ Please read the installation instructions that are present on both the download 
   - Added support for setting DriveLetter parameter with or without colon.
   - Removed obfuscation of drive/partition errors by eliminating try/catch block.
   - Improved code commenting.
+  - Reordered tests so they are in same order as module functions to ease creation.
 * xMountImage:
   - Added validation of DriveLetter parameter.
   - Added support for setting DriveLetter parameter with or without colon.

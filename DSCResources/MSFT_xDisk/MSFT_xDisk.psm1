@@ -151,9 +151,7 @@ function Set-TargetResource
                 $($LocalizedData.SetDiskOnlineMessage -f $DiskNumber)
             ) -join '' )
 
-        Set-Disk `
-            -InputObject $disk `
-            -IsOffline $false
+        $disk | Set-Disk -IsOffline $false
     } # if
 
     if ($disk.IsReadOnly)
@@ -164,9 +162,7 @@ function Set-TargetResource
                 $($LocalizedData.SetDiskReadwriteMessage -f $DiskNumber)
             ) -join '' )
 
-        Set-Disk `
-            -InputObject $disk `
-            -IsReadOnly $false
+        $disk | Set-Disk -IsReadOnly $false
     } # if
 
     Write-Verbose -Message ( @(
@@ -184,8 +180,7 @@ function Set-TargetResource
                     $($LocalizedData.InitializingDiskMessage -f $DiskNumber)
                 ) -join '' )
 
-            Initialize-Disk `
-                -InputObject $disk `
+            $disk | Initialize-Disk `
                 -PartitionStyle "GPT" `
                 -PassThru
         }
@@ -263,9 +258,7 @@ function Set-TargetResource
             ) -join '' )
 
         # Format the volume
-        $volume = Format-Volume `
-            -InputObject $partition `
-            @VolParams
+        $volume = $partition | Format-Volume @VolParams
 
         if ($volume)
         {
@@ -318,12 +311,10 @@ function Set-TargetResource
                 # The volume lable needs to be changed because it is different.
                 Write-Verbose -Message ( @(
                         "$($MyInvocation.MyCommand): "
-                        $($LocalizedData.ChangingVolumeLabelMessage -f $Volume.DriveLetter,$FSLabel)
+                        $($LocalizedData.ChangingVolumeLabelMessage -f $volume.DriveLetter,$FSLabel)
                     ) -join '' )
 
-                Set-Volume `
-                    -InputObject $Volume `
-                    -NewFileSystemLabel $FSLabel
+                $volume | Set-Volume -NewFileSystemLabel $FSLabel
             } # if
         } # if
     } # if
