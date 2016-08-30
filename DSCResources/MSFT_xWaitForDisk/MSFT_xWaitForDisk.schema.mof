@@ -1,5 +1,5 @@
 
-[ClassVersion("0.1.0.0"), FriendlyName("xWaitForDisk")]
+[ClassVersion("1.0.0.0"), FriendlyName("xWaitForDisk")]
 class MSFT_xWaitForDisk : OMI_BaseResource
 {
     [Key, Description("Specifies the identifier for which disk to wait for.")] Uint32 DiskNumber;

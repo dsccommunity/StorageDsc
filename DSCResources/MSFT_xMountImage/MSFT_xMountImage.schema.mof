@@ -1,5 +1,5 @@
 
-[ClassVersion("0.1.0.0"), FriendlyName("xMountImage")]
+[ClassVersion("1.0.0.0"), FriendlyName("xMountImage")]
 class MSFT_xMountImage : OMI_BaseResource
 {
     [Key, Description("This setting provides a unique name for the configuration")] String Name;

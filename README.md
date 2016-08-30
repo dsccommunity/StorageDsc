@@ -35,6 +35,7 @@ Please read the installation instructions that are present on both the download 
 * **[Uint64] Size**: Specifies the size of new volume (use all available space on disk if not provided). Optional.
 * **[String] FSLabel**: Define volume label if required. Optional.
 * **[UInt32] AllocationUnitSize**: Specifies the allocation unit size to use when formatting the volume. Optional.
+* **[String] FSFormat**: Define volume label if required. Optional. { *NTFS* | ReFS }. Defaults to NTFS.
 
 ### xWaitforDisk
 
@@ -68,6 +69,7 @@ Please read the installation instructions that are present on both the download 
   - Removed obfuscation of drive/partition errors by eliminating try/catch block.
   - Improved code commenting.
   - Reordered tests so they are in same order as module functions to ease creation.
+  - Added FSFormat parameter to allow disk format to be specified.
 * xMountImage:
   - Added validation of DriveLetter parameter.
   - Added support for setting DriveLetter parameter with or without colon.
@@ -150,6 +152,7 @@ Configuration DataDisk
              DiskNumber = 3
              DriveLetter = 'S'
              Size = 100GB
+             FSFormat = 'ReFS'
              AllocationUnitSize = 64kb
         }
     }

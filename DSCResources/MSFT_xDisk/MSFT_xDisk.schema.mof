@@ -1,5 +1,5 @@
 
-[ClassVersion("0.1.0.0"), FriendlyName("xDisk")]
+[ClassVersion("1.0.0.0"), FriendlyName("xDisk")]
 class MSFT_xDisk : OMI_BaseResource
 {
     [Key, Description("Specifies the identifier for which disk to modify.")] String DriveLetter;
@@ -7,4 +7,5 @@ class MSFT_xDisk : OMI_BaseResource
     [Write, Description("Specifies the size of new volume.")] Uint64 Size;
     [Write, Description("Define volume label if required.")] String FSLabel;
     [Write, Description("Specifies the allocation unit size to use when formatting the volume.")] uint32 AllocationUnitSize;
+    [Write, Description("Specifies the file system format of the new volume."), ValueMap{"NTFS","ReFS"}, Values{"NTFS","ReFS"}] String FSFormat;
 };

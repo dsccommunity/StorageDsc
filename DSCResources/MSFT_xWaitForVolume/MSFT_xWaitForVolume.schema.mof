@@ -1,5 +1,5 @@
 
-[ClassVersion("0.1.0.0"), FriendlyName("xWaitForVolume")]
+[ClassVersion("1.0.0.0"), FriendlyName("xWaitForVolume")]
 class MSFT_xWaitForVolume : OMI_BaseResource
 {
     [Key, Description("Specifies the drive letter of the volume to wait for.")] String DriveLetter;

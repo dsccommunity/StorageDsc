@@ -33,6 +33,7 @@ Configuration DataDisk
              DiskNumber = 3
              DriveLetter = 'S'
              Size = 100GB
+             FSFormat = 'ReFS'
              AllocationUnitSize = 64kb
         }
     }

@@ -56,19 +56,20 @@ try
                 PartitionStyle = 'Raw'
             }
         $global:mockedWmi = [pscustomobject] @{BlockSize=4096}
-        $Global:mockedPartition = [pscustomobject] @{
-                    DriveLetter='F'
-                    Size=123
-                }
+        $global:mockedPartition = [pscustomobject] @{
+                DriveLetter='F'
+                Size=123
+            }
         $global:mockedVolume = [pscustomobject] @{
-                    FileSystemLabel='myLabel'
-                    DriveLetter='F'
-                }
-
-        $global:mockedVolumeNoLetter = [pscustomobject] @{
-                    FileSystemLabel='myLabel'
-                    DriveLetter=$null
-                }
+                FileSystemLabel = 'myLabel'
+                DriveLetter = 'F'
+                FileSystem = 'NTFS'
+            }
+        $global:mockedVolumeReFS = [pscustomobject] @{
+                FileSystemLabel = 'myLabel'
+                DriveLetter = 'F'
+                FileSystem = 'ReFS'
+            }
         #endregion
 
         #region Function Get-TargetResource
@@ -77,10 +78,10 @@ try
             Mock Get-WmiObject -mockwith {return $global:mockedWmi}
             Mock Get-CimInstance -mockwith {return $global:mockedWmi}
             Mock Get-Disk -mockwith {return $global:mockedDisk0} -verifiable
-            Mock Get-Partition -mockwith {return $Global:mockedPartition} -verifiable
+            Mock Get-Partition -mockwith {return $global:mockedPartition} -verifiable
             Mock Get-Volume -mockwith {return $global:mockedVolume} -verifiable
 
-            $resource = Get-TargetResource -DiskNumber 0 -DriveLetter 'G' -verbose
+            $resource = Get-TargetResource -DiskNumber 0 -DriveLetter 'G' -Verbose
             it "DiskNumber should be 0" {
                 $resource.DiskNumber | should be 0
             }
@@ -101,6 +102,10 @@ try
                 $resource.AllocationUnitSize | should be 4096
             }
 
+            it "FSFormat should be NTFS" {
+                $resource.FSFormat | should be 'NTFS'
+            }
+
             it "all the get mocks should be called" {
                 Assert-VerifiableMocks
             }
@@ -113,7 +118,7 @@ try
                 # verifiable (should be called) mocks
                 Mock Get-Disk -mockwith {return $global:mockedDisk0Raw} -verifiable
                 Mock Set-Partition -MockWith {}
-                Mock Get-Partition -mockwith {return $Global:mockedPartition}  -verifiable
+                Mock Get-Partition -mockwith {return $global:mockedPartition}  -verifiable
                 Mock Get-Volume -mockwith {return $global:mockedVolume} -verifiable
 
                 # mocks that should not be called
@@ -125,7 +130,7 @@ try
                 Mock New-Partition -mockwith {return [pscustomobject] @{DriveLetter='Z'}}
 
                 it 'Should not throw' {
-                    {Set-targetResource -diskNumber 0 -driveletter G -verbose} | should not throw
+                    {Set-targetResource -diskNumber 0 -driveletter G -Verbose} | should not throw
                 }
 
                 it "the correct mocks were called" {
@@ -143,7 +148,7 @@ try
             context 'Online Formatted disk No Drive Letter' {
                 # verifiable (should be called) mocks
                 Mock Get-Disk -mockwith {return $global:mockedDisk0Raw} -verifiable
-                Mock Get-Partition -mockwith {return $Global:mockedPartition}  -verifiable
+                Mock Get-Partition -mockwith {return $global:mockedPartition}  -verifiable
                 Mock Get-Volume -mockwith {return $global:mockedVolumeNoLetter} -verifiable
                 Mock Set-Partition -MockWith {}
 
@@ -156,7 +161,7 @@ try
                 Mock Initialize-Disk -mockwith {} -verifiable
 
                 it 'Should not throw' {
-                    {Set-targetResource -diskNumber 0 -driveletter G -verbose} | should not throw
+                    {Set-targetResource -diskNumber 0 -driveletter G -Verbose} | should not throw
                 }
 
                 it "the correct mocks were called" {
@@ -182,13 +187,13 @@ try
                  # mocks that should not be called
                  Mock Get-WmiObject -mockwith {return $global:mockedWmi}
                  Mock Get-CimInstance -mockwith {return $global:mockedWmi}
-                 Mock Get-Partition -mockwith {return $Global:mockedPartition}  -verifiable
+                 Mock Get-Partition -mockwith {return $global:mockedPartition}  -verifiable
                  Mock Set-Disk -mockwith {}
                  Mock Set-Partition -MockWith {}
 
 
                  it 'Should not throw' {
-                     {Set-targetResource -diskNumber 0 -driveletter G -verbose} | should not throw
+                     {Set-targetResource -diskNumber 0 -driveletter G -Verbose} | should not throw
                  }
 
                   it "the correct mocks were called" {
@@ -206,7 +211,7 @@ try
             context 'Set changed FSLabel' {
                 # verifiable (should be called) mocks
                 Mock Get-Disk -mockwith {return $global:mockedDisk0Raw} -verifiable
-                Mock Get-Partition -mockwith {return $Global:mockedPartition}  -verifiable
+                Mock Get-Partition -mockwith {return $global:mockedPartition}  -verifiable
                 Mock Get-Volume -mockwith {return $global:mockedVolume} -verifiable
                 Mock Set-Volume -mockwith {return $null} -verifiable
 
@@ -221,7 +226,7 @@ try
 
 
                 it 'Should not throw' {
-                    {Set-targetResource -diskNumber 0 -driveletter F -FsLabel 'NewLabel' -verbose} | should not throw
+                    {Set-targetResource -diskNumber 0 -driveletter F -FsLabel 'NewLabel' -Verbose} | should not throw
                 }
 
                 it "the correct mocks were called" {
@@ -241,20 +246,27 @@ try
 
         #region Function Test-TargetResource
         Describe "MSFT_xDisk\Test-TargetResource" {
+            Mock Get-WmiObject -mockwith {return $global:mockedWmi}
+            Mock Get-CimInstance -mockwith {return $global:mockedWmi}
+
             context 'Test disk not initialized' {
                 # verifiable (should be called) mocks
-                Mock Get-WmiObject -mockwith {return $global:mockedWmi}
-                Mock Get-CimInstance -mockwith {return $global:mockedWmi}
                 Mock Get-Disk -mockwith {return $global:mockedDisk0Offline} -verifiable
 
                 # mocks that should not be called
                 Mock Get-Volume -mockwith {return $global:mockedVolume}
-                Mock Get-Partition -mockwith {return $Global:mockedPartition}
+                Mock Get-Partition -mockwith {return $global:mockedPartition}
 
                 $script:result = $null
 
                 it 'calling test should not throw' {
-                    {$script:result = Test-TargetResource -DiskNumber 0 -DriveLetter 'F' -AllocationUnitSize 4096 -verbose} | should not throw
+                    {
+                        $script:result = Test-TargetResource `
+                            -DiskNumber $global:mockedDisk0Offline.Number `
+                            -DriveLetter $global:mockedVolume.DriveLetter `
+                            -AllocationUnitSize 4096 `
+                            -Verbose
+                    } | should not throw
                 }
 
                 it "result should be false" {
@@ -270,18 +282,22 @@ try
 
             context 'Test disk read only' {
                 # verifiable (should be called) mocks
-                Mock Get-WmiObject -mockwith {return $global:mockedWmi}
-                Mock Get-CimInstance -mockwith {return $global:mockedWmi}
                 Mock Get-Disk -mockwith {return $global:mockedDisk0Readonly} -verifiable
 
                 # mocks that should not be called
                 Mock Get-Volume -mockwith {return $global:mockedVolume}
-                Mock Get-Partition -mockwith {return $Global:mockedPartition}
+                Mock Get-Partition -mockwith {return $global:mockedPartition}
 
                 $script:result = $null
 
                 it 'calling test should not throw' {
-                    {$script:result = Test-TargetResource -DiskNumber 0 -DriveLetter 'F' -AllocationUnitSize 4096 -verbose} | should not throw
+                    {
+                        $script:result = Test-TargetResource `
+                            -DiskNumber $global:mockedDisk0Readonly.Number `
+                            -DriveLetter $global:mockedVolume.DriveLetter `
+                            -AllocationUnitSize 4096 `
+                            -Verbose
+                    } | should not throw
                 }
 
                 it "result should be false" {
@@ -295,12 +311,41 @@ try
                 }
             }
 
-            context 'Test matching AllocationUnitSize' {
+            context 'Test online unformatted disk' {
                 # verifiable (should be called) mocks
-                Mock Get-WmiObject -mockwith {return $global:mockedWmi}
-                Mock Get-CimInstance -mockwith {return $global:mockedWmi}
+                Mock Get-Disk -mockwith {return $global:mockedDisk0Raw} -verifiable
+
+                # mocks that should not be called
+                Mock Get-Volume -mockwith {return $global:mockedVolume}
+                Mock Get-Partition -mockwith {return $global:mockedPartition}
+
+                $script:result = $null
+
+                it 'calling test should not throw' {
+                    {
+                        $script:result = Test-TargetResource `
+                            -DiskNumber $global:mockedDisk0Raw.Number `
+                            -DriveLetter $global:mockedVolume.DriveLetter `
+                            -AllocationUnitSize 4096 `
+                            -Verbose
+                    } | should not throw
+                }
+
+                it "result should be false" {
+                    $script:result | should be $false
+                }
+
+                it "the correct mocks were called" {
+                    Assert-VerifiableMocks
+                    Assert-MockCalled -CommandName Get-Partition -Times 0
+                    Assert-MockCalled -CommandName Get-Volume -Times 0
+                }
+            }
+
+            context 'Test mismatching partition size' {
+                # verifiable (should be called) mocks
                 Mock Get-Disk -mockwith {return $global:mockedDisk0} -verifiable
-                Mock Get-Partition -mockwith {return $Global:mockedPartition} -verifiable
+                Mock Get-Partition -mockwith {return $global:mockedPartition} -verifiable
 
                 # mocks that should not be called
                 Mock Get-Volume -mockwith {return $global:mockedVolume}
@@ -308,7 +353,136 @@ try
                 $script:result = $null
 
                 it 'calling test should not throw' {
-                    {$script:result = Test-TargetResource -DiskNumber 0 -DriveLetter 'F' -AllocationUnitSize 4096 -verbose} | should not throw
+                    {
+                        $script:result = Test-TargetResource `
+                            -DiskNumber $global:mockedDisk0.Number `
+                            -DriveLetter $global:mockedVolume.DriveLetter `
+                            -AllocationUnitSize 4096 `
+                            -Size 124 `
+                            -Verbose
+                    } | should not throw
+                }
+
+                it "result should be false" {
+                    $script:result | should be $false
+                }
+
+                it "the correct mocks were called" {
+                    Assert-VerifiableMocks
+                    Assert-MockCalled -CommandName Get-Partition -Times 1
+                    Assert-MockCalled -CommandName Get-Volume -Times 0
+                }
+            }
+
+            context 'Test mismatched AllocationUnitSize' {
+                # verifiable (should be called) mocks
+                Mock Get-Disk -mockwith {return $global:mockedDisk0} -verifiable
+                Mock Get-Partition -mockwith {return $global:mockedPartition} -verifiable
+
+                # mocks that should not be called
+                Mock Get-Volume -mockwith {return $global:mockedVolume}
+
+                $script:result = $null
+
+                it 'calling test should not throw' {
+                    {
+                        $script:result = Test-TargetResource `
+                            -DiskNumber $global:mockedDisk0.Number `
+                            -DriveLetter $global:mockedVolume.DriveLetter `
+                            -AllocationUnitSize 4097 `
+                            -Verbose
+                    } | should not throw
+                }
+
+                # skipped due to:  https://github.com/PowerShell/xStorage/issues/22
+                it "result should be false" -skip {
+                    $script:result | should be $false
+                }
+
+                it "the correct mocks were called" {
+                    Assert-VerifiableMocks
+                    Assert-MockCalled -CommandName Get-Partition -Times 1
+                    Assert-MockCalled -CommandName Get-Volume -Times 1
+                }
+            }
+
+            context 'Test mismatching FSFormat' {
+                # verifiable (should be called) mocks
+                Mock Get-Disk -mockwith {return $global:mockedDisk0} -verifiable
+                Mock Get-Partition -mockwith {return $global:mockedPartition} -verifiable
+                Mock Get-Volume -mockwith {return $global:mockedVolume} -verifiable
+
+                $script:result = $null
+
+                it 'calling test should not throw' {
+                    {
+                        $script:result = Test-TargetResource `
+                            -DiskNumber $global:mockedDisk0.Number `
+                            -DriveLetter $global:mockedVolume.DriveLetter `
+                            -FSFormat 'ReFS' `
+                            -Verbose
+                    } | should not throw
+                }
+
+                it "result should be false" {
+                    $script:result | should be $false
+                }
+
+                it "the correct mocks were called" {
+                    Assert-VerifiableMocks
+                    Assert-MockCalled -CommandName Get-Partition -Times 1
+                    Assert-MockCalled -CommandName Get-Volume -Times 1
+                }
+            }
+
+            context 'Test mismatching FSLabel' {
+                # verifiable (should be called) mocks
+                Mock Get-Disk -mockwith {return $global:mockedDisk0} -verifiable
+                Mock Get-Partition -mockwith {return $global:mockedPartition} -verifiable
+                Mock Get-Volume -mockwith {return $global:mockedVolume} -verifiable
+
+                $script:result = $null
+
+                it 'calling test should not throw' {
+                    {
+                        $script:result = Test-TargetResource `
+                            -DiskNumber $global:mockedDisk0.Number `
+                            -DriveLetter $global:mockedVolume.DriveLetter `
+                            -FSLabel 'NewLabel' `
+                            -Verbose
+                    } | should not throw
+                }
+
+                it "result should be false" {
+                    $script:result | should be $false
+                }
+
+                it "the correct mocks were called" {
+                    Assert-VerifiableMocks
+                    Assert-MockCalled -CommandName Get-Partition -Times 1
+                    Assert-MockCalled -CommandName Get-Volume -Times 1
+                }
+            }
+
+            context 'Test all disk properties matching' {
+                # verifiable (should be called) mocks
+                Mock Get-Disk -mockwith {return $global:mockedDisk0} -verifiable
+                Mock Get-Partition -mockwith {return $global:mockedPartition} -verifiable
+                Mock Get-Volume -mockwith {return $global:mockedVolume} -verifiable
+
+                $script:result = $null
+
+                it 'calling test should not throw' {
+                    {
+                        $script:result = Test-TargetResource `
+                            -DiskNumber $global:mockedDisk0.Number `
+                            -DriveLetter $global:mockedVolume.DriveLetter `
+                            -AllocationUnitSize 4096 `
+                            -Size $global:mockedPartition.Size `
+                            -FSLabel $global:mockedVolume.FileSystemLabel `
+                            -FSFormat $global:mockedVolume.FileSystem `
+                            -Verbose
+                    } | should not throw
                 }
 
                 it "result should be true" {
@@ -317,53 +491,8 @@ try
 
                 it "the correct mocks were called" {
                     Assert-VerifiableMocks
-                    Assert-MockCalled -CommandName Get-Volume -Times 0
-                }
-            }
-
-            context 'Test mismatched AllocationUnitSize' {
-                # verifiable (should be called) mocks
-                Mock Get-WmiObject -mockwith {return $global:mockedWmi}
-                Mock Get-CimInstance -mockwith {return $global:mockedWmi}
-                Mock Get-Disk -mockwith {return $global:mockedDisk0} -verifiable
-                Mock Get-Partition -mockwith {return $Global:mockedPartition} -verifiable
-
-                # mocks that should not be called
-                Mock Get-Volume -mockwith {return $global:mockedVolume}
-
-                $script:result = $null
-
-                it 'calling test should not throw' {
-                    {$script:result = Test-TargetResource -DiskNumber 0 -DriveLetter 'F' -AllocationUnitSize 4097 -verbose} | should not throw
-                }
-
-                # skipped due to:  https://github.com/PowerShell/xStorage/issues/22
-                it "result should be true" -skip {
-                    $script:result | should be $false
-                }
-
-                it "the correct mocks were called" {
-                    Assert-VerifiableMocks
-                    Assert-MockCalled -CommandName Get-Volume -Times 0
-                }
-            }
-
-            context 'Test changed FSLabel' {
-                # verifiable (should be called) mocks
-                Mock Get-WmiObject -mockwith {return $global:mockedWmi}
-                Mock Get-CimInstance -mockwith {return $global:mockedWmi}
-                Mock Get-Disk -mockwith {return $global:mockedDisk0} -verifiable
-                Mock Get-Partition -mockwith {return $Global:mockedPartition} -verifiable
-                Mock Get-Volume -mockwith {return $global:mockedVolume}
-
-                $script:result = $null
-
-                it 'calling test should not throw' {
-                    {$script:result = Test-TargetResource -DiskNumber 0 -DriveLetter 'F' -FSLabel 'NewLabel' -verbose} | should not throw
-                }
-
-                it "result should be false" {
-                    $script:result | should be $false
+                    Assert-MockCalled -CommandName Get-Partition -Times 1
+                    Assert-MockCalled -CommandName Get-Volume -Times 1
                 }
             }
         }

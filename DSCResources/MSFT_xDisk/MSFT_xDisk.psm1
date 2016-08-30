@@ -34,6 +34,8 @@ Import-Module -Name ( Join-Path `
     Define volume label if required.
     .PARAMETER AllocationUnitSize
     Specifies the allocation unit size to use when formatting the volume.
+    .PARAMETER FSFormat
+    Specifies the file system format of the new volume.
 #>
 function Get-TargetResource
 {
@@ -50,7 +52,11 @@ function Get-TargetResource
 
         [string] $FSLabel,
 
-        [UInt32] $AllocationUnitSize
+        [UInt32] $AllocationUnitSize,
+
+        [ValidateSet("NTFS","ReFS")]
+        [System.String]
+        $FSFormat = 'NTFS'
     )
 
     Write-Verbose -Message ( @(
@@ -69,9 +75,12 @@ function Get-TargetResource
         -DriveLetter $DriveLetter `
         -ErrorAction SilentlyContinue
 
-    $FSLabel = (Get-Volume `
+    $volume = Get-Volume `
         -DriveLetter $DriveLetter `
-        -ErrorAction SilentlyContinue).FileSystemLabel
+        -ErrorAction SilentlyContinue
+
+    $FSFormat = $volume.FileSystem
+    $FSLabel = $volume.FileSystemLabel
 
     $blockSize = (Get-CimInstance `
         -Query "SELECT BlockSize from Win32_Volume WHERE DriveLetter = '$($DriveLetter):'" `
@@ -96,6 +105,7 @@ function Get-TargetResource
         Size = $partition.Size
         FSLabel = $FSLabel
         AllocationUnitSize = $allocationUnitSize
+        FSFormat = $FSFormat
     }
     $returnValue
 } # Get-TargetResource
@@ -113,6 +123,8 @@ function Get-TargetResource
     Define volume label if required.
     .PARAMETER AllocationUnitSize
     Specifies the allocation unit size to use when formatting the volume.
+    .PARAMETER FSFormat
+    Specifies the file system format of the new volume.
 #>
 function Set-TargetResource
 {
@@ -128,7 +140,11 @@ function Set-TargetResource
 
         [string] $FSLabel,
 
-        [UInt32] $AllocationUnitSize
+        [UInt32] $AllocationUnitSize,
+
+        [ValidateSet("NTFS","ReFS")]
+        [System.String]
+        $FSFormat = 'NTFS'
     )
 
     Write-Verbose -Message ( @(
@@ -246,7 +262,7 @@ function Set-TargetResource
             # Set the File System label on the new volume
             $volParams["NewFileSystemLabel"] = $FSLabel
         } # if
-        if($AllocationUnitSize)
+        if ($AllocationUnitSize)
         {
             # Set the Allocation Unit Size on the new volume
             $volParams["AllocationUnitSize"] = $AllocationUnitSize
@@ -276,7 +292,7 @@ function Set-TargetResource
         if ($volume.DriveLetter)
         {
             # A volume also exists in the partition
-            if($volume.DriveLetter -ne $DriveLetter)
+            if ($volume.DriveLetter -ne $DriveLetter)
             {
                 # The drive letter assigned to the volume is different, so change it.
                 Write-Verbose -Message ( @(
@@ -306,7 +322,7 @@ function Set-TargetResource
         if ($PSBoundParameters.ContainsKey('FSLabel'))
         {
             # The volume should have a label assigned
-            if($volume.FileSystemLabel -ne $FSLabel)
+            if ($volume.FileSystemLabel -ne $FSLabel)
             {
                 # The volume lable needs to be changed because it is different.
                 Write-Verbose -Message ( @(
@@ -333,6 +349,8 @@ function Set-TargetResource
     Define volume label if required.
     .PARAMETER AllocationUnitSize
     Specifies the allocation unit size to use when formatting the volume.
+    .PARAMETER FSFormat
+    Specifies the file system format of the new volume.
 #>
 function Test-TargetResource
 {
@@ -350,7 +368,11 @@ function Test-TargetResource
 
         [string] $FSLabel,
 
-        [UInt32] $AllocationUnitSize
+        [UInt32] $AllocationUnitSize,
+
+        [ValidateSet("NTFS","ReFS")]
+        [System.String]
+        $FSFormat = 'NTFS'
     )
 
     Write-Verbose -Message ( @(
@@ -443,9 +465,9 @@ function Test-TargetResource
             -ErrorAction SilentlyContinue).BlockSize
     } # if
 
-    if($blockSize -gt 0 -and $AllocationUnitSize -ne 0)
+    if ($blockSize -gt 0 -and $AllocationUnitSize -ne 0)
     {
-        if($AllocationUnitSize -ne $blockSize)
+        if ($AllocationUnitSize -ne $blockSize)
         {
             # Just write a warning, we will not try to reformat a drive due to invalid allocation
             # unit sizes
@@ -457,19 +479,38 @@ function Test-TargetResource
         } # if
     } # if
 
+    # Get the volume so the properties can be checked
+    $volume = Get-Volume `
+        -DriveLetter $DriveLetter `
+        -ErrorAction SilentlyContinue
+
+    if ($PSBoundParameters.ContainsKey('FSFormat'))
+    {
+        # Check the filesystem format
+        $fileSystem = $volume.FileSystem
+        if ($fileSystem -ne $FSFormat)
+        {
+            # The file system format does not match
+            Write-Verbose -Message ( @(
+                    "$($MyInvocation.MyCommand): "
+                    $($LocalizedData.FileSystemFormatMismatch -f `
+                        $DriveLetter,$fileSystem,$FSFormat)
+                ) -join '' )
+            return $false
+        } # if
+    } # if
+
     if ($PSBoundParameters.ContainsKey('FSLabel'))
     {
         # Check the volume label
-        $label = (Get-Volume `
-            -DriveLetter $DriveLetter `
-            -ErrorAction SilentlyContinue).FileSystemLabel
+        $label = $volume.FileSystemLabel
         if ($label -ne $FSLabel)
         {
             # The assigned volume label is different and needs updating
             Write-Verbose -Message ( @(
                     "$($MyInvocation.MyCommand): "
                     $($LocalizedData.DriveLabelMismatch -f `
-                        $DriveLetter,$Label,$FSLabel)
+                        $DriveLetter,$label,$FSLabel)
                 ) -join '' )
             return $false
         } # if
