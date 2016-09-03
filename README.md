@@ -168,7 +168,7 @@ Configuration DataDisk
         {
              DiskNumber = 2
              DriveLetter = 'J'
-			 FSLabel = 'Data
+			 FSLabel = 'Data'
 			 DependsOn = [xDisk]GVolume
         }
         
