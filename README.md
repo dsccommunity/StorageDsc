@@ -161,22 +161,22 @@ Configuration DataDisk
         {
              DiskNumber = 2
              DriveLetter = 'G'
-			 Size = 10GB
+             Size = 10GB
         }
         
         xDisk JVolume
         {
              DiskNumber = 2
              DriveLetter = 'J'
-			 FSLabel = 'Data
-			 DependsOn = [xDisk]GVolume
+             FSLabel = 'Data'
+             DependsOn = [xDisk]GVolume
         }
         
         xDisk DataVolume
         {
              DiskNumber = 3
              DriveLetter = 'S'
-			 Size = 100GB
+             Size = 100GB
              AllocationUnitSize = 64kb
         }
     }
