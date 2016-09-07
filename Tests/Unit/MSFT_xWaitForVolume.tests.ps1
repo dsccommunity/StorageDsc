@@ -107,7 +107,8 @@ try
 
                 $errorRecord = Get-InvalidOperationError `
                     -ErrorId 'VolumeNotFoundAfterError' `
-                    -ErrorMessage $($LocalizedData.VolumeNotFoundAfterError -f $driveCParameters.DriveLetter,$driveCParameters.RetryCount)
+                    -ErrorMessage $($LocalizedData.VolumeNotFoundAfterError `
+                        -f $driveCParameters.DriveLetter,$driveCParameters.RetryCount)
 
                 It 'should throw VolumeNotFoundAfterError' {
                     { Set-targetResource @driveCParameters -Verbose } | Should Throw $errorRecord
@@ -134,7 +135,9 @@ try
                 $script:result = $null
 
                 It 'calling test should not throw' {
-                    { $script:result = Test-TargetResource @driveCParameters -Verbose } | Should Not Throw
+                    {
+                        $script:result = Test-TargetResource @driveCParameters -Verbose
+                    } | Should Not Throw
                 }
 
                 It "result Should Be true" {
@@ -154,7 +157,9 @@ try
                 $script:result = $null
 
                 It 'calling test should not throw' {
-                    { $script:result = Test-TargetResource @driveCParameters -Verbose } | Should Not Throw
+                    {
+                        $script:result = Test-TargetResource @driveCParameters -Verbose
+                    } | Should Not Throw
                 }
 
                 It 'result Should Be false' {

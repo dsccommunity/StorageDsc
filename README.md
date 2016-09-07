@@ -70,6 +70,7 @@ Please read the installation instructions that are present on both the download 
   - Improved code commenting.
   - Reordered tests so they are in same order as module functions to ease creation.
   - Added FSFormat parameter to allow disk format to be specified.
+  - Size or AllocationUnitSize mistmatches no longer trigger Set-TargetResource because these values can't be changed (yet).
 * xMountImage:
   - Added validation of DriveLetter parameter.
   - Added support for setting DriveLetter parameter with or without colon.

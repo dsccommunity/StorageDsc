@@ -54,8 +54,9 @@ try
             Number = 0
             FriendlyName = 'Test Disk'
         }
+
         $disk0Parameters = @{
-            DiskNumber = 0
+            DiskNumber = 00
             RetryIntervalSec = 5
             RetryCount = 20
         }
@@ -106,7 +107,8 @@ try
 
                 $errorRecord = Get-InvalidOperationError `
                     -ErrorId 'DiskNotFoundAfterError' `
-                    -ErrorMessage $($LocalizedData.DiskNotFoundAfterError -f $disk0Parameters.DiskNumber,$disk0Parameters.RetryCount)
+                    -ErrorMessage $($LocalizedData.DiskNotFoundAfterError `
+                        -f $disk0Parameters.DiskNumber,$disk0Parameters.RetryCount)
 
                 It 'should throw DiskNotFoundAfterError' {
                     { Set-targetResource @disk0Parameters -Verbose } | Should Throw $errorRecord
@@ -130,7 +132,9 @@ try
                 $script:result = $null
 
                 It 'calling test should not throw' {
-                    { $script:result = Test-TargetResource @disk0Parameters -Verbose } | Should Not Throw
+                    {
+                        $script:result = Test-TargetResource @disk0Parameters -Verbose
+                    } | Should Not Throw
                 }
 
                 It "result Should Be true" {
@@ -149,7 +153,9 @@ try
                 $script:result = $null
 
                 It 'calling test should not throw' {
-                    { $script:result = Test-TargetResource @disk0Parameters -Verbose } | Should Not Throw
+                    {
+                        $script:result = Test-TargetResource @disk0Parameters -Verbose
+                    } | Should Not Throw
                 }
 
                 It 'result Should Be false' {

@@ -223,7 +223,7 @@ function Set-TargetResource
     {
         # There is no partiton on the disk, so create one
         $partParams = @{
-            DriveLetter = $DriveLetter;
+            DriveLetter = $DriveLetter
             DiskNumber = $DiskNumber
         }
 
@@ -232,7 +232,8 @@ function Set-TargetResource
             # Use only a specific size
             Write-Verbose -Message ( @(
                     "$($MyInvocation.MyCommand): "
-                    $($LocalizedData.CreatingPartitionMessage -f $DiskNumber,$DriveLetter,"$($Size/1kb) kb")
+                    $($LocalizedData.CreatingPartitionMessage `
+                        -f $DiskNumber,$DriveLetter,"$($Size/1kb) kb")
                 ) -join '' )
             $partParams["Size"] = $Size
         }
@@ -241,19 +242,39 @@ function Set-TargetResource
             # Use the entire disk
             Write-Verbose -Message ( @(
                     "$($MyInvocation.MyCommand): "
-                    $($LocalizedData.CreatingPartitionMessage -f $DiskNumber,$DriveLetter,'all free space')
+                    $($LocalizedData.CreatingPartitionMessage `
+                        -f $DiskNumber,$DriveLetter,'all free space')
                 ) -join '' )
             $partParams["UseMaximumSize"] = $true
         } # if
 
         # Create the partition.
-        $partition = New-Partition @PartParams
+        $partition = New-Partition @partParams
 
-        # Sometimes the disk will still be read-only after the call to New-Partition returns.
-        Start-Sleep -Seconds 5
+        # After creating the partition it can take a few seconds for it to become writeable
+        # Wait for up to 30 seconds for the parition to become writeable
+        $timeout = 30000
+        $start = [DateTime]::Now
+        While ($partition.IsReadOnly `
+            -and ([DateTime]::Now - $start).TotalMilliseconds -lt $timeout)
+        {
+            Start-Sleep -Seconds 1
+            $partition = $partition | Get-Partition
+            Write-Verbose -Message ($LocalizedData.NewPartitionIsReadOnlyMessage -f `
+                $partition.DiskNumber,$partition.PartitionNumber)
+        } # while
+
+        if ($partition)
+        {
+            # The partition is still readonly - throw an exception
+            New-InvalidOperationError `
+                -ErrorId 'NewParitionReadOnlyError' `
+                -ErrorMessage ($LocalizedData.ParitionIsReadOnlyError -f `
+                    $partition.DiskNumber,$partition.PartitionNumber)
+        } # if
 
         $volParams = @{
-            FileSystem = "NTFS";
+            FileSystem = $FSFormat
             Confirm = $false
         }
 
@@ -262,6 +283,7 @@ function Set-TargetResource
             # Set the File System label on the new volume
             $volParams["NewFileSystemLabel"] = $FSLabel
         } # if
+
         if ($AllocationUnitSize)
         {
             # Set the Allocation Unit Size on the new volume
@@ -289,6 +311,21 @@ function Set-TargetResource
         # The disk already has a partition on it
         $volume = ($Disk | Get-Partition | Get-Volume)
 
+        if ($PSBoundParameters.ContainsKey('FSFormat'))
+        {
+            # Check the filesystem format
+            $fileSystem = $volume.FileSystem
+            if ($fileSystem -ne $FSFormat)
+            {
+                # The file system format does not match
+                Write-Verbose -Message ( @(
+                        "$($MyInvocation.MyCommand): "
+                        $($LocalizedData.FileSystemFormatMismatch -f `
+                            $DriveLetter,$fileSystem,$FSFormat)
+                    ) -join '' )
+            } # if
+        } # if
+
         if ($volume.DriveLetter)
         {
             # A volume also exists in the partition
@@ -297,7 +334,8 @@ function Set-TargetResource
                 # The drive letter assigned to the volume is different, so change it.
                 Write-Verbose -Message ( @(
                         "$($MyInvocation.MyCommand): "
-                        $($LocalizedData.ChangingDriveLetterMessage -f $volume.DriveLetter,$DriveLetter)
+                        $($LocalizedData.ChangingDriveLetterMessage `
+                            -f $volume.DriveLetter,$DriveLetter)
                     ) -join '' )
 
                 Set-Partition `
@@ -327,7 +365,8 @@ function Set-TargetResource
                 # The volume lable needs to be changed because it is different.
                 Write-Verbose -Message ( @(
                         "$($MyInvocation.MyCommand): "
-                        $($LocalizedData.ChangingVolumeLabelMessage -f $volume.DriveLetter,$FSLabel)
+                        $($LocalizedData.ChangingVolumeLabelMessage `
+                            -f $volume.DriveLetter,$FSLabel)
                     ) -join '' )
 
                 $volume | Set-Volume -NewFileSystemLabel $FSLabel
@@ -445,12 +484,12 @@ function Test-TargetResource
     {
         if ($partition.Size -ne $Size)
         {
+            # The partition size mismatches but can't be changed (yet)
             Write-Verbose -Message ( @(
                     "$($MyInvocation.MyCommand): "
                     $($LocalizedData.DriveSizeMismatchMessage -f `
                         $DriveLetter,$Partition.Size,$Size)
                 ) -join '' )
-            return $false
         } # if
     } # if
 
@@ -469,8 +508,7 @@ function Test-TargetResource
     {
         if ($AllocationUnitSize -ne $blockSize)
         {
-            # Just write a warning, we will not try to reformat a drive due to invalid allocation
-            # unit sizes
+            # The allocation unit size mismatches but can't be changed (yet)
             Write-Verbose -Message ( @(
                     "$($MyInvocation.MyCommand): "
                     $($LocalizedData.DriveAllocationUnitSizeMismatchMessage -f `
@@ -490,13 +528,12 @@ function Test-TargetResource
         $fileSystem = $volume.FileSystem
         if ($fileSystem -ne $FSFormat)
         {
-            # The file system format does not match
+            # The file system format does not match but can't be changed (yet)
             Write-Verbose -Message ( @(
                     "$($MyInvocation.MyCommand): "
                     $($LocalizedData.FileSystemFormatMismatch -f `
                         $DriveLetter,$fileSystem,$FSFormat)
                 ) -join '' )
-            return $false
         } # if
     } # if
 
