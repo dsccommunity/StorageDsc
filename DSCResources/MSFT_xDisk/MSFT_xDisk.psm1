@@ -198,7 +198,7 @@ function Set-TargetResource
 
             $disk | Initialize-Disk `
                 -PartitionStyle "GPT"
-        }
+        } # "RAW"
         "GPT"
         {
             # The disk partition is already initialized with GPT.
@@ -206,7 +206,7 @@ function Set-TargetResource
                     "$($MyInvocation.MyCommand): "
                     $($LocalizedData.DiskAlreadyInitializedMessage -f $DiskNumber)
                 ) -join '' )
-        }
+        } # "GPT"
         default
         {
             # This disk is initialized but not as GPT - so raise an exception.
@@ -214,11 +214,13 @@ function Set-TargetResource
                 -ErrorId 'DiskAlreadyInitializedError' `
                 -ErrorMessage ($LocalizedData.DiskAlreadyInitializedError -f `
                     $DiskNumber,$Disk.PartitionStyle)
-        }
+        } # default
     } # switch
 
+    $volume = $disk | Get-Partition | Get-Volume
+
     # Check if existing partition already has file system on it
-    if ($null -eq ($disk | Get-Partition | Get-Volume ))
+    if ($null -eq $volume)
     {
         # There is no partiton on the disk, so create one
         $partitionParams = @{
@@ -311,8 +313,8 @@ function Set-TargetResource
     else
     {
         # The disk already has a partition on it
-        $volume = ($Disk | Get-Partition | Get-Volume)
 
+        # Check the volume format matches
         if ($PSBoundParameters.ContainsKey('FSFormat'))
         {
             # Check the filesystem format
@@ -320,6 +322,7 @@ function Set-TargetResource
             if ($fileSystem -ne $FSFormat)
             {
                 # The file system format does not match
+                # There is nothing we can do to resolve this (yet)
                 Write-Verbose -Message ( @(
                         "$($MyInvocation.MyCommand): "
                         $($LocalizedData.FileSystemFormatMismatch -f `
@@ -357,7 +360,7 @@ function Set-TargetResource
                 -DiskNumber $DiskNumber `
                 -PartitionNumber 2 `
                 -NewDriveLetter $DriveLetter
-        }
+        } # if
 
         if ($PSBoundParameters.ContainsKey('FSLabel'))
         {
