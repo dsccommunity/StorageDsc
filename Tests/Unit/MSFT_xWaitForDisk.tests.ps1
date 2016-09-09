@@ -25,6 +25,7 @@ try
     # The InModuleScope command allows you to perform white-box unit testing on the internal
     # (non-exported) code of a Script Module.
     InModuleScope $script:DSCResourceName {
+        # Function to create a exception object for testing output exceptions
         function Get-InvalidOperationError
         {
             [CmdletBinding()]

@@ -25,6 +25,30 @@ try
     # The InModuleScope command allows you to perform white-box unit testing on the internal
     # (non-exported) code of a Script Module.
     InModuleScope $script:DSCResourceName {
+        # Function to create a exception object for testing output exceptions
+        function Get-InvalidOperationError
+        {
+            [CmdletBinding()]
+            param
+            (
+                [Parameter(Mandatory)]
+                [ValidateNotNullOrEmpty()]
+                [System.String]
+                $ErrorId,
+
+                [Parameter(Mandatory)]
+                [ValidateNotNullOrEmpty()]
+                [System.String]
+                $ErrorMessage
+            )
+
+            $exception = New-Object -TypeName System.InvalidOperationException `
+                -ArgumentList $ErrorMessage
+            $errorCategory = [System.Management.Automation.ErrorCategory]::InvalidOperation
+            $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
+                -ArgumentList $exception, $ErrorId, $errorCategory, $null
+            return $errorRecord
+        } # end function Get-InvalidOperationError
 
         #region Pester Test Initialization
         $global:mockedDisk0 = [pscustomobject] @{
@@ -33,6 +57,13 @@ try
                 IsOffline = $false
                 IsReadOnly = $false
                 PartitionStyle = 'GPT'
+            }
+        $global:mockedDisk0Mbr = [pscustomobject] @{
+                Number = 0
+                DiskNumber = 0
+                IsOffline = $false
+                IsReadOnly = $false
+                PartitionStyle = 'MBR'
             }
 
         $global:mockedDisk0Offline = [pscustomobject] @{
@@ -48,7 +79,7 @@ try
                 DiskNumber = 0
                 IsOffline = $true
                 IsReadOnly = $false
-                PartitionStyle = 'RAW'
+                PartitionStyle = 'Raw'
             }
 
         $global:mockedDisk0Readonly = [pscustomobject] @{
@@ -170,7 +201,6 @@ try
                 $AllocationUnitSize
             )
         }
-
         #endregion
 
         #region Function Get-TargetResource
@@ -240,6 +270,67 @@ try
                 Mock `
                     -CommandName Get-Disk `
                     -MockWith { $global:mockedDisk0Offline } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Set-Disk `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-Partition `
+                    -Verifiable
+
+                Mock `
+                    -CommandName New-Partition `
+                    -ParameterFilter {
+                        $DriveLetter -eq 'G'
+                    } `
+                    -MockWith { $global:mockedPartition } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Format-Volume `
+                    -Verifiable
+
+                # mocks that should not be called
+                Mock -CommandName Initialize-Disk
+                Mock -CommandName Get-Volume
+                Mock -CommandName Get-WmiObject
+                Mock -CommandName Get-CimInstance
+                Mock -CommandName Set-Partition
+
+                It 'Should not throw' {
+                    {
+                        Set-targetResource `
+                            -DiskNumber 0 `
+                            -Driveletter 'G' `
+                            -Verbose
+                    } | Should not throw
+                }
+
+                It 'the correct mocks were called' {
+                    Assert-VerifiableMocks
+                    Assert-MockCalled -CommandName Get-Disk -Times 1
+                    Assert-MockCalled -CommandName Set-Disk -Times 1
+                    Assert-MockCalled -CommandName Initialize-Disk -Times 0
+                    Assert-MockCalled -CommandName Get-Partition -Times 1
+                    Assert-MockCalled -CommandName Get-Volume -Times 0
+                    Assert-MockCalled -CommandName New-Partition -Times 1 `
+                        -ParameterFilter {
+                            $DriveLetter -eq 'G'
+                        }
+                    Assert-MockCalled -CommandName Format-Volume -Times 1
+                    Assert-MockCalled -CommandName Set-Partition -Times 0
+                    Assert-MockCalled -CommandName Get-WmiObject -Times 0
+                    Assert-MockCalled -CommandName Get-CimInstance -Times 0
+                }
+            }
+
+            Context 'Readonly GPT disk' {
+                # verifiable (should be called) mocks
+                Mock `
+                    -CommandName Get-Disk `
+                    -MockWith { $global:mockedDisk0Readonly } `
                     -Verifiable
 
                 Mock `
@@ -408,6 +499,169 @@ try
                     Assert-MockCalled -CommandName Get-Disk -Times 1
                     Assert-MockCalled -CommandName Set-Disk -Times 0
                     Assert-MockCalled -CommandName Initialize-Disk -Times 1
+                    Assert-MockCalled -CommandName Get-Partition -Times 1
+                    Assert-MockCalled -CommandName Get-Volume -Times 0
+                    Assert-MockCalled -CommandName New-Partition -Times 1 `
+                        -ParameterFilter {
+                            $DriveLetter -eq 'G'
+                        }
+                    Assert-MockCalled -CommandName Format-Volume -Times 1
+                    Assert-MockCalled -CommandName Set-Partition -Times 0
+                    Assert-MockCalled -CommandName Get-WmiObject -Times 0
+                    Assert-MockCalled -CommandName Get-CimInstance -Times 0
+                }
+            }
+
+            Context 'Online GPT disk with no partitions' {
+                # verifiable (should be called) mocks
+                Mock `
+                    -CommandName Get-Disk `
+                    -MockWith { $global:mockedDisk0 } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-Partition `
+                    -Verifiable
+
+                Mock `
+                    -CommandName New-Partition `
+                    -ParameterFilter {
+                        $DriveLetter -eq 'G'
+                    } `
+                    -MockWith { $global:mockedPartition } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Format-Volume `
+                    -Verifiable
+
+                # mocks that should not be called
+                Mock -CommandName Set-Disk
+                Mock -CommandName Initialize-Disk
+                Mock -CommandName Get-Volume
+                Mock -CommandName Get-WmiObject
+                Mock -CommandName Get-CimInstance
+                Mock -CommandName Set-Partition
+
+                It 'Should not throw' {
+                    {
+                        Set-targetResource `
+                            -DiskNumber 0 `
+                            -Driveletter 'G' `
+                            -Verbose
+                    } | Should not throw
+                }
+
+                It 'the correct mocks were called' {
+                    Assert-VerifiableMocks
+                    Assert-MockCalled -CommandName Get-Disk -Times 1
+                    Assert-MockCalled -CommandName Set-Disk -Times 0
+                    Assert-MockCalled -CommandName Initialize-Disk -Times 0
+                    Assert-MockCalled -CommandName Get-Partition -Times 1
+                    Assert-MockCalled -CommandName Get-Volume -Times 0
+                    Assert-MockCalled -CommandName New-Partition -Times 1 `
+                        -ParameterFilter {
+                            $DriveLetter -eq 'G'
+                        }
+                    Assert-MockCalled -CommandName Format-Volume -Times 1
+                    Assert-MockCalled -CommandName Set-Partition -Times 0
+                    Assert-MockCalled -CommandName Get-WmiObject -Times 0
+                    Assert-MockCalled -CommandName Get-CimInstance -Times 0
+                }
+            }
+
+            Context 'Online MBR disk' {
+                # verifiable (should be called) mocks
+                Mock `
+                    -CommandName Get-Disk `
+                    -MockWith { $global:mockedDisk0Mbr } `
+                    -Verifiable
+
+                # mocks that should not be called
+                Mock -CommandName Set-Disk
+                Mock -CommandName Initialize-Disk
+                Mock -CommandName Get-Partition
+                Mock -CommandName New-Partition
+                Mock -CommandName Format-Volume
+                Mock -CommandName Get-Volume
+                Mock -CommandName Get-WmiObject
+                Mock -CommandName Get-CimInstance
+                Mock -CommandName Set-Partition
+
+                $errorRecord = Get-InvalidOperationError `
+                    -ErrorId 'DiskAlreadyInitializedError' `
+                    -ErrorMessage ($LocalizedData.DiskAlreadyInitializedError -f `
+                        0,$global:mockedDisk0Mbr.PartitionStyle)
+
+                It 'Should throw DiskAlreadyInitializedError' {
+                    {
+                        Set-targetResource `
+                            -DiskNumber 0 `
+                            -Driveletter 'G' `
+                            -Verbose
+                    } | Should Throw $errorRecord
+                }
+
+                It 'the correct mocks were called' {
+                    Assert-VerifiableMocks
+                    Assert-MockCalled -CommandName Get-Disk -Times 1
+                    Assert-MockCalled -CommandName Set-Disk -Times 0
+                    Assert-MockCalled -CommandName Initialize-Disk -Times 0
+                    Assert-MockCalled -CommandName Get-Partition -Times 0
+                    Assert-MockCalled -CommandName Get-Volume -Times 0
+                    Assert-MockCalled -CommandName New-Partition -Times 0
+                    Assert-MockCalled -CommandName Format-Volume -Times 0
+                    Assert-MockCalled -CommandName Set-Partition -Times 0
+                    Assert-MockCalled -CommandName Get-WmiObject -Times 0
+                    Assert-MockCalled -CommandName Get-CimInstance -Times 0
+                }
+            }
+
+            Context 'Online MBR disk with a Partition' {
+                # verifiable (should be called) mocks
+                Mock `
+                    -CommandName Get-Disk `
+                    -MockWith { $global:mockedDisk0 } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-Partition `
+                    -Verifiable
+
+                Mock `
+                    -CommandName New-Partition `
+                    -ParameterFilter {
+                        $DriveLetter -eq 'G'
+                    } `
+                    -MockWith { $global:mockedPartition } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Format-Volume `
+                    -Verifiable
+
+                # mocks that should not be called
+                Mock -CommandName Set-Disk
+                Mock -CommandName Initialize-Disk
+                Mock -CommandName Get-Volume
+                Mock -CommandName Get-WmiObject
+                Mock -CommandName Get-CimInstance
+                Mock -CommandName Set-Partition
+
+                It 'Should not throw' {
+                    {
+                        Set-targetResource `
+                            -DiskNumber 0 `
+                            -Driveletter 'G' `
+                            -Verbose
+                    } | Should not throw
+                }
+
+                It 'the correct mocks were called' {
+                    Assert-VerifiableMocks
+                    Assert-MockCalled -CommandName Get-Disk -Times 1
+                    Assert-MockCalled -CommandName Set-Disk -Times 0
+                    Assert-MockCalled -CommandName Initialize-Disk -Times 0
                     Assert-MockCalled -CommandName Get-Partition -Times 1
                     Assert-MockCalled -CommandName Get-Volume -Times 0
                     Assert-MockCalled -CommandName New-Partition -Times 1 `
