@@ -197,8 +197,7 @@ function Set-TargetResource
                 ) -join '' )
 
             $disk | Initialize-Disk `
-                -PartitionStyle "GPT" `
-                -PassThru
+                -PartitionStyle "GPT"
         }
         "GPT"
         {
@@ -222,7 +221,7 @@ function Set-TargetResource
     if ($null -eq ($disk | Get-Partition | Get-Volume ))
     {
         # There is no partiton on the disk, so create one
-        $partParams = @{
+        $partitionParams = @{
             DriveLetter = $DriveLetter
             DiskNumber = $DiskNumber
         }
@@ -235,7 +234,7 @@ function Set-TargetResource
                     $($LocalizedData.CreatingPartitionMessage `
                         -f $DiskNumber,$DriveLetter,"$($Size/1kb) kb")
                 ) -join '' )
-            $partParams["Size"] = $Size
+            $partitionParams["Size"] = $Size
         }
         else
         {
@@ -245,11 +244,11 @@ function Set-TargetResource
                     $($LocalizedData.CreatingPartitionMessage `
                         -f $DiskNumber,$DriveLetter,'all free space')
                 ) -join '' )
-            $partParams["UseMaximumSize"] = $true
+            $partitionParams["UseMaximumSize"] = $true
         } # if
 
         # Create the partition.
-        $partition = New-Partition @partParams
+        $partition = New-Partition @partitionParams
 
         # After creating the partition it can take a few seconds for it to become writeable
         # Wait for up to 30 seconds for the parition to become writeable
@@ -258,13 +257,16 @@ function Set-TargetResource
         While ($partition.IsReadOnly `
             -and ([DateTime]::Now - $start).TotalMilliseconds -lt $timeout)
         {
-            Start-Sleep -Seconds 1
-            $partition = $partition | Get-Partition
             Write-Verbose -Message ($LocalizedData.NewPartitionIsReadOnlyMessage -f `
                 $partition.DiskNumber,$partition.PartitionNumber)
+
+            Start-Sleep -Seconds 1
+
+            # Pull the partition details again to check if it is readonly
+            $partition = $partition | Get-Partition
         } # while
 
-        if ($partition)
+        if ($partition.IsReadOnly)
         {
             # The partition is still readonly - throw an exception
             New-InvalidOperationError `
