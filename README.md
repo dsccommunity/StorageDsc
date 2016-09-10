@@ -23,31 +23,31 @@ Please read the installation instructions that are present on both the download 
 
 ### xMountImage
 
-* **[String] Name**: This setting provides a unique name for the configuration. Key.
-* **[String] ImagePath**: Specifies the path of the VHD or ISO file. Required.
-* **[String] DriveLetter**: Specifies the drive letter after the ISO is mounted. Optional.
-* **[String] Ensure**: Determines whether the setting should be applied or removed. Optional. { *Present* | Absent }. Defaults to Present.
+* **[String] Name** _(Key)_: This setting provides a unique name for the configuration.
+* **[String] ImagePath** _(Required)_: Specifies the path of the VHD or ISO file.
+* **[String] DriveLetter** _(Write)_: Specifies the drive letter after the ISO is mounted.
+* **[String] Ensure** _(Write)_: Determines whether the setting should be applied or removed. { *Present* | Absent }. Defaults to Present.
 
 ### xDisk
 
-* **[UInt32] DiskNumber**: Specifies the identifier for which disk to modify. Key.
-* **[String] DriveLetter**: Specifies the preferred letter to assign to the disk volume. Required.
-* **[Uint64] Size**: Specifies the size of new volume (use all available space on disk if not provided). Optional.
-* **[String] FSLabel**: Define volume label if required. Optional.
-* **[UInt32] AllocationUnitSize**: Specifies the allocation unit size to use when formatting the volume. Optional.
-* **[String] FSFormat**: Define volume label if required. Optional. { *NTFS* | ReFS }. Defaults to NTFS.
+* **[UInt32] DiskNumber** _(Key)_: Specifies the identifier for which disk to modify.
+* **[String] DriveLetter** _(Required)_: Specifies the preferred letter to assign to the disk volume.
+* **[Uint64] Size** _(Write)_: Specifies the size of new volume (use all available space on disk if not provided).
+* **[String] FSLabel** _(Write)_: Define volume label if required.
+* **[UInt32] AllocationUnitSize** _(Write)_: Specifies the allocation unit size to use when formatting the volume.
+* **[String] FSFormat** _(Write)_: Define volume label if required. { *NTFS* | ReFS }. Defaults to NTFS.
 
 ### xWaitforDisk
 
-*   **[UInt32] DiskNumber**: Specifies the identifier for which disk to wait for. Key.
-*   **[UInt64] RetryIntervalSec**: Specifies the number of seconds to wait for the disk to become available. Optional. Defaults to 10 seconds.
-*   **[UInt32] RetryCount**: The number of times to loop the retry interval while waiting for the disk. Optional. Defaults to 60 times.
+*   **[UInt32] DiskNumber** _(Key)_: Specifies the identifier for which disk to wait for.
+*   **[UInt64] RetryIntervalSec** _(Write)_: Specifies the number of seconds to wait for the disk to become available. Defaults to 10 seconds.
+*   **[UInt32] RetryCount** _(Write)_: The number of times to loop the retry interval while waiting for the disk. Defaults to 60 times.
 
 ### xWaitForVolume
 
-*   **[String] DriveLetter**: Specifies the name of the drive to wait for. Key.
-*   **[UInt64] RetryIntervalSec**: Specifies the number of seconds to wait for the drive to become available. Optional. Defaults to 10 seconds.
-*   **[UInt32] RetryCount**: The number of times to loop the retry interval while waiting for the drive. Optional. Defaults to 60 times.
+*   **[String] DriveLetter** _(Key)_: Specifies the name of the drive to wait for.
+*   **[UInt64] RetryIntervalSec** _(Write)_: Specifies the number of seconds to wait for the drive to become available. Defaults to 10 seconds.
+*   **[UInt32] RetryCount** _(Write)_: The number of times to loop the retry interval while waiting for the drive. Defaults to 60 times.
 
 ## Versions
 
