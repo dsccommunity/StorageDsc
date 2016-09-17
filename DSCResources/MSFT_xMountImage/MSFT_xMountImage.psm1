@@ -141,7 +141,7 @@ function Set-TargetResource
         ) -join '' )
 
     # Check the parameter combo passed is valid, and throw if not.
-    Test-ParameterValid @PSBoundParameters
+    $null = Test-ParameterValid @PSBoundParameters
 
     # Get the current mount state of this disk image
     $currentState = Get-TargetResource -ImagePath $ImagePath
@@ -160,18 +160,20 @@ function Set-TargetResource
         {
             $needsMount = $true
         }
-
-        if ($currentState.DriveLetter -ne $normalizedDriveLetter)
+        else
         {
-            # The disk image is mounted to the wrong DriveLetter -remount disk
-            Write-Verbose -Message ( @(
-                    "$($MyInvocation.MyCommand): "
-                    $($LocalizedData.DismountingImageMessage `
-                        -f $ImagePath,$currentState.DriveLetter)
-                ) -join '' )
+            if ($currentState.DriveLetter -ne $normalizedDriveLetter)
+            {
+                # The disk image is mounted to the wrong DriveLetter -remount disk
+                Write-Verbose -Message ( @(
+                        "$($MyInvocation.MyCommand): "
+                        $($LocalizedData.DismountingImageMessage `
+                            -f $ImagePath,$currentState.DriveLetter)
+                    ) -join '' )
 
-            Dismount-DiskImage -ImagePath $ImagePath
-            $needsMount = $true
+                Dismount-DiskImage -ImagePath $ImagePath
+                $needsMount = $true
+            } # if
         } # if
 
         if ($currentState.StorageType -ne 'ISO')
@@ -196,6 +198,12 @@ function Set-TargetResource
 
         if ($needsMount)
         {
+        Write-Verbose -Message ( @(
+                "$($MyInvocation.MyCommand): "
+                $($LocalizedData.MountingImageMessage `
+                    -f $ImagePath,$normalizedDriveLetter)
+            ) -join '' )
+
             Mount-DiskImageToLetter @PSBoundParameters
         } # if
     }
@@ -268,7 +276,7 @@ function Test-TargetResource
         ) -join '' )
 
     # Check the parameter combo passed is valid, and throw if not.
-    Test-ParameterValid @PSBoundParameters
+    $null = Test-ParameterValid @PSBoundParameters
 
     # Get the current mount state of this disk image
     $currentState = Get-TargetResource -ImagePath $ImagePath
@@ -288,7 +296,7 @@ function Test-TargetResource
                         -f $ImagePath,$normalizedDriveLetter)
                 ) -join '' )
             return $false
-        }
+        } # if
 
         if ($currentState.DriveLetter -ne $normalizedDriveLetter)
         {
@@ -498,12 +506,6 @@ function Mount-DiskImageToLetter
     # Get the normalized DriveLetter (colon removed)
     $normalizedDriveLetter = Test-DriveLetter -DriveLetter $DriveLetter
 
-    Write-Verbose -Message ( @(
-            "$($MyInvocation.MyCommand): "
-            $($LocalizedData.MountingImageMessage `
-                -f $ImagePath,$normalizedDriveLetter)
-        ) -join '' )
-
     # Mount the Diskimage
     $mountParams = @{ ImagePath = $ImagePath }
     if ($PSBoundParameters.ContainsKey('Access'))
@@ -543,7 +545,7 @@ function Mount-DiskImageToLetter
         Write-Verbose -Message ( @(
                 "$($MyInvocation.MyCommand): "
                 $($LocalizedData.ChangingISODriveLetterMessage `
-                    -f $ImagePath,$CimVolume.DriveLetter,$normalizedDriveLetter)
+                    -f $ImagePath,$volume.DriveLetter,$normalizedDriveLetter)
             ) -join '' )
 
         <#
