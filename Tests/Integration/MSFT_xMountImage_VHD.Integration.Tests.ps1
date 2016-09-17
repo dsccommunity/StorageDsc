@@ -62,6 +62,17 @@ try
     $LastDrive = ((Get-Volume).DriveLetter | Sort-Object | Select-Object -Last 1)
     $DriveLetter = [char](([int][char]$LastDrive)+1)
 
+    # Create a VHDx with a partition
+    $VHDPath = Join-Path -Path $TestEnvironment.WorkingFolder `
+        -ChildPath 'TestDisk.vhdx'
+    $null = New-VHD -Path $VHDPath -SizeBytes 10GB -Dynamic
+    $null = Mount-DiskImage -ImagePath $VHDPath
+    $disk = Get-Disk | Where-Object -Property Location -EQ -Value $VHDPath
+    $null = $disk | Initialize-Disk -PartitionStyle GPT
+    $partition = $disk | New-Partition -UseMaximumSize
+    $null = $partition | Get-Volume | Format-Volume -FileSystem NTFS
+    $null = Dismount-Diskimage -ImagePath $VHDPath
+
     # Create a config data object to pass to the DSC Configs
     $ConfigData = @{
         AllNodes = @(
@@ -72,11 +83,6 @@ try
             }
         )
     }
-
-    # Create a VHDx
-    $VHDPath = Join-Path -Path $TestEnvironment.WorkingFolder `
-        -ChildPath 'TestDisk.vhdx'
-    New-VHD -Path $VHDPath -SizeBytes 10GB -Dynamic
 
     # Mount VHD
     $ConfigFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:DSCResourceName)_mount.config.ps1"
