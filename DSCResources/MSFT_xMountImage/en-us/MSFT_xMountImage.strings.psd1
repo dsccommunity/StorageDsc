@@ -15,7 +15,8 @@ ConvertFrom-StringData @'
     TestingMountedImageError = Tetting Mounted Drive for image file '{0}'.
     InvalidParameterSpecifiedError = Ensure is '{0}' but '{1}' was specified.
     InvalidParameterNotSpecifiedError = Ensure is '{0}' but '{1}' was not specified.
+    DiskImageFileNotFoundError = The image file '{0}' could not be found.
 
     MountingImageMessage = The image file '{0}' is being mounted as drive '{1}'.
-    ChangingISODriveLetterMessage = ISO Image file '{0}' mounted as drive '{1}' but is being changed to '{2}'.
+    ChangingISODriveLetterMessage = ISO image file '{0}' mounted as drive '{1}' but is being changed to '{2}'.
 '@

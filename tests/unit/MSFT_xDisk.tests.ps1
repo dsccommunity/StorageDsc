@@ -51,14 +51,14 @@ try
         } # end function Get-InvalidOperationError
 
         #region Pester Test Initialization
-        $global:mockedDisk0 = [pscustomobject] @{
+        $script:mockedDisk0 = [pscustomobject] @{
                 Number = 0
                 DiskNumber = 0
                 IsOffline = $false
                 IsReadOnly = $false
                 PartitionStyle = 'GPT'
             }
-        $global:mockedDisk0Mbr = [pscustomobject] @{
+        $script:mockedDisk0Mbr = [pscustomobject] @{
                 Number = 0
                 DiskNumber = 0
                 IsOffline = $false
@@ -66,7 +66,7 @@ try
                 PartitionStyle = 'MBR'
             }
 
-        $global:mockedDisk0Offline = [pscustomobject] @{
+        $script:mockedDisk0Offline = [pscustomobject] @{
                 Number = 0
                 DiskNumber = 0
                 IsOffline = $true
@@ -74,7 +74,7 @@ try
                 PartitionStyle = 'GPT'
             }
 
-        $global:mockedDisk0OfflineRaw = [pscustomobject] @{
+        $script:mockedDisk0OfflineRaw = [pscustomobject] @{
                 Number = 0
                 DiskNumber = 0
                 IsOffline = $true
@@ -82,7 +82,7 @@ try
                 PartitionStyle = 'Raw'
             }
 
-        $global:mockedDisk0Readonly = [pscustomobject] @{
+        $script:mockedDisk0Readonly = [pscustomobject] @{
                 Number = 0
                 DiskNumber = 0
                 IsOffline = $false
@@ -90,7 +90,7 @@ try
                 PartitionStyle = 'GPT'
             }
 
-        $global:mockedDisk0Raw = [pscustomobject] @{
+        $script:mockedDisk0Raw = [pscustomobject] @{
                 Number = 0
                 DiskNumber = 0
                 IsOffline = $false
@@ -98,26 +98,26 @@ try
                 PartitionStyle = 'Raw'
             }
 
-        $global:mockedWmi = [pscustomobject] @{BlockSize=4096}
+        $script:mockedWmi = [pscustomobject] @{BlockSize=4096}
 
-        $global:mockedPartition = [pscustomobject] @{
+        $script:mockedPartition = [pscustomobject] @{
                 DriveLetter='F'
                 Size=123
             }
 
-        $global:mockedVolume = [pscustomobject] @{
+        $script:mockedVolume = [pscustomobject] @{
                 FileSystemLabel = 'myLabel'
                 DriveLetter = 'F'
                 FileSystem = 'NTFS'
             }
 
-        $global:mockedVolumeNoDriveLetter = [pscustomobject] @{
+        $script:mockedVolumeNoDriveLetter = [pscustomobject] @{
                 FileSystemLabel = 'myLabel'
                 DriveLetter = ''
                 FileSystem = 'NTFS'
             }
 
-        $global:mockedVolumeReFS = [pscustomobject] @{
+        $script:mockedVolumeReFS = [pscustomobject] @{
                 FileSystemLabel = 'myLabel'
                 DriveLetter = 'F'
                 FileSystem = 'ReFS'
@@ -226,22 +226,22 @@ try
             # verifiable (should be called) mocks
             Mock `
                 -CommandName Get-CimInstance `
-                -MockWith { $global:mockedWmi } `
+                -MockWith { $script:mockedWmi } `
                 -Verifiable
 
             Mock `
                 -CommandName Get-Disk `
-                -MockWith { $global:mockedDisk0 } `
+                -MockWith { $script:mockedDisk0 } `
                 -Verifiable
 
             Mock `
                 -CommandName Get-Partition `
-                -MockWith { $global:mockedPartition } `
+                -MockWith { $script:mockedPartition } `
                 -Verifiable
 
             Mock `
                 -CommandName Get-Volume `
-                -MockWith { $global:mockedVolume } `
+                -MockWith { $script:mockedVolume } `
                 -Verifiable
 
             # mocks that should not be called
@@ -287,7 +287,7 @@ try
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Get-Disk `
-                    -MockWith { $global:mockedDisk0Offline } `
+                    -MockWith { $script:mockedDisk0Offline } `
                     -Verifiable
 
                 Mock `
@@ -303,7 +303,7 @@ try
                     -ParameterFilter {
                         $DriveLetter -eq 'G'
                     } `
-                    -MockWith { $global:mockedPartition } `
+                    -MockWith { $script:mockedPartition } `
                     -Verifiable
 
                 Mock `
@@ -344,7 +344,7 @@ try
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Get-Disk `
-                    -MockWith { $global:mockedDisk0Readonly } `
+                    -MockWith { $script:mockedDisk0Readonly } `
                     -Verifiable
 
                 Mock `
@@ -360,7 +360,7 @@ try
                     -ParameterFilter {
                         $DriveLetter -eq 'G'
                     } `
-                    -MockWith { $global:mockedPartition } `
+                    -MockWith { $script:mockedPartition } `
                     -Verifiable
 
                 Mock `
@@ -401,7 +401,7 @@ try
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Get-Disk `
-                    -MockWith { $global:mockedDisk0OfflineRaw } `
+                    -MockWith { $script:mockedDisk0OfflineRaw } `
                     -Verifiable
 
                 Mock `
@@ -421,7 +421,7 @@ try
                     -ParameterFilter {
                         $DriveLetter -eq 'G'
                     } `
-                    -MockWith { $global:mockedPartition } `
+                    -MockWith { $script:mockedPartition } `
                     -Verifiable
 
                 Mock `
@@ -461,7 +461,7 @@ try
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Get-Disk `
-                    -MockWith { $global:mockedDisk0Raw } `
+                    -MockWith { $script:mockedDisk0Raw } `
                     -Verifiable
 
                 Mock `
@@ -477,7 +477,7 @@ try
                     -ParameterFilter {
                         $DriveLetter -eq 'G'
                     } `
-                    -MockWith { $global:mockedPartition } `
+                    -MockWith { $script:mockedPartition } `
                     -Verifiable
 
                 Mock `
@@ -518,7 +518,7 @@ try
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Get-Disk `
-                    -MockWith { $global:mockedDisk0 } `
+                    -MockWith { $script:mockedDisk0 } `
                     -Verifiable
 
                 Mock `
@@ -530,7 +530,7 @@ try
                     -ParameterFilter {
                         $DriveLetter -eq 'G'
                     } `
-                    -MockWith { $global:mockedPartition } `
+                    -MockWith { $script:mockedPartition } `
                     -Verifiable
 
                 Mock `
@@ -572,7 +572,7 @@ try
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Get-Disk `
-                    -MockWith { $global:mockedDisk0Mbr } `
+                    -MockWith { $script:mockedDisk0Mbr } `
                     -Verifiable
 
                 # mocks that should not be called
@@ -587,7 +587,7 @@ try
                 $errorRecord = Get-InvalidOperationError `
                     -ErrorId 'DiskAlreadyInitializedError' `
                     -ErrorMessage ($LocalizedData.DiskAlreadyInitializedError -f `
-                        0,$global:mockedDisk0Mbr.PartitionStyle)
+                        0,$script:mockedDisk0Mbr.PartitionStyle)
 
                 It 'Should throw DiskAlreadyInitializedError' {
                     {
@@ -615,17 +615,17 @@ try
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Get-Disk `
-                    -MockWith { $global:mockedDisk0 } `
+                    -MockWith { $script:mockedDisk0 } `
                     -Verifiable
 
                 Mock `
                     -CommandName Get-Partition `
-                    -MockWith { $global:mockedPartition } `
+                    -MockWith { $script:mockedPartition } `
                     -Verifiable
 
                 Mock `
                     -CommandName Get-Volume `
-                    -MockWith { $global:mockedVolume } `
+                    -MockWith { $script:mockedVolume } `
                     -Verifiable
 
                 # mocks that should not be called
@@ -660,17 +660,17 @@ try
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Get-Disk `
-                    -MockWith { $global:mockedDisk0 } `
+                    -MockWith { $script:mockedDisk0 } `
                     -Verifiable
 
                 Mock `
                     -CommandName Get-Partition `
-                    -MockWith { $global:mockedPartition } `
+                    -MockWith { $script:mockedPartition } `
                     -Verifiable
 
                 Mock `
                     -CommandName Get-Volume `
-                    -MockWith { $global:mockedVolumeNoDriveLetter } `
+                    -MockWith { $script:mockedVolumeNoDriveLetter } `
                     -Verifiable
 
                 Mock `
@@ -708,17 +708,17 @@ try
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Get-Disk `
-                    -MockWith { $global:mockedDisk0 } `
+                    -MockWith { $script:mockedDisk0 } `
                     -Verifiable
 
                 Mock `
                     -CommandName Get-Partition `
-                    -MockWith { $global:mockedPartition } `
+                    -MockWith { $script:mockedPartition } `
                     -Verifiable
 
                 Mock `
                     -CommandName Get-Volume `
-                    -MockWith { $global:mockedVolume } `
+                    -MockWith { $script:mockedVolume } `
                     -Verifiable
 
                 Mock `
@@ -756,17 +756,17 @@ try
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Get-Disk `
-                    -MockWith { $global:mockedDisk0 } `
+                    -MockWith { $script:mockedDisk0 } `
                     -Verifiable
 
                 Mock `
                     -CommandName Get-Partition `
-                    -MockWith { $global:mockedPartition } `
+                    -MockWith { $script:mockedPartition } `
                     -Verifiable
 
                 Mock `
                     -CommandName Get-Volume `
-                    -MockWith { $global:mockedVolume } `
+                    -MockWith { $script:mockedVolume } `
                     -Verifiable
 
                 Mock `
@@ -809,13 +809,13 @@ try
         Describe 'MSFT_xDisk\Test-TargetResource' {
             Mock `
                 -CommandName Get-CimInstance `
-                -MockWith { $global:mockedWmi }
+                -MockWith { $script:mockedWmi }
 
             Context 'Test disk not initialized' {
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Get-Disk `
-                    -MockWith { $global:mockedDisk0Offline } `
+                    -MockWith { $script:mockedDisk0Offline } `
                     -Verifiable
 
                 # mocks that should not be called
@@ -829,8 +829,8 @@ try
                 It 'calling test should not throw' {
                     {
                         $script:result = Test-TargetResource `
-                            -DiskNumber $global:mockedDisk0Offline.Number `
-                            -DriveLetter $global:mockedVolume.DriveLetter `
+                            -DiskNumber $script:mockedDisk0Offline.Number `
+                            -DriveLetter $script:mockedVolume.DriveLetter `
                             -AllocationUnitSize 4096 `
                             -Verbose
                     } | Should not throw
@@ -854,7 +854,7 @@ try
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Get-Disk `
-                    -MockWith { $global:mockedDisk0Readonly } `
+                    -MockWith { $script:mockedDisk0Readonly } `
                     -Verifiable
 
                 # mocks that should not be called
@@ -868,8 +868,8 @@ try
                 It 'calling test should not throw' {
                     {
                         $script:result = Test-TargetResource `
-                            -DiskNumber $global:mockedDisk0Readonly.Number `
-                            -DriveLetter $global:mockedVolume.DriveLetter `
+                            -DiskNumber $script:mockedDisk0Readonly.Number `
+                            -DriveLetter $script:mockedVolume.DriveLetter `
                             -AllocationUnitSize 4096 `
                             -Verbose
                     } | Should not throw
@@ -893,7 +893,7 @@ try
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Get-Disk `
-                    -MockWith { $global:mockedDisk0Raw } `
+                    -MockWith { $script:mockedDisk0Raw } `
                     -Verifiable
 
                 # mocks that should not be called
@@ -907,8 +907,8 @@ try
                 It 'calling test should not throw' {
                     {
                         $script:result = Test-TargetResource `
-                            -DiskNumber $global:mockedDisk0Raw.Number `
-                            -DriveLetter $global:mockedVolume.DriveLetter `
+                            -DiskNumber $script:mockedDisk0Raw.Number `
+                            -DriveLetter $script:mockedVolume.DriveLetter `
                             -AllocationUnitSize 4096 `
                             -Verbose
                     } | Should not throw
@@ -932,22 +932,22 @@ try
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Get-Disk `
-                    -MockWith { $global:mockedDisk0 } `
+                    -MockWith { $script:mockedDisk0 } `
                     -Verifiable
 
                 Mock `
                     -CommandName Get-Partition `
-                    -MockWith { $global:mockedPartition } `
+                    -MockWith { $script:mockedPartition } `
                     -Verifiable
 
                 Mock `
                     -CommandName Get-Volume `
-                    -MockWith { $global:mockedVolume } `
+                    -MockWith { $script:mockedVolume } `
                     -Verifiable
 
                 Mock `
                     -CommandName Get-CimInstance `
-                    -MockWith { $global:mockedWmi } `
+                    -MockWith { $script:mockedWmi } `
                     -Verifiable
 
                 # mocks that should not be called
@@ -958,8 +958,8 @@ try
                 It 'calling test should not throw' {
                     {
                         $script:result = Test-TargetResource `
-                            -DiskNumber $global:mockedDisk0.Number `
-                            -DriveLetter $global:mockedVolume.DriveLetter `
+                            -DiskNumber $script:mockedDisk0.Number `
+                            -DriveLetter $script:mockedVolume.DriveLetter `
                             -AllocationUnitSize 4096 `
                             -Size 124 `
                             -Verbose
@@ -984,17 +984,17 @@ try
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Get-Disk `
-                    -MockWith { $global:mockedDisk0 } `
+                    -MockWith { $script:mockedDisk0 } `
                     -Verifiable
 
                 Mock `
                     -CommandName Get-Partition `
-                    -MockWith { $global:mockedPartition } `
+                    -MockWith { $script:mockedPartition } `
                     -Verifiable
 
                 Mock `
                     -CommandName Get-CimInstance `
-                    -MockWith { $global:mockedWmi } `
+                    -MockWith { $script:mockedWmi } `
                     -Verifiable
 
                 # mocks that should not be called
@@ -1006,8 +1006,8 @@ try
                 It 'calling test should not throw' {
                     {
                         $script:result = Test-TargetResource `
-                            -DiskNumber $global:mockedDisk0.Number `
-                            -DriveLetter $global:mockedVolume.DriveLetter `
+                            -DiskNumber $script:mockedDisk0.Number `
+                            -DriveLetter $script:mockedVolume.DriveLetter `
                             -AllocationUnitSize 4097 `
                             -Verbose
                     } | Should not throw
@@ -1032,22 +1032,22 @@ try
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Get-Disk `
-                    -MockWith { $global:mockedDisk0 } `
+                    -MockWith { $script:mockedDisk0 } `
                     -Verifiable
 
                 Mock `
                     -CommandName Get-Partition `
-                    -MockWith { $global:mockedPartition } `
+                    -MockWith { $script:mockedPartition } `
                     -Verifiable
 
                 Mock `
                     -CommandName Get-Volume `
-                    -MockWith { $global:mockedVolume } `
+                    -MockWith { $script:mockedVolume } `
                     -Verifiable
 
                 Mock `
                     -CommandName Get-CimInstance `
-                    -MockWith { $global:mockedWmi } `
+                    -MockWith { $script:mockedWmi } `
                     -Verifiable
 
                 # mocks that should not be called
@@ -1058,8 +1058,8 @@ try
                 It 'calling test should not throw' {
                     {
                         $script:result = Test-TargetResource `
-                            -DiskNumber $global:mockedDisk0.Number `
-                            -DriveLetter $global:mockedVolume.DriveLetter `
+                            -DiskNumber $script:mockedDisk0.Number `
+                            -DriveLetter $script:mockedVolume.DriveLetter `
                             -FSFormat 'ReFS' `
                             -Verbose
                     } | Should not throw
@@ -1083,22 +1083,22 @@ try
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Get-Disk `
-                    -MockWith { $global:mockedDisk0 } `
+                    -MockWith { $script:mockedDisk0 } `
                     -Verifiable
 
                 Mock `
                     -CommandName Get-Partition `
-                    -MockWith { $global:mockedPartition } `
+                    -MockWith { $script:mockedPartition } `
                     -Verifiable
 
                 Mock `
                     -CommandName Get-Volume `
-                    -MockWith { $global:mockedVolume } `
+                    -MockWith { $script:mockedVolume } `
                     -Verifiable
 
                 Mock `
                     -CommandName Get-CimInstance `
-                    -MockWith { $global:mockedWmi } `
+                    -MockWith { $script:mockedWmi } `
                     -Verifiable
 
                 # mocks that should not be called
@@ -1109,8 +1109,8 @@ try
                 It 'calling test should not throw' {
                     {
                         $script:result = Test-TargetResource `
-                            -DiskNumber $global:mockedDisk0.Number `
-                            -DriveLetter $global:mockedVolume.DriveLetter `
+                            -DiskNumber $script:mockedDisk0.Number `
+                            -DriveLetter $script:mockedVolume.DriveLetter `
                             -FSLabel 'NewLabel' `
                             -Verbose
                     } | Should not throw
@@ -1134,22 +1134,22 @@ try
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Get-Disk `
-                    -MockWith { $global:mockedDisk0 } `
+                    -MockWith { $script:mockedDisk0 } `
                     -Verifiable
 
                 Mock `
                     -CommandName Get-Partition `
-                    -MockWith { $global:mockedPartition } `
+                    -MockWith { $script:mockedPartition } `
                     -Verifiable
 
                 Mock `
                     -CommandName Get-Volume `
-                    -MockWith { $global:mockedVolume } `
+                    -MockWith { $script:mockedVolume } `
                     -Verifiable
 
                 Mock `
                     -CommandName Get-CimInstance `
-                    -MockWith { $global:mockedWmi } `
+                    -MockWith { $script:mockedWmi } `
                     -Verifiable
 
                 # mocks that should not be called
@@ -1160,12 +1160,12 @@ try
                 It 'calling test should not throw' {
                     {
                         $script:result = Test-TargetResource `
-                            -DiskNumber $global:mockedDisk0.Number `
-                            -DriveLetter $global:mockedVolume.DriveLetter `
+                            -DiskNumber $script:mockedDisk0.Number `
+                            -DriveLetter $script:mockedVolume.DriveLetter `
                             -AllocationUnitSize 4096 `
-                            -Size $global:mockedPartition.Size `
-                            -FSLabel $global:mockedVolume.FileSystemLabel `
-                            -FSFormat $global:mockedVolume.FileSystem `
+                            -Size $script:mockedPartition.Size `
+                            -FSLabel $script:mockedVolume.FileSystemLabel `
+                            -FSFormat $script:mockedVolume.FileSystem `
                             -Verbose
                     } | Should not throw
                 }

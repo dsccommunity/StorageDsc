@@ -432,6 +432,15 @@ function Test-ParameterValid
     }
     else
     {
+        if (-not (Test-Path -Path $ImagePath))
+        {
+            # The file specified by ImagePath should be found
+            New-InvalidOperationError `
+                -ErrorId 'DiskImageFileNotFoundError' `
+                -ErrorMessage ($LocalizedData.DiskImageFileNotFoundError -f `
+                    $ImagePath)
+        } # if
+
         if ($PSBoundParameters.ContainsKey('DriveLetter'))
         {
             # Test the Drive Letter to ensure it is valid
