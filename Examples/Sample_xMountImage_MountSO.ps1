@@ -4,7 +4,6 @@ configuration Sample_xMountImage_MountISO
     Import-DscResource -ModuleName xStorage
     xMountImage ISO
     {
-        Name        = 'SQL Disk'
         ImagePath   = 'c:\Sources\SQL.iso'
         DriveLetter = 'S'
     }

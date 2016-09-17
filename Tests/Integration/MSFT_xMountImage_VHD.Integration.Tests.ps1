@@ -1,3 +1,7 @@
+# In order to run these tests, Hyper-V must be installed on the testing computer.
+# If it is not installed these tests will not be run. This does prevent these tests
+# from being run on AppVeyor.
+
 $script:DSCModuleName      = 'xStorage'
 $script:DSCResourceName    = 'MSFT_xMountImage'
 
@@ -20,7 +24,9 @@ $TestEnvironment = Initialize-TestEnvironment `
 # Using try/finally to always cleanup even if something awful happens.
 try
 {
-    # Ensure that the tests can be performed on this computer
+    #region Integration Tests for VHD
+
+    # Ensure that the VHD tests can be performed on this computer
     $ProductType = (Get-CimInstance Win32_OperatingSystem).ProductType
     switch ($ProductType) {
         1
@@ -52,37 +58,36 @@ try
         Break
     }
 
-    #region Integration Tests
-    $ConfigFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:DSCResourceName).config.ps1"
+    # Get a spare drive letter
+    $LastDrive = ((Get-Volume).DriveLetter | Sort-Object | Select-Object -Last 1)
+    $DriveLetter = [char](([int][char]$LastDrive)+1)
+
+    # Create a config data object to pass to the DSC Configs
+    $ConfigData = @{
+        AllNodes = @(
+            @{
+                NodeName    = 'localhost'
+                ImagePath   = $VHDPath
+                DriveLetter = $DriveLetter
+            }
+        )
+    }
+
+    # Create a VHDx
+    $VHDPath = Join-Path -Path $TestEnvironment.WorkingFolder `
+        -ChildPath 'TestDisk.vhdx'
+    New-VHD -Path $VHDPath -SizeBytes 10GB -Dynamic
+
+    # Mount VHD
+    $ConfigFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:DSCResourceName)_mount.config.ps1"
     . $ConfigFile -Verbose -ErrorAction Stop
 
-    Describe "$($script:DSCResourceName)_Integration" {
-        BeforeAll {
-            # Create a VHDx
-            $VHDPath = Join-Path -Path $TestEnvironment.WorkingFolder `
-                -ChildPath 'TestDisk.vhdx'
-            New-VHD -Path $VHDPath -SizeBytes 1GB -Dynamic
-
-            # Get a spare drive letter
-            $LastDrive = ((Get-Volume).DriveLetter | Sort-Object | Select-Object -Last 1)
-            $DriveLetter = [char](([int][char]$LastDrive)+1)
-        }
+    Describe "$($script:DSCResourceName)_MountVHD_Integration" {
 
         #region DEFAULT TESTS
         It 'Should compile without throwing' {
             {
-                # This is so that the
-                $ConfigData = @{
-                    AllNodes = @(
-                        @{
-                            NodeName    = 'localhost'
-                            ImagePath   = $VHDPath
-                            DriveLetter = $DriveLetter
-                        }
-                    )
-                }
-
-                & "$($script:DSCResourceName)_Config" `
+                & "$($script:DSCResourceName)_Mount_Config" `
                     -OutputPath $TestEnvironment.WorkingFolder `
                     -ConfigurationData $ConfigData
                 Start-DscConfiguration -Path $TestEnvironment.WorkingFolder `
@@ -97,19 +102,50 @@ try
 
         It 'Should have set the resource and all the parameters should match' {
             $current = Get-DscConfiguration | Where-Object {
-                $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
+                $_.ConfigurationName -eq "$($script:DSCResourceName)_Mount_Config"
             }
-            $current.DiskNumber       | Should Be $Disk.DiskNumber
+            $current.Imagepath        | Should Be $VHDPath
             $current.DriveLetter      | Should Be $DriveLetter
-            $current.FSLabel          | Should Be $FSLabel
-        }
-
-        AfterAll {
-            Dismount-DiskImage -ImagePath $VHDPath -StorageType VHDx
-            Remove-Item -Path $VHDPath -Force
+            $current.StorageType      | Should Be 'VHDX'
+            $current.Access           | Should Be 'ReadWrite'
+            $current.Ensure           | Should Be 'Present'
         }
     }
-    #endregion
+
+    # Dismount VHD
+    $ConfigFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:DSCResourceName)_dismount.config.ps1"
+    . $ConfigFile -Verbose -ErrorAction Stop
+
+    Describe "$($script:DSCResourceName)_DismountVHD_Integration" {
+
+        #region DEFAULT TESTS
+        It 'Should compile without throwing' {
+            {
+                & "$($script:DSCResourceName)_Dismount_Config" `
+                    -OutputPath $TestEnvironment.WorkingFolder `
+                    -ConfigurationData $ConfigData
+                Start-DscConfiguration -Path $TestEnvironment.WorkingFolder `
+                    -ComputerName localhost -Wait -Verbose -Force
+            } | Should not throw
+        }
+
+        It 'should be able to call Get-DscConfiguration without throwing' {
+            { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should Not throw
+        }
+        #endregion
+
+        It 'Should have set the resource and all the parameters should match' {
+            $current = Get-DscConfiguration | Where-Object {
+                $_.ConfigurationName -eq "$($script:DSCResourceName)_Dismount_Config"
+            }
+            $current.Imagepath        | Should Be $VHDPath
+            $current.Ensure           | Should Be 'Absent'
+        }
+    }
+
+    # Delete the VHDx test file created
+    Remove-Item -Path $VHDPath -Force
+    #endregion Integration Tests for VHD
 }
 finally
 {

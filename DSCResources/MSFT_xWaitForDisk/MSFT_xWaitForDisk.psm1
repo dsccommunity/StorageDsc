@@ -19,15 +19,18 @@ else
 # Import the common storage functions
 Import-Module -Name ( Join-Path `
     -Path (Split-Path -Path $PSScriptRoot -Parent) `
-    -ChildPath '\MSFT_xStorageCommon\MSFT_xStorageCommon.psm1' )
+    -ChildPath '\StorageCommon\StorageCommon.psm1' )
 
 <#
     .SYNOPSIS
     Returns the current state of the wait for disk resource.
+
     .PARAMETER DiskNumber
     Specifies the identifier for which disk to wait for.
+
     .PARAMETER RetryIntervalSec
     Specifies the number of seconds to wait for the disk to become available.
+
     .PARAMETER RetryCount
     The number of times to loop the retry interval while waiting for the disk.
 #>
@@ -60,10 +63,13 @@ function Get-TargetResource
 <#
     .SYNOPSIS
     Sets the current state of the wait for disk resource.
+
     .PARAMETER DiskNumber
     Specifies the identifier for which disk to wait for.
+
     .PARAMETER RetryIntervalSec
     Specifies the number of seconds to wait for the disk to become available.
+
     .PARAMETER RetryCount
     The number of times to loop the retry interval while waiting for the disk.
 #>
@@ -121,10 +127,13 @@ function Set-TargetResource
 <#
     .SYNOPSIS
     Tests the current state of the wait for disk resource.
+
     .PARAMETER DiskNumber
     Specifies the identifier for which disk to wait for.
+
     .PARAMETER RetryIntervalSec
     Specifies the number of seconds to wait for the disk to become available.
+
     .PARAMETER RetryCount
     The number of times to loop the retry interval while waiting for the disk.
 #>

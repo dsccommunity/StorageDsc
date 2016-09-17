@@ -19,13 +19,12 @@ else
 # Import the common storage functions
 Import-Module -Name ( Join-Path `
     -Path (Split-Path -Path $PSScriptRoot -Parent) `
-    -ChildPath '\MSFT_xStorageCommon\MSFT_xStorageCommon.psm1' )
+    -ChildPath '\StorageCommon\StorageCommon.psm1' )
 
 <#
     .SYNOPSIS
-    Returns the current state of the mounted image.
-    .PARAMETER Name
-    This setting provides a unique name for the configuration.
+    Returns the current mount state of the VHD or ISO file.
+
     .PARAMETER ImagePath
     Specifies the path of the VHD or ISO file.
 #>
@@ -37,51 +36,76 @@ function Get-TargetResource
     (
         [parameter(Mandatory = $true)]
         [System.String]
-        $Name,
-
-        [parameter(Mandatory = $true)]
-        [System.String]
         $ImagePath
     )
 
     Write-Verbose -Message ( @(
             "$($MyInvocation.MyCommand): "
-            $($LocalizedData.GettingMountedImageMessage -f $DriveLetter)
+            $($LocalizedData.GettingMountedImageMessage `
+                -f $ImagePath)
         ) -join '' )
 
-    # Test for Image mounted. If not mounted mount
-    $Image = Get-DiskImage -ImagePath $ImagePath | Get-Volume
-
-    if ($Image)
+    $diskImage = Get-DiskImage -ImagePath $ImagePath
+    if ($diskImage.Attached)
     {
-        $EnsureResult = 'Present'
-        $Name = $Name
+        $returnValue = @{
+            ImagePath   = $ImagePath
+            DriveLetter = ''
+            StorageType = [Microsoft.PowerShell.Cmdletization.GeneratedTypes.DiskImage.StorageType] $diskImage.StorageType
+            Access      = 'ReadOnly'
+            Ensure      = 'Present'
+        }
+
+        # Determine the Disk Image Access mode
+        if ($diskImage.StorageType `
+            -eq [Microsoft.PowerShell.Cmdletization.GeneratedTypes.DiskImage.StorageType]::ISO)
+        {
+            # Get the Drive Letter the ISO is mounted as
+            $volume = $diskImage | Get-Volume
+            $returnValue.Driveletter = $volume.DriveLetter
+        }
+        else
+        {
+            # Look up the disk and find out if it is readwrite.
+            $disk = Get-Disk | Where-Object -Property Location -EQ -Value $ImagePath
+            if (-not $disk.IsReadOnly)
+            {
+                $returnValue.Access = 'ReadWrite'
+            } # if
+
+            # Lookup the volume and get the first mounted Drive Letter.
+            $volumes = $disk | Get-Partition | Get-Volume
+            $firstVolume = $volumes | Select-Object -First 1
+            $returnValue.Driveletter = $firstVolume.DriveLetter
+        } # if
     }
     else
     {
-        $EnsureResult = 'Absent'
-        $Name = $null
-    }
-
-    $returnValue = @{
-        Name = [System.String]$Name
-        ImagePath = [System.String]$ImagePath
-        DriveLetter = [System.String]$Image.DriveLetter
-        Ensure = [System.String]$EnsureResult
-    }
+        $returnValue = @{
+            ImagePath   = $ImagePath
+            Ensure      = 'Absent'
+        }
+    } # if
 
     $returnValue
 } # Get-TargetResource
 
 <#
     .SYNOPSIS
-    Mounts or dismounts the ISO.
-    .PARAMETER Name
-    This setting provides a unique name for the configuration.
+    Mounts or dismounts the ISO or VHD.
+
     .PARAMETER ImagePath
     Specifies the path of the VHD or ISO file.
+
     .PARAMETER DriveLetter
-    Specifies the drive letter after the ISO is mounted.
+    Specifies the drive letter to mount this VHD or ISO to.
+
+    .PARAMETER StorageType
+    Specifies the storage type of a file. If the StorageType parameter is not specified, then the storage type is determined by file extension.
+
+    .PARAMETER Access
+    Allows a VHD file to be mounted in read-only or read-write mode. ISO files are mounted in read-only mode regardless of what parameter value you provide.
+
     .PARAMETER Ensure
     Determines whether the setting should be applied or removed.
 #>
@@ -92,14 +116,18 @@ function Set-TargetResource
     (
         [parameter(Mandatory = $true)]
         [System.String]
-        $Name,
-
-        [parameter(Mandatory = $true)]
-        [System.String]
         $ImagePath,
 
         [System.String]
         $DriveLetter,
+
+        [ValidateSet("ISO","VHD","VHDx","VHDSet")]
+        [System.String]
+        $StorageType,
+
+        [ValidateSet("ReadOnly","ReadWrite")]
+        [System.String]
+        $Access,
 
         [ValidateSet("Present","Absent")]
         [System.String]
@@ -108,57 +136,102 @@ function Set-TargetResource
 
     Write-Verbose -Message ( @(
             "$($MyInvocation.MyCommand): "
-            $($LocalizedData.SettingMountedImageMessage -f $DriveLetter)
+            $($LocalizedData.SettingMountedImageMessage `
+                -f $ImagePath)
         ) -join '' )
 
-    # Validate driveletter has a ":"
-    if ($DriveLetter -match "^[A-Za-z][:]$")
-    {
-        Write-Verbose "DriveLetter validation passed."
-    }
-    else
-    {
-        Throw "DriveLetter did not pass validation. Ensure DriveLetter contains a letter and a colon."
-    } # if
+    # Check the parameter combo passed is valid, and throw if not.
+    Test-ParameterValid @PSBoundParameters
 
-    # Test for Image mounted. If not mounted mount
-    $Image = Get-DiskImage -ImagePath $ImagePath | Get-Volume
+    # Get the current mount state of this disk image
+    $currentState = Get-TargetResource -ImagePath $ImagePath
+
+    # Remove Ensure from PSBoundParameters so it can be splatted
+    $null = $PSBoundParameters.Remove('Ensure')
 
     if ($Ensure -eq 'Present')
     {
-        $Image = Get-DiskImage -ImagePath $ImagePath | Get-Volume
-        if (!$Image)
+        # Get the normalized DriveLetter (colon removed)
+        $normalizedDriveLetter = Test-DriveLetter -DriveLetter $DriveLetter
+
+        # The Disk Image should be mounted
+        $needsMount = $false
+        if ($currentState.Ensure -eq 'Absent')
         {
-            Write-Verbose "Image is not mounted. Mounting image $ImagePath"
-            $Image = Mount-DiskImage -ImagePath $ImagePath -PassThru | Get-Volume
+            $needsMount = $true
+        }
+
+        if ($currentState.DriveLetter -ne $normalizedDriveLetter)
+        {
+            # The disk image is mounted to the wrong DriveLetter -remount disk
+            Write-Verbose -Message ( @(
+                    "$($MyInvocation.MyCommand): "
+                    $($LocalizedData.DismountingImageMessage `
+                        -f $ImagePath,$currentState.DriveLetter)
+                ) -join '' )
+
+            Dismount-DiskImage -ImagePath $ImagePath
+            $needsMount = $true
         } # if
 
-        #Verify drive letter. ObjectId is more verbose than DeviceId in Windows 10 Anniversary Edition, look for
-        #DeviceId in the ObjectId string to match volumes.
-        $CimVolume = Get-CimInstance -ClassName Win32_Volume | Where-Object -FilterScript {$Image.ObjectId.IndexOf($_.DeviceId) -ne -1}
-        if ($CimVolume.DriveLetter -ne $DriveLetter)
+        if ($currentState.StorageType -ne 'ISO')
         {
-            Write-Verbose "Drive letter does not match expected value. Expected DriveLetter $DriveLetter Actual DriverLetter $($CimVolume.DriveLetter)"
-            Write-Verbose "Changing drive letter to $DriveLetter"
-            Set-CimInstance -InputObject $CimVolume -Property @{DriveLetter = $DriveLetter}
+            if ($PSBoundParameters.ContainsKey('Access'))
+            {
+                # For VHD/VHDx/VHDSet disks check the access mode
+                if ($currentState.Access -ne $Access)
+                {
+                    # The access mode is wrong -remount disk
+                    Write-Verbose -Message ( @(
+                            "$($MyInvocation.MyCommand): "
+                            $($LocalizedData.DismountingImageMessage `
+                                -f $ImagePath,$currentState.DriveLetter)
+                        ) -join '' )
+
+                    Dismount-DiskImage -ImagePath $ImagePath
+                    $needsMount = $true
+                } # if
+            } # if
+        } # if
+
+        if ($needsMount)
+        {
+            Mount-DiskImageToLetter @PSBoundParameters
         } # if
     }
     else
     {
-        Write-Verbose "Dismounting $ImagePath"
-        Dismount-DiskImage -ImagePath $ImagePath
+        # The Disk Image should not be mounted
+        if ($currentState.Ensure -eq 'Present')
+        {
+            # It is mounted so dismount it
+            Write-Verbose -Message ( @(
+                    "$($MyInvocation.MyCommand): "
+                    $($LocalizedData.DismountingImageMessage `
+                        -f $ImagePath,$currentState.DriveLetter)
+                ) -join '' )
+
+            Dismount-DiskImage -ImagePath $ImagePath
+        }
     } # if
 } # Set-TargetResource
 
 <#
     .SYNOPSIS
-    Tests if the ISO mount is in the correct state.
-    .PARAMETER Name
-    This setting provides a unique name for the configuration.
+    Tests if the ISO or VHD file mount is in the correct state.
+
     .PARAMETER ImagePath
     Specifies the path of the VHD or ISO file.
+
     .PARAMETER DriveLetter
-    Specifies the drive letter after the ISO is mounted.
+    Specifies the drive letter to mount this VHD or ISO to.
+
+    .PARAMETER StorageType
+    Specifies the storage type of a file. If the StorageType parameter is not specified, then the storage type is determined by file extension.
+
+    .PARAMETER Access
+    Allows a VHD file to be mounted in read-only or read-write mode. ISO files are mounted in read-only mode regardless of what parameter value you provide.
+
     .PARAMETER Ensure
     Determines whether the setting should be applied or removed.
 #>
@@ -170,14 +243,18 @@ function Test-TargetResource
     (
         [parameter(Mandatory = $true)]
         [System.String]
-        $Name,
-
-        [parameter(Mandatory = $true)]
-        [System.String]
         $ImagePath,
 
         [System.String]
         $DriveLetter,
+
+        [ValidateSet("ISO","VHD","VHDx","VHDSet")]
+        [System.String]
+        $StorageType,
+
+        [ValidateSet("ReadOnly","ReadWrite")]
+        [System.String]
+        $Access,
 
         [ValidateSet("Present","Absent")]
         [System.String]
@@ -186,53 +263,293 @@ function Test-TargetResource
 
     Write-Verbose -Message ( @(
             "$($MyInvocation.MyCommand): "
-            $($LocalizedData.SettingMountedImageMessage -f $DriveLetter)
+            $($LocalizedData.TestingMountedImageMessage `
+                -f $DriveLetter)
         ) -join '' )
 
-    # Validate driveletter has a ":"
-    if ($DriveLetter -match "^[A-Za-z][:]$")
-    {
-        Write-Verbose "DriveLetter validation passed."
-    }
-    else
-    {
-        Throw "DriveLetter did not pass validation.  Ensure DriveLetter contains a letter and a colon."
-    } # if
+    # Check the parameter combo passed is valid, and throw if not.
+    Test-ParameterValid @PSBoundParameters
 
-    #Test for Image mounted. If not mounted mount
-    $Image = Get-DiskImage -ImagePath $ImagePath | Get-Volume
+    # Get the current mount state of this disk image
+    $currentState = Get-TargetResource -ImagePath $ImagePath
 
     if ($Ensure -eq 'Present')
     {
-        $Image = Get-DiskImage -ImagePath $ImagePath | Get-Volume
-        if (!$Image)
+        # Get the normalized DriveLetter (colon removed)
+        $normalizedDriveLetter = Test-DriveLetter -DriveLetter $DriveLetter
+
+        # The Disk Image should be mounted
+        if ($currentState.Ensure -eq 'Absent')
         {
-            Write-Verbose "Image is not mounted. Mounting image $ImagePath"
+            # The disk image isn't mounted
+            Write-Verbose -Message ( @(
+                    "$($MyInvocation.MyCommand): "
+                    $($LocalizedData.ImageIsNotMountedButShouldBeMessage `
+                        -f $ImagePath,$normalizedDriveLetter)
+                ) -join '' )
+            return $false
+        }
+
+        if ($currentState.DriveLetter -ne $normalizedDriveLetter)
+        {
+            # The disk image is mounted to the wrong DriveLetter
+            Write-Verbose -Message ( @(
+                    "$($MyInvocation.MyCommand): "
+                    $($LocalizedData.ImageIsMountedToTheWrongDriveLetterMessage `
+                        -f $ImagePath,$currentState.DriveLetter,$normalizedDriveLetter)
+                ) -join '' )
             return $false
         } # if
 
-        # Verify drive letter
-        $CimVolume = Get-CimInstance -ClassName Win32_Volume | where {$_.DeviceId -eq $Image.ObjectId}
-        if ($CimVolume.DriveLetter -ne $DriveLetter)
+        if ($currentState.StorageType -ne 'ISO')
         {
-            Write-Verbose "Drive letter does not match expected value. Expected DriveLetter $DriveLetter Actual DriverLetter $($CimVolume.DriveLetter)"
-
-            return $false
+            if ($PSBoundParameters.ContainsKey('Access'))
+            {
+                # For VHD/VHDx/VHDSet disks check the access mode
+                if ($currentState.Access -ne $Access)
+                {
+                    Write-Verbose -Message ( @(
+                            "$($MyInvocation.MyCommand): "
+                            $($LocalizedData.VHDAccessModeMismatchMessage `
+                                -f $ImagePath,$normalizedDriveLetter,$currentState.Access,$Access)
+                        ) -join '' )
+                    return $false
+                } # if
+            } # if
         } # if
-        # If the script made it this far the ISO is mounted and has the desired DriveLetter
 
-        return $true
-    } # if
-
-    if ($Ensure -eq 'Absent' -and $Image)
-    {
-        Write-Verbose "Expect ISO to be dismounted. Actual is mounted with drive letter $($Image.DriveLetter)"
-        return $false
+        # The Disk Image is mounted to the expected Drive - nothing to change.
+        Write-Verbose -Message ( @(
+                "$($MyInvocation.MyCommand): "
+                $($LocalizedData.ImageIsMountedAndShouldBeMessage `
+                    -f $ImagePath,$normalizedDriveLetter)
+            ) -join '' )
     }
     else
     {
-        return $true
+        # The Disk Image should not be mounted
+        if ($currentState.Ensure -eq 'Present')
+        {
+            # The disk image is mounted
+            Write-Verbose -Message ( @(
+                    "$($MyInvocation.MyCommand): "
+                    $($LocalizedData.ImageIsMountedButShouldNotBeMessage `
+                        -f $ImagePath,$currentState.DriveLetter)
+                ) -join '' )
+            return $false
+        } # if
+
+        # The image is not mounted and should not be
+        Write-Verbose -Message ( @(
+                "$($MyInvocation.MyCommand): "
+                $($LocalizedData.ImageIsNotMountedAndShouldNotBeMessage `
+                    -f $ImagePath)
+            ) -join '' )
     } # if
+
+    # No changes are needed
+    return $true
 } # Test-TargetResource
+
+<#
+    .SYNOPSIS
+    Validates that the parameters passed are valid. If the parameter combination
+    is invalid then an exception will be thrown. Also validates the DriveLetter
+    value that is passed is valid.
+
+    .PARAMETER ImagePath
+    Specifies the path of the VHD or ISO file.
+
+    .PARAMETER DriveLetter
+    Specifies the drive letter to mount this VHD or ISO to.
+
+    .PARAMETER StorageType
+    Specifies the storage type of a file. If the StorageType parameter is not specified, then the storage type is determined by file extension.
+
+    .PARAMETER Access
+    Allows a VHD file to be mounted in read-only or read-write mode. ISO files are mounted in read-only mode regardless of what parameter value you provide.
+
+    .PARAMETER Ensure
+    Determines whether the setting should be applied or removed.
+
+    .OUTPUTS
+    If ensure is present then returns a normalized array of Drive Letters.
+#>
+function Test-ParameterValid
+{
+    [CmdletBinding()]
+    [OutputType([String[]])]
+    param
+    (
+        [parameter(Mandatory = $true)]
+        [System.String]
+        $ImagePath,
+
+        [System.String]
+        $DriveLetter,
+
+        [ValidateSet("ISO","VHD","VHDx","VHDSet")]
+        [System.String]
+        $StorageType,
+
+        [ValidateSet("ReadOnly","ReadWrite")]
+        [System.String]
+        $Access,
+
+        [ValidateSet("Present","Absent")]
+        [System.String]
+        $Ensure = 'Present'
+    )
+
+    if ($Ensure -eq 'Absent')
+    {
+        if ($PSBoundParameters.ContainsKey('DriveLetter'))
+        {
+            # The DriveLetter should not be set if Ensure is Absent
+            New-InvalidOperationError `
+                -ErrorId 'InvalidParameterSpecifiedError' `
+                -ErrorMessage ($LocalizedData.InvalidParameterSpecifiedError -f `
+                    'Absent','DriveLetter')
+        } # if
+
+        if ($PSBoundParameters.ContainsKey('StorageType'))
+        {
+            # The StorageType should not be set if Ensure is Absent
+            New-InvalidOperationError `
+                -ErrorId 'InvalidParameterSpecifiedError' `
+                -ErrorMessage ($LocalizedData.InvalidParameterSpecifiedError -f `
+                    'Absent','StorageType')
+        } # if
+
+        if ($PSBoundParameters.ContainsKey('Access'))
+        {
+            # The Access should not be set if Ensure is Absent
+            New-InvalidOperationError `
+                -ErrorId 'InvalidParameterSpecifiedError' `
+                -ErrorMessage ($LocalizedData.InvalidParameterSpecifiedError -f `
+                    'Absent','Access')
+        } # if
+    }
+    else
+    {
+        if ($PSBoundParameters.ContainsKey('DriveLetter'))
+        {
+            # Test the Drive Letter to ensure it is valid
+            $normalizedDriveLetter = Test-DriveLetter -DriveLetter $DriveLetter
+        }
+        else
+        {
+            # Drive letter is not specified but Ensure is present.
+            New-InvalidOperationError `
+                -ErrorId 'InvalidParameterNotSpecifiedError' `
+                -ErrorMessage ($LocalizedData.InvalidParameterNotSpecifiedError -f `
+                    'Present','DriveLetter')
+        } # if
+    } # if
+} # Test-ParameterValid
+
+<#
+    .SYNOPSIS
+    Mounts a Disk Image to a specific Drive Letter.
+
+    .PARAMETER ImagePath
+    Specifies the path of the VHD or ISO file.
+
+    .PARAMETER DriveLetter
+    Specifies the drive letter to mount this VHD or ISO to.
+
+    .PARAMETER StorageType
+    Specifies the storage type of a file. If the StorageType parameter is not specified, then the storage type is determined by file extension.
+
+    .PARAMETER Access
+    Allows a VHD file to be mounted in read-only or read-write mode. ISO files are mounted in read-only mode regardless of what parameter value you provide.
+#>
+function Mount-DiskImageToLetter
+{
+    [CmdletBinding()]
+    [OutputType([String[]])]
+    param
+    (
+        [parameter(Mandatory = $true)]
+        [System.String]
+        $ImagePath,
+
+        [System.String]
+        $DriveLetter,
+
+        [ValidateSet("ISO","VHD","VHDx","VHDSet")]
+        [System.String]
+        $StorageType,
+
+        [ValidateSet("ReadOnly","ReadWrite")]
+        [System.String]
+        $Access
+    )
+
+    # Get the normalized DriveLetter (colon removed)
+    $normalizedDriveLetter = Test-DriveLetter -DriveLetter $DriveLetter
+
+    Write-Verbose -Message ( @(
+            "$($MyInvocation.MyCommand): "
+            $($LocalizedData.MountingImageMessage `
+                -f $ImagePath,$normalizedDriveLetter)
+        ) -join '' )
+
+    # Mount the Diskimage
+    $mountParams = @{ ImagePath = $ImagePath }
+    if ($PSBoundParameters.ContainsKey('Access'))
+    {
+        $mountParams += @{ Access = $Access }
+    }  # if
+    Mount-DiskImage @mountParams
+
+    # Get the DiskImage object
+    $diskImage = Get-DiskImage -ImagePath $ImagePath
+
+    # Determine the Storage Type expected
+    if (-not $PSBoundParameters.ContainsKey('StorageType'))
+    {
+        $StorageType = [Microsoft.PowerShell.Cmdletization.GeneratedTypes.DiskImage.StorageType] $diskImage.StorageType
+    } # if
+
+    # Different StorageType images require different methods of getting the Volume object.
+    if ($StorageType -eq [Microsoft.PowerShell.Cmdletization.GeneratedTypes.DiskImage.StorageType]::ISO)
+    {
+        # This is a ISO diskimage
+        $volume = $diskImage | Get-Volume
+    }
+    else
+    {
+        # This is a VHD/VHDx/VHDSet diskimage
+        $disk = Get-Disk | Where-Object -Property Location -EQ -Value $ImagePath
+
+        # Lookup the volume and get the first mounted Drive Letter.
+        $volumes = $disk | Get-Partition | Get-Volume
+        $volume = $volumes | Select-Object -First 1
+    } # if
+
+    # Verify that the drive letter assigned to the drive is the one needed.
+    if ($volume.DriveLetter -ne $normalizedDriveLetter)
+    {
+        Write-Verbose -Message ( @(
+                "$($MyInvocation.MyCommand): "
+                $($LocalizedData.ChangingISODriveLetterMessage `
+                    -f $ImagePath,$CimVolume.DriveLetter,$normalizedDriveLetter)
+            ) -join '' )
+
+        <#
+            Use CIM to change the DriveLetter.
+            The Win32_Volume must be looked up using the ObjectId found in the Volume object
+            ObjectId is more verbose than DeviceId in Windows 10 Anniversary Edition, look for
+            DeviceId in the ObjectId string to match volumes.
+        #>
+        $cimVolume = Get-CimInstance -ClassName Win32_Volume |
+            Where-Object -FilterScript { $volume.ObjectId.IndexOf($_.DeviceId) -ne -1 }
+
+        Set-CimInstance `
+            -InputObject $cimVolume `
+            -Property @{ DriveLetter = "$($normalizedDriveLetter):" }
+    } # if
+} # Mount-DiskImageToLetter
 
 Export-ModuleMember -Function *-TargetResource

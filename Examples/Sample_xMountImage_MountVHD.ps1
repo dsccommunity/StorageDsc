@@ -1,11 +1,10 @@
 # This configuration will mount a VHD file and wait for it to become available.
-configuration Sample_MountVHD
+configuration Sample_xMountImage_MountVHD
 {
     Import-DscResource -ModuleName xStorage
     xMountImage MountVHD
     {
-        Name        = 'Data1'
-        ImagePath   = 'd:\Data\Disk1.vhdx'
+        ImagePath   = 'd:\Data\Disk1.vhd'
         DriveLetter = 'V'
     }
 
@@ -17,5 +16,5 @@ configuration Sample_MountVHD
     }
 }
 
-Sample_MountVHD
-Start-DscConfiguration -Path Sample_MountVHD -Wait -Force -Verbose
+Sample_xMountImage_MountVHD
+Start-DscConfiguration -Path Sample_xMountImage_MountVHD -Wait -Force -Verbose

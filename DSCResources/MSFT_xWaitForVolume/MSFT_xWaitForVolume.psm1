@@ -19,15 +19,18 @@ else
 # Import the common storage functions
 Import-Module -Name ( Join-Path `
     -Path (Split-Path -Path $PSScriptRoot -Parent) `
-    -ChildPath '\MSFT_xStorageCommon\MSFT_xStorageCommon.psm1' )
+    -ChildPath '\StorageCommon\StorageCommon.psm1' )
 
 <#
     .SYNOPSIS
     Returns the current state of the wait for drive resource.
+
     .PARAMETER DriveLetter
     Specifies the name of the drive to wait for.
+
     .PARAMETER RetryIntervalSec
     Specifies the number of seconds to wait for the drive to become available.
+
     .PARAMETER RetryCount
     The number of times to loop the retry interval while waiting for the drive.
 #>
@@ -63,10 +66,13 @@ function Get-TargetResource
 <#
     .SYNOPSIS
     Sets the current state of the wait for drive resource.
+
     .PARAMETER DriveLetter
     Specifies the name of the drive to wait for.
+
     .PARAMETER RetryIntervalSec
     Specifies the number of seconds to wait for the drive to become available.
+
     .PARAMETER RetryCount
     The number of times to loop the retry interval while waiting for the drive.
 #>
@@ -131,10 +137,13 @@ function Set-TargetResource
 <#
     .SYNOPSIS
     Tests the current state of the wait for drive resource.
+
     .PARAMETER DriveLetter
     Specifies the name of the drive to wait for.
+
     .PARAMETER RetryIntervalSec
     Specifies the number of seconds to wait for the drive to become available.
+
     .PARAMETER RetryCount
     The number of times to loop the retry interval while waiting for the drive.
 #>

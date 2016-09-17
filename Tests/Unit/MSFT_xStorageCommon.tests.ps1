@@ -1,5 +1,5 @@
 $script:DSCModuleName      = 'xStorage'
-$script:DSCResourceName    = 'MSFT_xStorageCommon'
+$script:DSCResourceName    = 'StorageCommon'
 
 #region HEADER
 # Unit Test Template Version: 1.1.0
@@ -83,7 +83,7 @@ try
     #endregion
 
     #region Function Test-DriveLetter
-    Describe "MSFT_xStorageCommon\Test-DriveLetter" {
+    Describe "StorageCommon\Test-DriveLetter" {
         Context 'drive letter is good, has no colon and colon is not required' {
             It "should return '$driveLetterGood'" {
                 Test-DriveLetter -DriveLetter $driveLetterGood | Should Be $driveLetterGood

@@ -19,21 +19,27 @@ else
 # Import the common storage functions
 Import-Module -Name ( Join-Path `
     -Path (Split-Path -Path $PSScriptRoot -Parent) `
-    -ChildPath '\MSFT_xStorageCommon\MSFT_xStorageCommon.psm1' )
+    -ChildPath '\StorageCommon\StorageCommon.psm1' )
 
 <#
     .SYNOPSIS
     Returns the current state of the Disk and Partition.
+
     .PARAMETER DiskNumber
     Specifies the identifier for which disk to modify.
+
     .PARAMETER DriveLetter
     Specifies the preferred letter to assign to the disk volume.
+
     .PARAMETER Size
     Specifies the size of new volume (use all available space on disk if not provided).
+
     .PARAMETER FSLabel
     Define volume label if required.
+
     .PARAMETER AllocationUnitSize
     Specifies the allocation unit size to use when formatting the volume.
+
     .PARAMETER FSFormat
     Specifies the file system format of the new volume.
 #>
@@ -113,16 +119,22 @@ function Get-TargetResource
 <#
     .SYNOPSIS
     Initializes the Disk and Partition and assigns the drive letter.
+
     .PARAMETER DiskNumber
     Specifies the identifier for which disk to modify.
+
     .PARAMETER DriveLetter
     Specifies the preferred letter to assign to the disk volume.
+
     .PARAMETER Size
     Specifies the size of new volume (use all available space on disk if not provided).
+
     .PARAMETER FSLabel
     Define volume label if required.
+
     .PARAMETER AllocationUnitSize
     Specifies the allocation unit size to use when formatting the volume.
+
     .PARAMETER FSFormat
     Specifies the file system format of the new volume.
 #>
@@ -383,16 +395,22 @@ function Set-TargetResource
 <#
     .SYNOPSIS
     Tests if the disk is initialized, the partion exists and the drive letter is assigned.
+
     .PARAMETER DiskNumber
     Specifies the identifier for which disk to modify.
+
     .PARAMETER DriveLetter
     Specifies the preferred letter to assign to the disk volume.
+
     .PARAMETER Size
     Specifies the size of new volume (use all available space on disk if not provided).
+
     .PARAMETER FSLabel
     Define volume label if required.
+
     .PARAMETER AllocationUnitSize
     Specifies the allocation unit size to use when formatting the volume.
+
     .PARAMETER FSFormat
     Specifies the file system format of the new volume.
 #>

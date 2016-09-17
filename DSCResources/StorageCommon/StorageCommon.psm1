@@ -3,7 +3,7 @@ if (Test-Path "${PSScriptRoot}\${PSUICulture}")
 {
     Import-LocalizedData `
         -BindingVariable LocalizedData `
-        -Filename MSFT_xStorageCommon.strings.psd1 `
+        -Filename StorageCommon.strings.psd1 `
         -BaseDirectory "${PSScriptRoot}\${PSUICulture}"
 }
 else
@@ -11,18 +11,20 @@ else
     #fallback to en-US
     Import-LocalizedData `
         -BindingVariable LocalizedData `
-        -Filename MSFT_xStorageCommon.strings.psd1 `
+        -Filename StorageCommon.strings.psd1 `
         -BaseDirectory "${PSScriptRoot}\en-US"
 }
 #endregion
 
 <#
- .SYNOPSIS
- Throws an InvalidOperation custom exception.
- .PARAMETER ErrorId
- The error Id of the exception.
- .PARAMETER ErrorMessage
- The error message text to set in the exception.
+    .SYNOPSIS
+    Throws an InvalidOperation custom exception.
+
+    .PARAMETER ErrorId
+    The error Id of the exception.
+
+    .PARAMETER ErrorMessage
+    The error message text to set in the exception.
 #>
 function New-InvalidOperationError
 {
@@ -49,12 +51,14 @@ function New-InvalidOperationError
 } # end function New-InvalidOperationError
 
 <#
- .SYNOPSIS
- Throws an InvalidArgument custom exception.
- .PARAMETER ErrorId
- The error Id of the exception.
- .PARAMETER ErrorMessage
- The error message text to set in the exception.
+    .SYNOPSIS
+    Throws an InvalidArgument custom exception.
+
+    .PARAMETER ErrorId
+    The error Id of the exception.
+
+    .PARAMETER ErrorMessage
+    The error message text to set in the exception.
 #>
 function New-InvalidArgumentError
 {
@@ -81,12 +85,14 @@ function New-InvalidArgumentError
 } # end function New-InvalidArgumentError
 
 <#
- .SYNOPSIS
- Validates a Drive Letter, removing or adding the trailing colon if required.
- .PARAMETER DriveLetter
- The Drive Letter string to validate.
- .PARAMETER Colon
- Will ensure the returned string will include or exclude a colon.
+    .SYNOPSIS
+    Validates a Drive Letter, removing or adding the trailing colon if required.
+
+    .PARAMETER DriveLetter
+    The Drive Letter string to validate.
+
+    .PARAMETER Colon
+    Will ensure the returned string will include or exclude a colon.
 #>
 function Test-DriveLetter
 {
