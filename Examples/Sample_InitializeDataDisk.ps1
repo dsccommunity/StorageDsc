@@ -1,6 +1,7 @@
 # This configuration will wait for disk 2 to become available, and then make the disk available as
-# two new formatted volumes, with J using all available space after 'G' has been created.
-Configuration DataDisk
+# two new formatted volumes, 'G' and 'J', with 'J' using all available space after 'G' has been
+# created. It also creates a new ReFS formated volume on Disk 3 attached as drive letter 'S'.
+Configuration Sample_DataDisk
 {
 
     Import-DSCResource -ModuleName xStorage
@@ -13,6 +14,7 @@ Configuration DataDisk
              RetryIntervalSec = 60
              Count = 60
         }
+
         xDisk GVolume
         {
              DiskNumber = 2
@@ -39,5 +41,5 @@ Configuration DataDisk
     }
 }
 
-DataDisk -outputpath C:\DataDisk
-Start-DscConfiguration -Path C:\DataDisk -Wait -Force -Verbose
+DataDisk -outputpath C:\Sample_DataDisk
+Start-DscConfiguration -Path C:\Sample_DataDisk -Wait -Force -Verbose

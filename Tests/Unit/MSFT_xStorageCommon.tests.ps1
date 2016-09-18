@@ -80,6 +80,10 @@ try
     $driveLetterBad = '1'
     $driveLetterBadColon = ':C'
     $driveLetterBadTooLong = 'FE:'
+
+    $accessPathGood = 'c:\Good'
+    $accessPathGoodWithSlash = 'c:\Good\'
+    $accessPathBad = 'c:\Bad'
     #endregion
 
     #region Function Test-DriveLetter
@@ -135,6 +139,54 @@ try
 
             It 'should throw InvalidDriveLetterFormatError' {
                 { Test-DriveLetter -DriveLetter $driveLetterBadTooLong } | Should Throw $errorRecord
+            }
+        }
+    }
+    #endregion
+
+    #region Function Test-AccessPath
+    Describe "StorageCommon\Test-AccessPath" {
+        Mock `
+            -CommandName Test-Path `
+            -ModuleName StorageCommon `
+            -MockWith { $True }
+
+        Context 'path is found, trailing slash included, not required' {
+            It "should return '$accessPathGood'" {
+                Test-AccessPath -AccessPath $accessPathGoodWithSlash | Should Be $accessPathGood
+            }
+        }
+
+        Context 'path is found, trailing slash included, required' {
+            It "should return '$accessPathGoodWithSlash'" {
+                Test-AccessPath -AccessPath $accessPathGoodWithSlash -Slash | Should Be $accessPathGoodWithSlash
+            }
+        }
+
+        Context 'path is found, trailing slash not included, required' {
+            It "should return '$accessPathGoodWithSlash'" {
+                Test-AccessPath -AccessPath $accessPathGood -Slash | Should Be $accessPathGoodWithSlash
+            }
+        }
+
+        Context 'path is found, trailing slash not included, not required' {
+            It "should return '$accessPathGood'" {
+                Test-AccessPath -AccessPath $accessPathGood | Should Be $accessPathGood
+            }
+        }
+
+        Mock `
+            -CommandName Test-Path `
+            -ModuleName StorageCommon `
+            -MockWith { $False }
+
+        Context 'drive is not found' {
+            $errorRecord = Get-InvalidArgumentError `
+                -ErrorId 'InvalidAccessPathError' `
+                -ErrorMessage $($LocalizedData.InvalidAccessPathError -f $accessPathBad)
+
+            It 'should throw InvalidAccessPathError' {
+                { Test-AccessPath -AccessPath $accessPathBad } | Should Throw $errorRecord
             }
         }
     }

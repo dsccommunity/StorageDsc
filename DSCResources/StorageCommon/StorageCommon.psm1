@@ -112,7 +112,7 @@ function Test-DriveLetter
     $Matches = @([regex]::matches($DriveLetter, '^([A-Za-z]{1})[:]?$', 'IgnoreCase'))
     if (-not $Matches)
     {
-        # DriveLetter format is invlid
+        # DriveLetter format is invalid
         New-InvalidArgumentError `
             -ErrorId 'InvalidDriveLetterFormatError' `
             -ErrorMessage $($LocalizedData.InvalidDriveLetterFormatError -f $DriveLetter)
@@ -125,3 +125,57 @@ function Test-DriveLetter
     } # if
     return $DriveLetter
 } # end function Test-DriveLetter
+
+<#
+    .SYNOPSIS
+    Validates an Access Path, removing or adding the trailing slash if required.
+    If the Access Path does not exist or is not a folder then an exception will
+    be thrown.
+
+    .PARAMETER AccessPath
+    The Access Path string to validate.
+
+    .PARAMETER Slash
+    Will ensure the returned path will include or exclude a slash.
+#>
+function Test-AccessPath
+{
+    [CmdletBinding()]
+    [OutputType([String])]
+    param
+    (
+        [Parameter(Mandatory)]
+        [ValidateNotNullOrEmpty()]
+        [System.String]
+        $AccessPath,
+
+        [Switch]
+        $Slash
+    )
+
+    if (-not (Test-Path -Path $AccessPath -PathType Container))
+    {
+        # AccessPath is invalid
+        New-InvalidArgumentError `
+            -ErrorId 'InvalidAccessPathError' `
+            -ErrorMessage $($LocalizedData.InvalidAccessPathError -f $AccessPath)
+    } # if
+
+    # Remove or Add the trailing slash
+    if($AccessPath.EndsWith('\'))
+    {
+        if (-not $Slash)
+        {
+            $AccessPath = $AccessPath.TrimEnd('\')
+        } # if
+    }
+    else
+    {
+        if ($Slash)
+        {
+            $AccessPath = "$AccessPath\"
+        } # if
+    } # if
+
+    return $AccessPath
+} # end function Test-AccessPath

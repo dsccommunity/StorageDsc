@@ -1,5 +1,5 @@
 # This configuration will unmount an ISO file that is mounted in S:.
-configuration Sample_xMountImage_UnmountISO
+configuration Sample_xMountImage_DismountISO
 {
     Import-DscResource -ModuleName xStorage
     xMountImage ISO
@@ -11,5 +11,5 @@ configuration Sample_xMountImage_UnmountISO
     }
 }
 
-Sample_xMountImage_UnmountISO
-Start-DscConfiguration -Path Sample_xMountImage_UnmountISO -Wait -Force -Verbose
+Sample_xMountImage_DismountISO
+Start-DscConfiguration -Path Sample_xMountImage_DismountISO -Wait -Force -Verbose

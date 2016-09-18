@@ -21,6 +21,7 @@ Please read the installation instructions that are present on both the download 
 
 * **xMountImage**: used to mount or unmount an ISO/VHD disk image. It can be mounted as read-only (ISO, VHD, VHDx) or read/write (VHD, VHDx).
 * **xDisk**: used to initialize, format and mount the partition as a drive letter.
+* **xDiskAccessPath**: used to initialize, format and mount the partition to a folder access path.
 * **xWaitForDisk** wait for a disk to become available.
 * **xWaitForVolume** wait for a drive to be mounted and become available.
 
@@ -34,10 +35,18 @@ Please read the installation instructions that are present on both the download 
 
 ### xDisk
 
-* **[UInt32] DiskNumber** _(Key)_: Specifies the identifier for which disk to modify.
-* **[String] DriveLetter** _(Required)_: Specifies the preferred letter to assign to the disk volume.
+* **[String] DriveLetter** _(Key)_: Specifies the preferred letter to assign to the disk volume.
+* **[UInt32] DiskNumber** _(Required)_: Specifies the disk number for which disk to modify.
 * **[Uint64] Size** _(Write)_: Specifies the size of new volume (use all available space on disk if not provided).
 * **[String] FSLabel** _(Write)_: Define volume label if required.
+* **[UInt32] AllocationUnitSize** _(Write)_: Specifies the allocation unit size to use when formatting the volume.
+* **[String] FSFormat** _(Write)_: Define volume label if required. { *NTFS* | ReFS }. Defaults to NTFS.
+
+### xDiskAccessPath
+
+* **[String] AccessPath** _(Key)_: Specifies the access path folder to the assign the disk volume to.
+* **[UInt32] DiskNumber** _(Required)_: Specifies the disk number for which disk to modify.
+* **[Uint64] Size** _(Write)_: Specifies the size of new volume (use all available space on disk if not provided).
 * **[UInt32] AllocationUnitSize** _(Write)_: Specifies the allocation unit size to use when formatting the volume.
 * **[String] FSFormat** _(Write)_: Define volume label if required. { *NTFS* | ReFS }. Defaults to NTFS.
 
@@ -70,7 +79,6 @@ Please read the installation instructions that are present on both the download 
   - MOF Class version updated to 1.0.0.0.
 * xWaitForVolume:
   - Added new resource.
-  - MOF Class version updated to 1.0.0.0.
 * xStorageCommon:
   - Added helper function module.
 * xDisk:
@@ -89,6 +97,8 @@ Please read the installation instructions that are present on both the download 
   - MOF Class version updated to 1.0.0.0.
   - Enabled mounting of VHD/VHDx/VHDSet disk images.
   - Added StorageType and Access parameters to allow mounting VHD and VHDx disks as read/write.
+* xDiskAccessPath:
+  - Added new resource.
 
 ### 2.6.0.0
 
@@ -133,12 +143,13 @@ This module was previously named **xDisk**, the version is regressing to a "1.0.
 
 ## Examples
 
-### Example 1
+### Example - xWaitForDisk, xDisk
 
-This configuration will wait for disk 2 to become available, and then make the disk available as two new formatted volumes, with J using all available space after 'G' has been created.
+This configuration will wait for disk 2 to become available, and then make the disk available as two new formatted volumes, 'G' and 'J', with 'J' using all available space after 'G' has been created.
+It also creates a new ReFS formated volume on Disk 3 attached as drive letter 'S'.
 
 ```powershell
-Configuration DataDisk
+Configuration Sample_DataDisk
 {
 
     Import-DSCResource -ModuleName xStorage
@@ -151,6 +162,7 @@ Configuration DataDisk
              RetryIntervalSec = 60
              Count = 60
         }
+
         xDisk GVolume
         {
              DiskNumber = 2
@@ -177,11 +189,50 @@ Configuration DataDisk
     }
 }
 
-DataDisk -outputpath C:\DataDisk
-Start-DscConfiguration -Path C:\DataDisk -Wait -Force -Verbose
+DataDisk -outputpath C:\Sample_DataDisk
+Start-DscConfiguration -Path C:\Sample_DataDisk -Wait -Force -Verbose
 ```
 
-### Example 2
+### Example - xWaitForDisk, xDiskAccessPath
+
+This configuration will wait for disk 2 to become available, and then make the disk available as two new formatted volumes mounted to folders c:\SQLData and c:\SQLLog, with c:\SQLLog using all available space after c:\SQLData has been created.
+
+```powershell
+Configuration Sample_DataDiskwithAccessPath
+{
+
+    Import-DSCResource -ModuleName xStorage
+
+    Node localhost
+    {
+        xWaitforDisk Disk2
+        {
+             DiskNumber = 2
+             RetryIntervalSec = 60
+             Count = 60
+        }
+
+        xDiskAccessPath DataVolume
+        {
+             DiskNumber = 2
+             AccessPath = 'c:\SQLData'
+             Size = 10GB
+        }
+
+        xDiskAccessPath LogVolume
+        {
+             DiskNumber = 2
+             AccessPath = 'c:\SQLLog'
+             DependsOn = '[xDisk]DataVolume'
+        }
+    }
+}
+
+DataDisk -outputpath C:\Sample_DataDiskwithAccessPath
+Start-DscConfiguration -Path C:\Sample_DataDiskwithAccessPath -Wait -Force -Verbose
+```
+
+### Example - xMountImage
 
 This configuration will mount an ISO file as drive S:.
 
@@ -201,12 +252,12 @@ Start-DscConfiguration -Path Sample_xMountImage_MountISO -Wait -Force -Verbose
 
 ```
 
-### Example 3
+### Example - xDismountImage
 
 This configuration will unmount an ISO file that is mounted in S:.
 
 ```powershell
-configuration Sample_xMountImage_UnmountISO
+configuration Sample_xMountImage_DismountISO
 {
     Import-DscResource -ModuleName xStorage
     xMountImage ISO
@@ -218,11 +269,11 @@ configuration Sample_xMountImage_UnmountISO
     }
 }
 
-Sample_xMountImage_UnmountISO
-Start-DscConfiguration -Path Sample_xMountImage_UnmountISO -Wait -Force -Verbose
+Sample_xMountImage_DismountISO
+Start-DscConfiguration -Path Sample_xMountImage_DismountISO -Wait -Force -Verbose
 ```
 
-### Example 4
+### Example - xMountImage
 
 This configuration will mount a VHD file and wait for it to become available.
 
