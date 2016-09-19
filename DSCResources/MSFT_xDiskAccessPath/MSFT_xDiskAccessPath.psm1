@@ -79,7 +79,7 @@ function Get-TargetResource
 
     $volume = $partition | Get-Volume
 
-    $FSFormat = $volume.FileSystem
+    $fileSystem = $volume.FileSystem
 
     # Prepare the AccessPath used in the CIM/WMI query (replaces '\' with '\\')
     $queryAccessPath = $AccessPath -replace '\\','\\'
@@ -88,25 +88,20 @@ function Get-TargetResource
         -Query "SELECT BlockSize from Win32_Volume WHERE Name = '$queryAccessPath'" `
         -ErrorAction SilentlyContinue).BlockSize
 
-    if ($blockSize)
-    {
-        $allocationUnitSize = $blockSize
-    }
-    else
+    if (-not $blockSize)
     {
         # If Get-CimInstance did not return a value, try again with Get-WmiObject
         $blockSize = (Get-WmiObject `
             -Query "SELECT BlockSize from Win32_Volume WHERE Name = '$queryAccessPath'" `
             -ErrorAction SilentlyContinue).BlockSize
-        $allocationUnitSize = $blockSize
     } # if
 
     $returnValue = @{
         DiskNumber = $disk.Number
         AccessPath = $AccessPath
         Size = $partition.Size
-        AllocationUnitSize = $allocationUnitSize
-        FSFormat = $FSFormat
+        AllocationUnitSize = $blockSize
+        FSFormat = $fileSystem
     }
     $returnValue
 } # Get-TargetResource
@@ -287,12 +282,6 @@ function Set-TargetResource
             FileSystem = $FSFormat
             Confirm = $false
         }
-
-        if ($FSLabel)
-        {
-            # Set the File System label on the new volume
-            $volParams["NewFileSystemLabel"] = $FSLabel
-        } # if
 
         if ($AllocationUnitSize)
         {
