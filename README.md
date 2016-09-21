@@ -1,4 +1,4 @@
-ï»¿[![Build status](https://ci.appveyor.com/api/projects/status/1j95juvceu39ekm7/branch/master?svg=true)](https://ci.appveyor.com/project/PowerShell/xstorage/branch/master)
+[![Build status](https://ci.appveyor.com/api/projects/status/1j95juvceu39ekm7/branch/master?svg=true)](https://ci.appveyor.com/project/PowerShell/xstorage/branch/master)
 
 
 # xStorage
@@ -27,7 +27,7 @@ To install **xstorage** module
 
 -   If you are using WMF4 / PowerShell Version 4: Unzip the content under $env:ProgramFilesWindowsPowerShellModules folder
 
--   If you are using WMF5 Preview: From an elevated PowerShell session run â€˜Install-Module xStorageâ€™
+-   If you are using WMF5 Preview: From an elevated PowerShell session run ‘Install-Module xStorage’
 
 To confirm installation
 
@@ -92,6 +92,8 @@ For more information see the [Code of Conduct FAQ](https://opensource.microsoft.
 ## Versions
 
 ### Unreleased
+
+### 2.7.0.0
 * Converted appveyor.yml to install Pester from PSGallery instead of from Chocolatey.
 * added test for existing file system and no drive letter assignment to allow simple drive letter assignment in MSFT_xDisk.psm1 
 * added unit test for volume with existing partition and no drive letter assigned for MSFT_xDisk.psm1 
