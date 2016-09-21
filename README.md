@@ -11,7 +11,7 @@ This module contains the **xMountImage, xDisk, and xWaitForDisk** resources.  Th
 Before beginning that operation, the disk is marked 'Online' and if it is set to 'Read-Only', that property is removed.
 While this is intended to be non-destructive, as with all expiremental resources the scripts contained should be thoroughly evaluated and well understood before implementing in a production environment or where disk modifications could result in lost data.
 
-**All of the resources in the DSC Resource Kit are provided AS IS, and are not supported through any Microsoft standard support program or service. The "x" in xDiskImage stands for experimental**, which means that these resources will be **fix forward** and monitored by the module owner(s).
+**All of the resources in the DSC Resource Kit are provided AS IS, and are not supported through any Microsoft standard support program or service. The "x" in xStorage stands for experimental**, which means that these resources will be **fix forward** and monitored by the module owner(s).
 
 Please leave comments, feature requests, and bug reports in the Q & A tab for
 this module.
@@ -27,7 +27,7 @@ To install **xstorage** module
 
 -   If you are using WMF4 / PowerShell Version 4: Unzip the content under $env:ProgramFilesWindowsPowerShellModules folder
 
--   If you are using WMF5 Preview: From an elevated PowerShell session run â€˜Install-Module xDiskImageâ€™
+-   If you are using WMF5 Preview: From an elevated PowerShell session run ‘Install-Module xStorage’
 
 To confirm installation
 
@@ -86,9 +86,19 @@ choice
 
 We reserve resource and module names without prefixes ("x" or "c") for future use (e.g. "MSFT_Resource"). If the next version of Windows Server ships with a "DiskImage" resource, we don't want to break any configurations that use any community modifications. Please keep a prefix such as "c" on all community modifications.
 
+This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/).
+For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
+
 ## Versions
 
 ### Unreleased
+
+### 2.7.0.0
+* Converted appveyor.yml to install Pester from PSGallery instead of from Chocolatey.
+* added test for existing file system and no drive letter assignment to allow simple drive letter assignment in MSFT_xDisk.psm1 
+* added unit test for volume with existing partition and no drive letter assigned for MSFT_xDisk.psm1 
+* xMountImage: Fixed mounting disk images on Windows 10 Anniversary Edition
+
 
 ### 2.6.0.0
 * MSFT_xDisk: Replaced Get-WmiObject with Get-CimInstance
@@ -153,22 +163,22 @@ Configuration DataDisk
         {
              DiskNumber = 2
              DriveLetter = 'G'
-			 Size = 10GB
+             Size = 10GB
         }
         
         xDisk JVolume
         {
              DiskNumber = 2
              DriveLetter = 'J'
-			 FSLabel = 'Data
-			 DependsOn = [xDisk]GVolume
+             FSLabel = 'Data'
+             DependsOn = [xDisk]GVolume
         }
         
         xDisk DataVolume
         {
              DiskNumber = 3
              DriveLetter = 'S'
-			 Size = 100GB
+             Size = 100GB
              AllocationUnitSize = 64kb
         }
     }

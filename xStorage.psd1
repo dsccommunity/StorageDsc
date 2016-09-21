@@ -10,7 +10,7 @@
 # RootModule = ''
 
 # Version number of this module.
-ModuleVersion = '2.6.0.0'
+ModuleVersion = '2.7.0.0'
 
 # ID used to uniquely identify this module
 GUID = '00d73ca1-58b5-46b7-ac1a-5bfcf5814faf'
@@ -102,7 +102,11 @@ PrivateData = @{
         # IconUri = ''
 
         # ReleaseNotes of this module
-        ReleaseNotes = '* MSFT_xDisk: Replaced Get-WmiObject with Get-CimInstance
+        ReleaseNotes = '* Converted appveyor.yml to install Pester from PSGallery instead of from Chocolatey.
+* added test for existing file system and no drive letter assignment to allow simple drive letter assignment in MSFT_xDisk.psm1 
+* added unit test for volume with existing partition and no drive letter assigned for MSFT_xDisk.psm1 
+* xMountImage: Fixed mounting disk images on Windows 10 Anniversary Edition
+
 
 '
 
@@ -117,4 +121,5 @@ PrivateData = @{
 # DefaultCommandPrefix = ''
 
 }
+
 
