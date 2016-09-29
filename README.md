@@ -1,4 +1,4 @@
-﻿[![Build status](https://ci.appveyor.com/api/projects/status/1j95juvceu39ekm7/branch/master?svg=true)](https://ci.appveyor.com/project/PowerShell/xstorage/branch/master)
+[![Build status](https://ci.appveyor.com/api/projects/status/1j95juvceu39ekm7/branch/master?svg=true)](https://ci.appveyor.com/project/PowerShell/xstorage/branch/master)
 
 # xStorage
 
@@ -6,6 +6,34 @@ The **xStorage** module is a part of the Windows PowerShell Desired State Config
 
 This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/).
 For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
+
+This module contains the **xMountImage, xDisk, and xWaitForDisk** resources.  The xMountImage resource can be used to mount or unmount an ISO/VHD disk image to the local file system, with simple declarative language.  The xDisk and xWaitforDisk resources enable you to wait for a disk to become available and then initialize, format, and bring it online using PowerShell DSC.
+
+**NOTE:** The xDisk resource follows a process to detect the existance of a RAW disk, initialize the disk, create a volume, assign a drive letter of specific size (if provided) or maximum size, then format the new volume using NTFS and assign a volume label if one is provided.
+Before beginning that operation, the disk is marked 'Online' and if it is set to 'Read-Only', that property is removed.
+While this is intended to be non-destructive, as with all expiremental resources the scripts contained should be thoroughly evaluated and well understood before implementing in a production environment or where disk modifications could result in lost data.
+
+**All of the resources in the DSC Resource Kit are provided AS IS, and are not supported through any Microsoft standard support program or service. The "x" in xStorage stands for experimental**, which means that these resources will be **fix forward** and monitored by the module owner(s).
+
+Please leave comments, feature requests, and bug reports in the Q & A tab for
+this module.
+
+If you would like to modify this module, feel free. When modifying, please update the module name, resource friendly name, and MOF class name (instructions below). As specified in the license, you may copy or modify this resource as long as they are used on the Windows Platform.
+
+For more information about Windows PowerShell Desired State Configuration, check out the blog posts on the [PowerShell Blog](http://blogs.msdn.com/b/powershell/) ([this](http://blogs.msdn.com/b/powershell/archive/2013/11/01/configuration-in-a-devops-world-windows-powershell-desired-state-configuration.aspx) is a good starting point). There are also great community resources, such as [PowerShell.org](http://powershell.org/wp/tag/dsc/), or [PowerShell Magazine](http://www.powershellmagazine.com/tag/dsc/). For more information on the DSC Resource Kit, checkout [this blog post](http://go.microsoft.com/fwlink/?LinkID=389546).
+
+Installation
+------------
+
+To install **xstorage** module
+
+-   If you are using WMF4 / PowerShell Version 4: Unzip the content under $env:ProgramFilesWindowsPowerShellModules folder
+
+-   If you are using WMF5 Preview: From an elevated PowerShell session run �Install-Module xStorage�
+
+To confirm installation
+
+-   Run Get-DSCResource to see that the resources listed above are among the DSC Resources displayed
 
 ## Contributing
 
@@ -65,8 +93,6 @@ Please read the installation instructions that are present on both the download 
 ## Versions
 
 ### Unreleased
-
-* Converted appveyor.yml to install Pester from PSGallery instead of from Chocolatey.
 * added test for existing file system and no drive letter assignment to allow simple drive letter assignment in MSFT_xDisk.psm1
 * added unit test for volume with existing partition and no drive letter assigned for MSFT_xDisk.psm1
 * xMountImage: Fixed mounting disk images on Windows 10 Anniversary Edition
@@ -99,6 +125,9 @@ Please read the installation instructions that are present on both the download 
   - Added StorageType and Access parameters to allow mounting VHD and VHDx disks as read/write.
 * xDiskAccessPath:
   - Added new resource.
+
+### 2.7.0.0
+* Converted appveyor.yml to install Pester from PSGallery instead of from Chocolatey.
 
 ### 2.6.0.0
 
