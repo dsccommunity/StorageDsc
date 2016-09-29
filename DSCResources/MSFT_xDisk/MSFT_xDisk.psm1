@@ -35,7 +35,7 @@ Import-Module -Name ( Join-Path `
     Specifies the size of new volume (use all available space on disk if not provided).
 
     .PARAMETER FSLabel
-    Define volume label if required.
+    Specifies the volume label to assign to the volume.
 
     .PARAMETER AllocationUnitSize
     Specifies the allocation unit size to use when formatting the volume.
@@ -130,7 +130,7 @@ function Get-TargetResource
     Specifies the size of new volume (use all available space on disk if not provided).
 
     .PARAMETER FSLabel
-    Define volume label if required.
+    Specifies the volume label to assign to the volume.
 
     .PARAMETER AllocationUnitSize
     Specifies the allocation unit size to use when formatting the volume.
@@ -210,6 +210,7 @@ function Set-TargetResource
 
             $disk | Initialize-Disk `
                 -PartitionStyle "GPT"
+                break
         } # "RAW"
         "GPT"
         {
@@ -218,6 +219,7 @@ function Set-TargetResource
                     "$($MyInvocation.MyCommand): "
                     $($LocalizedData.DiskAlreadyInitializedMessage -f $DiskNumber)
                 ) -join '' )
+                break
         } # "GPT"
         default
         {
@@ -406,7 +408,7 @@ function Set-TargetResource
     Specifies the size of new volume (use all available space on disk if not provided).
 
     .PARAMETER FSLabel
-    Define volume label if required.
+    Specifies the volume label to assign to the volume.
 
     .PARAMETER AllocationUnitSize
     Specifies the allocation unit size to use when formatting the volume.

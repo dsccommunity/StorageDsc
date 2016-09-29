@@ -195,6 +195,7 @@ function Set-TargetResource
 
             $disk | Initialize-Disk `
                 -PartitionStyle "GPT"
+            break
         } # "RAW"
         "GPT"
         {
@@ -203,6 +204,7 @@ function Set-TargetResource
                     "$($MyInvocation.MyCommand): "
                     $($LocalizedData.DiskAlreadyInitializedMessage -f $DiskNumber)
                 ) -join '' )
+            break
         } # "GPT"
         default
         {

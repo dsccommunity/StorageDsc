@@ -15,8 +15,7 @@ While this is intended to be non-destructive, as with all expiremental resources
 
 **All of the resources in the DSC Resource Kit are provided AS IS, and are not supported through any Microsoft standard support program or service. The "x" in xStorage stands for experimental**, which means that these resources will be **fix forward** and monitored by the module owner(s).
 
-Please leave comments, feature requests, and bug reports in the Q & A tab for
-this module.
+Please leave comments, feature requests, and bug reports in the Q & A tab for this module.
 
 If you would like to modify this module, feel free. When modifying, please update the module name, resource friendly name, and MOF class name (instructions below). As specified in the license, you may copy or modify this resource as long as they are used on the Windows Platform.
 
@@ -25,11 +24,11 @@ For more information about Windows PowerShell Desired State Configuration, check
 Installation
 ------------
 
-To install **xstorage** module
+To install the **xStorage** module
 
 -   If you are using WMF4 / PowerShell Version 4: Unzip the content under $env:ProgramFilesWindowsPowerShellModules folder
 
--   If you are using WMF5 Preview: From an elevated PowerShell session run �Install-Module xStorage�
+-   If you are using WMF5 Preview: From an elevated PowerShell session run ```Install-Module xStorage```
 
 To confirm installation
 
@@ -41,9 +40,7 @@ Please check out common DSC Resources [contributing guidelines](https://github.c
 
 ## Requirements
 
-This module requires the latest version of PowerShell (v4.0, which ships in Windows 8.1 or Windows Server 2012R2).
-To easily use PowerShell 4.0 on older operating systems, install WMF 4.0.
-Please read the installation instructions that are present on both the download page and the release notes for WMF 4.0.
+This module requires the PowerShell v4.0 or above.
 
 ## Resources
 

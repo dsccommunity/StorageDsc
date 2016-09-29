@@ -1,7 +1,7 @@
 ﻿ConvertFrom-StringData @'
     GettingDiskMessage = Getting Disk '{0}' status for drive letter '{1}'.
     SettingDiskMessage = Setting Disk '{0}' status for drive letter '{1}'.
-    SetDiskOnlineMessage = Setting disk number '{0}' is online.
+    SetDiskOnlineMessage = Setting disk number '{0}' online.
     SetDiskReadwriteMessage = Setting disk number '{0}' to read/write.
     CheckingDiskPartitionStyleMessage = Checking disk number '{0}' partition style.
     InitializingDiskMessage = Initializing disk number '{0}'.
@@ -18,7 +18,7 @@
     DiskNotFoundMessage = Disk number '{0}' was not found.
     DiskNotOnlineMessage = Disk number '{0}' is not online.
     DiskReadOnlyMessage = Disk number '{0}' is readonly.
-    DiskNotGPTMessage = Disk number '{0}' is initialised with '{1}' partition style. GPT required.
+    DiskNotGPTMessage = Disk number '{0}' is initialized with '{1}' partition style. GPT required.
     DriveLetterNotFoundMessage = Drive {0} was not found.
     DriveSizeMismatchMessage = Drive {0} size {1} does not match expected size {2}.
     DriveAllocationUnitSizeMismatchMessage = Drive {0} allocation unit size {1} kb does not match expected allocation unit size {2} kb.
