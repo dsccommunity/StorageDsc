@@ -66,6 +66,8 @@ try
             $Disk = Get-Disk | Where-Object -FilterScript {
                 $_.Location -eq $VHDPath
             }
+            $FSLabel = 'TestDisk'
+
 
             # Get a mount point path
             $AccessPath = Join-Path -Path $ENV:Temp -ChildPath 'xDiskAccessPath_Mount'
@@ -85,6 +87,7 @@ try
                             NodeName    = 'localhost'
                             AccessPath  = $AccessPath
                             DiskNumber  = $Disk.Number
+                            FSLabel     = $FSLabel
                         }
                     )
                 }
@@ -108,6 +111,7 @@ try
             }
             $current.DiskNumber       | Should Be $Disk.DiskNumber
             $current.AccessPath       | Should Be "$($AccessPath)\"
+            $current.FSLabel          | Should Be $FSLabel
         }
 
         AfterAll {

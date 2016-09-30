@@ -231,7 +231,7 @@ try
             function Get-Partition {
                 Param
                 (
-                    [cmdletbinding()]
+                    [CmdletBinding()]
                     [Parameter(ValueFromPipeline)]
                     $Disk,
 
@@ -249,7 +249,7 @@ try
             function Get-Volume {
                 Param
                 (
-                    [cmdletbinding()]
+                    [CmdletBinding()]
                     [Parameter(ValueFromPipeline)]
                     $Partition,
 
@@ -916,7 +916,7 @@ try
             function Get-Partition {
                 Param
                 (
-                    [cmdletbinding()]
+                    [CmdletBinding()]
                     [Parameter(ValueFromPipeline)]
                     $Disk,
 
@@ -934,7 +934,7 @@ try
             function Get-Volume {
                 Param
                 (
-                    [cmdletbinding()]
+                    [CmdletBinding()]
                     [Parameter(ValueFromPipeline)]
                     $Partition,
 
@@ -946,7 +946,7 @@ try
             function Set-CimInstance {
                 Param
                 (
-                    [cmdletbinding()]
+                    [CmdletBinding()]
                     [Parameter(ValueFromPipeline)]
                     $InputObject,
 

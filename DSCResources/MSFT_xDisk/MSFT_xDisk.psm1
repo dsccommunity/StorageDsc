@@ -45,18 +45,19 @@ Import-Module -Name ( Join-Path `
 #>
 function Get-TargetResource
 {
+    [CmdletBinding()]
     [OutputType([System.Collections.Hashtable])]
     param
     (
         [parameter(Mandatory)]
-        [string] $DriveLetter,
+        [System.String] $DriveLetter,
 
         [parameter(Mandatory)]
         [uint32] $DiskNumber,
 
         [UInt64] $Size,
 
-        [string] $FSLabel,
+        [System.String] $FSLabel,
 
         [UInt32] $AllocationUnitSize,
 
@@ -85,7 +86,7 @@ function Get-TargetResource
         -DriveLetter $DriveLetter `
         -ErrorAction SilentlyContinue
 
-    $FSFormat = $volume.FileSystem
+    $fileSystem = $volume.FileSystem
     $FSLabel = $volume.FileSystemLabel
 
     $blockSize = (Get-CimInstance `
@@ -94,7 +95,7 @@ function Get-TargetResource
 
     if ($blockSize)
     {
-        $allocationUnitSize = $blockSize
+        $AllocationUnitSize = $blockSize
     }
     else
     {
@@ -102,7 +103,6 @@ function Get-TargetResource
         $blockSize = (Get-WmiObject `
             -Query "SELECT BlockSize from Win32_Volume WHERE DriveLetter = '$($DriveLetter):'" `
             -ErrorAction SilentlyContinue).BlockSize
-        $allocationUnitSize = $blockSize
     } # if
 
     $returnValue = @{
@@ -110,8 +110,8 @@ function Get-TargetResource
         DriveLetter = $partition.DriveLetter
         Size = $partition.Size
         FSLabel = $FSLabel
-        AllocationUnitSize = $allocationUnitSize
-        FSFormat = $FSFormat
+        AllocationUnitSize = $blockSize
+        FSFormat = $fileSystem
     }
     $returnValue
 } # Get-TargetResource
@@ -140,17 +140,18 @@ function Get-TargetResource
 #>
 function Set-TargetResource
 {
+    [CmdletBinding()]
     param
     (
         [parameter(Mandatory)]
-        [string] $DriveLetter,
+        [System.String] $DriveLetter,
 
         [parameter(Mandatory)]
         [uint32] $DiskNumber,
 
         [UInt64] $Size,
 
-        [string] $FSLabel,
+        [System.String] $FSLabel,
 
         [UInt32] $AllocationUnitSize,
 
@@ -210,7 +211,8 @@ function Set-TargetResource
 
             $disk | Initialize-Disk `
                 -PartitionStyle "GPT"
-                break
+
+            break
         } # "RAW"
         "GPT"
         {
@@ -219,7 +221,8 @@ function Set-TargetResource
                     "$($MyInvocation.MyCommand): "
                     $($LocalizedData.DiskAlreadyInitializedMessage -f $DiskNumber)
                 ) -join '' )
-                break
+
+            break
         } # "GPT"
         default
         {
@@ -250,6 +253,7 @@ function Set-TargetResource
                     $($LocalizedData.CreatingPartitionMessage `
                         -f $DiskNumber,$DriveLetter,"$($Size/1kb) kb")
                 ) -join '' )
+
             $partitionParams["Size"] = $Size
         }
         else
@@ -260,6 +264,7 @@ function Set-TargetResource
                     $($LocalizedData.CreatingPartitionMessage `
                         -f $DiskNumber,$DriveLetter,'all free space')
                 ) -join '' )
+
             $partitionParams["UseMaximumSize"] = $true
         } # if
 
@@ -273,8 +278,11 @@ function Set-TargetResource
         While ($partition.IsReadOnly `
             -and ([DateTime]::Now - $start).TotalMilliseconds -lt $timeout)
         {
-            Write-Verbose -Message ($LocalizedData.NewPartitionIsReadOnlyMessage -f `
-                $partition.DiskNumber,$partition.PartitionNumber)
+            Write-Verbose -Message ( @(
+                    "$($MyInvocation.MyCommand): "
+                    ($LocalizedData.NewPartitionIsReadOnlyMessage `
+                        -f $partition.DiskNumber,$partition.PartitionNumber)
+                ) -join '' )
 
             Start-Sleep -Seconds 1
 
@@ -339,8 +347,8 @@ function Set-TargetResource
                 # There is nothing we can do to resolve this (yet)
                 Write-Verbose -Message ( @(
                         "$($MyInvocation.MyCommand): "
-                        $($LocalizedData.FileSystemFormatMismatch -f `
-                            $DriveLetter,$fileSystem,$FSFormat)
+                        $($LocalizedData.FileSystemFormatMismatch `
+                            -f $DriveLetter,$fileSystem,$FSFormat)
                     ) -join '' )
             } # if
         } # if
@@ -418,19 +426,19 @@ function Set-TargetResource
 #>
 function Test-TargetResource
 {
+    [CmdletBinding()]
     [OutputType([System.Boolean])]
-    [cmdletbinding()]
     param
     (
         [parameter(Mandatory)]
-        [string] $DriveLetter,
+        [System.String] $DriveLetter,
 
         [parameter(Mandatory)]
         [uint32] $DiskNumber,
 
         [UInt64] $Size,
 
-        [string] $FSLabel,
+        [System.String] $FSLabel,
 
         [UInt32] $AllocationUnitSize,
 
@@ -462,6 +470,7 @@ function Test-TargetResource
                 "$($MyInvocation.MyCommand): "
                 $($LocalizedData.DiskNotFoundMessage -f $DiskNumber)
             ) -join '' )
+
         return $false
     } # if
 
@@ -471,6 +480,7 @@ function Test-TargetResource
                 "$($MyInvocation.MyCommand): "
                 $($LocalizedData.DiskNotOnlineMessage -f $DiskNumber)
             ) -join '' )
+
         return $false
     } # if
 
@@ -480,6 +490,7 @@ function Test-TargetResource
                 "$($MyInvocation.MyCommand): "
                 $($LocalizedData.DiskReadOnlyMessage -f $DiskNumber)
             ) -join '' )
+
         return $false
     } # if
 
@@ -489,6 +500,7 @@ function Test-TargetResource
                 "$($MyInvocation.MyCommand): "
                 $($LocalizedData.DiskNotGPTMessage -f $DiskNumber,$Disk.PartitionStyle)
             ) -join '' )
+
         return $false
     } # if
 
@@ -501,6 +513,7 @@ function Test-TargetResource
                 "$($MyInvocation.MyCommand): "
                 $($LocalizedData.DriveLetterNotFoundMessage -f $DriveLetter)
             ) -join '' )
+
         return $false
     } # if
 
@@ -512,8 +525,8 @@ function Test-TargetResource
             # The partition size mismatches but can't be changed (yet)
             Write-Verbose -Message ( @(
                     "$($MyInvocation.MyCommand): "
-                    $($LocalizedData.DriveSizeMismatchMessage -f `
-                        $DriveLetter,$Partition.Size,$Size)
+                    $($LocalizedData.DriveSizeMismatchMessage `
+                        -f $DriveLetter,$Partition.Size,$Size)
                 ) -join '' )
         } # if
     } # if
@@ -536,8 +549,8 @@ function Test-TargetResource
             # The allocation unit size mismatches but can't be changed (yet)
             Write-Verbose -Message ( @(
                     "$($MyInvocation.MyCommand): "
-                    $($LocalizedData.DriveAllocationUnitSizeMismatchMessage -f `
-                        $DriveLetter,$($blockSize.BlockSize/1kb),$($AllocationUnitSize/1kb))
+                    $($LocalizedData.DriveAllocationUnitSizeMismatchMessage `
+                        -f $DriveLetter,$($blockSize.BlockSize/1kb),$($AllocationUnitSize/1kb))
                 ) -join '' )
         } # if
     } # if
@@ -556,8 +569,8 @@ function Test-TargetResource
             # The file system format does not match but can't be changed (yet)
             Write-Verbose -Message ( @(
                     "$($MyInvocation.MyCommand): "
-                    $($LocalizedData.FileSystemFormatMismatch -f `
-                        $DriveLetter,$fileSystem,$FSFormat)
+                    $($LocalizedData.FileSystemFormatMismatch `
+                        -f $DriveLetter,$fileSystem,$FSFormat)
                 ) -join '' )
         } # if
     } # if
@@ -571,9 +584,10 @@ function Test-TargetResource
             # The assigned volume label is different and needs updating
             Write-Verbose -Message ( @(
                     "$($MyInvocation.MyCommand): "
-                    $($LocalizedData.DriveLabelMismatch -f `
-                        $DriveLetter,$label,$FSLabel)
+                    $($LocalizedData.DriveLabelMismatch `
+                        -f $DriveLetter,$label,$FSLabel)
                 ) -join '' )
+
             return $false
         } # if
     } # if

@@ -112,10 +112,12 @@ try
             }
 
         $script:mockedVolume = [pscustomobject] @{
+                FileSystemLabel = 'myLabel'
                 FileSystem = 'NTFS'
             }
 
         $script:mockedVolumeReFS = [pscustomobject] @{
+                FileSystemLabel = 'myLabel'
                 FileSystem = 'ReFS'
             }
         #endregion
@@ -128,7 +130,7 @@ try
             function Get-Partition {
                 Param
                 (
-                    [cmdletbinding()]
+                    [CmdletBinding()]
                     [Parameter(ValueFromPipeline)]
                     $Disk,
 
@@ -143,7 +145,7 @@ try
             function Get-Volume {
                 Param
                 (
-                    [cmdletbinding()]
+                    [CmdletBinding()]
                     [Parameter(ValueFromPipeline)]
                     $Partition
                 )
@@ -195,6 +197,10 @@ try
 
                 It "Size should be $($script:mockedPartition.Size)" {
                     $resource.Size | Should be $script:mockedPartition.Size
+                }
+
+                It "FSLabel should be $($script:mockedVolume.FileSystemLabel)" {
+                    $resource.FSLabel | Should be $script:mockedVolume.FileSystemLabel
                 }
 
                 It "AllocationUnitSize should be $($script:mockedWmi.BlockSize)" {
@@ -258,6 +264,10 @@ try
                     $resource.Size | Should be $null
                 }
 
+                It "FSLabel should be empty" {
+                    $resource.FSLabel | Should be ''
+                }
+
                 It "AllocationUnitSize should be null" {
                     $resource.AllocationUnitSize | Should be $null
                 }
@@ -286,7 +296,7 @@ try
             function Set-Disk {
                 Param
                 (
-                    [cmdletbinding()]
+                    [CmdletBinding()]
                     [Parameter(ValueFromPipeline)]
                     $InputObject,
 
@@ -301,7 +311,7 @@ try
             function Initialize-Disk {
                 Param
                 (
-                    [cmdletbinding()]
+                    [CmdletBinding()]
                     [Parameter(ValueFromPipeline)]
                     $InputObject,
 
@@ -313,7 +323,7 @@ try
             function Get-Partition {
                 Param
                 (
-                    [cmdletbinding()]
+                    [CmdletBinding()]
                     [Parameter(ValueFromPipeline)]
                     $Disk,
 
@@ -328,16 +338,28 @@ try
             function Get-Volume {
                 Param
                 (
-                    [cmdletbinding()]
+                    [CmdletBinding()]
                     [Parameter(ValueFromPipeline)]
                     $Partition
+                )
+            }
+
+            function Set-Volume {
+                Param
+                (
+                    [CmdletBinding()]
+                    [Parameter(ValueFromPipeline)]
+                    $InputObject,
+
+                    [String]
+                    $NewFileSystemLabel
                 )
             }
 
             function Format-Volume {
                 Param
                 (
-                    [cmdletbinding()]
+                    [CmdletBinding()]
                     [Parameter(ValueFromPipeline)]
                     $Partition,
 
@@ -737,6 +759,63 @@ try
                     Assert-MockCalled -CommandName Set-Partition -Times 0
                 }
             }
+
+            Context 'Online GPT disk with correct partition/volume but wrong Volume Label assigned' {
+                # verifiable (should be called) mocks
+                Mock `
+                    -CommandName Test-AccessPath `
+                    -MockWith { $script:testAccessPath } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-Disk `
+                    -MockWith { $script:mockedDisk0 } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-Partition `
+                    -MockWith { $script:mockedPartition } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-Volume `
+                    -MockWith { $script:mockedVolume } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Set-Volume `
+                    -Verifiable
+
+                # mocks that should not be called
+                Mock -CommandName Set-Disk
+                Mock -CommandName Initialize-Disk
+                Mock -CommandName Format-Volume
+                Mock -CommandName Set-Partition
+
+                It 'Should not throw' {
+                    {
+                        Set-targetResource `
+                            -DiskNumber 0 `
+                            -AccessPath $script:testAccessPath `
+                            -FSLabel 'NewLabel' `
+                            -Verbose
+                    } | Should not throw
+                }
+
+                It 'the correct mocks were called' {
+                    Assert-VerifiableMocks
+                    Assert-MockCalled -CommandName Test-AccessPath -Times 1
+                    Assert-MockCalled -CommandName Get-Disk -Times 1
+                    Assert-MockCalled -CommandName Set-Disk -Times 0
+                    Assert-MockCalled -CommandName Initialize-Disk -Times 0
+                    Assert-MockCalled -CommandName Get-Partition -Times 1
+                    Assert-MockCalled -CommandName Get-Volume -Times 1
+                    Assert-MockCalled -CommandName New-Partition -Times 0
+                    Assert-MockCalled -CommandName Format-Volume -Times 0
+                    Assert-MockCalled -CommandName Set-Partition -Times 0
+                    Assert-MockCalled -CommandName Set-Volume -Times 1
+                }
+            }
         }
         #endregion
 
@@ -748,7 +827,7 @@ try
             function Get-Partition {
                 Param
                 (
-                    [cmdletbinding()]
+                    [CmdletBinding()]
                     [Parameter(ValueFromPipeline)]
                     $Disk,
 
@@ -763,7 +842,7 @@ try
             function Get-Volume {
                 Param
                 (
-                    [cmdletbinding()]
+                    [CmdletBinding()]
                     [Parameter(ValueFromPipeline)]
                     $Partition
                 )
@@ -1065,6 +1144,63 @@ try
 
                 It 'result should be true' {
                     $script:result | Should be $true
+                }
+
+                It 'the correct mocks were called' {
+                    Assert-VerifiableMocks
+                    Assert-MockCalled -CommandName Test-AccessPath -Times 1
+                    Assert-MockCalled -CommandName Get-Disk -Times 1
+                    Assert-MockCalled -CommandName Get-Partition -Times 1
+                    Assert-MockCalled -CommandName Get-Volume -Times 1
+                    Assert-MockCalled -CommandName Get-WmiObject -Times 0
+                    Assert-MockCalled -CommandName Get-CimInstance -Times 1
+                }
+            }
+
+            Context 'Test mismatching FSLabel' {
+                # verifiable (should be called) mocks
+                Mock `
+                    -CommandName Test-AccessPath `
+                    -MockWith { $script:testAccessPath } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-Disk `
+                    -MockWith { $script:mockedDisk0 } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-Partition `
+                    -MockWith { $script:mockedPartition } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-Volume `
+                    -MockWith { $script:mockedVolume } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-CimInstance `
+                    -MockWith { $script:mockedWmi } `
+                    -Verifiable
+
+                # mocks that should not be called
+                Mock -CommandName Get-WmiObject
+
+                $script:result = $null
+
+                It 'calling test should not throw' {
+                    {
+                        $script:result = Test-TargetResource `
+                            -DiskNumber $script:mockedDisk0.Number `
+                            -AccessPath $script:testAccessPath `
+                            -FSLabel 'NewLabel' `
+                            -Verbose
+                    } | Should not throw
+                }
+
+                It 'result should be false' {
+                    $script:result | Should be $false
                 }
 
                 It 'the correct mocks were called' {

@@ -11,6 +11,7 @@
     SuccessfullyInitializedMessage = Successfully initialized volume and assigned to access path '{0}'.
     ChangingDriveLetterMessage = The volume already exists, changing access path '{0}' to '{1}'.
     AssigningDriveLetterMessage = Assigning access path '{0}'.
+    ChangingVolumeLabelMessage = Changing Volume assigned to access path '{0}' label to '{1}'.
     NewPartitionIsReadOnlyMessage = New partition '{1}' on disk '{0}' is readonly. Waiting for it to become writable.
     TestingDiskMessage = Testing Disk '{0}' status for access path '{1}'.
     CheckDiskInitializedMessage = Checking if disk number '{0}' is initialized.
@@ -22,6 +23,7 @@
     SizeMismatchMessage = Volume assigned to access path '{0}' has size {1}, which does not match expected size {2}.
     AllocationUnitSizeMismatchMessage = Volume assigned to access path '{0}' has allocation unit size {1} kb does not match expected allocation unit size {2} kb.
     FileSystemFormatMismatch = Volume assigned to access path '{0}' filesystem format '{1}' does not match expected format '{2}'.
+    DriveLabelMismatch = Volume assigned to access path '{0}' label '{1}' does not match expected label '{2}'.
 
     DiskAlreadyInitializedError = Disk number '{0}' is already initialized with {1}.
     NewParitionIsReadOnlyError = New partition '{1}' on disk '{0}' did not become writable in the expected time.

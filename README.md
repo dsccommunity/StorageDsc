@@ -11,7 +11,7 @@ This module contains the **xMountImage, xDisk, and xWaitForDisk** resources.  Th
 
 **NOTE:** The xDisk resource follows a process to detect the existance of a RAW disk, initialize the disk, create a volume, assign a drive letter of specific size (if provided) or maximum size, then format the new volume using NTFS and assign a volume label if one is provided.
 Before beginning that operation, the disk is marked 'Online' and if it is set to 'Read-Only', that property is removed.
-While this is intended to be non-destructive, as with all expiremental resources the scripts contained should be thoroughly evaluated and well understood before implementing in a production environment or where disk modifications could result in lost data.
+While this is intended to be non-destructive, as with all experimental resources the scripts contained should be thoroughly evaluated and well understood before implementing in a production environment or where disk modifications could result in lost data.
 
 **All of the resources in the DSC Resource Kit are provided AS IS, and are not supported through any Microsoft standard support program or service. The "x" in xStorage stands for experimental**, which means that these resources will be **fix forward** and monitored by the module owner(s).
 
@@ -37,10 +37,6 @@ To confirm installation
 ## Contributing
 
 Please check out common DSC Resources [contributing guidelines](https://github.com/PowerShell/DscResource.Kit/blob/master/CONTRIBUTING.md).
-
-## Requirements
-
-This module requires the PowerShell v4.0 or above.
 
 ## Resources
 
@@ -72,6 +68,7 @@ This module requires the PowerShell v4.0 or above.
 * **[String] AccessPath** _(Key)_: Specifies the access path folder to the assign the disk volume to.
 * **[UInt32] DiskNumber** _(Required)_: Specifies the disk number for which disk to modify.
 * **[Uint64] Size** _(Write)_: Specifies the size of new volume (use all available space on disk if not provided).
+* **[String] FSLabel** _(Write)_: Define volume label if required.
 * **[UInt32] AllocationUnitSize** _(Write)_: Specifies the allocation unit size to use when formatting the volume.
 * **[String] FSFormat** _(Write)_: Define volume label if required. { *NTFS* | ReFS }. Defaults to NTFS.
 
@@ -102,8 +99,9 @@ This module requires the PowerShell v4.0 or above.
   - MOF Class version updated to 1.0.0.0.
 * xWaitForVolume:
   - Added new resource.
-* xStorageCommon:
+* StorageCommon:
   - Added helper function module.
+  - Corrected name of unit tests file.
 * xDisk:
   - Added validation of DriveLetter parameter.
   - Added support for setting DriveLetter parameter with or without colon.
@@ -113,6 +111,10 @@ This module requires the PowerShell v4.0 or above.
   - Added FSFormat parameter to allow disk format to be specified.
   - Size or AllocationUnitSize mismatches no longer trigger Set-TargetResource because these values can't be changed (yet).
   - MOF Class version updated to 1.0.0.0.
+  - Unit tests changed to match xDiskAccessPath methods.
+  - Added additional unit tests to Get-TargetResource.
+  - Fixed bug in Get-TargetResource when disk did not contain any partitions.
+  - Added missing cmdletbinding() to functions.
 * xMountImage (Breaking Change):
   - Removed Name parameter (Breaking Change)
   - Added validation of DriveLetter parameter.
@@ -122,6 +124,7 @@ This module requires the PowerShell v4.0 or above.
   - Added StorageType and Access parameters to allow mounting VHD and VHDx disks as read/write.
 * xDiskAccessPath:
   - Added new resource.
+  - Added support for changing/setting volume label.
 
 ### 2.7.0.0
 * Converted appveyor.yml to install Pester from PSGallery instead of from Chocolatey.
@@ -243,12 +246,14 @@ Configuration Sample_DataDiskwithAccessPath
              DiskNumber = 2
              AccessPath = 'c:\SQLData'
              Size = 10GB
+             FSLabel = 'SQLData1'
         }
 
         xDiskAccessPath LogVolume
         {
              DiskNumber = 2
              AccessPath = 'c:\SQLLog'
+             FSLabel = 'SQLLog1'
              DependsOn = '[xDisk]DataVolume'
         }
     }

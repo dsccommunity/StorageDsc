@@ -20,12 +20,14 @@ Configuration Sample_DataDiskwithAccessPath
              DiskNumber = 2
              AccessPath = 'c:\SQLData'
              Size = 10GB
+             FSLabel = 'SQLData1'
         }
 
         xDiskAccessPath LogVolume
         {
              DiskNumber = 2
              AccessPath = 'c:\SQLLog'
+             FSLabel = 'SQLLog1'
              DependsOn = '[xDisk]DataVolume'
         }
     }

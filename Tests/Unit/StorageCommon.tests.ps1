@@ -186,7 +186,8 @@ try
                 -ErrorMessage $($LocalizedData.InvalidAccessPathError -f $accessPathBad)
 
             It 'should throw InvalidAccessPathError' {
-                { Test-AccessPath -AccessPath $accessPathBad } | Should Throw $errorRecord
+                { Test-AccessPath `
+                    -AccessPath $accessPathBad } | Should Throw $errorRecord
             }
         }
     }

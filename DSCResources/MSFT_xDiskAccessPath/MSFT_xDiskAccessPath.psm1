@@ -34,6 +34,9 @@ Import-Module -Name ( Join-Path `
     .PARAMETER Size
     Specifies the size of new volume (use all available space on disk if not provided).
 
+    .PARAMETER FSLabel
+    Specifies the volume label to assign to the volume.
+
     .PARAMETER AllocationUnitSize
     Specifies the allocation unit size to use when formatting the volume.
 
@@ -42,16 +45,19 @@ Import-Module -Name ( Join-Path `
 #>
 function Get-TargetResource
 {
+    [CmdletBinding()]
     [OutputType([System.Collections.Hashtable])]
     param
     (
         [parameter(Mandatory)]
-        [string] $AccessPath,
+        [System.String] $AccessPath,
 
         [parameter(Mandatory)]
         [uint32] $DiskNumber,
 
         [UInt64] $Size,
+
+        [System.String] $FSLabel,
 
         [UInt32] $AllocationUnitSize,
 
@@ -80,6 +86,7 @@ function Get-TargetResource
     $volume = $partition | Get-Volume
 
     $fileSystem = $volume.FileSystem
+    $FSLabel = $volume.FileSystemLabel
 
     # Prepare the AccessPath used in the CIM/WMI query (replaces '\' with '\\')
     $queryAccessPath = $AccessPath -replace '\\','\\'
@@ -88,7 +95,11 @@ function Get-TargetResource
         -Query "SELECT BlockSize from Win32_Volume WHERE Name = '$queryAccessPath'" `
         -ErrorAction SilentlyContinue).BlockSize
 
-    if (-not $blockSize)
+    if ($blockSize)
+    {
+        $AllocationUnitSize = $blockSize
+    }
+    else
     {
         # If Get-CimInstance did not return a value, try again with Get-WmiObject
         $blockSize = (Get-WmiObject `
@@ -100,6 +111,7 @@ function Get-TargetResource
         DiskNumber = $disk.Number
         AccessPath = $AccessPath
         Size = $partition.Size
+        FSLabel = $FSLabel
         AllocationUnitSize = $blockSize
         FSFormat = $fileSystem
     }
@@ -119,6 +131,9 @@ function Get-TargetResource
     .PARAMETER Size
     Specifies the size of new volume (use all available space on disk if not provided).
 
+    .PARAMETER FSLabel
+    Specifies the volume label to assign to the volume.
+
     .PARAMETER AllocationUnitSize
     Specifies the allocation unit size to use when formatting the volume.
 
@@ -127,15 +142,18 @@ function Get-TargetResource
 #>
 function Set-TargetResource
 {
+    [CmdletBinding()]
     param
     (
         [parameter(Mandatory)]
-        [string] $AccessPath,
+        [System.String] $AccessPath,
 
         [parameter(Mandatory)]
         [uint32] $DiskNumber,
 
         [UInt64] $Size,
+
+        [System.String] $FSLabel,
 
         [UInt32] $AllocationUnitSize,
 
@@ -285,6 +303,12 @@ function Set-TargetResource
             Confirm = $false
         }
 
+        if ($FSLabel)
+        {
+            # Set the File System label on the new volume
+            $volParams["NewFileSystemLabel"] = $FSLabel
+        } # if
+
         if ($AllocationUnitSize)
         {
             # Set the Allocation Unit Size on the new volume
@@ -332,6 +356,22 @@ function Set-TargetResource
                     ) -join '' )
             } # if
         } # if
+
+        if ($PSBoundParameters.ContainsKey('FSLabel'))
+        {
+            # The volume should have a label assigned
+            if ($volume.FileSystemLabel -ne $FSLabel)
+            {
+                # The volume lable needs to be changed because it is different.
+                Write-Verbose -Message ( @(
+                        "$($MyInvocation.MyCommand): "
+                        $($LocalizedData.ChangingVolumeLabelMessage `
+                            -f $volume.DriveLetter,$FSLabel)
+                    ) -join '' )
+
+                $volume | Set-Volume -NewFileSystemLabel $FSLabel
+            } # if
+        } # if
     } # if
 } # Set-TargetResource
 
@@ -348,6 +388,9 @@ function Set-TargetResource
     .PARAMETER Size
     Specifies the size of new volume (use all available space on disk if not provided).
 
+    .PARAMETER FSLabel
+    Specifies the volume label to assign to the volume.
+
     .PARAMETER AllocationUnitSize
     Specifies the allocation unit size to use when formatting the volume.
 
@@ -356,17 +399,19 @@ function Set-TargetResource
 #>
 function Test-TargetResource
 {
+    [CmdletBinding()]
     [OutputType([System.Boolean])]
-    [cmdletbinding()]
     param
     (
         [parameter(Mandatory)]
-        [string] $AccessPath,
+        [System.String] $AccessPath,
 
         [parameter(Mandatory)]
         [uint32] $DiskNumber,
 
         [UInt64] $Size,
+
+        [System.String] $FSLabel,
 
         [UInt32] $AllocationUnitSize,
 
@@ -498,6 +543,22 @@ function Test-TargetResource
                     $($LocalizedData.FileSystemFormatMismatch -f `
                         $AccessPath,$fileSystem,$FSFormat)
                 ) -join '' )
+        } # if
+    } # if
+
+    if ($PSBoundParameters.ContainsKey('FSLabel'))
+    {
+        # Check the volume label
+        $label = $volume.FileSystemLabel
+        if ($label -ne $FSLabel)
+        {
+            # The assigned volume label is different and needs updating
+            Write-Verbose -Message ( @(
+                    "$($MyInvocation.MyCommand): "
+                    $($LocalizedData.DriveLabelMismatch -f `
+                        $DriveLetter,$label,$FSLabel)
+                ) -join '' )
+            return $false
         } # if
     } # if
 

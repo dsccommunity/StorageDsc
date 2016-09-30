@@ -6,6 +6,7 @@ configuration MSFT_xDiskAccessPath_Config {
         xDiskAccessPath Integration_Test {
             DiskNumber         = $Node.DiskNumber
             AccessPath         = $Node.AccessPath
+            FSLabel            = $Node.FSLabel
         }
     }
 }
