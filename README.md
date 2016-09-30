@@ -213,7 +213,7 @@ Configuration Sample_DataDisk
              DriveLetter = 'S'
              Size = 100GB
              FSFormat = 'ReFS'
-             AllocationUnitSize = 64kb
+             AllocationUnitSize = 64KB
         }
     }
 }
@@ -275,6 +275,13 @@ configuration Sample_xMountImage_MountISO
     {
         ImagePath   = 'c:\Sources\SQL.iso'
         DriveLetter = 'S'
+    }
+
+    xWaitForVolume WaitForISO
+    {
+        DriveLetter      = 'S'
+        RetryIntervalSec = 5
+        RetryCount       = 10
     }
 }
 

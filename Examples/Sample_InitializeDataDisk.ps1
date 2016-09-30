@@ -36,7 +36,7 @@ Configuration Sample_DataDisk
              DriveLetter = 'S'
              Size = 100GB
              FSFormat = 'ReFS'
-             AllocationUnitSize = 64kb
+             AllocationUnitSize = 64KB
         }
     }
 }

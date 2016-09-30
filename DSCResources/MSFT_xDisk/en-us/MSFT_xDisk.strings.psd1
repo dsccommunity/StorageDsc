@@ -21,7 +21,7 @@
     DiskNotGPTMessage = Disk number '{0}' is initialized with '{1}' partition style. GPT required.
     DriveLetterNotFoundMessage = Drive {0} was not found.
     DriveSizeMismatchMessage = Drive {0} size {1} does not match expected size {2}.
-    DriveAllocationUnitSizeMismatchMessage = Drive {0} allocation unit size {1} kb does not match expected allocation unit size {2} kb.
+    DriveAllocationUnitSizeMismatchMessage = Drive {0} allocation unit size {1} KB does not match expected allocation unit size {2} KB.
     FileSystemFormatMismatch = Drive {0} filesystem format '{1}' does not match expected format '{2}'.
     DriveLabelMismatch = Drive {0} label '{1}' does not match expected label '{2}'.
 

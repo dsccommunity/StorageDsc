@@ -38,12 +38,14 @@ try
                 ((Get-WindowsOptionalFeature `
                     -FeatureName Microsoft-Hyper-V-Management-PowerShell `
                     -Online).State -eq 'Enabled'))
+            Break
         }
         3
         {
             # Server OS
             $HyperVInstalled = (((Get-WindowsFeature -Name Hyper-V).Installed) -and `
                 ((Get-WindowsFeature -Name Hyper-V-PowerShell).Installed))
+            Break
         }
         default
         {
@@ -55,7 +57,7 @@ try
     if ($HyperVInstalled -eq $false)
     {
         Write-Verbose -Message "$($script:DSCResourceName) integration tests cannot be run because Hyper-V Components not installed." -Verbose
-        Break
+        Return
     }
 
     # Get a spare drive letter

@@ -7,6 +7,13 @@ configuration Sample_xMountImage_MountISO
         ImagePath   = 'c:\Sources\SQL.iso'
         DriveLetter = 'S'
     }
+
+    xWaitForVolume WaitForISO
+    {
+        DriveLetter      = 'S'
+        RetryIntervalSec = 5
+        RetryCount       = 10
+    }
 }
 
 Sample_xMountImage_MountISO

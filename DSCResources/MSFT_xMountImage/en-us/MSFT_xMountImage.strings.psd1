@@ -12,7 +12,7 @@ ConvertFrom-StringData @'
     ImageIsMountedButShouldNotBeMessage = The image file '{0}' is mounted to drive '{1}' but should not be. Change required.
     ImageIsNotMountedAndShouldNotBeMessage = The image file '{0}' is not mounted and should not be.
 
-    TestingMountedImageError = Tetting Mounted Drive for image file '{0}'.
+    TestingMountedImageError = Testing Mounted Drive for image file '{0}'.
     InvalidParameterSpecifiedError = Ensure is '{0}' but '{1}' was specified.
     InvalidParameterNotSpecifiedError = Ensure is '{0}' but '{1}' was not specified.
     DiskImageFileNotFoundError = The image file '{0}' could not be found.

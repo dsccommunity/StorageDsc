@@ -32,16 +32,19 @@ try
                 ((Get-WindowsOptionalFeature `
                     -FeatureName Microsoft-Hyper-V-Management-PowerShell `
                     -Online).State -eq 'Enabled'))
+            Break
         }
         3
         {
             # Server OS
             $HyperVInstalled = (((Get-WindowsFeature -Name Hyper-V).Installed) -and `
                 ((Get-WindowsFeature -Name Hyper-V-PowerShell).Installed))
+            Break
         }
         default
         {
             # Unsupported OS type for testing
+            Write-Verbose -Message "$($script:DSCResourceName) integration tests cannot be run on this operating system." -Verbose
             Break
         }
     }
@@ -49,7 +52,7 @@ try
     if ($HyperVInstalled -eq $false)
     {
         Write-Verbose -Message "$($script:DSCResourceName) integration tests cannot be run because Hyper-V Components not installed." -Verbose
-        Break
+        Return
     }
 
     #region Integration Tests

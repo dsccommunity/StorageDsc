@@ -31,7 +31,7 @@ try
     if (-not (Test-Path -Path $ISOPath))
     {
         Write-Verbose -Message "$($script:DSCResourceName) integration tests cannot be run because the ISO File '$ISOPath' is not available." -Verbose
-        Break
+        Return
     } # if
 
     # Get a spare drive letter

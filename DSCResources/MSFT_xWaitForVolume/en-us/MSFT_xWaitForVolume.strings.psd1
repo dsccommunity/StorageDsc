@@ -7,6 +7,6 @@ ConvertFrom-StringData @'
     VolumeNotFoundRetryingMessage = Volume '{0}' not found, retrying in {1} seconds.
     VolumeNotFoundAfterError = Volume '{0}' not found after {1} counts.
 
-    TestingWaitForVolumeStatusMessage = Tetting Wait for Volume status on volume '{0}'.
+    TestingWaitForVolumeStatusMessage = Teting Wait for Volume status on volume '{0}'.
     VolumeNotFoundMessage = Volume '{0}' not found.
 '@

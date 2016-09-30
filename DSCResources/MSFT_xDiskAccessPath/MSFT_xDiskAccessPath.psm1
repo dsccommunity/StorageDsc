@@ -255,7 +255,7 @@ function Set-TargetResource
             Write-Verbose -Message ( @(
                     "$($MyInvocation.MyCommand): "
                     $($LocalizedData.CreatingPartitionMessage `
-                        -f $DiskNumber,"$($Size/1kb) kb")
+                        -f $DiskNumber,"$($Size/1KB) KB")
                 ) -join '' )
             $partitionParams["Size"] = $Size
         }
@@ -523,7 +523,7 @@ function Test-TargetResource
             Write-Verbose -Message ( @(
                     "$($MyInvocation.MyCommand): "
                     $($LocalizedData.AllocationUnitSizeMismatchMessage -f `
-                        $AccessPath,$($blockSize.BlockSize/1kb),$($AllocationUnitSize/1kb))
+                        $AccessPath,$($blockSize.BlockSize/1KB),$($AllocationUnitSize/1KB))
                 ) -join '' )
         } # if
     } # if

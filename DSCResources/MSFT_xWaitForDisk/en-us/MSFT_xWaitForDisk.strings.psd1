@@ -7,6 +7,6 @@ ConvertFrom-StringData @'
     DiskNotFoundRetryingMessage = Disk '{0}' not found, retrying in {1} seconds.
     DiskNotFoundAfterError = Disk '{0}' not found after {1} counts.
 
-    TestingWaitForDiskStatusMessage = Tetting Wait for Disk status on disk '{0}'.
+    TestingWaitForDiskStatusMessage = Testing Wait for Disk status on disk '{0}'.
     DiskNotFoundMessage = Disk '{0}' not found.
 '@

@@ -109,7 +109,7 @@ function Test-DriveLetter
         $Colon
     )
 
-    $Matches = @([regex]::matches($DriveLetter, '^([A-Za-z]{1})[:]?$', 'IgnoreCase'))
+    $Matches = @([regex]::matches($DriveLetter, '^([A-Za-z]):?$', 'IgnoreCase'))
     if (-not $Matches)
     {
         # DriveLetter format is invalid
