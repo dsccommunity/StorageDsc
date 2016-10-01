@@ -60,7 +60,7 @@ try
     . $ConfigFile -Verbose -ErrorAction Stop
 
     Describe "$($script:DSCResourceName)_Integration" {
-        BeforeAll {
+        Context 'Partition and format newly provisioned disk and assign a Drive Letter' {
             # Create a VHDx and attach it to the computer
             $VHDPath = Join-Path -Path $TestEnvironment.WorkingFolder `
                 -ChildPath 'TestDisk.vhdx'
@@ -74,46 +74,44 @@ try
             # Get a spare drive letter
             $LastDrive = ((Get-Volume).DriveLetter | Sort-Object | Select-Object -Last 1)
             $DriveLetter = [char](([int][char]$LastDrive)+1)
-        }
 
-        #region DEFAULT TESTS
-        It 'Should compile without throwing' {
-            {
-                # This is so that the
-                $ConfigData = @{
-                    AllNodes = @(
-                        @{
-                            NodeName    = 'localhost'
-                            DriveLetter = $DriveLetter
-                            DiskNumber  = $Disk.Number
-                            FSLabel     = $FSLabel
-                        }
-                    )
-                }
+            #region DEFAULT TESTS
+            It 'Should compile without throwing' {
+                {
+                    # This is so that the
+                    $ConfigData = @{
+                        AllNodes = @(
+                            @{
+                                NodeName    = 'localhost'
+                                DriveLetter = $DriveLetter
+                                DiskNumber  = $Disk.Number
+                                FSLabel     = $FSLabel
+                            }
+                        )
+                    }
 
-                & "$($script:DSCResourceName)_Config" `
-                    -OutputPath $TestEnvironment.WorkingFolder `
-                    -ConfigurationData $ConfigData
-                Start-DscConfiguration -Path $TestEnvironment.WorkingFolder `
-                    -ComputerName localhost -Wait -Verbose -Force
-            } | Should not throw
-        }
-
-        It 'should be able to call Get-DscConfiguration without throwing' {
-            { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should Not throw
-        }
-        #endregion
-
-        It 'Should have set the resource and all the parameters should match' {
-            $current = Get-DscConfiguration | Where-Object {
-                $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
+                    & "$($script:DSCResourceName)_Config" `
+                        -OutputPath $TestEnvironment.WorkingFolder `
+                        -ConfigurationData $ConfigData
+                    Start-DscConfiguration -Path $TestEnvironment.WorkingFolder `
+                        -ComputerName localhost -Wait -Verbose -Force
+                } | Should not throw
             }
-            $current.DiskNumber       | Should Be $Disk.DiskNumber
-            $current.DriveLetter      | Should Be $DriveLetter
-            $current.FSLabel          | Should Be $FSLabel
-        }
 
-        AfterAll {
+            It 'should be able to call Get-DscConfiguration without throwing' {
+                { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should Not throw
+            }
+            #endregion
+
+            It 'Should have set the resource and all the parameters should match' {
+                $current = Get-DscConfiguration | Where-Object {
+                    $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
+                }
+                $current.DiskNumber       | Should Be $Disk.DiskNumber
+                $current.DriveLetter      | Should Be $DriveLetter
+                $current.FSLabel          | Should Be $FSLabel
+            }
+
             Dismount-DiskImage -ImagePath $VHDPath -StorageType VHDx
             Remove-Item -Path $VHDPath -Force
         }

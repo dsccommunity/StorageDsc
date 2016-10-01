@@ -60,7 +60,7 @@ try
     . $ConfigFile -Verbose -ErrorAction Stop
 
     Describe "$($script:DSCResourceName)_Integration" {
-        BeforeAll {
+        Context 'Partition and format newly provisioned disk and assign an Access Path' {
             # Create a VHDx and attach it to the computer
             $VHDPath = Join-Path -Path $TestEnvironment.WorkingFolder `
                 -ChildPath 'TestDisk.vhdx'
@@ -78,46 +78,44 @@ try
             {
                 New-Item -Path $AccessPath -ItemType Directory
             } # if
-        }
 
-        #region DEFAULT TESTS
-        It 'Should compile without throwing' {
-            {
-                # This is so that the
-                $ConfigData = @{
-                    AllNodes = @(
-                        @{
-                            NodeName    = 'localhost'
-                            AccessPath  = $AccessPath
-                            DiskNumber  = $Disk.Number
-                            FSLabel     = $FSLabel
-                        }
-                    )
-                }
+            #region DEFAULT TESTS
+            It 'Should compile without throwing' {
+                {
+                    # This is so that the
+                    $ConfigData = @{
+                        AllNodes = @(
+                            @{
+                                NodeName    = 'localhost'
+                                AccessPath  = $AccessPath
+                                DiskNumber  = $Disk.Number
+                                FSLabel     = $FSLabel
+                            }
+                        )
+                    }
 
-                & "$($script:DSCResourceName)_Config" `
-                    -OutputPath $TestEnvironment.WorkingFolder `
-                    -ConfigurationData $ConfigData
-                Start-DscConfiguration -Path $TestEnvironment.WorkingFolder `
-                    -ComputerName localhost -Wait -Verbose -Force
-            } | Should not throw
-        }
-
-        It 'should be able to call Get-DscConfiguration without throwing' {
-            { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should Not throw
-        }
-        #endregion
-
-        It 'Should have set the resource and all the parameters should match' {
-            $current = Get-DscConfiguration | Where-Object {
-                $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
+                    & "$($script:DSCResourceName)_Config" `
+                        -OutputPath $TestEnvironment.WorkingFolder `
+                        -ConfigurationData $ConfigData
+                    Start-DscConfiguration -Path $TestEnvironment.WorkingFolder `
+                        -ComputerName localhost -Wait -Verbose -Force
+                } | Should not throw
             }
-            $current.DiskNumber       | Should Be $Disk.DiskNumber
-            $current.AccessPath       | Should Be "$($AccessPath)\"
-            $current.FSLabel          | Should Be $FSLabel
-        }
 
-        AfterAll {
+            It 'should be able to call Get-DscConfiguration without throwing' {
+                { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should Not throw
+            }
+            #endregion
+
+            It 'Should have set the resource and all the parameters should match' {
+                $current = Get-DscConfiguration | Where-Object {
+                    $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
+                }
+                $current.DiskNumber       | Should Be $Disk.DiskNumber
+                $current.AccessPath       | Should Be "$($AccessPath)\"
+                $current.FSLabel          | Should Be $FSLabel
+            }
+
             Remove-PartitionAccessPath `
                 -DiskNumber $Disk.DiskNumber `
                 -PartitionNumber 2 `

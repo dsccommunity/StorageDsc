@@ -91,32 +91,33 @@ try
     . $ConfigFile -Verbose -ErrorAction Stop
 
     Describe "$($script:DSCResourceName)_MountVHD_Integration" {
-
-        #region DEFAULT TESTS
-        It 'Should compile without throwing' {
-            {
-                & "$($script:DSCResourceName)_Mount_Config" `
-                    -OutputPath $TestEnvironment.WorkingFolder `
-                    -ConfigurationData $ConfigData
-                Start-DscConfiguration -Path $TestEnvironment.WorkingFolder `
-                    -ComputerName localhost -Wait -Verbose -Force
-            } | Should not throw
-        }
-
-        It 'should be able to call Get-DscConfiguration without throwing' {
-            { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should Not throw
-        }
-        #endregion
-
-        It 'Should have set the resource and all the parameters should match' {
-            $current = Get-DscConfiguration | Where-Object {
-                $_.ConfigurationName -eq "$($script:DSCResourceName)_Mount_Config"
+        Context 'Mount an VHDX and assign a Drive Letter' {
+            #region DEFAULT TESTS
+            It 'Should compile without throwing' {
+                {
+                    & "$($script:DSCResourceName)_Mount_Config" `
+                        -OutputPath $TestEnvironment.WorkingFolder `
+                        -ConfigurationData $ConfigData
+                    Start-DscConfiguration -Path $TestEnvironment.WorkingFolder `
+                        -ComputerName localhost -Wait -Verbose -Force
+                } | Should not throw
             }
-            $current.Imagepath        | Should Be $VHDPath
-            $current.DriveLetter      | Should Be $DriveLetter
-            $current.StorageType      | Should Be 'VHDX'
-            $current.Access           | Should Be 'ReadWrite'
-            $current.Ensure           | Should Be 'Present'
+
+            It 'should be able to call Get-DscConfiguration without throwing' {
+                { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should Not throw
+            }
+            #endregion
+
+            It 'Should have set the resource and all the parameters should match' {
+                $current = Get-DscConfiguration | Where-Object {
+                    $_.ConfigurationName -eq "$($script:DSCResourceName)_Mount_Config"
+                }
+                $current.Imagepath        | Should Be $VHDPath
+                $current.DriveLetter      | Should Be $DriveLetter
+                $current.StorageType      | Should Be 'VHDX'
+                $current.Access           | Should Be 'ReadWrite'
+                $current.Ensure           | Should Be 'Present'
+            }
         }
     }
 
@@ -125,29 +126,30 @@ try
     . $ConfigFile -Verbose -ErrorAction Stop
 
     Describe "$($script:DSCResourceName)_DismountVHD_Integration" {
-
-        #region DEFAULT TESTS
-        It 'Should compile without throwing' {
-            {
-                & "$($script:DSCResourceName)_Dismount_Config" `
-                    -OutputPath $TestEnvironment.WorkingFolder `
-                    -ConfigurationData $ConfigData
-                Start-DscConfiguration -Path $TestEnvironment.WorkingFolder `
-                    -ComputerName localhost -Wait -Verbose -Force
-            } | Should not throw
-        }
-
-        It 'should be able to call Get-DscConfiguration without throwing' {
-            { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should Not throw
-        }
-        #endregion
-
-        It 'Should have set the resource and all the parameters should match' {
-            $current = Get-DscConfiguration | Where-Object {
-                $_.ConfigurationName -eq "$($script:DSCResourceName)_Dismount_Config"
+        Context 'Dismount a previously mounted ISO' {
+            #region DEFAULT TESTS
+            It 'Should compile without throwing' {
+                {
+                    & "$($script:DSCResourceName)_Dismount_Config" `
+                        -OutputPath $TestEnvironment.WorkingFolder `
+                        -ConfigurationData $ConfigData
+                    Start-DscConfiguration -Path $TestEnvironment.WorkingFolder `
+                        -ComputerName localhost -Wait -Verbose -Force
+                } | Should not throw
             }
-            $current.Imagepath        | Should Be $VHDPath
-            $current.Ensure           | Should Be 'Absent'
+
+            It 'should be able to call Get-DscConfiguration without throwing' {
+                { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should Not throw
+            }
+            #endregion
+
+            It 'Should have set the resource and all the parameters should match' {
+                $current = Get-DscConfiguration | Where-Object {
+                    $_.ConfigurationName -eq "$($script:DSCResourceName)_Dismount_Config"
+                }
+                $current.Imagepath        | Should Be $VHDPath
+                $current.Ensure           | Should Be 'Absent'
+            }
         }
     }
 

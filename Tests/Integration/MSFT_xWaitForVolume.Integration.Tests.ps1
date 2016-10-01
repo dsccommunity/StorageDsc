@@ -25,26 +25,28 @@ try
     . $ConfigFile -Verbose -ErrorAction Stop
 
     Describe "$($script:DSCResourceName)_Integration" {
-        #region DEFAULT TESTS
-        It 'Should compile without throwing' {
-            {
-                & "$($script:DSCResourceName)_Config" -OutputPath $TestEnvironment.WorkingFolder
-                Start-DscConfiguration -Path $TestEnvironment.WorkingFolder -ComputerName localhost -Wait -Verbose -Force
-            } | Should not throw
-        }
-
-        It 'should be able to call Get-DscConfiguration without throwing' {
-            { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should Not throw
-        }
-        #endregion
-
-        It 'Should have set the resource and all the parameters should match' {
-            $current = Get-DscConfiguration | Where-Object {
-                $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
+        Context 'Wait for a Volume' {
+            #region DEFAULT TESTS
+            It 'Should compile without throwing' {
+                {
+                    & "$($script:DSCResourceName)_Config" -OutputPath $TestEnvironment.WorkingFolder
+                    Start-DscConfiguration -Path $TestEnvironment.WorkingFolder -ComputerName localhost -Wait -Verbose -Force
+                } | Should not throw
             }
-            $current.DriveLetter      | Should Be $TestWaitForVolume.DriveLetter
-            $current.RetryIntervalSec | Should Be $TestWaitForVolume.RetryIntervalSec
-            $current.RetryCount       | Should Be $TestWaitForVolume.RetryCount
+
+            It 'should be able to call Get-DscConfiguration without throwing' {
+                { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should Not throw
+            }
+            #endregion
+
+            It 'Should have set the resource and all the parameters should match' {
+                $current = Get-DscConfiguration | Where-Object {
+                    $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
+                }
+                $current.DriveLetter      | Should Be $TestWaitForVolume.DriveLetter
+                $current.RetryIntervalSec | Should Be $TestWaitForVolume.RetryIntervalSec
+                $current.RetryCount       | Should Be $TestWaitForVolume.RetryCount
+            }
         }
     }
     #endregion

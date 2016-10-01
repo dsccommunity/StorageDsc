@@ -1,4 +1,4 @@
-$TestWaitForDisk = [PSObject] @{
+$TestWaitForDisk = @{
     DiskNumber       = 0
     RetryIntervalSec = 1
     RetryCount       = 2

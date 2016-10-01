@@ -1,7 +1,9 @@
-# In order to run these tests, an basic ISO file called 'test.iso' should be placed
-# in the same folder as this file. The ISO fil emust be a valid ISO file that can
+# In order to run these tests, a basic ISO file called 'test.iso' must be put
+# in the same folder as this file. The ISO file must be a valid ISO file that can
 # normally be mounted. If the test.iso file is not found the tests will not run.
-
+# The ISO is not included with this repository because of size contstraints.
+# It is up to the user or mechanism running these tests to put a valid 'test.iso'
+# into this folder.
 $script:DSCModuleName      = 'xStorage'
 $script:DSCResourceName    = 'MSFT_xMountImage'
 
@@ -54,32 +56,33 @@ try
     . $ConfigFile -Verbose -ErrorAction Stop
 
     Describe "$($script:DSCResourceName)_MountISO_Integration" {
-
-        #region DEFAULT TESTS
-        It 'Should compile without throwing' {
-            {
-                & "$($script:DSCResourceName)_Mount_Config" `
-                    -OutputPath $TestEnvironment.WorkingFolder `
-                    -ConfigurationData $ConfigData
-                Start-DscConfiguration -Path $TestEnvironment.WorkingFolder `
-                    -ComputerName localhost -Wait -Verbose -Force
-            } | Should not throw
-        }
-
-        It 'should be able to call Get-DscConfiguration without throwing' {
-            { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should Not throw
-        }
-        #endregion
-
-        It 'Should have set the resource and all the parameters should match' {
-            $current = Get-DscConfiguration | Where-Object {
-                $_.ConfigurationName -eq "$($script:DSCResourceName)_Mount_Config"
+        Context 'Mount an ISO and assign a Drive Letter' {
+            #region DEFAULT TESTS
+            It 'Should compile without throwing' {
+                {
+                    & "$($script:DSCResourceName)_Mount_Config" `
+                        -OutputPath $TestEnvironment.WorkingFolder `
+                        -ConfigurationData $ConfigData
+                    Start-DscConfiguration -Path $TestEnvironment.WorkingFolder `
+                        -ComputerName localhost -Wait -Verbose -Force
+                } | Should not throw
             }
-            $current.Imagepath        | Should Be $ISOPath
-            $current.DriveLetter      | Should Be $DriveLetter
-            $current.StorageType      | Should Be 'ISO'
-            $current.Access           | Should Be 'ReadOnly'
-            $current.Ensure           | Should Be 'Present'
+
+            It 'should be able to call Get-DscConfiguration without throwing' {
+                { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should Not throw
+            }
+            #endregion
+
+            It 'Should have set the resource and all the parameters should match' {
+                $current = Get-DscConfiguration | Where-Object {
+                    $_.ConfigurationName -eq "$($script:DSCResourceName)_Mount_Config"
+                }
+                $current.Imagepath        | Should Be $ISOPath
+                $current.DriveLetter      | Should Be $DriveLetter
+                $current.StorageType      | Should Be 'ISO'
+                $current.Access           | Should Be 'ReadOnly'
+                $current.Ensure           | Should Be 'Present'
+            }
         }
     }
 
@@ -88,29 +91,30 @@ try
     . $ConfigFile -Verbose -ErrorAction Stop
 
     Describe "$($script:DSCResourceName)_DismountISO_Integration" {
-
-        #region DEFAULT TESTS
-        It 'Should compile without throwing' {
-            {
-                & "$($script:DSCResourceName)_Dismount_Config" `
-                    -OutputPath $TestEnvironment.WorkingFolder `
-                    -ConfigurationData $ConfigData
-                Start-DscConfiguration -Path $TestEnvironment.WorkingFolder `
-                    -ComputerName localhost -Wait -Verbose -Force
-            } | Should not throw
-        }
-
-        It 'should be able to call Get-DscConfiguration without throwing' {
-            { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should Not throw
-        }
-        #endregion
-
-        It 'Should have set the resource and all the parameters should match' {
-            $current = Get-DscConfiguration | Where-Object {
-                $_.ConfigurationName -eq "$($script:DSCResourceName)_Dismount_Config"
+        Context 'Dismount a previously mounted ISO' {
+            #region DEFAULT TESTS
+            It 'Should compile without throwing' {
+                {
+                    & "$($script:DSCResourceName)_Dismount_Config" `
+                        -OutputPath $TestEnvironment.WorkingFolder `
+                        -ConfigurationData $ConfigData
+                    Start-DscConfiguration -Path $TestEnvironment.WorkingFolder `
+                        -ComputerName localhost -Wait -Verbose -Force
+                } | Should not throw
             }
-            $current.Imagepath        | Should Be $ISOPath
-            $current.Ensure           | Should Be 'Absent'
+
+            It 'should be able to call Get-DscConfiguration without throwing' {
+                { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should Not throw
+            }
+            #endregion
+
+            It 'Should have set the resource and all the parameters should match' {
+                $current = Get-DscConfiguration | Where-Object {
+                    $_.ConfigurationName -eq "$($script:DSCResourceName)_Dismount_Config"
+                }
+                $current.Imagepath        | Should Be $ISOPath
+                $current.Ensure           | Should Be 'Absent'
+            }
         }
     }
     #endregion Integration Tests for ISO

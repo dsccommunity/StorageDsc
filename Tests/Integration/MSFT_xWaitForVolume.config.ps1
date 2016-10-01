@@ -1,4 +1,4 @@
-$TestWaitForVolume = [PSObject] @{
+$TestWaitForVolume = @{
     DriveLetter      = 'C'
     RetryIntervalSec = 1
     RetryCount       = 2
