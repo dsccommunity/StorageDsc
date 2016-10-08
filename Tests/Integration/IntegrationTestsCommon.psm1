@@ -37,14 +37,14 @@ function Test-HyperVInstalled
         default
         {
             # Unsupported OS type for testing
-            Write-Verbose -Message "$($script:DSCResourceName) integration tests cannot be run on this operating system." -Verbose
+            Write-Verbose -Message "Integration tests cannot be run on this operating system." -Verbose
             Break
         }
     }
 
     if ($HyperVInstalled -eq $false)
     {
-        Write-Verbose -Message "$($script:DSCResourceName) integration tests cannot be run because Hyper-V Components not installed." -Verbose
+        Write-Verbose -Message "Integration tests cannot be run because Hyper-V Components not installed." -Verbose
         Return $false
     }
     Return $True
