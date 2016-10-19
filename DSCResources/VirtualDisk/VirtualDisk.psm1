@@ -62,29 +62,11 @@ The Set-TargetResource function is used to either;
 #>
 function Set-TargetResource
 {
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
     [CmdletBinding()]
     param
     (
         [parameter(Mandatory)]
         [String] $FriendlyName,
-=======
-=======
->>>>>>> parent of 294b759... removed all WhatIf code
-=======
->>>>>>> parent of 294b759... removed all WhatIf code
-=======
->>>>>>> parent of 294b759... removed all WhatIf code
-    [CmdletBinding(SupportsShouldProcess=$true)]
-    param
-    (
-        [parameter(Mandatory = $true)]
-        [System.String]
-        $FriendlyName,
->>>>>>> parent of 294b759... removed all WhatIf code
 
         [parameter(Mandatory)]
         [String] $StoragePoolFriendlyName,
@@ -114,54 +96,24 @@ function Set-TargetResource
             Write-Verbose "Complete removal of VirtualDisk $($FriendlyName) requested"
             Write-Debug "Complete removal of VirtualDisk $($FriendlyName) requested"
             #Your wish is our command....destroy the virtualdisk
-<<<<<<< HEAD
             $PT = Get-Disk -ErrorAction SilentlyContinue | Where-Object FriendlyName -ieq $FriendlyName|Get-Partition -ErrorAction SilentlyContinue #improve on this! can result in false results
-=======
-            $PT = Get-Disk -ErrorAction SilentlyContinue | Where FriendlyName -ieq $FriendlyName|Get-Partition -ErrorAction SilentlyContinue #improve on this! can result in false results
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> parent of 294b759... removed all WhatIf code
-=======
->>>>>>> parent of 294b759... removed all WhatIf code
-=======
->>>>>>> parent of 294b759... removed all WhatIf code
 
-            If ([bool]$WhatIfPreference.IsPresent) {
-                If ($SP.IsReadOnly -eq $true){
-                    $SP|Set-StoragePool -IsReadOnly $false -WhatIf:([bool]$WhatIfPreference.IsPresent)
-                    Write-Verbose "StoragePool $($StoragePoolFriendlyName) would have been set to read/write"
-                    Write-Debug "StoragePool $($StoragePoolFriendlyName) would have been set to read/write"
-                }
-                If ($PT){
-                    $PT|Remove-Partition -WhatIf:([bool]$WhatIfPreference.IsPresent)
-                    Write-Verbose "Partition(s) $($PT.DriveLetter) would have been deleted"
-                    Write-Debug "Partition(s) $($PT.DriveLetter) would have been deleted"
-                }
-                If ($VD){
-                    $VD|Remove-VirtualDisk -WhatIf:([bool]$WhatIfPreference.IsPresent)
-                    Write-Verbose "VirtualDisk $($FriendlyName) would have been deleted"
-                    Write-Debug "VirtualDisk $($FriendlyName) would have been deleted"
-                }
-                return
+            If ($SP.IsReadOnly -eq $true){
+                $SP|Set-StoragePool -IsReadOnly $false
+                Write-Verbose "StoragePool $($StoragePoolFriendlyName) has been set to read/write"
+                Write-Debug "StoragePool $($StoragePoolFriendlyName) has been set to read/write"
             }
-            Else {
-                If ($SP.IsReadOnly -eq $true){
-                    $SP|Set-StoragePool -IsReadOnly $false
-                    Write-Verbose "StoragePool $($StoragePoolFriendlyName) has been set to read/write"
-                    Write-Debug "StoragePool $($StoragePoolFriendlyName) has been set to read/write"
-                }
-                If ($PT){
-                    $PT|Remove-Partition -Confirm:$false
-                    Write-Verbose "Partition(s) $($PT.DriveLetter) has/have been deleted"
-                    Write-Debug "Partition(s) $($PT.DriveLetter) has/have been deleted"
-                }
-                If ($VD){
-                    $VD|Remove-VirtualDisk -Confirm:$false
-                    Write-Verbose "VirtualDisk $($FriendlyName) has been deleted"
-                    Write-Debug "VirtualDisk $($FriendlyName) has been deleted"
-                }
-                return
+            If ($PT){
+                $PT|Remove-Partition -Confirm:$false
+                Write-Verbose "Partition(s) $($PT.DriveLetter) has/have been deleted"
+                Write-Debug "Partition(s) $($PT.DriveLetter) has/have been deleted"
             }
+            If ($VD){
+                $VD|Remove-VirtualDisk -Confirm:$false
+                Write-Verbose "VirtualDisk $($FriendlyName) has been deleted"
+                Write-Debug "VirtualDisk $($FriendlyName) has been deleted"
+            }
+            return
         }
 
         If (($Ensure -ieq 'Present') -and (!($VD))) {#No virtualdisk found, create one
