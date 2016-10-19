@@ -1,5 +1,5 @@
 ﻿#
-# xComputer: DSC resource to initialize, partition, and format disks.
+# xDisk: DSC resource to initialize, partition, and format disks.
 #
 
 function Get-TargetResource
@@ -8,7 +8,7 @@ function Get-TargetResource
     param
     (
         [parameter(Mandatory)]
-        [uint32] $DiskNumber,
+        [string] $Disk,
 
         [parameter(Mandatory)]
         [string] $DriveLetter,
@@ -18,8 +18,16 @@ function Get-TargetResource
         [UInt32] $AllocationUnitSize
     )
 
-    $Disk = Get-Disk -Number $DiskNumber -ErrorAction SilentlyContinue
-    
+	Try
+	{
+		[Uint32]$Disk
+		$Dsk = Get-Disk -Number ([Uint32]$Disk) -ErrorAction SilentlyContinue
+	}
+	Catch
+	{
+		$Dsk = Get-Disk -FriendlyName $Disk -ErrorAction SilentlyContinue
+	}
+
     $Partition = Get-Partition -DriveLetter $DriveLetter -ErrorAction SilentlyContinue
 
     $FSLabel = Get-Volume -DriveLetter $DriveLetter -ErrorAction SilentlyContinue | Select-Object -ExpandProperty FileSystemLabel
@@ -35,7 +43,7 @@ function Get-TargetResource
     }
 
     $returnValue = @{
-        DiskNumber = $Disk.Number
+        DiskNumber = $Dsk.Number
         DriveLetter = $Partition.DriveLetter
         Size = $Partition.Size
         FSLabel = $FSLabel
@@ -49,7 +57,7 @@ function Set-TargetResource
     param
     (
         [parameter(Mandatory)]
-        [uint32] $DiskNumber,
+        [string] $Disk,
 
         [parameter(Mandatory)]
         [string] $DriveLetter,
@@ -61,49 +69,63 @@ function Set-TargetResource
     
     try
     {
-        $Disk = Get-Disk -Number $DiskNumber -ErrorAction Stop
+		Try
+		{
+			[Uint32]$Disk
+			$Dsk = Get-Disk -Number ([Uint32]$Disk) -ErrorAction Stop
+		}
+		Catch
+		{
+			If ((Get-WinVersion) -eq [decimal]6.2){$Dsk = Get-Disk -UniqueId ((Get-VirtualDisk -FriendlyName $Disk).UniqueId) -ErrorAction Stop}
+			If ((Get-WinVersion) -eq [decimal]6.3){$Dsk = Get-Disk -UniqueId ((Get-VirtualDisk -FriendlyName $Disk).UniqueId) -ErrorAction Stop}
+			If ((Get-WinVersion) -ge [decimal]10.0){$Dsk = Get-Disk -FriendlyName $Disk -ErrorAction Stop}
+		}
     
-        if ($Disk.IsOffline -eq $true)
+        if ($Dsk.IsOffline -eq $true)
         {
             Write-Verbose 'Setting disk Online'
-            $Disk | Set-Disk -IsOffline $false
+            $Dsk | Set-Disk -IsOffline $false
         }
         
-        if ($Disk.IsReadOnly -eq $true)
+        if ($Dsk.IsReadOnly -eq $true)
         {
             Write-Verbose 'Setting disk to not ReadOnly'
-            $Disk | Set-Disk -IsReadOnly $false
+            $Dsk | Set-Disk -IsReadOnly $false
         }
 
         Write-Verbose -Message "Checking existing disk partition style..."
-        if (($Disk.PartitionStyle -ne "GPT") -and ($Disk.PartitionStyle -ne "RAW"))
+        if (($Dsk.PartitionStyle -ne "GPT") -and ($Dsk.PartitionStyle -ne "RAW"))
         {
-            Throw "Disk '$($DiskNumber)' is already initialised with '$($Disk.PartitionStyle)'"
+            Throw "Disk '$($Disk)' is already initialised with '$($Dsk.PartitionStyle)'"
         }
         else
         {
-            if ($Disk.PartitionStyle -eq "RAW")
+            if ($Dsk.PartitionStyle -eq "RAW")
             {
-                Write-Verbose -Message "Initializing disk number '$($DiskNumber)'..."
-                $Disk | Initialize-Disk -PartitionStyle "GPT" -PassThru
+                Write-Verbose -Message "Initializing disk number '$($Disk)'..."
+                $Dsk | Initialize-Disk -PartitionStyle "GPT" -PassThru
             }
             else
             {
-                Write-Verbose -Message "Disk number '$($DiskNumber)' is already configured for 'GPT'"
+                Write-Verbose -Message "Disk '$($Disk)' is already configured for 'GPT'"
             }
         }
 
         # Check if existing partition already has file system on it
         
-        if (($Disk | Get-Partition | Get-Volume ) -eq $null)
+        if (($Dsk | Get-Partition | Get-Volume ) -eq $null)
         {
 
 
             Write-Verbose -Message "Creating the partition..."
             $PartParams = @{
                             DriveLetter = $DriveLetter;
-                            DiskNumber = $DiskNumber
                             }
+			
+			If ((Get-WinVersion) -eq [decimal]6.2){$PartParams["DiskNumber"] = $Dsk.Number}
+			If ((Get-WinVersion) -eq [decimal]6.3){$PartParams["DiskNumber"] = $Dsk.Number}
+			If ((Get-WinVersion) -ge [decimal]10.0){$PartParams["DiskNumber"] = $Dsk.DiskNumber}
+
             if ($Size)
             {
                 $PartParams["Size"] = $Size
@@ -143,7 +165,7 @@ function Set-TargetResource
         }
         else 
         {
-            $Volume = ($Disk | Get-Partition | Get-Volume)
+            $Volume = ($Dsk | Get-Partition | Get-Volume)
 
             if ($Volume.DriveLetter)
             {
@@ -157,7 +179,7 @@ function Set-TargetResource
             {
                 # volume doesn't have an assigned letter
                 Write-Verbose -Message "Assigning drive letter..."
-                Set-Partition -DiskNumber $DiskNumber -PartitionNumber 2 -NewDriveLetter $DriveLetter
+				Set-Partition -DiskNumber ($Dsk.DiskNumber) -PartitionNumber 2 -NewDriveLetter $DriveLetter
             }
 
             if($PSBoundParameters.ContainsKey('FSLabel'))
@@ -184,7 +206,7 @@ function Test-TargetResource
     param
     (
         [parameter(Mandatory)]
-        [uint32] $DiskNumber,
+        [string] $Disk,
 
         [parameter(Mandatory)]
         [string] $DriveLetter,
@@ -194,30 +216,38 @@ function Test-TargetResource
         [UInt32] $AllocationUnitSize
     )
 
-    Write-Verbose -Message "Checking if disk number '$($DiskNumber)' is initialized..."
-    $Disk = Get-Disk -Number $DiskNumber -ErrorAction SilentlyContinue
+    Write-Verbose -Message "Checking if disk '$($Disk)' is initialized..."
+	Try
+	{
+		[Uint32]$Disk
+		$Dsk = Get-Disk -Number ([Uint32]$Disk) -ErrorAction SilentlyContinue
+	}
+	Catch
+	{
+		$Dsk = Get-Disk -FriendlyName $Disk -ErrorAction SilentlyContinue
+	}
 
-    if (-not $Disk)
+    if (-not $Dsk)
     {
-        Write-Verbose "Disk number '$($DiskNumber)' was not found."
+        Write-Verbose "Disk '$($Disk)' was not found."
         return $false
     }
 
-    if ($Disk.IsOffline -eq $true)
+    if ($Dsk.IsOffline -eq $true)
     {
         Write-Verbose 'Disk is not Online'
         return $false
     }
     
-    if ($Disk.IsReadOnly -eq $true)
+    if ($Dsk.IsReadOnly -eq $true)
     {
         Write-Verbose 'Disk set as ReadOnly'
         return $false
     }
 
-    if ($Disk.PartitionStyle -ne "GPT")
+    if ($Dsk.PartitionStyle -ne "GPT")
     {
-        Write-Verbose "Disk '$($DiskNumber)' is initialised with '$($Disk.PartitionStyle)' partition style"
+        Write-Verbose "Disk '$($Disk)' is initialised with '$($Dsk.PartitionStyle)' partition style"
         return $false
     }
 
@@ -267,5 +297,11 @@ function Test-TargetResource
     return $true
 }
 
+Function Get-WinVersion
+{
+    #not using Get-CimInstance; older versions of Windows use DCOM. Get-WmiObject works on all, so far...
+    $os = (Get-WmiObject -Class Win32_OperatingSystem).Version.Split('.')
+    [decimal]($os[0] + "." + $os[1])
+}
 
 Export-ModuleMember -Function *-TargetResource
