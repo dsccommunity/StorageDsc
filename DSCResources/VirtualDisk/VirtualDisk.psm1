@@ -65,12 +65,15 @@ function Set-TargetResource
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     [CmdletBinding()]
     param
     (
         [parameter(Mandatory)]
         [String] $FriendlyName,
 =======
+=======
+>>>>>>> parent of 294b759... removed all WhatIf code
 =======
 >>>>>>> parent of 294b759... removed all WhatIf code
 =======
@@ -116,6 +119,9 @@ function Set-TargetResource
 =======
             $PT = Get-Disk -ErrorAction SilentlyContinue | Where FriendlyName -ieq $FriendlyName|Get-Partition -ErrorAction SilentlyContinue #improve on this! can result in false results
 <<<<<<< HEAD
+<<<<<<< HEAD
+>>>>>>> parent of 294b759... removed all WhatIf code
+=======
 >>>>>>> parent of 294b759... removed all WhatIf code
 =======
 >>>>>>> parent of 294b759... removed all WhatIf code
