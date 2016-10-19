@@ -8,28 +8,22 @@ function Get-TargetResource
     [OutputType([System.Collections.Hashtable])]
     param
     (
-        [parameter(Mandatory = $true)]
-        [System.String]
-        $FriendlyName,
+        [parameter(Mandatory)]
+        [String] $FriendlyName,
 
-        [parameter(Mandatory = $true)]
-        [System.String]
-        $StoragePoolFriendlyName,
+        [parameter(Mandatory)]
+        [String] $StoragePoolFriendlyName,
 
-        [System.UInt32]
-        $Size = 0,
+        [UInt32] $Size = 0,
 
         [ValidateSet('Thin','Fixed')]
-        [System.String]
-        $ProvisioningType = 'Fixed',
+        [String] $ProvisioningType = 'Fixed',
 
         [ValidateSet('Simple','Mirror','Parity')]
-        [System.String]
-        $ResiliencySettingName = 'Mirror',
+        [String] $ResiliencySettingName = 'Mirror',
 
         [ValidateSet('Present','Absent')]
-        [System.String]
-        $Ensure = 'Present'
+        [String] $Ensure = 'Present'
     )
 
     If ((Get-WinVersion) -lt [decimal]6.2){
@@ -43,17 +37,17 @@ function Get-TargetResource
 
     If ($VD){
         $returnValue = @{
-            FriendlyName = [System.String]$FriendlyName
-            StorageSpaceFriendlyName = [System.String]$StorageSpaceFriendlyName
-            Size = [System.UInt32]($VD.Size/1073741824)
-            ProvisioningType = [System.String]$VD.ProvisioningType
-            ResiliencySettingName = [System.String]$VD.ResiliencySettingName
+            FriendlyName = $FriendlyName
+            StorageSpaceFriendlyName = $StorageSpaceFriendlyName
+            Size = ($VD.Size/1073741824)
+            ProvisioningType = [$VD.ProvisioningType
+            ResiliencySettingName = $VD.ResiliencySettingName
             Ensure = 'Present'
         }
     }
     Else{
         $returnValue = @{
-            FriendlyName = [System.String]$FriendlyName
+            FriendlyName = $FriendlyName
             Ensure = 'Absent'
         }
     }
@@ -72,32 +66,26 @@ The Set-TargetResource function is used to either;
 #>
 function Set-TargetResource
 {
-    [CmdletBinding()]
-    param
-    (
-        [parameter(Mandatory = $true)]
-        [System.String]
-        $FriendlyName,
+    [CmdletBinding()]
+    param
+    (
+        [parameter(Mandatory)]
+        [String] $FriendlyName,
 
-        [parameter(Mandatory = $true)]
-        [System.String]
-        $StoragePoolFriendlyName,
+        [parameter(Mandatory)]
+        [String] $StoragePoolFriendlyName,
 
-        [System.UInt32]
-        $Size = 0,
+        [UInt32] $Size = 0,
 
         [ValidateSet('Thin','Fixed')]
-        [System.String]
-        $ProvisioningType = 'Fixed',
+        [String] $ProvisioningType = 'Fixed',
 
         [ValidateSet('Simple','Mirror','Parity')]
-        [System.String]
-        $ResiliencySettingName = 'Mirror',
+        [String] $ResiliencySettingName = 'Mirror',
 
         [ValidateSet('Present','Absent')]
-        [System.String]
-        $Ensure = 'Present'
-    )
+        [String] $Ensure = 'Present'
+    )
  
     If ((Get-WinVersion) -lt [decimal]6.2){
         Throw "VirtualDisk resource only supported in Windows 2012 and up."
@@ -174,28 +162,22 @@ function Test-TargetResource
     [OutputType([System.Boolean])]
     param
     (
-        [parameter(Mandatory = $true)]
-        [System.String]
-        $FriendlyName,
+        [parameter(Mandatory)]
+        [String] $FriendlyName,
 
-        [parameter(Mandatory = $true)]
-        [System.String]
-        $StoragePoolFriendlyName,
+        [parameter(Mandatory)]
+        [String] $StoragePoolFriendlyName,
 
-        [System.UInt32]
-        $Size = 0,
+        [UInt32] $Size = 0,
 
         [ValidateSet('Thin','Fixed')]
-        [System.String]
-        $ProvisioningType = 'Fixed',
+        [String] $ProvisioningType = 'Fixed',
 
         [ValidateSet('Simple','Mirror','Parity')]
-        [System.String]
-        $ResiliencySettingName = 'Mirror',
+        [String] $ResiliencySettingName = 'Mirror',
 
         [ValidateSet('Present','Absent')]
-        [System.String]
-        $Ensure = 'Present'
+        [String] $Ensure = 'Present'
     )
 
     If ((Get-WinVersion) -lt [decimal]6.2){
