@@ -7,8 +7,9 @@ function Get-TargetResource
     [OutputType([System.Collections.Hashtable])]
     param
     (
-        [parameter(Mandatory)]
-        [string] $Disk,
+        [UInt32] $DiskNumber,
+
+		[String] $DiskFriendlyName,
 
         [parameter(Mandatory)]
         [string] $DriveLetter,
@@ -18,14 +19,29 @@ function Get-TargetResource
         [UInt32] $AllocationUnitSize
     )
 
-	Try
-	{
-		[Uint32]$Disk
-		$Dsk = Get-Disk -Number ([Uint32]$Disk) -ErrorAction SilentlyContinue
+	If (($DiskNumber) -and ($DiskFriendlyName)){
+		Throw "DiskNumber and DiskFriendlyName cannot be used together. Please delete one parameter depending on wanted function in configuration."
 	}
-	Catch
-	{
-		$Dsk = Get-Disk -FriendlyName $Disk -ErrorAction SilentlyContinue
+	If ($DiskNumber){$Disk = Get-Disk -Number $DiskNumber -ErrorAction SilentlyContinue}
+	If ($DiskFriendlyName){
+		If ((Get-WinVersion) -lt [decimal]6.2){
+			Throw "DiskFriendlyName parameter only supported in Windows 2012 and up. Please delete parameter in configuration"
+		}
+		If ((Get-WinVersion) -eq [decimal]6.2){
+			$Disk = Get-Disk -UniqueId ((Get-VirtualDisk -FriendlyName $DiskFriendlyName).UniqueId) -ErrorAction SilentlyContinue
+			$DiskNumber = $Disk.Number
+		}
+		If ((Get-WinVersion) -eq [decimal]6.3){
+			$Disk = Get-Disk -UniqueId ((Get-VirtualDisk -FriendlyName $DiskFriendlyName).UniqueId) -ErrorAction SilentlyContinue
+			$DiskNumber = $Disk.Number
+		}
+		If ((Get-WinVersion) -ge [decimal]10.0){
+			$Disk = Get-Disk -FriendlyName $DiskFriendlyName -ErrorAction SilentlyContinue
+			$DiskNumber = $Disk.DiskNumber
+		}
+	}
+	If (!($DiskNumber) -and !($DiskFriendlyName)){
+		Throw "DiskNumber or DiskFriendlyName parameter required. Please add parameter in configuration."
 	}
 
     $Partition = Get-Partition -DriveLetter $DriveLetter -ErrorAction SilentlyContinue
@@ -43,7 +59,7 @@ function Get-TargetResource
     }
 
     $returnValue = @{
-        DiskNumber = $Dsk.Number
+        DiskNumber = $DiskNumber
         DriveLetter = $Partition.DriveLetter
         Size = $Partition.Size
         FSLabel = $FSLabel
@@ -56,8 +72,9 @@ function Set-TargetResource
 {
     param
     (
-        [parameter(Mandatory)]
-        [string] $Disk,
+        [UInt32] $DiskNumber,
+
+		[String] $DiskFriendlyName,
 
         [parameter(Mandatory)]
         [string] $DriveLetter,
@@ -69,41 +86,54 @@ function Set-TargetResource
     
     try
     {
-		Try
-		{
-			[Uint32]$Disk
-			$Dsk = Get-Disk -Number ([Uint32]$Disk) -ErrorAction Stop
+		If (($DiskNumber) -and ($DiskFriendlyName)){
+			Throw "DiskNumber and DiskFriendlyName cannot be used together. Please delete one parameter depending on wanted function in configuration."
 		}
-		Catch
-		{
-			If ((Get-WinVersion) -eq [decimal]6.2){$Dsk = Get-Disk -UniqueId ((Get-VirtualDisk -FriendlyName $Disk).UniqueId) -ErrorAction Stop}
-			If ((Get-WinVersion) -eq [decimal]6.3){$Dsk = Get-Disk -UniqueId ((Get-VirtualDisk -FriendlyName $Disk).UniqueId) -ErrorAction Stop}
-			If ((Get-WinVersion) -ge [decimal]10.0){$Dsk = Get-Disk -FriendlyName $Disk -ErrorAction Stop}
+		If ($DiskNumber){$Disk = Get-Disk -Number $DiskNumber -ErrorAction Stop}
+		If ($DiskFriendlyName){
+			If ((Get-WinVersion) -lt [decimal]6.2){
+				Throw "DiskFriendlyName parameter only supported in Windows 2012 and up. Please delete parameter in configuration"
+			}
+			If ((Get-WinVersion) -eq [decimal]6.2){
+				$Disk = Get-Disk -UniqueId ((Get-VirtualDisk -FriendlyName $DiskFriendlyName).UniqueId) -ErrorAction Stop
+				$DiskNumber = $Disk.Number
+			}
+			If ((Get-WinVersion) -eq [decimal]6.3){
+				$Disk = Get-Disk -UniqueId ((Get-VirtualDisk -FriendlyName $DiskFriendlyName).UniqueId) -ErrorAction Stop
+				$DiskNumber = $Disk.Number
+			}
+			If ((Get-WinVersion) -ge [decimal]10.0){
+				$Disk = Get-Disk -FriendlyName $DiskFriendlyName -ErrorAction Stop
+				$DiskNumber = $Disk.DiskNumber
+			}
 		}
-    
-        if ($Dsk.IsOffline -eq $true)
+		If (!($DiskNumber) -and !($DiskFriendlyName)){
+			Throw "DiskNumber or DiskFriendlyName parameter required. Please add parameter in configuration."
+		}
+
+        if ($Disk.IsOffline -eq $true)
         {
             Write-Verbose 'Setting disk Online'
-            $Dsk | Set-Disk -IsOffline $false
+            $Disk | Set-Disk -IsOffline $false
         }
         
-        if ($Dsk.IsReadOnly -eq $true)
+        if ($Disk.IsReadOnly -eq $true)
         {
             Write-Verbose 'Setting disk to not ReadOnly'
-            $Dsk | Set-Disk -IsReadOnly $false
+            $Disk | Set-Disk -IsReadOnly $false
         }
 
         Write-Verbose -Message "Checking existing disk partition style..."
-        if (($Dsk.PartitionStyle -ne "GPT") -and ($Dsk.PartitionStyle -ne "RAW"))
+        if (($Disk.PartitionStyle -ne "GPT") -and ($Disk.PartitionStyle -ne "RAW"))
         {
-            Throw "Disk '$($Disk)' is already initialised with '$($Dsk.PartitionStyle)'"
+            Throw "Disk number '$($DiskNumber)' is already initialised with '$($Disk.PartitionStyle)'"
         }
         else
         {
-            if ($Dsk.PartitionStyle -eq "RAW")
+            if ($Disk.PartitionStyle -eq "RAW")
             {
-                Write-Verbose -Message "Initializing disk number '$($Disk)'..."
-                $Dsk | Initialize-Disk -PartitionStyle "GPT" -PassThru
+                Write-Verbose -Message "Initializing disk number '$($DiskNumber)'..."
+                $Disk | Initialize-Disk -PartitionStyle "GPT" -PassThru
             }
             else
             {
@@ -113,18 +143,15 @@ function Set-TargetResource
 
         # Check if existing partition already has file system on it
         
-        if (($Dsk | Get-Partition | Get-Volume ) -eq $null)
+        if (($Disk | Get-Partition | Get-Volume ) -eq $null)
         {
 
 
             Write-Verbose -Message "Creating the partition..."
             $PartParams = @{
                             DriveLetter = $DriveLetter;
+							DiskNumber = $DiskNumber
                             }
-			
-			If ((Get-WinVersion) -eq [decimal]6.2){$PartParams["DiskNumber"] = $Dsk.Number}
-			If ((Get-WinVersion) -eq [decimal]6.3){$PartParams["DiskNumber"] = $Dsk.Number}
-			If ((Get-WinVersion) -ge [decimal]10.0){$PartParams["DiskNumber"] = $Dsk.DiskNumber}
 
             if ($Size)
             {
@@ -165,7 +192,7 @@ function Set-TargetResource
         }
         else 
         {
-            $Volume = ($Dsk | Get-Partition | Get-Volume)
+            $Volume = ($Disk | Get-Partition | Get-Volume)
 
             if ($Volume.DriveLetter)
             {
@@ -179,7 +206,7 @@ function Set-TargetResource
             {
                 # volume doesn't have an assigned letter
                 Write-Verbose -Message "Assigning drive letter..."
-				Set-Partition -DiskNumber ($Dsk.DiskNumber) -PartitionNumber 2 -NewDriveLetter $DriveLetter
+				Set-Partition -DiskNumber $DiskNumber -PartitionNumber 2 -NewDriveLetter $DriveLetter
             }
 
             if($PSBoundParameters.ContainsKey('FSLabel'))
@@ -205,8 +232,9 @@ function Test-TargetResource
     [cmdletbinding()]
     param
     (
-        [parameter(Mandatory)]
-        [string] $Disk,
+        [UInt32] $DiskNumber,
+
+		[String] $DiskFriendlyName,
 
         [parameter(Mandatory)]
         [string] $DriveLetter,
@@ -216,38 +244,54 @@ function Test-TargetResource
         [UInt32] $AllocationUnitSize
     )
 
-    Write-Verbose -Message "Checking if disk '$($Disk)' is initialized..."
-	Try
-	{
-		[Uint32]$Disk
-		$Dsk = Get-Disk -Number ([Uint32]$Disk) -ErrorAction SilentlyContinue
+	If (($DiskNumber) -and ($DiskFriendlyName)){
+		Throw "DiskNumber and DiskFriendlyName cannot be used together. Please delete one parameter depending on wanted function in configuration."
 	}
-	Catch
-	{
-		$Dsk = Get-Disk -FriendlyName $Disk -ErrorAction SilentlyContinue
+	If ($DiskNumber){$Disk = Get-Disk -Number $DiskNumber -ErrorAction SilentlyContinue}
+	If ($DiskFriendlyName){
+		If ((Get-WinVersion) -lt [decimal]6.2){
+			Throw "DiskFriendlyName parameter only supported in Windows 2012 and up. Please delete parameter in configuration"
+		}
+		If ((Get-WinVersion) -eq [decimal]6.2){
+			$Disk = Get-Disk -UniqueId ((Get-VirtualDisk -FriendlyName $DiskFriendlyName).UniqueId) -ErrorAction SilentlyContinue
+			$DiskNumber = $Disk.Number
+		}
+		If ((Get-WinVersion) -eq [decimal]6.3){
+			$Disk = Get-Disk -UniqueId ((Get-VirtualDisk -FriendlyName $DiskFriendlyName).UniqueId) -ErrorAction SilentlyContinue
+			$DiskNumber = $Disk.Number
+		}
+		If ((Get-WinVersion) -ge [decimal]10.0){
+			$Disk = Get-Disk -FriendlyName $DiskFriendlyName -ErrorAction SilentlyContinue
+			$DiskNumber = $Disk.DiskNumber
+		}
+	}
+	If (!($DiskNumber) -and !($DiskFriendlyName)){
+		Throw "DiskNumber or DiskFriendlyName parameter required. Please add parameter in configuration."
 	}
 
-    if (-not $Dsk)
+    Write-Verbose -Message "Checking if disk number '$($DiskNumber)' is initialized..."
+
+    if (-not $Disk)
     {
-        Write-Verbose "Disk '$($Disk)' was not found."
+        Write-Verbose "Disk number '$($DiskNumber)' was not found."
         return $false
     }
 
-    if ($Dsk.IsOffline -eq $true)
+    if ($Disk.IsOffline -eq $true)
     {
         Write-Verbose 'Disk is not Online'
         return $false
     }
     
-    if ($Dsk.IsReadOnly -eq $true)
+    if ($Disk.IsReadOnly -eq $true)
     {
         Write-Verbose 'Disk set as ReadOnly'
         return $false
     }
 
-    if ($Dsk.PartitionStyle -ne "GPT")
+    if ($Disk.PartitionStyle -ne "GPT")
     {
-        Write-Verbose "Disk '$($Disk)' is initialised with '$($Dsk.PartitionStyle)' partition style"
+        Write-Verbose "Disk number '$($DiskNumber)' is initialised with '$($Disk.PartitionStyle)' partition style"
         return $false
     }
 

@@ -3,7 +3,8 @@
 class MSFT_xDisk : OMI_BaseResource
 {
     [key] string DriveLetter;
-    [required,write] string Disk;
+    [write] uint32 DiskNumber;
+	[write] string DiskFriendlyName;
     [write] uint64 Size;
     [write] string FSLabel;
     [write] uint32 AllocationUnitSize;
