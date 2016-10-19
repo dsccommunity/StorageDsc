@@ -19,18 +19,16 @@ function Get-TargetResource
         [UInt32] $AllocationUnitSize
     )
 
+	If ((Get-WinVersion) -lt [decimal]6.2){
+		Throw "xDisk resource only supported in Windows 2012 and up."
+	}
 	If (($DiskNumber) -and ($DiskFriendlyName)){
 		Throw "DiskNumber and DiskFriendlyName cannot be used together. Please delete one parameter depending on wanted function in configuration."
 	}
 	If ($DiskNumber){$Disk = Get-Disk -Number $DiskNumber -ErrorAction SilentlyContinue}
 	If ($DiskFriendlyName){
-		If ((Get-WinVersion) -lt [decimal]6.2){
-			Throw "DiskFriendlyName parameter only supported in Windows 2012 and up. Please delete parameter in configuration"
-		}
-		If ((Get-WinVersion) -eq [decimal]6.2){
-			$Disk = Get-Disk -UniqueId ((Get-VirtualDisk -FriendlyName $DiskFriendlyName).UniqueId) -ErrorAction SilentlyContinue
-		}
-		If ((Get-WinVersion) -eq [decimal]6.3){
+
+		IIf (((Get-WinVersion) -eq [decimal]6.2) -or ((Get-WinVersion) -eq [decimal]6.3)) {
 			$Disk = Get-Disk -UniqueId ((Get-VirtualDisk -FriendlyName $DiskFriendlyName).UniqueId) -ErrorAction SilentlyContinue
 		}
 		If ((Get-WinVersion) -ge [decimal]10.0){
@@ -81,6 +79,9 @@ function Set-TargetResource
         [UInt32] $AllocationUnitSize
     )
     
+	If ((Get-WinVersion) -lt [decimal]6.2){
+		Throw "xDisk resource only supported in Windows 2012 and up."
+	}
     try
     {
 		If (($DiskNumber) -and ($DiskFriendlyName)){
@@ -88,13 +89,7 @@ function Set-TargetResource
 		}
 		If ($DiskNumber){$Disk = Get-Disk -Number $DiskNumber -ErrorAction Stop}
 		If ($DiskFriendlyName){
-			If ((Get-WinVersion) -lt [decimal]6.2){
-				Throw "DiskFriendlyName parameter only supported in Windows 2012 and up. Please delete parameter in configuration"
-			}
-			If ((Get-WinVersion) -eq [decimal]6.2){
-				$Disk = Get-Disk -UniqueId ((Get-VirtualDisk -FriendlyName $DiskFriendlyName).UniqueId) -ErrorAction Stop
-			}
-			If ((Get-WinVersion) -eq [decimal]6.3){
+			If (((Get-WinVersion) -eq [decimal]6.2) -or ((Get-WinVersion) -eq [decimal]6.3)) {
 				$Disk = Get-Disk -UniqueId ((Get-VirtualDisk -FriendlyName $DiskFriendlyName).UniqueId) -ErrorAction Stop
 			}
 			If ((Get-WinVersion) -ge [decimal]10.0){
@@ -238,6 +233,9 @@ function Test-TargetResource
         [UInt32] $AllocationUnitSize
     )
 
+	If ((Get-WinVersion) -lt [decimal]6.2){
+		Throw "xDisk resource only supported in Windows 2012 and up."
+	}
 	If (($DiskNumber) -and ($DiskFriendlyName)){
 		Throw "DiskNumber and DiskFriendlyName cannot be used together. Please delete one parameter depending on wanted function in configuration."
 	}
@@ -246,10 +244,7 @@ function Test-TargetResource
 		If ((Get-WinVersion) -lt [decimal]6.2){
 			Throw "DiskFriendlyName parameter only supported in Windows 2012 and up. Please delete parameter in configuration"
 		}
-		If ((Get-WinVersion) -eq [decimal]6.2){
-			$Disk = Get-Disk -UniqueId ((Get-VirtualDisk -FriendlyName $DiskFriendlyName).UniqueId) -ErrorAction SilentlyContinue
-		}
-		If ((Get-WinVersion) -eq [decimal]6.3){
+		If (((Get-WinVersion) -eq [decimal]6.2) -or ((Get-WinVersion) -eq [decimal]6.3)) {
 			$Disk = Get-Disk -UniqueId ((Get-VirtualDisk -FriendlyName $DiskFriendlyName).UniqueId) -ErrorAction SilentlyContinue
 		}
 		If ((Get-WinVersion) -ge [decimal]10.0){
