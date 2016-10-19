@@ -29,15 +29,12 @@ function Get-TargetResource
 		}
 		If ((Get-WinVersion) -eq [decimal]6.2){
 			$Disk = Get-Disk -UniqueId ((Get-VirtualDisk -FriendlyName $DiskFriendlyName).UniqueId) -ErrorAction SilentlyContinue
-			$DiskNumber = $Disk.Number
 		}
 		If ((Get-WinVersion) -eq [decimal]6.3){
 			$Disk = Get-Disk -UniqueId ((Get-VirtualDisk -FriendlyName $DiskFriendlyName).UniqueId) -ErrorAction SilentlyContinue
-			$DiskNumber = $Disk.Number
 		}
 		If ((Get-WinVersion) -ge [decimal]10.0){
 			$Disk = Get-Disk -FriendlyName $DiskFriendlyName -ErrorAction SilentlyContinue
-			$DiskNumber = $Disk.DiskNumber
 		}
 	}
 	If (!($DiskNumber) -and !($DiskFriendlyName)){
@@ -59,7 +56,7 @@ function Get-TargetResource
     }
 
     $returnValue = @{
-        DiskNumber = $DiskNumber
+        DiskNumber = $Disk.Number
         DriveLetter = $Partition.DriveLetter
         Size = $Partition.Size
         FSLabel = $FSLabel
@@ -96,15 +93,12 @@ function Set-TargetResource
 			}
 			If ((Get-WinVersion) -eq [decimal]6.2){
 				$Disk = Get-Disk -UniqueId ((Get-VirtualDisk -FriendlyName $DiskFriendlyName).UniqueId) -ErrorAction Stop
-				$DiskNumber = $Disk.Number
 			}
 			If ((Get-WinVersion) -eq [decimal]6.3){
 				$Disk = Get-Disk -UniqueId ((Get-VirtualDisk -FriendlyName $DiskFriendlyName).UniqueId) -ErrorAction Stop
-				$DiskNumber = $Disk.Number
 			}
 			If ((Get-WinVersion) -ge [decimal]10.0){
 				$Disk = Get-Disk -FriendlyName $DiskFriendlyName -ErrorAction Stop
-				$DiskNumber = $Disk.DiskNumber
 			}
 		}
 		If (!($DiskNumber) -and !($DiskFriendlyName)){
@@ -150,7 +144,7 @@ function Set-TargetResource
             Write-Verbose -Message "Creating the partition..."
             $PartParams = @{
                             DriveLetter = $DriveLetter;
-							DiskNumber = $DiskNumber
+							DiskNumber = $Disk.Number
                             }
 
             if ($Size)
@@ -254,15 +248,12 @@ function Test-TargetResource
 		}
 		If ((Get-WinVersion) -eq [decimal]6.2){
 			$Disk = Get-Disk -UniqueId ((Get-VirtualDisk -FriendlyName $DiskFriendlyName).UniqueId) -ErrorAction SilentlyContinue
-			$DiskNumber = $Disk.Number
 		}
 		If ((Get-WinVersion) -eq [decimal]6.3){
 			$Disk = Get-Disk -UniqueId ((Get-VirtualDisk -FriendlyName $DiskFriendlyName).UniqueId) -ErrorAction SilentlyContinue
-			$DiskNumber = $Disk.Number
 		}
 		If ((Get-WinVersion) -ge [decimal]10.0){
 			$Disk = Get-Disk -FriendlyName $DiskFriendlyName -ErrorAction SilentlyContinue
-			$DiskNumber = $Disk.DiskNumber
 		}
 	}
 	If (!($DiskNumber) -and !($DiskFriendlyName)){
@@ -291,7 +282,7 @@ function Test-TargetResource
 
     if ($Disk.PartitionStyle -ne "GPT")
     {
-        Write-Verbose "Disk number '$($DiskNumber)' is initialised with '$($Disk.PartitionStyle)' partition style"
+        Write-Verbose "Disk number '$($Disk.Number)' is initialised with '$($Disk.PartitionStyle)' partition style"
         return $false
     }
 
