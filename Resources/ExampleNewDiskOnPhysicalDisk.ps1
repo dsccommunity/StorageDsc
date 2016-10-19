@@ -5,12 +5,12 @@
 
     xDisk 'E'
     {
-        Disk = 1
+        DiskNumber = 1
         DriveLetter =  'E'
     }
 }
 
-$MOFPath = 'C:\Support\MOF'
+$MOFPath = 'C:\MOF'
 If (!(Test-Path $MOFPath)){New-Item -Path $MOFPath -ItemType Directory}
 NewDiskOnPhysicalDisk -OutputPath $MOFPath
 Start-DscConfiguration -Path $MOFPath -Wait -Force -Verbose

@@ -10,7 +10,7 @@
     }
 }
 
-$MOFPath = 'C:\Support\MOF'
+$MOFPath = 'C:\MOF'
 If (!(Test-Path $MOFPath)){New-Item -Path $MOFPath -ItemType Directory}
 StorageSpaces -OutputPath $MOFPath
-Start-DscConfiguration -Path $MOFPath -ComputerName 'Localhost' -Wait -Force -Verbose
+Start-DscConfiguration -Path $MOFPath -Wait -Force -Verbose

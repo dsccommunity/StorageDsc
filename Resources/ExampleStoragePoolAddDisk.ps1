@@ -10,10 +10,10 @@ Configuration StorageSpaces
     }
 }
 
-$MOFPath = 'C:\Support\MOF'
+$MOFPath = 'C:\MOF'
 If (!(Test-Path $MOFPath)){New-Item -Path $MOFPath -ItemType Directory}
 StorageSpaces -OutputPath $MOFPath
-Start-DscConfiguration -Path $MOFPath -ComputerName 'Localhost' -Wait -Force -Verbose
+Start-DscConfiguration -Path $MOFPath -Wait -Force -Verbose
 
 Start-Sleep -Seconds 10
 Write-Host
@@ -32,7 +32,7 @@ Configuration StorageSpacesAddDisk
     }
 }
 
-$MOFPath = 'C:\Support\MOF'
+$MOFPath = 'C:\MOF'
 If (!(Test-Path $MOFPath)){New-Item -Path $MOFPath -ItemType Directory}
 StorageSpacesAddDisk -OutputPath $MOFPath
-Start-DscConfiguration -Path $MOFPath -ComputerName 'Localhost' -Wait -Force -Verbose
+Start-DscConfiguration -Path $MOFPath -Wait -Force -Verbose

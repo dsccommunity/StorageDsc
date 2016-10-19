@@ -5,12 +5,12 @@
 
     xDisk 'E'
     {
-        Disk = 'VD_Test'
+        DiskFriendlyName = 'VD_Test'
         DriveLetter =  'E'
     }
 }
 
-$MOFPath = 'C:\Support\MOF'
+$MOFPath = 'C:\MOF'
 If (!(Test-Path $MOFPath)){New-Item -Path $MOFPath -ItemType Directory}
 NewDiskOnVirtualDisk -OutputPath $MOFPath
 Start-DscConfiguration -Path $MOFPath -Wait -Force -Verbose

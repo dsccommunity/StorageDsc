@@ -1,4 +1,4 @@
-﻿#
+#
 # xDisk: DSC resource to initialize, partition, and format disks.
 #
 
@@ -9,7 +9,7 @@ function Get-TargetResource
     (
         [UInt32] $DiskNumber,
 
-		[String] $DiskFriendlyName,
+        [String] $DiskFriendlyName,
 
         [parameter(Mandatory)]
         [string] $DriveLetter,
@@ -19,25 +19,25 @@ function Get-TargetResource
         [UInt32] $AllocationUnitSize
     )
 
-	If ((Get-WinVersion) -lt [decimal]6.2){
-		Throw "xDisk resource only supported in Windows 2012 and up."
-	}
-	If (($DiskNumber) -and ($DiskFriendlyName)){
-		Throw "DiskNumber and DiskFriendlyName cannot be used together. Please delete one parameter depending on wanted function in configuration."
-	}
-	If ($DiskNumber){$Disk = Get-Disk -Number $DiskNumber -ErrorAction SilentlyContinue}
-	If ($DiskFriendlyName){
+    If ((Get-WinVersion) -lt [decimal]6.2){
+        Throw "xDisk resource only supported in Windows 2012 and up."
+    }
+    If (($DiskNumber) -and ($DiskFriendlyName)){
+        Throw "DiskNumber and DiskFriendlyName cannot be used together. Please delete one parameter depending on wanted function in configuration."
+    }
+    If ($DiskNumber){$Disk = Get-Disk -Number $DiskNumber -ErrorAction SilentlyContinue}
+    If ($DiskFriendlyName){
 
-		IIf (((Get-WinVersion) -eq [decimal]6.2) -or ((Get-WinVersion) -eq [decimal]6.3)) {
-			$Disk = Get-Disk -UniqueId ((Get-VirtualDisk -FriendlyName $DiskFriendlyName).UniqueId) -ErrorAction SilentlyContinue
-		}
-		If ((Get-WinVersion) -ge [decimal]10.0){
-			$Disk = Get-Disk -FriendlyName $DiskFriendlyName -ErrorAction SilentlyContinue
-		}
-	}
-	If (!($DiskNumber) -and !($DiskFriendlyName)){
-		Throw "DiskNumber or DiskFriendlyName parameter required. Please add parameter in configuration."
-	}
+        IIf (((Get-WinVersion) -eq [decimal]6.2) -or ((Get-WinVersion) -eq [decimal]6.3)) {
+            $Disk = Get-Disk -UniqueId ((Get-VirtualDisk -FriendlyName $DiskFriendlyName).UniqueId) -ErrorAction SilentlyContinue
+        }
+        If ((Get-WinVersion) -ge [decimal]10.0){
+            $Disk = Get-Disk -FriendlyName $DiskFriendlyName -ErrorAction SilentlyContinue
+        }
+    }
+    If (!($DiskNumber) -and !($DiskFriendlyName)){
+        Throw "DiskNumber or DiskFriendlyName parameter required. Please add parameter in configuration."
+    }
 
     $Partition = Get-Partition -DriveLetter $DriveLetter -ErrorAction SilentlyContinue
 
@@ -69,7 +69,7 @@ function Set-TargetResource
     (
         [UInt32] $DiskNumber,
 
-		[String] $DiskFriendlyName,
+        [String] $DiskFriendlyName,
 
         [parameter(Mandatory)]
         [string] $DriveLetter,
@@ -79,26 +79,26 @@ function Set-TargetResource
         [UInt32] $AllocationUnitSize
     )
     
-	If ((Get-WinVersion) -lt [decimal]6.2){
-		Throw "xDisk resource only supported in Windows 2012 and up."
-	}
+    If ((Get-WinVersion) -lt [decimal]6.2){
+        Throw "xDisk resource only supported in Windows 2012 and up."
+    }
     try
     {
-		If (($DiskNumber) -and ($DiskFriendlyName)){
-			Throw "DiskNumber and DiskFriendlyName cannot be used together. Please delete one parameter depending on wanted function in configuration."
-		}
-		If ($DiskNumber){$Disk = Get-Disk -Number $DiskNumber -ErrorAction Stop}
-		If ($DiskFriendlyName){
-			If (((Get-WinVersion) -eq [decimal]6.2) -or ((Get-WinVersion) -eq [decimal]6.3)) {
-				$Disk = Get-Disk -UniqueId ((Get-VirtualDisk -FriendlyName $DiskFriendlyName).UniqueId) -ErrorAction Stop
-			}
-			If ((Get-WinVersion) -ge [decimal]10.0){
-				$Disk = Get-Disk -FriendlyName $DiskFriendlyName -ErrorAction Stop
-			}
-		}
-		If (!($DiskNumber) -and !($DiskFriendlyName)){
-			Throw "DiskNumber or DiskFriendlyName parameter required. Please add parameter in configuration."
-		}
+        If (($DiskNumber) -and ($DiskFriendlyName)){
+            Throw "DiskNumber and DiskFriendlyName cannot be used together. Please delete one parameter depending on wanted function in configuration."
+        }
+        If ($DiskNumber){$Disk = Get-Disk -Number $DiskNumber -ErrorAction Stop}
+        If ($DiskFriendlyName){
+            If (((Get-WinVersion) -eq [decimal]6.2) -or ((Get-WinVersion) -eq [decimal]6.3)) {
+                $Disk = Get-Disk -UniqueId ((Get-VirtualDisk -FriendlyName $DiskFriendlyName).UniqueId) -ErrorAction Stop
+            }
+            If ((Get-WinVersion) -ge [decimal]10.0){
+                $Disk = Get-Disk -FriendlyName $DiskFriendlyName -ErrorAction Stop
+            }
+        }
+        If (!($DiskNumber) -and !($DiskFriendlyName)){
+            Throw "DiskNumber or DiskFriendlyName parameter required. Please add parameter in configuration."
+        }
 
         if ($Disk.IsOffline -eq $true)
         {
@@ -139,7 +139,7 @@ function Set-TargetResource
             Write-Verbose -Message "Creating the partition..."
             $PartParams = @{
                             DriveLetter = $DriveLetter;
-							DiskNumber = $Disk.Number
+                            DiskNumber = $Disk.Number
                             }
 
             if ($Size)
@@ -195,7 +195,7 @@ function Set-TargetResource
             {
                 # volume doesn't have an assigned letter
                 Write-Verbose -Message "Assigning drive letter..."
-				Set-Partition -DiskNumber $DiskNumber -PartitionNumber 2 -NewDriveLetter $DriveLetter
+                Set-Partition -DiskNumber $DiskNumber -PartitionNumber 2 -NewDriveLetter $DriveLetter
             }
 
             if($PSBoundParameters.ContainsKey('FSLabel'))
@@ -223,7 +223,7 @@ function Test-TargetResource
     (
         [UInt32] $DiskNumber,
 
-		[String] $DiskFriendlyName,
+        [String] $DiskFriendlyName,
 
         [parameter(Mandatory)]
         [string] $DriveLetter,
@@ -233,27 +233,27 @@ function Test-TargetResource
         [UInt32] $AllocationUnitSize
     )
 
-	If ((Get-WinVersion) -lt [decimal]6.2){
-		Throw "xDisk resource only supported in Windows 2012 and up."
-	}
-	If (($DiskNumber) -and ($DiskFriendlyName)){
-		Throw "DiskNumber and DiskFriendlyName cannot be used together. Please delete one parameter depending on wanted function in configuration."
-	}
-	If ($DiskNumber){$Disk = Get-Disk -Number $DiskNumber -ErrorAction SilentlyContinue}
-	If ($DiskFriendlyName){
-		If ((Get-WinVersion) -lt [decimal]6.2){
-			Throw "DiskFriendlyName parameter only supported in Windows 2012 and up. Please delete parameter in configuration"
-		}
-		If (((Get-WinVersion) -eq [decimal]6.2) -or ((Get-WinVersion) -eq [decimal]6.3)) {
-			$Disk = Get-Disk -UniqueId ((Get-VirtualDisk -FriendlyName $DiskFriendlyName).UniqueId) -ErrorAction SilentlyContinue
-		}
-		If ((Get-WinVersion) -ge [decimal]10.0){
-			$Disk = Get-Disk -FriendlyName $DiskFriendlyName -ErrorAction SilentlyContinue
-		}
-	}
-	If (!($DiskNumber) -and !($DiskFriendlyName)){
-		Throw "DiskNumber or DiskFriendlyName parameter required. Please add parameter in configuration."
-	}
+    If ((Get-WinVersion) -lt [decimal]6.2){
+        Throw "xDisk resource only supported in Windows 2012 and up."
+    }
+    If (($DiskNumber) -and ($DiskFriendlyName)){
+        Throw "DiskNumber and DiskFriendlyName cannot be used together. Please delete one parameter depending on wanted function in configuration."
+    }
+    If ($DiskNumber){$Disk = Get-Disk -Number $DiskNumber -ErrorAction SilentlyContinue}
+    If ($DiskFriendlyName){
+        If ((Get-WinVersion) -lt [decimal]6.2){
+            Throw "DiskFriendlyName parameter only supported in Windows 2012 and up. Please delete parameter in configuration"
+        }
+        If (((Get-WinVersion) -eq [decimal]6.2) -or ((Get-WinVersion) -eq [decimal]6.3)) {
+            $Disk = Get-Disk -UniqueId ((Get-VirtualDisk -FriendlyName $DiskFriendlyName).UniqueId) -ErrorAction SilentlyContinue
+        }
+        If ((Get-WinVersion) -ge [decimal]10.0){
+            $Disk = Get-Disk -FriendlyName $DiskFriendlyName -ErrorAction SilentlyContinue
+        }
+    }
+    If (!($DiskNumber) -and !($DiskFriendlyName)){
+        Throw "DiskNumber or DiskFriendlyName parameter required. Please add parameter in configuration."
+    }
 
     Write-Verbose -Message "Checking if disk number '$($DiskNumber)' is initialized..."
 
