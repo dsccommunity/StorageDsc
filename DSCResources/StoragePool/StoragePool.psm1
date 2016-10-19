@@ -1,29 +1,19 @@
-<#
-.Synopsis
-The Get-TargetResource function is used to fetch the status of StorageSpace on the target machine.
-#>
 function Get-TargetResource
 {
     [CmdletBinding()]
     [OutputType([System.Collections.Hashtable])]
-    param
-    (
-        [parameter(Mandatory = $true)]
-        [System.String]
-        $FriendlyName,
+    param(
+        [parameter(Mandatory)]
+        [String] $FriendlyName,
 
-        [System.String]
-        $NewFriendlyName,
+        [String] $NewFriendlyName,
 
-        [System.UInt32]
-        $NumberOfDisks = 0,
+        [UInt32] $NumberOfDisks = 0,
 
-        [System.UInt32]
-        $DriveSize = 0,
+        [UInt32] $DriveSize = 0,
 
         [ValidateSet('Present','Absent')]
-        [System.String]
-        $Ensure = 'Present'
+        [String] $Ensure = 'Present'
     )
 
     If ((Get-WinVersion) -lt [decimal]6.2){
@@ -37,16 +27,16 @@ function Get-TargetResource
 
     If ($SP){
         $returnValue = @{
-            FriendlyName = [System.String]$FriendlyName
-            DriveSize = [System.UInt32]($SP.AlllocatedSize/@($PD).Count/1073741824) # Average on total disks
-            NumberOfDisks = [System.UInt32]@($PD).Count
+            FriendlyName = $FriendlyName
+            DriveSize = ($SP.AlllocatedSize/@($PD).Count/1073741824) # Average on total disks
+            NumberOfDisks = @($PD).Count
             Ensure = 'Present'
             #Add total size and available?
         }
     }
     Else{
         $returnValue = @{
-            FriendlyName = [System.String]$FriendlyName
+            FriendlyName = $FriendlyName
             Ensure = 'Absent'
         }
     }
@@ -72,32 +62,26 @@ The Set-TargetResource function is used to either;
 #>
 function Set-TargetResource
 {
-    [CmdletBinding()]
-    param
-    (
-        [parameter(Mandatory = $true)]
-        [System.String]
-        $FriendlyName,
+    [CmdletBinding()]
+    param(
+        [parameter(Mandatory)]
+        [String] $FriendlyName,
 
-        [System.String]
-        $NewFriendlyName,
+        [String] $NewFriendlyName,
 
-        [System.UInt32]
-        $NumberOfDisks = 0,
+        [UInt32] $NumberOfDisks = 0,
 
-        [System.UInt32]
-        $DriveSize = 0,
+        [UInt32] $DriveSize = 0,
 
         [ValidateSet('Present','Absent')]
-        [System.String]
-        $Ensure = 'Present'
-    )
- 
+        [String] $Ensure = 'Present'
+    )
+
     If ((Get-WinVersion) -lt [decimal]6.2){
         Throw "StoragePool resource only supported in Windows 2012 and up."
     }
-       
-    Try
+
+   Try
     {
         $SP = Get-StoragePool -FriendlyName $FriendlyName -ErrorAction SilentlyContinue #Check if storagepool already exists
         
@@ -181,33 +165,22 @@ function Set-TargetResource
     }
 }
 
-
-<#
-.Synopsis
-The Test-TargetResource function is used to test the status of StorageSpace on the target machine.
-#>
 function Test-TargetResource
 {
     [CmdletBinding()]
     [OutputType([System.Boolean])]
-    param
-    (
-        [parameter(Mandatory = $true)]
-        [System.String]
-        $FriendlyName,
+    param(
+        [parameter(Mandatory)]
+        [String] $FriendlyName,
 
-        [System.String]
-        $NewFriendlyName,
+        [String] $NewFriendlyName,
 
-        [System.UInt32]
-        $NumberOfDisks = 0,
+        [UInt32] $NumberOfDisks = 0,
 
-        [System.UInt32]
-        $DriveSize = 0,
+        [UInt32] $DriveSize = 0,
 
         [ValidateSet('Present','Absent')]
-        [System.String]
-        $Ensure = 'Present'
+        [String] $Ensure = 'Present'
     )
 
     If ((Get-WinVersion) -lt [decimal]6.2){
@@ -260,4 +233,3 @@ Function Get-WinVersion
 }
 
 Export-ModuleMember -Function *-TargetResource
-
