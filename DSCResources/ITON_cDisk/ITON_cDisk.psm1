@@ -1,5 +1,5 @@
-﻿#
-# xComputer: DSC resource to initialize, partition, and format disks.
+#
+# xDisk: DSC resource to initialize, partition, and format disks.
 #
 
 function Get-TargetResource
@@ -7,8 +7,9 @@ function Get-TargetResource
     [OutputType([System.Collections.Hashtable])]
     param
     (
-        [parameter(Mandatory)]
-        [uint32] $DiskNumber,
+        [UInt32] $DiskNumber,
+
+        [String] $DiskFriendlyName,
 
         [parameter(Mandatory)]
         [string] $DriveLetter,
@@ -18,8 +19,26 @@ function Get-TargetResource
         [UInt32] $AllocationUnitSize
     )
 
-    $Disk = Get-Disk -Number $DiskNumber -ErrorAction SilentlyContinue
-    
+    If ((Get-WinVersion) -lt [decimal]6.2){
+        Throw "xDisk resource only supported in Windows 2012 and up."
+    }
+    If (($DiskNumber) -and ($DiskFriendlyName)){
+        Throw "DiskNumber and DiskFriendlyName cannot be used together. Please delete one parameter depending on wanted function in configuration."
+    }
+    If ($DiskNumber){$Disk = Get-Disk -Number $DiskNumber -ErrorAction SilentlyContinue}
+    If ($DiskFriendlyName){
+
+        IIf (((Get-WinVersion) -eq [decimal]6.2) -or ((Get-WinVersion) -eq [decimal]6.3)) {
+            $Disk = Get-Disk -UniqueId ((Get-VirtualDisk -FriendlyName $DiskFriendlyName).UniqueId) -ErrorAction SilentlyContinue
+        }
+        If ((Get-WinVersion) -ge [decimal]10.0){
+            $Disk = Get-Disk -FriendlyName $DiskFriendlyName -ErrorAction SilentlyContinue
+        }
+    }
+    If (!($DiskNumber) -and !($DiskFriendlyName)){
+        Throw "DiskNumber or DiskFriendlyName parameter required. Please add parameter in configuration."
+    }
+
     $Partition = Get-Partition -DriveLetter $DriveLetter -ErrorAction SilentlyContinue
 
     $FSLabel = Get-Volume -DriveLetter $DriveLetter -ErrorAction SilentlyContinue | Select-Object -ExpandProperty FileSystemLabel
@@ -48,8 +67,9 @@ function Set-TargetResource
 {
     param
     (
-        [parameter(Mandatory)]
-        [uint32] $DiskNumber,
+        [UInt32] $DiskNumber,
+
+        [String] $DiskFriendlyName,
 
         [parameter(Mandatory)]
         [string] $DriveLetter,
@@ -59,10 +79,27 @@ function Set-TargetResource
         [UInt32] $AllocationUnitSize
     )
     
+    If ((Get-WinVersion) -lt [decimal]6.2){
+        Throw "xDisk resource only supported in Windows 2012 and up."
+    }
     try
     {
-        $Disk = Get-Disk -Number $DiskNumber -ErrorAction Stop
-    
+        If (($DiskNumber) -and ($DiskFriendlyName)){
+            Throw "DiskNumber and DiskFriendlyName cannot be used together. Please delete one parameter depending on wanted function in configuration."
+        }
+        If ($DiskNumber){$Disk = Get-Disk -Number $DiskNumber -ErrorAction Stop}
+        If ($DiskFriendlyName){
+            If (((Get-WinVersion) -eq [decimal]6.2) -or ((Get-WinVersion) -eq [decimal]6.3)) {
+                $Disk = Get-Disk -UniqueId ((Get-VirtualDisk -FriendlyName $DiskFriendlyName).UniqueId) -ErrorAction Stop
+            }
+            If ((Get-WinVersion) -ge [decimal]10.0){
+                $Disk = Get-Disk -FriendlyName $DiskFriendlyName -ErrorAction Stop
+            }
+        }
+        If (!($DiskNumber) -and !($DiskFriendlyName)){
+            Throw "DiskNumber or DiskFriendlyName parameter required. Please add parameter in configuration."
+        }
+
         if ($Disk.IsOffline -eq $true)
         {
             Write-Verbose 'Setting disk Online'
@@ -78,7 +115,7 @@ function Set-TargetResource
         Write-Verbose -Message "Checking existing disk partition style..."
         if (($Disk.PartitionStyle -ne "GPT") -and ($Disk.PartitionStyle -ne "RAW"))
         {
-            Throw "Disk '$($DiskNumber)' is already initialised with '$($Disk.PartitionStyle)'"
+            Throw "Disk number '$($DiskNumber)' is already initialised with '$($Disk.PartitionStyle)'"
         }
         else
         {
@@ -89,7 +126,7 @@ function Set-TargetResource
             }
             else
             {
-                Write-Verbose -Message "Disk number '$($DiskNumber)' is already configured for 'GPT'"
+                Write-Verbose -Message "Disk '$($Disk)' is already configured for 'GPT'"
             }
         }
 
@@ -102,8 +139,9 @@ function Set-TargetResource
             Write-Verbose -Message "Creating the partition..."
             $PartParams = @{
                             DriveLetter = $DriveLetter;
-                            DiskNumber = $DiskNumber
+                            DiskNumber = $Disk.Number
                             }
+
             if ($Size)
             {
                 $PartParams["Size"] = $Size
@@ -183,8 +221,9 @@ function Test-TargetResource
     [cmdletbinding()]
     param
     (
-        [parameter(Mandatory)]
-        [uint32] $DiskNumber,
+        [UInt32] $DiskNumber,
+
+        [String] $DiskFriendlyName,
 
         [parameter(Mandatory)]
         [string] $DriveLetter,
@@ -194,8 +233,29 @@ function Test-TargetResource
         [UInt32] $AllocationUnitSize
     )
 
+    If ((Get-WinVersion) -lt [decimal]6.2){
+        Throw "xDisk resource only supported in Windows 2012 and up."
+    }
+    If (($DiskNumber) -and ($DiskFriendlyName)){
+        Throw "DiskNumber and DiskFriendlyName cannot be used together. Please delete one parameter depending on wanted function in configuration."
+    }
+    If ($DiskNumber){$Disk = Get-Disk -Number $DiskNumber -ErrorAction SilentlyContinue}
+    If ($DiskFriendlyName){
+        If ((Get-WinVersion) -lt [decimal]6.2){
+            Throw "DiskFriendlyName parameter only supported in Windows 2012 and up. Please delete parameter in configuration"
+        }
+        If (((Get-WinVersion) -eq [decimal]6.2) -or ((Get-WinVersion) -eq [decimal]6.3)) {
+            $Disk = Get-Disk -UniqueId ((Get-VirtualDisk -FriendlyName $DiskFriendlyName).UniqueId) -ErrorAction SilentlyContinue
+        }
+        If ((Get-WinVersion) -ge [decimal]10.0){
+            $Disk = Get-Disk -FriendlyName $DiskFriendlyName -ErrorAction SilentlyContinue
+        }
+    }
+    If (!($DiskNumber) -and !($DiskFriendlyName)){
+        Throw "DiskNumber or DiskFriendlyName parameter required. Please add parameter in configuration."
+    }
+
     Write-Verbose -Message "Checking if disk number '$($DiskNumber)' is initialized..."
-    $Disk = Get-Disk -Number $DiskNumber -ErrorAction SilentlyContinue
 
     if (-not $Disk)
     {
@@ -217,7 +277,7 @@ function Test-TargetResource
 
     if ($Disk.PartitionStyle -ne "GPT")
     {
-        Write-Verbose "Disk '$($DiskNumber)' is initialised with '$($Disk.PartitionStyle)' partition style"
+        Write-Verbose "Disk number '$($Disk.Number)' is initialised with '$($Disk.PartitionStyle)' partition style"
         return $false
     }
 
@@ -267,5 +327,11 @@ function Test-TargetResource
     return $true
 }
 
+Function Get-WinVersion
+{
+    #not using Get-CimInstance; older versions of Windows use DCOM. Get-WmiObject works on all, so far...
+    $os = (Get-WmiObject -Class Win32_OperatingSystem).Version.Split('.')
+    [decimal]($os[0] + "." + $os[1])
+}
 
 Export-ModuleMember -Function *-TargetResource
