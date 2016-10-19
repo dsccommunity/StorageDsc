@@ -1,7 +1,3 @@
-<#
-.Synopsis
-The Get-TargetResource function is used to fetch the status of VirtualDisk on the target machine.
-#>
 function Get-TargetResource
 {
     [CmdletBinding()]
@@ -33,14 +29,14 @@ function Get-TargetResource
     #Check storagepool
     Write-Verbose "Getting info for VirtualDisk $($FriendlyName)."
     $SP = Get-StoragePool -FriendlyName $StoragePoolFriendlyName -ErrorAction SilentlyContinue
-    $VD = $SP|Get-VirtualDisk -ErrorAction SilentlyContinue | Where FriendlyName -ieq $FriendlyName
+    $VD = $SP|Get-VirtualDisk -ErrorAction SilentlyContinue | Where-Object FriendlyName -ieq $FriendlyName
 
     If ($VD){
         $returnValue = @{
             FriendlyName = $FriendlyName
             StorageSpaceFriendlyName = $StorageSpaceFriendlyName
             Size = ($VD.Size/1073741824)
-            ProvisioningType = [$VD.ProvisioningType
+            ProvisioningType = $VD.ProvisioningType
             ResiliencySettingName = $VD.ResiliencySettingName
             Ensure = 'Present'
         }
@@ -90,17 +86,17 @@ function Set-TargetResource
     If ((Get-WinVersion) -lt [decimal]6.2){
         Throw "VirtualDisk resource only supported in Windows 2012 and up."
     }
-    
+
     Try
     {
         $SP = Get-StoragePool -FriendlyName $StoragePoolFriendlyName -ErrorAction Stop
-        $VD = $SP|Get-VirtualDisk -ErrorAction SilentlyContinue | Where FriendlyName -ieq $FriendlyName
+        $VD = $SP|Get-VirtualDisk -ErrorAction SilentlyContinue | Where-Object FriendlyName -ieq $FriendlyName
 
         If (($Ensure -ieq 'Absent') -and ($VD)) { #Removal requested
             Write-Verbose "Complete removal of VirtualDisk $($FriendlyName) requested"
             Write-Debug "Complete removal of VirtualDisk $($FriendlyName) requested"
             #Your wish is our command....destroy the virtualdisk
-            $PT = Get-Disk -ErrorAction SilentlyContinue | Where FriendlyName -ieq $FriendlyName|Get-Partition -ErrorAction SilentlyContinue #improve on this! can result in false results
+            $PT = Get-Disk -ErrorAction SilentlyContinue | Where-Object FriendlyName -ieq $FriendlyName|Get-Partition -ErrorAction SilentlyContinue #improve on this! can result in false results
 
             If ($SP.IsReadOnly -eq $true){
                 $SP|Set-StoragePool -IsReadOnly $false
@@ -142,7 +138,7 @@ function Set-TargetResource
                                 -AutoWriteCacheSize `
                                 -ProvisioningType $ProvisioningType `
                                 -ResiliencySettingName $ResiliencySettingName
-                $VD = $SP|Get-VirtualDisk -ErrorAction SilentlyContinue | Where FriendlyName -ieq $FriendlyName
+                $VD = $SP|Get-VirtualDisk -ErrorAction SilentlyContinue | Where-Object FriendlyName -ieq $FriendlyName
                 Write-Verbose "VirtualDisk $($FriendlyName) has been created on StoragePool $($StoragePoolFriendlyName) with size $($VD.Size/1073741824) GB"
                 Write-Debug "VirtualDisk $($FriendlyName) has been created on StoragePool $($StoragePoolFriendlyName) with size $($VD.Size/1073741824) GB"
             }
@@ -154,7 +150,6 @@ function Set-TargetResource
         Throw "VirtualDisk Set-TargetResource failed with the following error: '$($message)'"
     }
 }
-
 
 function Test-TargetResource
 {
@@ -184,7 +179,7 @@ function Test-TargetResource
         Throw "VirtualDisk resource only supported in Windows 2012 and up."
     }
 
-    Write-Verbose "Testing VirtualDisk $($FriendlyName)."
+       Write-Verbose "Testing VirtualDisk $($FriendlyName)."
 
     #Check of virtualdisk already exists
     $CheckVirtualDisk = Get-TargetResource @PSBoundParameters
@@ -211,4 +206,3 @@ Function Get-WinVersion
 }
 
 Export-ModuleMember -Function *-TargetResource
-
