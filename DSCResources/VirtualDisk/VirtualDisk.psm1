@@ -72,7 +72,7 @@ The Set-TargetResource function is used to either;
 #>
 function Set-TargetResource
 {
-    [CmdletBinding(SupportsShouldProcess=$true)]
+    [CmdletBinding()]
     param
     (
         [parameter(Mandatory = $true)]
@@ -114,42 +114,22 @@ function Set-TargetResource
             #Your wish is our command....destroy the virtualdisk
             $PT = Get-Disk -ErrorAction SilentlyContinue | Where FriendlyName -ieq $FriendlyName|Get-Partition -ErrorAction SilentlyContinue #improve on this! can result in false results
 
-            If ([bool]$WhatIfPreference.IsPresent) {
-                If ($SP.IsReadOnly -eq $true){
-                    $SP|Set-StoragePool -IsReadOnly $false -WhatIf:([bool]$WhatIfPreference.IsPresent)
-                    Write-Verbose "StoragePool $($StoragePoolFriendlyName) would have been set to read/write"
-                    Write-Debug "StoragePool $($StoragePoolFriendlyName) would have been set to read/write"
-                }
-                If ($PT){
-                    $PT|Remove-Partition -WhatIf:([bool]$WhatIfPreference.IsPresent)
-                    Write-Verbose "Partition(s) $($PT.DriveLetter) would have been deleted"
-                    Write-Debug "Partition(s) $($PT.DriveLetter) would have been deleted"
-                }
-                If ($VD){
-                    $VD|Remove-VirtualDisk -WhatIf:([bool]$WhatIfPreference.IsPresent)
-                    Write-Verbose "VirtualDisk $($FriendlyName) would have been deleted"
-                    Write-Debug "VirtualDisk $($FriendlyName) would have been deleted"
-                }
-                return
+            If ($SP.IsReadOnly -eq $true){
+                $SP|Set-StoragePool -IsReadOnly $false
+                Write-Verbose "StoragePool $($StoragePoolFriendlyName) has been set to read/write"
+                Write-Debug "StoragePool $($StoragePoolFriendlyName) has been set to read/write"
             }
-            Else {
-                If ($SP.IsReadOnly -eq $true){
-                    $SP|Set-StoragePool -IsReadOnly $false
-                    Write-Verbose "StoragePool $($StoragePoolFriendlyName) has been set to read/write"
-                    Write-Debug "StoragePool $($StoragePoolFriendlyName) has been set to read/write"
-                }
-                If ($PT){
-                    $PT|Remove-Partition -Confirm:$false
-                    Write-Verbose "Partition(s) $($PT.DriveLetter) has/have been deleted"
-                    Write-Debug "Partition(s) $($PT.DriveLetter) has/have been deleted"
-                }
-                If ($VD){
-                    $VD|Remove-VirtualDisk -Confirm:$false
-                    Write-Verbose "VirtualDisk $($FriendlyName) has been deleted"
-                    Write-Debug "VirtualDisk $($FriendlyName) has been deleted"
-                }
-                return
+            If ($PT){
+                $PT|Remove-Partition -Confirm:$false
+                Write-Verbose "Partition(s) $($PT.DriveLetter) has/have been deleted"
+                Write-Debug "Partition(s) $($PT.DriveLetter) has/have been deleted"
             }
+            If ($VD){
+                $VD|Remove-VirtualDisk -Confirm:$false
+                Write-Verbose "VirtualDisk $($FriendlyName) has been deleted"
+                Write-Debug "VirtualDisk $($FriendlyName) has been deleted"
+            }
+            return
         }
 
         If (($Ensure -ieq 'Present') -and (!($VD))) {#No virtualdisk found, create one
