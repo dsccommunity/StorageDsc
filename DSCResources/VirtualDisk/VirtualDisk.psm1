@@ -63,12 +63,15 @@ The Set-TargetResource function is used to either;
 function Set-TargetResource
 {
 <<<<<<< HEAD
+<<<<<<< HEAD
     [CmdletBinding()]
     param
     (
         [parameter(Mandatory)]
         [String] $FriendlyName,
 =======
+=======
+>>>>>>> parent of 294b759... removed all WhatIf code
     [CmdletBinding(SupportsShouldProcess=$true)]
     param
     (
@@ -105,7 +108,11 @@ function Set-TargetResource
             Write-Verbose "Complete removal of VirtualDisk $($FriendlyName) requested"
             Write-Debug "Complete removal of VirtualDisk $($FriendlyName) requested"
             #Your wish is our command....destroy the virtualdisk
+<<<<<<< HEAD
             $PT = Get-Disk -ErrorAction SilentlyContinue | Where-Object FriendlyName -ieq $FriendlyName|Get-Partition -ErrorAction SilentlyContinue #improve on this! can result in false results
+=======
+            $PT = Get-Disk -ErrorAction SilentlyContinue | Where FriendlyName -ieq $FriendlyName|Get-Partition -ErrorAction SilentlyContinue #improve on this! can result in false results
+>>>>>>> parent of 294b759... removed all WhatIf code
 
             If ([bool]$WhatIfPreference.IsPresent) {
                 If ($SP.IsReadOnly -eq $true){
