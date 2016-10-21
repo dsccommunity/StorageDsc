@@ -6,20 +6,22 @@
     StoragePool SP_Test
     {
         FriendlyName = 'SP_Test'
-        NumberOfDisks = 1
+        NumberOfDisks = 2
     }
 
     VirtualDisk VD_Test
     {
         FriendlyName = 'VD_Test'
         StoragePoolFriendlyName =  'SP_Test'
-        ResiliencySettingName = 'Simple'
+        ResiliencySettingName = 'Mirror'
+        DependsOn = '[StoragePool]SP_Test'
     }
 
-    xDisk 'E'
+    cDisk 'F'
     {
         DiskFriendlyName = 'VD_Test'
-        DriveLetter =  'E'
+        DriveLetter =  'F'
+        DependsOn = '[VirtualDisk]VD_Test'
     }
 }
 

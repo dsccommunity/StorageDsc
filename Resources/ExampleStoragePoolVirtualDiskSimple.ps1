@@ -14,6 +14,7 @@
         FriendlyName = 'VD_Test'
         StoragePoolFriendlyName =  'SP_Test'
         ResiliencySettingName = 'Simple'
+        DependsOn = '[StoragePool]SP_Test'
     }
 }
 
