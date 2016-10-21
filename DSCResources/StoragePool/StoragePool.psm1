@@ -1,4 +1,4 @@
-function Get-TargetResource
+﻿function Get-TargetResource
 {
     [CmdletBinding()]
     [OutputType([System.Collections.Hashtable])]
@@ -8,7 +8,7 @@ function Get-TargetResource
 
         [String] $NewFriendlyName,
 
-        [UInt32] $NumberOfDisks = 0,
+        [UInt32] $NumberOfDisks = 0,
 
         [UInt32] $DriveSize = 0,
 
