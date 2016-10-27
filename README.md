@@ -336,7 +336,3 @@ configuration Sample_xMountImage_MountVHD
 Sample_xMountImage_MountVHD
 Start-DscConfiguration -Path Sample_xMountImage_MountVHD -Wait -Force -Verbose
 ```
-
-## Contributing
-
-Please check out common DSC Resources [contributing guidelines](https://github.com/PowerShell/DscResource.Kit/blob/master/CONTRIBUTING.md).
