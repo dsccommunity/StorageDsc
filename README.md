@@ -48,41 +48,41 @@ Please check out common DSC Resources [contributing guidelines](https://github.c
 
 ### xMountImage
 
-* **[String] ImagePath** _(Key)_: Specifies the path of the VHD or ISO file.
-* **[String] DriveLetter** _(Write)_: Specifies the drive letter to mount this VHD or ISO to. Must be empty if Ensure is Absent.
-* **[String] StorageType** _(Write)_: Specifies the storage type of a file. If the StorageType parameter is not specified, then the storage type is determined by file extension. { ISO | VHD | VHDx | VHDSet }.
-* **[String] Access** _(Write)_: Allows a VHD file to be mounted in read-only or read-write mode. ISO files are mounted in read-only mode regardless of what parameter value you provide. { ReadOnly | ReadWrite }.
-* **[String] Ensure** _(Write)_: Determines whether the VHD or ISO should be mounted or not. { *Present* | Absent }. Defaults to Present.
+* **`[String]` ImagePath** _(Key)_: Specifies the path of the VHD or ISO file.
+* **`[String]` DriveLetter** _(Write)_: Specifies the drive letter to mount this VHD or ISO to. Must be empty if Ensure is Absent.
+* **`[String]` StorageType** _(Write)_: Specifies the storage type of a file. If the StorageType parameter is not specified, then the storage type is determined by file extension. { ISO | VHD | VHDx | VHDSet }.
+* **`[String]` Access** _(Write)_: Allows a VHD file to be mounted in read-only or read-write mode. ISO files are mounted in read-only mode regardless of what parameter value you provide. { ReadOnly | ReadWrite }.
+* **`[String]` Ensure** _(Write)_: Determines whether the VHD or ISO should be mounted or not. { *Present* | Absent }. Defaults to Present.
 
 ### xDisk
 
-* **[String] DriveLetter** _(Key)_: Specifies the preferred letter to assign to the disk volume.
-* **[UInt32] DiskNumber** _(Required)_: Specifies the disk number for which disk to modify.
-* **[Uint64] Size** _(Write)_: Specifies the size of new volume (use all available space on disk if not provided).
-* **[String] FSLabel** _(Write)_: Define volume label if required.
-* **[UInt32] AllocationUnitSize** _(Write)_: Specifies the allocation unit size to use when formatting the volume.
-* **[String] FSFormat** _(Write)_: Define volume label if required. { *NTFS* | ReFS }. Defaults to NTFS.
+* **`[String]` DriveLetter** _(Key)_: Specifies the preferred letter to assign to the disk volume.
+* **`[UInt32]` DiskNumber** _(Required)_: Specifies the disk number for which disk to modify.
+* **`[Uint64]` Size** _(Write)_: Specifies the size of new volume (use all available space on disk if not provided).
+* **`[String]` FSLabel** _(Write)_: Define volume label if required.
+* **`[UInt32]` AllocationUnitSize** _(Write)_: Specifies the allocation unit size to use when formatting the volume.
+* **`[String]` FSFormat** _(Write)_: Define volume label if required. { *NTFS* | ReFS }. Defaults to NTFS.
 
 ### xDiskAccessPath
 
-* **[String] AccessPath** _(Key)_: Specifies the access path folder to the assign the disk volume to.
-* **[UInt32] DiskNumber** _(Required)_: Specifies the disk number for which disk to modify.
-* **[Uint64] Size** _(Write)_: Specifies the size of new volume (use all available space on disk if not provided).
-* **[String] FSLabel** _(Write)_: Define volume label if required.
-* **[UInt32] AllocationUnitSize** _(Write)_: Specifies the allocation unit size to use when formatting the volume.
-* **[String] FSFormat** _(Write)_: Define volume label if required. { *NTFS* | ReFS }. Defaults to NTFS.
+* **`[String]` AccessPath** _(Key)_: Specifies the access path folder to the assign the disk volume to.
+* **`[UInt32]` DiskNumber** _(Required)_: Specifies the disk number for which disk to modify.
+* **`[Uint64]` Size** _(Write)_: Specifies the size of new volume (use all available space on disk if not provided).
+* **`[String]` FSLabel** _(Write)_: Define volume label if required.
+* **`[UInt32]` AllocationUnitSize** _(Write)_: Specifies the allocation unit size to use when formatting the volume.
+* **`[String]` FSFormat** _(Write)_: Define volume label if required. { *NTFS* | ReFS }. Defaults to NTFS.
 
 ### xWaitforDisk
 
-*   **[UInt32] DiskNumber** _(Key)_: Specifies the identifier for which disk to wait for.
-*   **[UInt64] RetryIntervalSec** _(Write)_: Specifies the number of seconds to wait for the disk to become available. Defaults to 10 seconds.
-*   **[UInt32] RetryCount** _(Write)_: The number of times to loop the retry interval while waiting for the disk. Defaults to 60 times.
+* **`[UInt32]` DiskNumber** _(Key)_: Specifies the identifier for which disk to wait for.
+* **`[UInt64]` RetryIntervalSec** _(Write)_: Specifies the number of seconds to wait for the disk to become available. Defaults to 10 seconds.
+* **`[UInt32]` RetryCount** _(Write)_: The number of times to loop the retry interval while waiting for the disk. Defaults to 60 times.
 
 ### xWaitForVolume
 
-*   **[String] DriveLetter** _(Key)_: Specifies the name of the drive to wait for.
-*   **[UInt64] RetryIntervalSec** _(Write)_: Specifies the number of seconds to wait for the drive to become available. Defaults to 10 seconds.
-*   **[UInt32] RetryCount** _(Write)_: The number of times to loop the retry interval while waiting for the drive. Defaults to 60 times.
+* **`[String]` DriveLetter** _(Key)_: Specifies the name of the drive to wait for.
+* **`[UInt64]` RetryIntervalSec** _(Write)_: Specifies the number of seconds to wait for the drive to become available. Defaults to 10 seconds.
+* **`[UInt32]` RetryCount** _(Write)_: The number of times to loop the retry interval while waiting for the drive. Defaults to 60 times.
 
 ## Versions
 
