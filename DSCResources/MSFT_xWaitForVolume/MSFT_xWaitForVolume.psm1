@@ -3,7 +3,7 @@ if (Test-Path "${PSScriptRoot}\${PSUICulture}")
 {
     Import-LocalizedData `
         -BindingVariable LocalizedData `
-        -Filename MSFT_xWaitForDisk.strings.psd1 `
+        -Filename MSFT_xWaitForVolume.strings.psd1 `
         -BaseDirectory "${PSScriptRoot}\${PSUICulture}"
 }
 else
@@ -11,7 +11,7 @@ else
     #fallback to en-US
     Import-LocalizedData `
         -BindingVariable LocalizedData `
-        -Filename MSFT_xWaitForDisk.strings.psd1 `
+        -Filename MSFT_xWaitForVolume.strings.psd1 `
         -BaseDirectory "${PSScriptRoot}\en-US"
 }
 #endregion
@@ -23,16 +23,16 @@ Import-Module -Name ( Join-Path `
 
 <#
     .SYNOPSIS
-    Returns the current state of the wait for disk resource.
+    Returns the current state of the wait for drive resource.
 
-    .PARAMETER DiskNumber
-    Specifies the identifier for which disk to wait for.
+    .PARAMETER DriveLetter
+    Specifies the name of the drive to wait for.
 
     .PARAMETER RetryIntervalSec
-    Specifies the number of seconds to wait for the disk to become available.
+    Specifies the number of seconds to wait for the drive to become available.
 
     .PARAMETER RetryCount
-    The number of times to loop the retry interval while waiting for the disk.
+    The number of times to loop the retry interval while waiting for the drive.
 #>
 function Get-TargetResource
 {
@@ -41,7 +41,7 @@ function Get-TargetResource
     param
     (
         [parameter(Mandatory)]
-        [UInt32] $DiskNumber,
+        [String] $DriveLetter,
 
         [UInt32] $RetryIntervalSec = 10,
 
@@ -50,11 +50,14 @@ function Get-TargetResource
 
     Write-Verbose -Message ( @(
             "$($MyInvocation.MyCommand): "
-            $($LocalizedData.GettingWaitForDiskStatusMessage -f $DiskNumber)
+            $($LocalizedData.GettingWaitForVolumeStatusMessage -f $DriveLetter)
         ) -join '' )
 
+    # Validate the DriveLetter parameter
+    $DriveLetter = Test-DriveLetter -DriveLetter $DriveLetter
+
     $returnValue = @{
-        DiskNumber       = $DiskNumber
+        DriveLetter      = $DriveLetter
         RetryIntervalSec = $RetryIntervalSec
         RetryCount       = $RetryCount
     }
@@ -63,16 +66,16 @@ function Get-TargetResource
 
 <#
     .SYNOPSIS
-    Sets the current state of the wait for disk resource.
+    Sets the current state of the wait for drive resource.
 
-    .PARAMETER DiskNumber
-    Specifies the identifier for which disk to wait for.
+    .PARAMETER DriveLetter
+    Specifies the name of the drive to wait for.
 
     .PARAMETER RetryIntervalSec
-    Specifies the number of seconds to wait for the disk to become available.
+    Specifies the number of seconds to wait for the drive to become available.
 
     .PARAMETER RetryCount
-    The number of times to loop the retry interval while waiting for the disk.
+    The number of times to loop the retry interval while waiting for the drive.
 #>
 function Set-TargetResource
 {
@@ -80,7 +83,7 @@ function Set-TargetResource
     param
     (
         [parameter(Mandatory)]
-        [UInt32] $DiskNumber,
+        [String] $DriveLetter,
 
         [UInt32] $RetryIntervalSec = 10,
 
@@ -89,55 +92,62 @@ function Set-TargetResource
 
     Write-Verbose -Message ( @(
             "$($MyInvocation.MyCommand): "
-            $($LocalizedData.CheckingForDiskMessage -f $DiskNumber)
+            $($LocalizedData.CheckingForVolumeStatusMessage -f $DriveLetter)
         ) -join '' )
 
-    $diskFound = $false
+    # Validate the DriveLetter parameter
+    $DriveLetter = Test-DriveLetter -DriveLetter $DriveLetter
+
+    $volumeFound = $false
 
     for ($count = 0; $count -lt $RetryCount; $count++)
     {
-        $disk = Get-Disk -Number $DiskNumber -ErrorAction SilentlyContinue
-        if ($disk)
+        $volume = Get-Volume -DriveLetter $DriveLetter -ErrorAction SilentlyContinue
+        if ($volume)
         {
             Write-Verbose -Message ( @(
                     "$($MyInvocation.MyCommand): "
-                    $($LocalizedData.DiskFoundMessage -f $DiskNumber,$disk.FriendlyName)
+                    $($LocalizedData.VolumeFoundMessage -f $DriveLetter)
                 ) -join '' )
 
-            $diskFound = $true
+            $volumeFound = $true
             break
         }
         else
         {
             Write-Verbose -Message ( @(
                     "$($MyInvocation.MyCommand): "
-                    $($LocalizedData.DiskNotFoundMessage -f $DiskNumber,$RetryIntervalSec)
+                    $($LocalizedData.VolumeNotFoundMessage -f $DriveLetter,$RetryIntervalSec)
                 ) -join '' )
 
             Start-Sleep -Seconds $RetryIntervalSec
+
+            # This command forces a refresh of the PS Drive subsystem.
+            # So triggers any "missing" drives to show up.
+            $null = Get-PSDrive
         } # if
     } # for
 
-    if (-not $diskFound)
+    if (-not $volumeFound)
     {
         New-InvalidOperationError `
-            -ErrorId 'DiskNotFoundAfterError' `
-            -ErrorMessage $($LocalizedData.DiskNotFoundAfterError -f $DiskNumber,$RetryCount)
+            -ErrorId 'VolumeNotFoundAfterError' `
+            -ErrorMessage $($LocalizedData.VolumeNotFoundAfterError -f $DriveLetter,$RetryCount)
     } # if
 } # function Set-TargetResource
 
 <#
     .SYNOPSIS
-    Tests the current state of the wait for disk resource.
+    Tests the current state of the wait for drive resource.
 
-    .PARAMETER DiskNumber
-    Specifies the identifier for which disk to wait for.
+    .PARAMETER DriveLetter
+    Specifies the name of the drive to wait for.
 
     .PARAMETER RetryIntervalSec
-    Specifies the number of seconds to wait for the disk to become available.
+    Specifies the number of seconds to wait for the drive to become available.
 
     .PARAMETER RetryCount
-    The number of times to loop the retry interval while waiting for the disk.
+    The number of times to loop the retry interval while waiting for the drive.
 #>
 function Test-TargetResource
 {
@@ -146,7 +156,7 @@ function Test-TargetResource
     param
     (
         [parameter(Mandatory)]
-        [UInt32] $DiskNumber,
+        [String] $DriveLetter,
 
         [UInt32] $RetryIntervalSec = 10,
 
@@ -155,15 +165,22 @@ function Test-TargetResource
 
     Write-Verbose -Message ( @(
             "$($MyInvocation.MyCommand): "
-            $($LocalizedData.CheckingForDiskMessage -f $DiskNumber)
+            $($LocalizedData.TestingWaitForVolumeStatusMessage -f $DriveLetter)
         ) -join '' )
 
-    $disk = Get-Disk -Number $DiskNumber -ErrorAction SilentlyContinue
-    if ($disk)
+    # Validate the DriveLetter parameter
+    $DriveLetter = Test-DriveLetter -DriveLetter $DriveLetter
+
+    # This command forces a refresh of the PS Drive subsystem.
+    # So triggers any "missing" drives to show up.
+    $null = Get-PSDrive
+
+    $volume = Get-Volume -DriveLetter $DriveLetter -ErrorAction SilentlyContinue
+    if ($volume)
     {
         Write-Verbose -Message ( @(
                 "$($MyInvocation.MyCommand): "
-                $($LocalizedData.DiskFoundMessage -f $DiskNumber,$disk.FriendlyName)
+                $($LocalizedData.VolumeFoundMessage -f $DriveLetter)
             ) -join '' )
 
         return $true
@@ -171,7 +188,7 @@ function Test-TargetResource
 
     Write-Verbose -Message ( @(
             "$($MyInvocation.MyCommand): "
-            $($LocalizedData.DiskNotFoundMessage -f $DiskNumber)
+            $($LocalizedData.VolumeNotFoundMessage -f $DriveLetter)
         ) -join '' )
 
     return $false
