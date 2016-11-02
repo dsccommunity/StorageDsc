@@ -87,6 +87,8 @@ Please check out common DSC Resources [contributing guidelines](https://github.c
 ## Versions
 
 ### Unreleased
+
+### 2.8.0.0
 * added test for existing file system and no drive letter assignment to allow simple drive letter assignment in MSFT_xDisk.psm1
 * added unit test for volume with existing partition and no drive letter assigned for MSFT_xDisk.psm1
 * xMountImage: Fixed mounting disk images on Windows 10 Anniversary Edition
