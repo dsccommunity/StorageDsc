@@ -61,9 +61,9 @@ try
             It 'Should compile without throwing' {
                 {
                     & "$($script:DSCResourceName)_Mount_Config" `
-                        -OutputPath $TestEnvironment.WorkingFolder `
+                        -OutputPath $TestDrive `
                         -ConfigurationData $ConfigData
-                    Start-DscConfiguration -Path $TestEnvironment.WorkingFolder `
+                    Start-DscConfiguration -Path $TestDrive `
                         -ComputerName localhost -Wait -Verbose -Force
                 } | Should not throw
             }
@@ -96,9 +96,9 @@ try
             It 'Should compile without throwing' {
                 {
                     & "$($script:DSCResourceName)_Dismount_Config" `
-                        -OutputPath $TestEnvironment.WorkingFolder `
+                        -OutputPath $TestDrive `
                         -ConfigurationData $ConfigData
-                    Start-DscConfiguration -Path $TestEnvironment.WorkingFolder `
+                    Start-DscConfiguration -Path $TestDrive `
                         -ComputerName localhost -Wait -Verbose -Force
                 } | Should not throw
             }

@@ -93,6 +93,7 @@ If you would like to contribute to this repository, please read the DSC Resource
   - Fix bug when re-attaching disk after mount point removed or detatched.
   - Additional log entries added for improved diagnostics.
   - Additional integration tests added.
+- Converted integration tests to use TestDrive as working folder.
 
 ### 2.8.0.0
 
