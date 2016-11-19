@@ -93,7 +93,14 @@ If you would like to contribute to this repository, please read the DSC Resource
   - Fix bug when re-attaching disk after mount point removed or detatched.
   - Additional log entries added for improved diagnostics.
   - Additional integration tests added.
-- Converted integration tests to use TestDrive as working folder.
+- Converted integration tests to use ```$TestDrive``` as working folder or ```temp``` folder when persistence across tests is required.
+- Suppress ```PSUseShouldProcessForStateChangingFunctions``` rule violations in resources.
+- Rename ```Test-AccessPath``` function to ```Assert-AccessPathValid```.
+- Rename ```Test-DriveLetter``` function to ```Assert-DriveLetterValid```.
+- Added ```CommonResourceHelper.psm1``` module (based on PSDscResources).
+- Added ```CommonTestsHelper.psm1``` module  (based on PSDscResources).
+- Converted all modules to load localization data using ```Get-LocalizedData``` from CommonResourceHelper.
+- Converted all exception calls and tests to use functions in ```CommonResourceHelper.psm1``` and ```CommonTestsHelper.psm1``` respectively.
 
 ### 2.8.0.0
 

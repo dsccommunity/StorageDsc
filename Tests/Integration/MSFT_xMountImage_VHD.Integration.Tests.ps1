@@ -41,7 +41,7 @@ try
     $DriveLetter = [char](([int][char]$LastDrive)+1)
 
     # Create a VHDx with a partition
-    $VHDPath = Join-Path -Path $TestDrive `
+    $VHDPath = Join-Path -Path $ENV:Temp `
         -ChildPath 'TestDisk.vhdx'
     $null = New-VHD -Path $VHDPath -SizeBytes 10GB -Dynamic
     $null = Mount-DiskImage -ImagePath $VHDPath

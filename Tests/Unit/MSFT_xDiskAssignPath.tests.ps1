@@ -1,6 +1,8 @@
 $script:DSCModuleName      = 'xStorage'
 $script:DSCResourceName    = 'MSFT_xDiskAccessPath'
 
+Import-Module -Name (Join-Path -Path (Join-Path -Path (Split-Path $PSScriptRoot -Parent) -ChildPath 'TestHelpers') -ChildPath 'CommonTestHelper.psm1')
+
 #region HEADER
 # Unit Test Template Version: 1.1.0
 [String] $script:moduleRoot = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
@@ -25,31 +27,6 @@ try
     # The InModuleScope command allows you to perform white-box unit testing on the internal
     # (non-exported) code of a Script Module.
     InModuleScope $script:DSCResourceName {
-        # Function to create a exception object for testing output exceptions
-        function Get-InvalidOperationError
-        {
-            [CmdletBinding()]
-            param
-            (
-                [Parameter(Mandatory)]
-                [ValidateNotNullOrEmpty()]
-                [System.String]
-                $ErrorId,
-
-                [Parameter(Mandatory)]
-                [ValidateNotNullOrEmpty()]
-                [System.String]
-                $ErrorMessage
-            )
-
-            $exception = New-Object -TypeName System.InvalidOperationException `
-                -ArgumentList $ErrorMessage
-            $errorCategory = [System.Management.Automation.ErrorCategory]::InvalidOperation
-            $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
-                -ArgumentList $exception, $ErrorId, $errorCategory, $null
-            return $errorRecord
-        } # end function Get-InvalidOperationError
-
         #region Pester Test Initialization
         $script:testAccessPath = 'c:\TestAccessPath'
 
@@ -155,7 +132,7 @@ try
             Context 'Online GPT disk with a partition/volume and correct Access Path assigned' {
                 # verifiable (should be called) mocks
                 Mock `
-                    -CommandName Test-AccessPath `
+                    -CommandName Assert-AccessPathValid `
                     -MockWith { $script:testAccessPath } `
                     -Verifiable
 
@@ -223,7 +200,7 @@ try
             Context 'Online GPT disk with no partition' {
                 # verifiable (should be called) mocks
                 Mock `
-                    -CommandName Test-AccessPath `
+                    -CommandName Assert-AccessPathValid `
                     -MockWith { $script:testAccessPath } `
                     -Verifiable
 
@@ -378,7 +355,7 @@ try
             Context 'Offline GPT disk' {
                 # verifiable (should be called) mocks
                 Mock `
-                    -CommandName Test-AccessPath `
+                    -CommandName Assert-AccessPathValid `
                     -MockWith { $script:testAccessPath } `
                     -Verifiable
 
@@ -420,7 +397,7 @@ try
 
                 It 'the correct mocks were called' {
                     Assert-VerifiableMocks
-                    Assert-MockCalled -CommandName Test-AccessPath -Times 1
+                    Assert-MockCalled -CommandName Assert-AccessPathValid -Times 1
                     Assert-MockCalled -CommandName Get-Disk -Times 1
                     Assert-MockCalled -CommandName Set-Disk -Times 1
                     Assert-MockCalled -CommandName Initialize-Disk -Times 0
@@ -435,7 +412,7 @@ try
             Context 'Readonly GPT disk' {
                 # verifiable (should be called) mocks
                 Mock `
-                    -CommandName Test-AccessPath `
+                    -CommandName Assert-AccessPathValid `
                     -MockWith { $script:testAccessPath } `
                     -Verifiable
 
@@ -477,7 +454,7 @@ try
 
                 It 'the correct mocks were called' {
                     Assert-VerifiableMocks
-                    Assert-MockCalled -CommandName Test-AccessPath -Times 1
+                    Assert-MockCalled -CommandName Assert-AccessPathValid -Times 1
                     Assert-MockCalled -CommandName Get-Disk -Times 1
                     Assert-MockCalled -CommandName Set-Disk -Times 1
                     Assert-MockCalled -CommandName Initialize-Disk -Times 0
@@ -492,7 +469,7 @@ try
             Context 'Offline RAW disk' {
                 # verifiable (should be called) mocks
                 Mock `
-                    -CommandName Test-AccessPath `
+                    -CommandName Assert-AccessPathValid `
                     -MockWith { $script:testAccessPath } `
                     -Verifiable
 
@@ -537,7 +514,7 @@ try
 
                 It 'the correct mocks were called' {
                     Assert-VerifiableMocks
-                    Assert-MockCalled -CommandName Test-AccessPath -Times 1
+                    Assert-MockCalled -CommandName Assert-AccessPathValid -Times 1
                     Assert-MockCalled -CommandName Get-Disk -Times 1
                     Assert-MockCalled -CommandName Set-Disk -Times 1
                     Assert-MockCalled -CommandName Initialize-Disk -Times 1
@@ -552,7 +529,7 @@ try
             Context 'Online RAW disk' {
                 # verifiable (should be called) mocks
                 Mock `
-                    -CommandName Test-AccessPath `
+                    -CommandName Assert-AccessPathValid `
                     -MockWith { $script:testAccessPath } `
                     -Verifiable
 
@@ -594,7 +571,7 @@ try
 
                 It 'the correct mocks were called' {
                     Assert-VerifiableMocks
-                    Assert-MockCalled -CommandName Test-AccessPath -Times 1
+                    Assert-MockCalled -CommandName Assert-AccessPathValid -Times 1
                     Assert-MockCalled -CommandName Get-Disk -Times 1
                     Assert-MockCalled -CommandName Set-Disk -Times 0
                     Assert-MockCalled -CommandName Initialize-Disk -Times 1
@@ -609,7 +586,7 @@ try
             Context 'Online GPT disk with no partitions' {
                 # verifiable (should be called) mocks
                 Mock `
-                    -CommandName Test-AccessPath `
+                    -CommandName Assert-AccessPathValid `
                     -MockWith { $script:testAccessPath } `
                     -Verifiable
 
@@ -648,7 +625,7 @@ try
 
                 It 'the correct mocks were called' {
                     Assert-VerifiableMocks
-                    Assert-MockCalled -CommandName Test-AccessPath -Times 1
+                    Assert-MockCalled -CommandName Assert-AccessPathValid -Times 1
                     Assert-MockCalled -CommandName Get-Disk -Times 1
                     Assert-MockCalled -CommandName Set-Disk -Times 0
                     Assert-MockCalled -CommandName Initialize-Disk -Times 0
@@ -663,7 +640,7 @@ try
             Context 'Online MBR disk' {
                 # verifiable (should be called) mocks
                 Mock `
-                    -CommandName Test-AccessPath `
+                    -CommandName Assert-AccessPathValid `
                     -MockWith { $script:testAccessPath } `
                     -Verifiable
 
@@ -681,9 +658,8 @@ try
                 Mock -CommandName Get-Volume
                 Mock -CommandName Set-Partition
 
-                $errorRecord = Get-InvalidOperationError `
-                    -ErrorId 'DiskAlreadyInitializedError' `
-                    -ErrorMessage ($LocalizedData.DiskAlreadyInitializedError -f `
+                $errorRecord = Get-InvalidOperationRecord `
+                    -Message ($LocalizedData.DiskAlreadyInitializedError -f `
                         0,$script:mockedDisk0Mbr.PartitionStyle)
 
                 It 'Should throw DiskAlreadyInitializedError' {
@@ -697,7 +673,7 @@ try
 
                 It 'the correct mocks were called' {
                     Assert-VerifiableMocks
-                    Assert-MockCalled -CommandName Test-AccessPath -Times 1
+                    Assert-MockCalled -CommandName Assert-AccessPathValid -Times 1
                     Assert-MockCalled -CommandName Get-Disk -Times 1
                     Assert-MockCalled -CommandName Set-Disk -Times 0
                     Assert-MockCalled -CommandName Initialize-Disk -Times 0
@@ -712,7 +688,7 @@ try
             Context 'Online GPT disk with correct partition/volume' {
                 # verifiable (should be called) mocks
                 Mock `
-                    -CommandName Test-AccessPath `
+                    -CommandName Assert-AccessPathValid `
                     -MockWith { $script:testAccessPath } `
                     -Verifiable
 
@@ -748,7 +724,7 @@ try
 
                 It 'the correct mocks were called' {
                     Assert-VerifiableMocks
-                    Assert-MockCalled -CommandName Test-AccessPath -Times 1
+                    Assert-MockCalled -CommandName Assert-AccessPathValid -Times 1
                     Assert-MockCalled -CommandName Get-Disk -Times 1
                     Assert-MockCalled -CommandName Set-Disk -Times 0
                     Assert-MockCalled -CommandName Initialize-Disk -Times 0
@@ -763,7 +739,7 @@ try
             Context 'Online GPT disk with correct partition/volume but wrong Volume Label assigned' {
                 # verifiable (should be called) mocks
                 Mock `
-                    -CommandName Test-AccessPath `
+                    -CommandName Assert-AccessPathValid `
                     -MockWith { $script:testAccessPath } `
                     -Verifiable
 
@@ -804,7 +780,7 @@ try
 
                 It 'the correct mocks were called' {
                     Assert-VerifiableMocks
-                    Assert-MockCalled -CommandName Test-AccessPath -Times 1
+                    Assert-MockCalled -CommandName Assert-AccessPathValid -Times 1
                     Assert-MockCalled -CommandName Get-Disk -Times 1
                     Assert-MockCalled -CommandName Set-Disk -Times 0
                     Assert-MockCalled -CommandName Initialize-Disk -Times 0
@@ -856,7 +832,7 @@ try
             Context 'Test disk not initialized' {
                 # verifiable (should be called) mocks
                 Mock `
-                    -CommandName Test-AccessPath `
+                    -CommandName Assert-AccessPathValid `
                     -MockWith { $script:testAccessPath } `
                     -Verifiable
 
@@ -889,7 +865,7 @@ try
 
                 It 'the correct mocks were called' {
                     Assert-VerifiableMocks
-                    Assert-MockCalled -CommandName Test-AccessPath -Times 1
+                    Assert-MockCalled -CommandName Assert-AccessPathValid -Times 1
                     Assert-MockCalled -CommandName Get-Disk -Times 1
                     Assert-MockCalled -CommandName Get-Partition -Times 0
                     Assert-MockCalled -CommandName Get-Volume -Times 0
@@ -901,7 +877,7 @@ try
             Context 'Test disk read only' {
                 # verifiable (should be called) mocks
                 Mock `
-                    -CommandName Test-AccessPath `
+                    -CommandName Assert-AccessPathValid `
                     -MockWith { $script:testAccessPath } `
                     -Verifiable
 
@@ -934,7 +910,7 @@ try
 
                 It 'the correct mocks were called' {
                     Assert-VerifiableMocks
-                    Assert-MockCalled -CommandName Test-AccessPath -Times 1
+                    Assert-MockCalled -CommandName Assert-AccessPathValid -Times 1
                     Assert-MockCalled -CommandName Get-Disk -Times 1
                     Assert-MockCalled -CommandName Get-Partition -Times 0
                     Assert-MockCalled -CommandName Get-Volume -Times 0
@@ -946,7 +922,7 @@ try
             Context 'Test online unformatted disk' {
                 # verifiable (should be called) mocks
                 Mock `
-                    -CommandName Test-AccessPath `
+                    -CommandName Assert-AccessPathValid `
                     -MockWith { $script:testAccessPath } `
                     -Verifiable
 
@@ -979,7 +955,7 @@ try
 
                 It 'the correct mocks were called' {
                     Assert-VerifiableMocks
-                    Assert-MockCalled -CommandName Test-AccessPath -Times 1
+                    Assert-MockCalled -CommandName Assert-AccessPathValid -Times 1
                     Assert-MockCalled -CommandName Get-Disk -Times 1
                     Assert-MockCalled -CommandName Get-Partition -Times 0
                     Assert-MockCalled -CommandName Get-Volume -Times 0
@@ -991,7 +967,7 @@ try
             Context 'Test mismatching partition size' {
                 # verifiable (should be called) mocks
                 Mock `
-                    -CommandName Test-AccessPath `
+                    -CommandName Assert-AccessPathValid `
                     -MockWith { $script:testAccessPath } `
                     -Verifiable
 
@@ -1037,7 +1013,7 @@ try
 
                 It 'the correct mocks were called' {
                     Assert-VerifiableMocks
-                    Assert-MockCalled -CommandName Test-AccessPath -Times 1
+                    Assert-MockCalled -CommandName Assert-AccessPathValid -Times 1
                     Assert-MockCalled -CommandName Get-Disk -Times 1
                     Assert-MockCalled -CommandName Get-Partition -Times 1
                     Assert-MockCalled -CommandName Get-Volume -Times 1
@@ -1049,7 +1025,7 @@ try
             Context 'Test mismatched AllocationUnitSize' {
                 # verifiable (should be called) mocks
                 Mock `
-                    -CommandName Test-AccessPath `
+                    -CommandName Assert-AccessPathValid `
                     -MockWith { $script:testAccessPath } `
                     -Verifiable
 
@@ -1091,7 +1067,7 @@ try
 
                 It 'the correct mocks were called' {
                     Assert-VerifiableMocks
-                    Assert-MockCalled -CommandName Test-AccessPath -Times 1
+                    Assert-MockCalled -CommandName Assert-AccessPathValid -Times 1
                     Assert-MockCalled -CommandName Get-Disk -Times 1
                     Assert-MockCalled -CommandName Get-Partition -Times 1
                     Assert-MockCalled -CommandName Get-Volume -Times 1
@@ -1103,7 +1079,7 @@ try
             Context 'Test mismatching FSFormat' {
                 # verifiable (should be called) mocks
                 Mock `
-                    -CommandName Test-AccessPath `
+                    -CommandName Assert-AccessPathValid `
                     -MockWith { $script:testAccessPath } `
                     -Verifiable
 
@@ -1148,7 +1124,7 @@ try
 
                 It 'the correct mocks were called' {
                     Assert-VerifiableMocks
-                    Assert-MockCalled -CommandName Test-AccessPath -Times 1
+                    Assert-MockCalled -CommandName Assert-AccessPathValid -Times 1
                     Assert-MockCalled -CommandName Get-Disk -Times 1
                     Assert-MockCalled -CommandName Get-Partition -Times 1
                     Assert-MockCalled -CommandName Get-Volume -Times 1
@@ -1160,7 +1136,7 @@ try
             Context 'Test mismatching FSLabel' {
                 # verifiable (should be called) mocks
                 Mock `
-                    -CommandName Test-AccessPath `
+                    -CommandName Assert-AccessPathValid `
                     -MockWith { $script:testAccessPath } `
                     -Verifiable
 
@@ -1205,7 +1181,7 @@ try
 
                 It 'the correct mocks were called' {
                     Assert-VerifiableMocks
-                    Assert-MockCalled -CommandName Test-AccessPath -Times 1
+                    Assert-MockCalled -CommandName Assert-AccessPathValid -Times 1
                     Assert-MockCalled -CommandName Get-Disk -Times 1
                     Assert-MockCalled -CommandName Get-Partition -Times 1
                     Assert-MockCalled -CommandName Get-Volume -Times 1
@@ -1217,7 +1193,7 @@ try
             Context 'Test all disk properties matching' {
                 # verifiable (should be called) mocks
                 Mock `
-                    -CommandName Test-AccessPath `
+                    -CommandName Assert-AccessPathValid `
                     -MockWith { $script:testAccessPath } `
                     -Verifiable
 
@@ -1264,7 +1240,7 @@ try
 
                 It 'the correct mocks were called' {
                     Assert-VerifiableMocks
-                    Assert-MockCalled -CommandName Test-AccessPath -Times 1
+                    Assert-MockCalled -CommandName Assert-AccessPathValid -Times 1
                     Assert-MockCalled -CommandName Get-Disk -Times 1
                     Assert-MockCalled -CommandName Get-Partition -Times 1
                     Assert-MockCalled -CommandName Get-Volume -Times 1

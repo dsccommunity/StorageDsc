@@ -1,6 +1,8 @@
 $script:DSCModuleName      = 'xStorage'
 $script:DSCResourceName    = 'MSFT_xWaitForDisk'
 
+Import-Module -Name (Join-Path -Path (Join-Path -Path (Split-Path $PSScriptRoot -Parent) -ChildPath 'TestHelpers') -ChildPath 'CommonTestHelper.psm1')
+
 #region HEADER
 # Unit Test Template Version: 1.1.0
 [String] $script:moduleRoot = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
@@ -25,31 +27,6 @@ try
     # The InModuleScope command allows you to perform white-box unit testing on the internal
     # (non-exported) code of a Script Module.
     InModuleScope $script:DSCResourceName {
-        # Function to create a exception object for testing output exceptions
-        function Get-InvalidOperationError
-        {
-            [CmdletBinding()]
-            param
-            (
-                [Parameter(Mandatory)]
-                [ValidateNotNullOrEmpty()]
-                [System.String]
-                $ErrorId,
-
-                [Parameter(Mandatory)]
-                [ValidateNotNullOrEmpty()]
-                [System.String]
-                $ErrorMessage
-            )
-
-            $exception = New-Object -TypeName System.InvalidOperationException `
-                -ArgumentList $ErrorMessage
-            $errorCategory = [System.Management.Automation.ErrorCategory]::InvalidOperation
-            $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
-                -ArgumentList $exception, $ErrorId, $errorCategory, $null
-            return $errorRecord
-        } # end function Get-InvalidOperationError
-
         #region Pester Test Initialization
         $mockedDisk0 = [pscustomobject] @{
             Number = 0
@@ -106,9 +83,8 @@ try
                 # verifiable (Should Be called) mocks
                 Mock Get-Disk -MockWith { } -Verifiable
 
-                $errorRecord = Get-InvalidOperationError `
-                    -ErrorId 'DiskNotFoundAfterError' `
-                    -ErrorMessage $($LocalizedData.DiskNotFoundAfterError `
+                $errorRecord = Get-InvalidOperationRecord `
+                    -Message $($LocalizedData.DiskNotFoundAfterError `
                         -f $disk0Parameters.DiskNumber,$disk0Parameters.RetryCount)
 
                 It 'should throw DiskNotFoundAfterError' {
