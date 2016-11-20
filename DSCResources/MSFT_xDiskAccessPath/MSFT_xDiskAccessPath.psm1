@@ -240,7 +240,7 @@ function Set-TargetResource
     if ($null -eq $assignedPartition)
     {
         # There is no partiton with this access path
-        $createPartition = $false
+        $createPartition = $true
 
         # Are there any partitions defined on this disk?
         if ($partition)
@@ -266,14 +266,14 @@ function Set-TargetResource
                 # A partition matching the required size was found
                 Write-Verbose -Message ($LocalizedData.MatchingPartitionFoundMessage -f `
                     $DiskNumber,$partition.PartitionNumber)
+
+                $createPartition = $false
             }
             else
             {
                 # A partition matching the required size was not found
                 Write-Verbose -Message ($LocalizedData.MatchingPartitionNotFoundMessage -f `
                     $DiskNumber)
-
-                $createPartition = $true
             } # if
         } # if
 

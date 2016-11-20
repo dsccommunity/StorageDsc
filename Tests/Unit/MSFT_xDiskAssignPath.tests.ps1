@@ -86,11 +86,25 @@ try
                     $script:testAccessPath
                 )
                 Size = 123
+                PartitionNumber = 1
+            }
+
+        $script:mockedPartitionNoAccess = [pscustomobject] @{
+                AccessPaths = @(
+                    '\\?\Volume{2d313fdd-e4a4-4f31-9784-dad758e0030f}\'
+                )
+                Size = 123
+                PartitionNumber = 1
             }
 
         $script:mockedVolume = [pscustomobject] @{
                 FileSystemLabel = 'myLabel'
                 FileSystem = 'NTFS'
+            }
+
+        $script:mockedVolumeUnformatted = [pscustomobject] @{
+                FileSystemLabel = ''
+                FileSystem = ''
             }
 
         $script:mockedVolumeReFS = [pscustomobject] @{
@@ -374,17 +388,24 @@ try
 
                 Mock `
                     -CommandName New-Partition `
-                    -MockWith { $script:mockedPartition } `
+                    -MockWith { $script:mockedPartitionNoAccess } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-Volume `
+                    -MockWith { $script:mockedVolumeUnformatted } `
                     -Verifiable
 
                 Mock `
                     -CommandName Format-Volume `
                     -Verifiable
 
+                Mock `
+                    -CommandName Add-PartitionAccessPath `
+                    -Verifiable
+
                 # mocks that should not be called
                 Mock -CommandName Initialize-Disk
-                Mock -CommandName Get-Volume
-                Mock -CommandName Set-Partition
 
                 It 'Should not throw' {
                     {
@@ -402,10 +423,10 @@ try
                     Assert-MockCalled -CommandName Set-Disk -Times 1
                     Assert-MockCalled -CommandName Initialize-Disk -Times 0
                     Assert-MockCalled -CommandName Get-Partition -Times 1
-                    Assert-MockCalled -CommandName Get-Volume -Times 0
+                    Assert-MockCalled -CommandName Get-Volume -Times 1
                     Assert-MockCalled -CommandName New-Partition -Times 1
                     Assert-MockCalled -CommandName Format-Volume -Times 1
-                    Assert-MockCalled -CommandName Set-Partition -Times 0
+                    Assert-MockCalled -CommandName Add-PartitionAccessPath -Times 1
                 }
             }
 
@@ -431,17 +452,24 @@ try
 
                 Mock `
                     -CommandName New-Partition `
-                    -MockWith { $script:mockedPartition } `
+                    -MockWith { $script:mockedPartitionNoAccess } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-Volume `
+                    -MockWith { $script:mockedVolumeUnformatted } `
                     -Verifiable
 
                 Mock `
                     -CommandName Format-Volume `
                     -Verifiable
 
+                Mock `
+                    -CommandName Add-PartitionAccessPath `
+                    -Verifiable
+
                 # mocks that should not be called
                 Mock -CommandName Initialize-Disk
-                Mock -CommandName Get-Volume
-                Mock -CommandName Set-Partition
 
                 It 'Should not throw' {
                     {
@@ -459,10 +487,10 @@ try
                     Assert-MockCalled -CommandName Set-Disk -Times 1
                     Assert-MockCalled -CommandName Initialize-Disk -Times 0
                     Assert-MockCalled -CommandName Get-Partition -Times 1
-                    Assert-MockCalled -CommandName Get-Volume -Times 0
+                    Assert-MockCalled -CommandName Get-Volume -Times 1
                     Assert-MockCalled -CommandName New-Partition -Times 1
                     Assert-MockCalled -CommandName Format-Volume -Times 1
-                    Assert-MockCalled -CommandName Set-Partition -Times 0
+                    Assert-MockCalled -CommandName Add-PartitionAccessPath -Times 1
                 }
             }
 
@@ -492,16 +520,23 @@ try
 
                 Mock `
                     -CommandName New-Partition `
-                    -MockWith { $script:mockedPartition } `
+                    -MockWith { $script:mockedPartitionNoAccess } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-Volume `
+                    -MockWith { $script:mockedVolumeUnformatted } `
                     -Verifiable
 
                 Mock `
                     -CommandName Format-Volume `
                     -Verifiable
 
+                Mock `
+                    -CommandName Add-PartitionAccessPath `
+                    -Verifiable
+
                 # mocks that should not be called
-                Mock -CommandName Get-Volume
-                Mock -CommandName Set-Partition
 
                 It 'Should not throw' {
                     {
@@ -519,10 +554,10 @@ try
                     Assert-MockCalled -CommandName Set-Disk -Times 1
                     Assert-MockCalled -CommandName Initialize-Disk -Times 1
                     Assert-MockCalled -CommandName Get-Partition -Times 1
-                    Assert-MockCalled -CommandName Get-Volume -Times 0
+                    Assert-MockCalled -CommandName Get-Volume -Times 1
                     Assert-MockCalled -CommandName New-Partition -Times 1
                     Assert-MockCalled -CommandName Format-Volume -Times 1
-                    Assert-MockCalled -CommandName Set-Partition -Times 0
+                    Assert-MockCalled -CommandName Add-PartitionAccessPath -Times 1
                 }
             }
 
@@ -548,17 +583,24 @@ try
 
                 Mock `
                     -CommandName New-Partition `
-                    -MockWith { $script:mockedPartition } `
+                    -MockWith { $script:mockedPartitionNoAccess } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-Volume `
+                    -MockWith { $script:mockedVolumeUnformatted } `
                     -Verifiable
 
                 Mock `
                     -CommandName Format-Volume `
                     -Verifiable
 
+                Mock `
+                    -CommandName Add-PartitionAccessPath `
+                    -Verifiable
+
                 # mocks that should not be called
                 Mock -CommandName Set-Disk
-                Mock -CommandName Get-Volume
-                Mock -CommandName Set-Partition
 
                 It 'Should not throw' {
                     {
@@ -576,10 +618,10 @@ try
                     Assert-MockCalled -CommandName Set-Disk -Times 0
                     Assert-MockCalled -CommandName Initialize-Disk -Times 1
                     Assert-MockCalled -CommandName Get-Partition -Times 1
-                    Assert-MockCalled -CommandName Get-Volume -Times 0
+                    Assert-MockCalled -CommandName Get-Volume -Times 1
                     Assert-MockCalled -CommandName New-Partition -Times 1
                     Assert-MockCalled -CommandName Format-Volume -Times 1
-                    Assert-MockCalled -CommandName Set-Partition -Times 0
+                    Assert-MockCalled -CommandName Add-PartitionAccessPath -Times 1
                 }
             }
 
@@ -605,14 +647,21 @@ try
                     -Verifiable
 
                 Mock `
+                    -CommandName Get-Volume `
+                    -MockWith { $script:mockedVolumeUnformatted } `
+                    -Verifiable
+
+                Mock `
                     -CommandName Format-Volume `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Add-PartitionAccessPath `
                     -Verifiable
 
                 # mocks that should not be called
                 Mock -CommandName Set-Disk
                 Mock -CommandName Initialize-Disk
-                Mock -CommandName Get-Volume
-                Mock -CommandName Set-Partition
 
                 It 'Should not throw' {
                     {
@@ -630,10 +679,10 @@ try
                     Assert-MockCalled -CommandName Set-Disk -Times 0
                     Assert-MockCalled -CommandName Initialize-Disk -Times 0
                     Assert-MockCalled -CommandName Get-Partition -Times 1
-                    Assert-MockCalled -CommandName Get-Volume -Times 0
+                    Assert-MockCalled -CommandName Get-Volume -Times 1
                     Assert-MockCalled -CommandName New-Partition -Times 1
                     Assert-MockCalled -CommandName Format-Volume -Times 1
-                    Assert-MockCalled -CommandName Set-Partition -Times 0
+                    Assert-MockCalled -CommandName Add-PartitionAccessPath -Times 1
                 }
             }
 
@@ -656,7 +705,7 @@ try
                 Mock -CommandName New-Partition
                 Mock -CommandName Format-Volume
                 Mock -CommandName Get-Volume
-                Mock -CommandName Set-Partition
+                Mock -CommandName Add-PartitionAccessPath
 
                 $errorRecord = Get-InvalidOperationRecord `
                     -Message ($LocalizedData.DiskAlreadyInitializedError -f `
@@ -681,7 +730,7 @@ try
                     Assert-MockCalled -CommandName Get-Volume -Times 0
                     Assert-MockCalled -CommandName New-Partition -Times 0
                     Assert-MockCalled -CommandName Format-Volume -Times 0
-                    Assert-MockCalled -CommandName Set-Partition -Times 0
+                    Assert-MockCalled -CommandName Add-PartitionAccessPath -Times 0
                 }
             }
 
@@ -711,7 +760,7 @@ try
                 Mock -CommandName Set-Disk
                 Mock -CommandName Initialize-Disk
                 Mock -CommandName Format-Volume
-                Mock -CommandName Set-Partition
+                Mock -CommandName Add-PartitionAccessPath
 
                 It 'Should not throw' {
                     {
@@ -732,7 +781,7 @@ try
                     Assert-MockCalled -CommandName Get-Volume -Times 1
                     Assert-MockCalled -CommandName New-Partition -Times 0
                     Assert-MockCalled -CommandName Format-Volume -Times 0
-                    Assert-MockCalled -CommandName Set-Partition -Times 0
+                    Assert-MockCalled -CommandName Add-PartitionAccessPath -Times 0
                 }
             }
 
@@ -766,7 +815,7 @@ try
                 Mock -CommandName Set-Disk
                 Mock -CommandName Initialize-Disk
                 Mock -CommandName Format-Volume
-                Mock -CommandName Set-Partition
+                Mock -CommandName Add-PartitionAccessPath
 
                 It 'Should not throw' {
                     {
@@ -788,8 +837,8 @@ try
                     Assert-MockCalled -CommandName Get-Volume -Times 1
                     Assert-MockCalled -CommandName New-Partition -Times 0
                     Assert-MockCalled -CommandName Format-Volume -Times 0
-                    Assert-MockCalled -CommandName Set-Partition -Times 0
                     Assert-MockCalled -CommandName Set-Volume -Times 1
+                    Assert-MockCalled -CommandName Add-PartitionAccessPath -Times 0
                 }
             }
         }
