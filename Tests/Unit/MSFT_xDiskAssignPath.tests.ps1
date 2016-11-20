@@ -80,21 +80,25 @@ try
 
         $script:mockedWmi = [pscustomobject] @{BlockSize=4096}
 
+        $script:mockedPartitionSize = 1GB
+
         $script:mockedPartition = [pscustomobject] @{
                 AccessPaths = @(
                     '\\?\Volume{2d313fdd-e4a4-4f31-9784-dad758e0030f}\'
                     $script:testAccessPath
                 )
-                Size = 123
+                Size = $script:mockedPartitionSize
                 PartitionNumber = 1
+                Type = 'Basic'
             }
 
         $script:mockedPartitionNoAccess = [pscustomobject] @{
                 AccessPaths = @(
                     '\\?\Volume{2d313fdd-e4a4-4f31-9784-dad758e0030f}\'
                 )
-                Size = 123
+                Size = $script:mockedPartitionSize
                 PartitionNumber = 1
+                Type = 'Basic'
             }
 
         $script:mockedVolume = [pscustomobject] @{
@@ -734,7 +738,7 @@ try
                 }
             }
 
-            Context 'Online GPT disk with correct partition/volume' {
+            Context 'Online GPT disk with partition/volume already assigned' {
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Assert-AccessPathValid `
@@ -782,6 +786,58 @@ try
                     Assert-MockCalled -CommandName New-Partition -Times 0
                     Assert-MockCalled -CommandName Format-Volume -Times 0
                     Assert-MockCalled -CommandName Add-PartitionAccessPath -Times 0
+                }
+            }
+
+            Context 'Online GPT disk containing matching partition but not assigned' {
+                # verifiable (should be called) mocks
+                Mock `
+                    -CommandName Assert-AccessPathValid `
+                    -MockWith { $script:testAccessPath } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-Disk `
+                    -MockWith { $script:mockedDisk0 } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-Partition `
+                    -MockWith { $script:mockedPartitionNoAccess } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-Volume `
+                    -MockWith { $script:mockedVolume } `
+                    -Verifiable
+
+                # mocks that should not be called
+                Mock -CommandName Set-Disk
+                Mock -CommandName Initialize-Disk
+                Mock -CommandName Format-Volume
+                Mock -CommandName Add-PartitionAccessPath
+
+                It 'Should not throw' {
+                    {
+                        Set-targetResource `
+                            -DiskNumber 0 `
+                            -AccessPath $script:testAccessPath `
+                            -Size $script:mockedPartitionSize `
+                            -Verbose
+                    } | Should not throw
+                }
+
+                It 'the correct mocks were called' {
+                    Assert-VerifiableMocks
+                    Assert-MockCalled -CommandName Assert-AccessPathValid -Times 1
+                    Assert-MockCalled -CommandName Get-Disk -Times 1
+                    Assert-MockCalled -CommandName Set-Disk -Times 0
+                    Assert-MockCalled -CommandName Initialize-Disk -Times 0
+                    Assert-MockCalled -CommandName Get-Partition -Times 1
+                    Assert-MockCalled -CommandName Get-Volume -Times 1
+                    Assert-MockCalled -CommandName New-Partition -Times 0
+                    Assert-MockCalled -CommandName Format-Volume -Times 0
+                    Assert-MockCalled -CommandName Add-PartitionAccessPath -Times 1
                 }
             }
 
