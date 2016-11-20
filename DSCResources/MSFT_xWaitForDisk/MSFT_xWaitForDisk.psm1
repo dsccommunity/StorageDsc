@@ -69,9 +69,7 @@ function Get-TargetResource
 #>
 function Set-TargetResource
 {
-    # Should process is called in a helper functions but not directly in Set-TargetResource
-    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSShouldProcess', '')]
-    [CmdletBinding(SupportsShouldProcess = $true)]
+    [CmdletBinding()]
     param
     (
         [parameter(Mandatory)]
