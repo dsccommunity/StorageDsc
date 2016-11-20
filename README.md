@@ -101,6 +101,10 @@ If you would like to contribute to this repository, please read the DSC Resource
 - Added ```CommonTestsHelper.psm1``` module  (based on PSDscResources).
 - Converted all modules to load localization data using ```Get-LocalizedData``` from CommonResourceHelper.
 - Converted all exception calls and tests to use functions in ```CommonResourceHelper.psm1``` and ```CommonTestsHelper.psm1``` respectively.
+- Fixed examples:
+  - Sample_InitializeDataDisk.ps1
+  - Sample_InitializeDataDiskWithAccessPath.ps1
+  - Sample_xMountImage_DismountISO.ps1
 
 ### 2.8.0.0
 
@@ -207,7 +211,7 @@ Configuration Sample_DataDisk
         {
              DiskNumber = 2
              RetryIntervalSec = 60
-             Count = 60
+             RetryCount = 60
         }
 
         xDisk GVolume
@@ -256,7 +260,7 @@ Configuration Sample_DataDiskwithAccessPath
         {
              DiskNumber = 2
              RetryIntervalSec = 60
-             Count = 60
+             RetryCount = 60
         }
 
         xDiskAccessPath DataVolume
@@ -318,7 +322,6 @@ configuration Sample_xMountImage_DismountISO
     Import-DscResource -ModuleName xStorage
     xMountImage ISO
     {
-        Name = 'SQL Disk'
         ImagePath = 'c:\Sources\SQL.iso'
         DriveLetter = 'S'
         Ensure = 'Absent'

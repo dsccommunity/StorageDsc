@@ -12,7 +12,7 @@ Configuration Sample_DataDiskwithAccessPath
         {
              DiskNumber = 2
              RetryIntervalSec = 60
-             Count = 60
+             RetryCount = 60
         }
 
         xDiskAccessPath DataVolume
