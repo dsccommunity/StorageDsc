@@ -4,11 +4,18 @@
 #>
 function Test-IsNanoServer
 {
-    [OutputType([Boolean])]
-    [CmdletBinding()]
-    param ()
+    if (Test-Command -Name Get-ComputerInfo)
+    {
+        $computerInfo = Get-ComputerInfo
 
-    return $PSVersionTable.PSEdition -ieq 'Core'
+        if ("Server" -eq $computerInfo.OsProductType `
+            -and "NanoServer" -eq $computerInfo.OsServerLevel)
+        {
+            return $true
+        }
+    }
+
+    return $false
 }
 
 <#

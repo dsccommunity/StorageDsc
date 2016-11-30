@@ -93,6 +93,7 @@ If you would like to contribute to this repository, please read the DSC Resource
   - Fix bug when re-attaching disk after mount point removed or detatched.
   - Additional log entries added for improved diagnostics.
   - Additional integration tests added.
+  - Improve timeout loop.
 - Converted integration tests to use ```$TestDrive``` as working folder or ```temp``` folder when persistence across tests is required.
 - Suppress ```PSUseShouldProcessForStateChangingFunctions``` rule violations in resources.
 - Rename ```Test-AccessPath``` function to ```Assert-AccessPathValid```.
@@ -105,6 +106,8 @@ If you would like to contribute to this repository, please read the DSC Resource
   - Sample_InitializeDataDisk.ps1
   - Sample_InitializeDataDiskWithAccessPath.ps1
   - Sample_xMountImage_DismountISO.ps1
+- xDisk:
+  - Improve timeout loop.
 
 ### 2.8.0.0
 

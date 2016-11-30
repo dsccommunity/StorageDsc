@@ -267,10 +267,9 @@ function Set-TargetResource
 
         # After creating the partition it can take a few seconds for it to become writeable
         # Wait for up to 30 seconds for the parition to become writeable
-        $timeout = 30000
-        $start = [DateTime]::Now
-        While ($partition.IsReadOnly `
-            -and ([DateTime]::Now - $start).TotalMilliseconds -lt $timeout)
+        $start = Get-Date
+        $timeout = (Get-Date) + (New-Timespan -Second 30)
+        While ($partition.IsReadOnly -and (Get-Date) -lt $timeout)
         {
             Write-Verbose -Message ( @(
                     "$($MyInvocation.MyCommand): "
