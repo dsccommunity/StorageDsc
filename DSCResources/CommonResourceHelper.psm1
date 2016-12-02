@@ -1,6 +1,6 @@
 ﻿<#
     .SYNOPSIS
-    Tests if the current machine is a Nano server.
+        Tests if the current machine is a Nano server.
 #>
 function Test-IsNanoServer
 {
@@ -16,6 +16,20 @@ function Test-IsNanoServer
     }
 
     return $false
+}
+
+<#
+    .SYNOPSIS
+        Tests if the the specified command is found.
+#>
+function Test-Command
+{
+    param
+    (
+        [String] $Name
+    )
+
+    return ($null -ne (Get-Command -Name $Name -ErrorAction Continue 2> $null))
 }
 
 <#
