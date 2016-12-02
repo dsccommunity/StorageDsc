@@ -24,6 +24,9 @@
     AllocationUnitSizeMismatchMessage = Volume assigned to access path '{0}' has allocation unit size {1} KB does not match expected allocation unit size {2} KB.
     FileSystemFormatMismatch = Volume assigned to access path '{0}' filesystem format '{1}' does not match expected format '{2}'.
     DriveLabelMismatch = Volume assigned to access path '{0}' label '{1}' does not match expected label '{2}'.
+    PartitionAlreadyAssignedMessage = Partition '{1}' is already assigned to access path '{0}'.
+    MatchingPartitionNotFoundMessage = Disk number '{0}' already contains paritions, but none match required size.
+    MatchingPartitionFoundMessage = Disk number '{0}' already contains paritions, and partition '{1}' matches required size.
 
     DiskAlreadyInitializedError = Disk number '{0}' is already initialized with {1}.
     NewParitionIsReadOnlyError = New partition '{1}' on disk '{0}' did not become writable in the expected time.

@@ -1,6 +1,8 @@
 $script:DSCModuleName      = 'xStorage'
 $script:DSCResourceName    = 'StorageCommon'
 
+Import-Module -Name (Join-Path -Path (Join-Path -Path (Split-Path $PSScriptRoot -Parent) -ChildPath 'TestHelpers') -ChildPath 'CommonTestHelper.psm1')
+
 #region HEADER
 # Unit Test Template Version: 1.1.0
 [String] $script:moduleRoot = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
@@ -26,54 +28,6 @@ try
         $LocalizedData
     }
 
-    function Get-InvalidOperationError
-    {
-        [CmdletBinding()]
-        param
-        (
-            [Parameter(Mandatory)]
-            [ValidateNotNullOrEmpty()]
-            [System.String]
-            $ErrorId,
-
-            [Parameter(Mandatory)]
-            [ValidateNotNullOrEmpty()]
-            [System.String]
-            $ErrorMessage
-        )
-
-        $exception = New-Object -TypeName System.InvalidOperationException `
-            -ArgumentList $ErrorMessage
-        $errorCategory = [System.Management.Automation.ErrorCategory]::InvalidOperation
-        $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
-            -ArgumentList $exception, $ErrorId, $errorCategory, $null
-        return $errorRecord
-    } # end function Get-InvalidOperationError
-
-    function Get-InvalidArgumentError
-    {
-        [CmdletBinding()]
-        param
-        (
-            [Parameter(Mandatory)]
-            [ValidateNotNullOrEmpty()]
-            [System.String]
-            $ErrorId,
-
-            [Parameter(Mandatory)]
-            [ValidateNotNullOrEmpty()]
-            [System.String]
-            $ErrorMessage
-        )
-
-        $exception = New-Object -TypeName System.ArgumentException `
-            -ArgumentList $ErrorMessage
-        $errorCategory = [System.Management.Automation.ErrorCategory]::InvalidArgument
-        $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
-            -ArgumentList $exception, $ErrorId, $errorCategory, $null
-        return $errorRecord
-    } # end function Get-InvalidArgumentError
-
     #region Pester Test Initialization
     $driveLetterGood = 'C'
     $driveLetterGoodwithColon = 'C:'
@@ -86,66 +40,66 @@ try
     $accessPathBad = 'c:\Bad'
     #endregion
 
-    #region Function Test-DriveLetter
-    Describe "StorageCommon\Test-DriveLetter" {
+    #region Function Assert-DriveLetterValid
+    Describe "StorageCommon\Assert-DriveLetterValid" {
         Context 'drive letter is good, has no colon and colon is not required' {
             It "should return '$driveLetterGood'" {
-                Test-DriveLetter -DriveLetter $driveLetterGood | Should Be $driveLetterGood
+                Assert-DriveLetterValid -DriveLetter $driveLetterGood | Should Be $driveLetterGood
             }
         }
 
         Context 'drive letter is good, has no colon but colon is required' {
             It "should return '$driveLetterGoodwithColon'" {
-                Test-DriveLetter -DriveLetter $driveLetterGood -Colon | Should Be $driveLetterGoodwithColon
+                Assert-DriveLetterValid -DriveLetter $driveLetterGood -Colon | Should Be $driveLetterGoodwithColon
             }
         }
 
         Context 'drive letter is good, has a colon but colon is not required' {
             It "should return '$driveLetterGood'" {
-                Test-DriveLetter -DriveLetter $driveLetterGoodwithColon | Should Be $driveLetterGood
+                Assert-DriveLetterValid -DriveLetter $driveLetterGoodwithColon | Should Be $driveLetterGood
             }
         }
 
         Context 'drive letter is good, has a colon and colon is required' {
             It "should return '$driveLetterGoodwithColon'" {
-                Test-DriveLetter -DriveLetter $driveLetterGoodwithColon -Colon | Should Be $driveLetterGoodwithColon
+                Assert-DriveLetterValid -DriveLetter $driveLetterGoodwithColon -Colon | Should Be $driveLetterGoodwithColon
             }
         }
 
         Context 'drive letter is non alpha' {
-            $errorRecord = Get-InvalidArgumentError `
-                -ErrorId 'InvalidDriveLetterFormatError' `
-                -ErrorMessage $($LocalizedData.InvalidDriveLetterFormatError -f $driveLetterBad)
+            $errorRecord = Get-InvalidArgumentRecord `
+                -Message $($LocalizedData.InvalidDriveLetterFormatError -f $driveLetterBad) `
+                -ArgumentName 'DriveLetter'
 
             It 'should throw InvalidDriveLetterFormatError' {
-                { Test-DriveLetter -DriveLetter $driveLetterBad } | Should Throw $errorRecord
+                { Assert-DriveLetterValid -DriveLetter $driveLetterBad } | Should Throw $errorRecord
             }
         }
 
         Context 'drive letter has a bad colon location' {
-            $errorRecord = Get-InvalidArgumentError `
-                -ErrorId 'InvalidDriveLetterFormatError' `
-                -ErrorMessage $($LocalizedData.InvalidDriveLetterFormatError -f $driveLetterBadColon)
+            $errorRecord = Get-InvalidArgumentRecord `
+                -Message $($LocalizedData.InvalidDriveLetterFormatError -f $driveLetterBadColon) `
+                -ArgumentName 'DriveLetter'
 
             It 'should throw InvalidDriveLetterFormatError' {
-                { Test-DriveLetter -DriveLetter $driveLetterBadColon } | Should Throw $errorRecord
+                { Assert-DriveLetterValid -DriveLetter $driveLetterBadColon } | Should Throw $errorRecord
             }
         }
 
         Context 'drive letter is too long' {
-            $errorRecord = Get-InvalidArgumentError `
-                -ErrorId 'InvalidDriveLetterFormatError' `
-                -ErrorMessage $($LocalizedData.InvalidDriveLetterFormatError -f $driveLetterBadTooLong)
+            $errorRecord = Get-InvalidArgumentRecord `
+                -Message $($LocalizedData.InvalidDriveLetterFormatError -f $driveLetterBadTooLong) `
+                -ArgumentName 'DriveLetter'
 
             It 'should throw InvalidDriveLetterFormatError' {
-                { Test-DriveLetter -DriveLetter $driveLetterBadTooLong } | Should Throw $errorRecord
+                { Assert-DriveLetterValid -DriveLetter $driveLetterBadTooLong } | Should Throw $errorRecord
             }
         }
     }
     #endregion
 
-    #region Function Test-AccessPath
-    Describe "StorageCommon\Test-AccessPath" {
+    #region Function Assert-AccessPathValid
+    Describe "StorageCommon\Assert-AccessPathValid" {
         Mock `
             -CommandName Test-Path `
             -ModuleName StorageCommon `
@@ -153,25 +107,25 @@ try
 
         Context 'path is found, trailing slash included, not required' {
             It "should return '$accessPathGood'" {
-                Test-AccessPath -AccessPath $accessPathGoodWithSlash | Should Be $accessPathGood
+                Assert-AccessPathValid -AccessPath $accessPathGoodWithSlash | Should Be $accessPathGood
             }
         }
 
         Context 'path is found, trailing slash included, required' {
             It "should return '$accessPathGoodWithSlash'" {
-                Test-AccessPath -AccessPath $accessPathGoodWithSlash -Slash | Should Be $accessPathGoodWithSlash
+                Assert-AccessPathValid -AccessPath $accessPathGoodWithSlash -Slash | Should Be $accessPathGoodWithSlash
             }
         }
 
         Context 'path is found, trailing slash not included, required' {
             It "should return '$accessPathGoodWithSlash'" {
-                Test-AccessPath -AccessPath $accessPathGood -Slash | Should Be $accessPathGoodWithSlash
+                Assert-AccessPathValid -AccessPath $accessPathGood -Slash | Should Be $accessPathGoodWithSlash
             }
         }
 
         Context 'path is found, trailing slash not included, not required' {
             It "should return '$accessPathGood'" {
-                Test-AccessPath -AccessPath $accessPathGood | Should Be $accessPathGood
+                Assert-AccessPathValid -AccessPath $accessPathGood | Should Be $accessPathGood
             }
         }
 
@@ -181,12 +135,12 @@ try
             -MockWith { $False }
 
         Context 'drive is not found' {
-            $errorRecord = Get-InvalidArgumentError `
-                -ErrorId 'InvalidAccessPathError' `
-                -ErrorMessage $($LocalizedData.InvalidAccessPathError -f $accessPathBad)
+            $errorRecord = Get-InvalidArgumentRecord `
+                -Message $($LocalizedData.InvalidAccessPathError -f $accessPathBad) `
+                -ArgumentName 'AccessPath'
 
             It 'should throw InvalidAccessPathError' {
-                { Test-AccessPath `
+                { Assert-AccessPathValid `
                     -AccessPath $accessPathBad } | Should Throw $errorRecord
             }
         }

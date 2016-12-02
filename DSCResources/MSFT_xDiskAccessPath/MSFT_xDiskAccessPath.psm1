@@ -1,20 +1,13 @@
-﻿#region localizeddata
-if (Test-Path "${PSScriptRoot}\${PSUICulture}")
-{
-    Import-LocalizedData `
-        -BindingVariable LocalizedData `
-        -Filename MSFT_xDiskAccessPath.strings.psd1 `
-        -BaseDirectory "${PSScriptRoot}\${PSUICulture}"
-}
-else
-{
-    #fallback to en-US
-    Import-LocalizedData `
-        -BindingVariable LocalizedData `
-        -Filename MSFT_xDiskAccessPath.strings.psd1 `
-        -BaseDirectory "${PSScriptRoot}\en-US"
-}
-#endregion
+﻿# Suppressed as per PSSA Rule Severity guidelines for unit/integration tests:
+# https://github.com/PowerShell/DscResources/blob/master/PSSARuleSeverities.md
+[System.Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseShouldProcessForStateChangingFunctions', '')]
+param ()
+
+Import-Module -Name (Join-Path -Path (Split-Path $PSScriptRoot -Parent) `
+                               -ChildPath 'CommonResourceHelper.psm1')
+
+# Localized messages for Write-Verbose statements in this resource
+$script:localizedData = Get-LocalizedData -ResourceName 'MSFT_xDiskAccessPath'
 
 # Import the common storage functions
 Import-Module -Name ( Join-Path `
@@ -72,7 +65,7 @@ function Get-TargetResource
         ) -join '' )
 
     # Validate the AccessPath parameter adding a trailing slash
-    $AccessPath = Test-AccessPath -AccessPath $AccessPath -Slash
+    $AccessPath = Assert-AccessPathValid -AccessPath $AccessPath -Slash
 
     $disk = Get-Disk `
         -Number $DiskNumber `
@@ -142,7 +135,9 @@ function Get-TargetResource
 #>
 function Set-TargetResource
 {
-    [CmdletBinding()]
+    # Should process is called in a helper functions but not directly in Set-TargetResource
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSShouldProcess', '')]
+    [CmdletBinding(SupportsShouldProcess = $true)]
     param
     (
         [parameter(Mandatory)]
@@ -168,7 +163,7 @@ function Set-TargetResource
         ) -join '' )
 
     # Validate the AccessPath parameter adding a trailing slash
-    $AccessPath = Test-AccessPath -AccessPath $AccessPath -Slash
+    $AccessPath = Assert-AccessPathValid -AccessPath $AccessPath -Slash
 
     $disk = Get-Disk `
         -Number $DiskNumber `
@@ -227,77 +222,138 @@ function Set-TargetResource
         default
         {
             # This disk is initialized but not as GPT - so raise an exception.
-            New-InvalidOperationError `
-                -ErrorId 'DiskAlreadyInitializedError' `
-                -ErrorMessage ($LocalizedData.DiskAlreadyInitializedError -f `
+            New-InvalidOperationException `
+                -Message ($LocalizedData.DiskAlreadyInitializedError -f `
                     $DiskNumber,$Disk.PartitionStyle)
         } # default
     } # switch
 
+    # Get the partitions on the disk
     $partition = Get-Partition `
         -DiskNumber $DiskNumber `
-        -ErrorAction SilentlyContinue |
-            Where-Object -Property AccessPaths -Contains -Value $AccessPath
-
-    $volume = $partition | Get-Volume
+        -ErrorAction SilentlyContinue
 
     # Check if the disk has an existing partition assigned to the access path
-    if ($null -eq $volume)
-    {
-        # There is no partiton with this access path, so create one
-        $partitionParams = @{
-            DiskNumber = $DiskNumber
-        }
+    $assignedPartition = $partition |
+            Where-Object -Property AccessPaths -Contains -Value $AccessPath
 
-        if ($Size)
+    if ($null -eq $assignedPartition)
+    {
+        # There is no partiton with this access path
+        $createPartition = $true
+
+        # Are there any partitions defined on this disk?
+        if ($partition)
         {
-            # Use only a specific size
-            Write-Verbose -Message ( @(
-                    "$($MyInvocation.MyCommand): "
-                    $($LocalizedData.CreatingPartitionMessage `
-                        -f $DiskNumber,"$($Size/1KB) KB")
-                ) -join '' )
-            $partitionParams["Size"] = $Size
-        }
-        else
-        {
-            # Use the entire disk
-            Write-Verbose -Message ( @(
-                    "$($MyInvocation.MyCommand): "
-                    $($LocalizedData.CreatingPartitionMessage `
-                        -f $DiskNumber,'all free space')
-                ) -join '' )
-            $partitionParams["UseMaximumSize"] = $true
+            # There are partitions defined - identify if one matches the size required
+            if ($Size)
+            {
+                # Find the first basic partition matching the size
+                $partition = $partition |
+                    Where-Object -Filter { $_.Type -eq 'Basic' -and $_.Size -eq $Size } |
+                    Select-Object -First 1
+            }
+            else
+            {
+                # Find the first basic partition of any size
+                $partition = $partition |
+                    Where-Object -Filter { $_.Type -eq 'Basic' } |
+                    Select-Object -First 1
+            } # if
+
+            if ($partition)
+            {
+                # A partition matching the required size was found
+                Write-Verbose -Message ($LocalizedData.MatchingPartitionFoundMessage -f `
+                    $DiskNumber,$partition.PartitionNumber)
+
+                $createPartition = $false
+            }
+            else
+            {
+                # A partition matching the required size was not found
+                Write-Verbose -Message ($LocalizedData.MatchingPartitionNotFoundMessage -f `
+                    $DiskNumber)
+            } # if
         } # if
 
-        # Create the partition.
-        $partition = New-Partition @partitionParams
-
-        # After creating the partition it can take a few seconds for it to become writeable
-        # Wait for up to 30 seconds for the parition to become writeable
-        $timeout = 30000
-        $start = [DateTime]::Now
-        While ($partition.IsReadOnly `
-            -and ([DateTime]::Now - $start).TotalMilliseconds -lt $timeout)
+        # Do we need to create a new partition?
+        if ($createPartition)
         {
-            Write-Verbose -Message ($LocalizedData.NewPartitionIsReadOnlyMessage -f `
-                $partition.DiskNumber,$partition.PartitionNumber)
+            # Attempt to create a new partition
+            $partitionParams = @{
+                DiskNumber = $DiskNumber
+            }
 
-            Start-Sleep -Seconds 1
+            if ($Size)
+            {
+                # Use only a specific size
+                Write-Verbose -Message ( @(
+                        "$($MyInvocation.MyCommand): "
+                        $($LocalizedData.CreatingPartitionMessage `
+                            -f $DiskNumber,"$($Size/1KB) KB")
+                    ) -join '' )
+                $partitionParams["Size"] = $Size
+            }
+            else
+            {
+                # Use the entire disk
+                Write-Verbose -Message ( @(
+                        "$($MyInvocation.MyCommand): "
+                        $($LocalizedData.CreatingPartitionMessage `
+                            -f $DiskNumber,'all free space')
+                    ) -join '' )
+                $partitionParams["UseMaximumSize"] = $true
+            } # if
 
-            # Pull the partition details again to check if it is readonly
-            $partition = $partition | Get-Partition
-        } # while
+            # Create the partition
+            $partition = New-Partition @partitionParams
+
+            # After creating the partition it can take a few seconds for it to become writeable
+            # Wait for up to 30 seconds for the parition to become writeable
+            $start = Get-Date
+            $timeout = (Get-Date) + (New-Timespan -Second 30)
+            While ($partition.IsReadOnly -and (Get-Date) -lt $timeout)
+            {
+                Write-Verbose -Message ($LocalizedData.NewPartitionIsReadOnlyMessage -f `
+                    $partition.DiskNumber,$partition.PartitionNumber)
+
+                Start-Sleep -Seconds 1
+
+                # Pull the partition details again to check if it is readonly
+                $partition = $partition | Get-Partition
+            } # while
+        } # if
 
         if ($partition.IsReadOnly)
         {
             # The partition is still readonly - throw an exception
-            New-InvalidOperationError `
-                -ErrorId 'NewParitionReadOnlyError' `
-                -ErrorMessage ($LocalizedData.ParitionIsReadOnlyError -f `
+            New-InvalidOperationException `
+                -Message ($LocalizedData.ParitionIsReadOnlyError -f `
                     $partition.DiskNumber,$partition.PartitionNumber)
         } # if
 
+        $assignAccessPath = $true
+    }
+    else
+    {
+        # The disk already has a partition on it that is assigned to the access path
+        Write-Verbose -Message ( @(
+                "$($MyInvocation.MyCommand): "
+                $($LocalizedData.PartitionAlreadyAssignedMessage -f `
+                    $AccessPath,$partition.PartitionNumber)
+            ) -join '' )
+
+        $assignAccessPath = $false
+    }
+
+    # Get the Volume on the partition
+    $volume = $partition | Get-Volume
+
+    # Is the volume already formatted?
+    if ($volume.FileSystem -eq '')
+    {
+        # The volume is not formatted
         $volParams = @{
             FileSystem = $FSFormat
             Confirm = $false
@@ -322,25 +378,10 @@ function Set-TargetResource
 
         # Format the volume
         $volume = $partition | Format-Volume @VolParams
-
-        if ($volume)
-        {
-            $null = Add-PartitionAccessPath `
-                -AccessPath $AccessPath `
-                -DiskNumber $DiskNumber `
-                -PartitionNumber $partition.PartitionNumber
-
-            Write-Verbose -Message ( @(
-                    "$($MyInvocation.MyCommand): "
-                    $($LocalizedData.SuccessfullyInitializedMessage -f $AccessPath)
-                ) -join '' )
-        } # if
     }
     else
     {
-        # The disk already has a partition on it that is assigned to the access path
-
-        # Check the volume format matches
+        # The volume is already formatted
         if ($PSBoundParameters.ContainsKey('FSFormat'))
         {
             # Check the filesystem format
@@ -357,6 +398,7 @@ function Set-TargetResource
             } # if
         } # if
 
+        # Check the volume label
         if ($PSBoundParameters.ContainsKey('FSLabel'))
         {
             # The volume should have a label assigned
@@ -372,6 +414,20 @@ function Set-TargetResource
                 $volume | Set-Volume -NewFileSystemLabel $FSLabel
             } # if
         } # if
+    } # if
+
+    # Assign the access path if it isn't assigned
+    if ($assignAccessPath)
+    {
+        $null = Add-PartitionAccessPath `
+            -AccessPath $AccessPath `
+            -DiskNumber $DiskNumber `
+            -PartitionNumber $partition.PartitionNumber
+
+        Write-Verbose -Message ( @(
+                "$($MyInvocation.MyCommand): "
+                $($LocalizedData.SuccessfullyInitializedMessage -f $AccessPath)
+            ) -join '' )
     } # if
 } # Set-TargetResource
 
@@ -426,7 +482,7 @@ function Test-TargetResource
         ) -join '' )
 
     # Validate the AccessPath parameter adding a trailing slash
-    $AccessPath = Test-AccessPath -AccessPath $AccessPath -Slash
+    $AccessPath = Assert-AccessPathValid -AccessPath $AccessPath -Slash
 
     Write-Verbose -Message ( @(
             "$($MyInvocation.MyCommand): "

@@ -38,7 +38,7 @@ try
     Describe "$($script:DSCResourceName)_Integration" {
         Context 'Partition and format newly provisioned disk and assign a Drive Letter' {
             # Create a VHDx and attach it to the computer
-            $VHDPath = Join-Path -Path $TestEnvironment.WorkingFolder `
+            $VHDPath = Join-Path -Path $TestDrive `
                 -ChildPath 'TestDisk.vhdx'
             New-VHD -Path $VHDPath -SizeBytes 1GB -Dynamic
             Mount-DiskImage -ImagePath $VHDPath -StorageType VHDX -NoDriveLetter
@@ -67,9 +67,9 @@ try
                     }
 
                     & "$($script:DSCResourceName)_Config" `
-                        -OutputPath $TestEnvironment.WorkingFolder `
+                        -OutputPath $TestDrive `
                         -ConfigurationData $ConfigData
-                    Start-DscConfiguration -Path $TestEnvironment.WorkingFolder `
+                    Start-DscConfiguration -Path $TestDrive `
                         -ComputerName localhost -Wait -Verbose -Force
                 } | Should not throw
             }

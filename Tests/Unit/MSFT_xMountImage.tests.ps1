@@ -1,6 +1,8 @@
 $script:DSCModuleName      = 'xStorage'
 $script:DSCResourceName    = 'MSFT_xMountImage'
 
+Import-Module -Name (Join-Path -Path (Join-Path -Path (Split-Path $PSScriptRoot -Parent) -ChildPath 'TestHelpers') -ChildPath 'CommonTestHelper.psm1')
+
 #region HEADER
 # Unit Test Template Version: 1.1.0
 [String] $script:moduleRoot = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
@@ -25,33 +27,7 @@ try
     # The InModuleScope command allows you to perform white-box unit testing on the internal
     # (non-exported) code of a Script Module.
     InModuleScope $script:DSCResourceName {
-        # Function to create a exception object for testing output exceptions
-        function Get-InvalidOperationError
-        {
-            [CmdletBinding()]
-            param
-            (
-                [Parameter(Mandatory)]
-                [ValidateNotNullOrEmpty()]
-                [System.String]
-                $ErrorId,
-
-                [Parameter(Mandatory)]
-                [ValidateNotNullOrEmpty()]
-                [System.String]
-                $ErrorMessage
-            )
-
-            $exception = New-Object -TypeName System.InvalidOperationException `
-                -ArgumentList $ErrorMessage
-            $errorCategory = [System.Management.Automation.ErrorCategory]::InvalidOperation
-            $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
-                -ArgumentList $exception, $ErrorId, $errorCategory, $null
-            return $errorRecord
-        } # end function Get-InvalidOperationError
-
         #region Pester Test Initialization
-
         $script:DriveLetter = 'X'
 
         # ISO Related Mocks
@@ -790,9 +766,8 @@ try
         Describe 'MSFT_xMountImage\Test-ParameterValid' {
             Context 'DriveLetter passed, ensure is Absent' {
                 It 'Should throw InvalidParameterSpecifiedError exception' {
-                    $errorRecord = Get-InvalidOperationError `
-                        -ErrorId 'InvalidParameterSpecifiedError' `
-                        -ErrorMessage ($LocalizedData.InvalidParameterSpecifiedError -f `
+                    $errorRecord = Get-InvalidOperationRecord `
+                        -Message ($LocalizedData.InvalidParameterSpecifiedError -f `
                             'Absent','DriveLetter')
 
                     {
@@ -807,9 +782,8 @@ try
 
             Context 'StorageType passed, ensure is Absent' {
                 It 'Should throw InvalidParameterSpecifiedError exception' {
-                    $errorRecord = Get-InvalidOperationError `
-                        -ErrorId 'InvalidParameterSpecifiedError' `
-                        -ErrorMessage ($LocalizedData.InvalidParameterSpecifiedError -f `
+                    $errorRecord = Get-InvalidOperationRecord `
+                        -Message ($LocalizedData.InvalidParameterSpecifiedError -f `
                             'Absent','StorageType')
 
                     {
@@ -824,9 +798,8 @@ try
 
             Context 'Access passed, ensure is Absent' {
                 It 'Should throw InvalidParameterSpecifiedError exception' {
-                    $errorRecord = Get-InvalidOperationError `
-                        -ErrorId 'InvalidParameterSpecifiedError' `
-                        -ErrorMessage ($LocalizedData.InvalidParameterSpecifiedError -f `
+                    $errorRecord = Get-InvalidOperationRecord `
+                        -Message ($LocalizedData.InvalidParameterSpecifiedError -f `
                             'Absent','Access')
 
                     {
@@ -856,9 +829,8 @@ try
                         -CommandName Test-Path `
                         -MockWith { $false }
 
-                    $errorRecord = Get-InvalidOperationError `
-                        -ErrorId 'DiskImageFileNotFoundError' `
-                        -ErrorMessage ($LocalizedData.DiskImageFileNotFoundError -f `
+                    $errorRecord = Get-InvalidOperationRecord `
+                        -Message ($LocalizedData.DiskImageFileNotFoundError -f `
                             $script:DiskImageISOPath)
 
                     {
@@ -876,9 +848,8 @@ try
                         -CommandName Test-Path `
                         -MockWith { $true }
 
-                    $errorRecord = Get-InvalidOperationError `
-                        -ErrorId 'InvalidParameterNotSpecifiedError' `
-                        -ErrorMessage ($LocalizedData.InvalidParameterNotSpecifiedError -f `
+                    $errorRecord = Get-InvalidOperationRecord `
+                        -Message ($LocalizedData.InvalidParameterNotSpecifiedError -f `
                             'Present','DriveLetter')
 
                     {
