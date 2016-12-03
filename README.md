@@ -60,7 +60,7 @@ If you would like to contribute to this repository, please read the DSC Resource
 - **`[Uint64]` Size** _(Write)_: Specifies the size of new volume (use all available space on disk if not provided).
 - **`[String]` FSLabel** _(Write)_: Define volume label if required.
 - **`[UInt32]` AllocationUnitSize** _(Write)_: Specifies the allocation unit size to use when formatting the volume.
-- **`[String]` FSFormat** _(Write)_: Define volume label if required. { *NTFS* | ReFS }. Defaults to NTFS.
+- **`[String]` FSFormat** _(Write)_: Define file system type if required. { *NTFS* | ReFS }. Defaults to NTFS.
 
 ### xDiskAccessPath
 
