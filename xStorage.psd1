@@ -10,7 +10,7 @@
 # RootModule = ''
 
 # Version number of this module.
-ModuleVersion = '2.8.0.0'
+ModuleVersion = '2.9.0.0'
 
 # ID used to uniquely identify this module
 GUID = '00d73ca1-58b5-46b7-ac1a-5bfcf5814faf'
@@ -102,44 +102,27 @@ PrivateData = @{
         # IconUri = ''
 
         # ReleaseNotes of this module
-        ReleaseNotes = '* added test for existing file system and no drive letter assignment to allow simple drive letter assignment in MSFT_xDisk.psm1
-* added unit test for volume with existing partition and no drive letter assigned for MSFT_xDisk.psm1
-* xMountImage: Fixed mounting disk images on Windows 10 Anniversary Edition
-* Updated to meet HQRM guidelines.
-* Moved all strings into localization files.
-* Fixed examples to import xStorage module.
-* Fixed Readme.md layout issues.
-* xWaitForDisk:
-  - Added support for setting DriveLetter parameter with or without colon.
-  - MOF Class version updated to 1.0.0.0.
-* xWaitForVolume:
-  - Added new resource.
-* StorageCommon:
-  - Added helper function module.
-  - Corrected name of unit tests file.
-* xDisk:
-  - Added validation of DriveLetter parameter.
-  - Added support for setting DriveLetter parameter with or without colon.
-  - Removed obfuscation of drive/partition errors by eliminating try/catch block.
-  - Improved code commenting.
-  - Reordered tests so they are in same order as module functions to ease creation.
-  - Added FSFormat parameter to allow disk format to be specified.
-  - Size or AllocationUnitSize mismatches no longer trigger Set-TargetResource because these values can"t be changed (yet).
-  - MOF Class version updated to 1.0.0.0.
-  - Unit tests changed to match xDiskAccessPath methods.
-  - Added additional unit tests to Get-TargetResource.
-  - Fixed bug in Get-TargetResource when disk did not contain any partitions.
-  - Added missing cmdletbinding() to functions.
-* xMountImage (Breaking Change):
-  - Removed Name parameter (Breaking Change)
-  - Added validation of DriveLetter parameter.
-  - Added support for setting DriveLetter parameter with or without colon.
-  - MOF Class version updated to 1.0.0.0.
-  - Enabled mounting of VHD/VHDx/VHDSet disk images.
-  - Added StorageType and Access parameters to allow mounting VHD and VHDx disks as read/write.
-* xDiskAccessPath:
-  - Added new resource.
-  - Added support for changing/setting volume label.
+        ReleaseNotes = '- Updated readme.md to remove markdown best practice rule violations.
+- Updated readme.md to match DSCResources/DscResource.Template/README.md.
+- xDiskAccessPath:
+  - Fix bug when re-attaching disk after mount point removed or detatched.
+  - Additional log entries added for improved diagnostics.
+  - Additional integration tests added.
+  - Improve timeout loop.
+- Converted integration tests to use ```$TestDrive``` as working folder or ```temp``` folder when persistence across tests is required.
+- Suppress ```PSUseShouldProcessForStateChangingFunctions``` rule violations in resources.
+- Rename ```Test-AccessPath``` function to ```Assert-AccessPathValid```.
+- Rename ```Test-DriveLetter``` function to ```Assert-DriveLetterValid```.
+- Added ```CommonResourceHelper.psm1``` module (based on PSDscResources).
+- Added ```CommonTestsHelper.psm1``` module  (based on PSDscResources).
+- Converted all modules to load localization data using ```Get-LocalizedData``` from CommonResourceHelper.
+- Converted all exception calls and tests to use functions in ```CommonResourceHelper.psm1``` and ```CommonTestsHelper.psm1``` respectively.
+- Fixed examples:
+  - Sample_InitializeDataDisk.ps1
+  - Sample_InitializeDataDiskWithAccessPath.ps1
+  - Sample_xMountImage_DismountISO.ps1
+- xDisk:
+  - Improve timeout loop.
 
 '
 
@@ -154,6 +137,7 @@ PrivateData = @{
 # DefaultCommandPrefix = ''
 
 }
+
 
 
 

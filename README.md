@@ -87,6 +87,8 @@ If you would like to contribute to this repository, please read the DSC Resource
 
 ### Unreleased
 
+### 2.9.0.0
+
 - Updated readme.md to remove markdown best practice rule violations.
 - Updated readme.md to match DSCResources/DscResource.Template/README.md.
 - xDiskAccessPath:
