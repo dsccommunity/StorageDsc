@@ -1,20 +1,13 @@
-﻿#region localizeddata
-if (Test-Path "${PSScriptRoot}\${PSUICulture}")
-{
-    Import-LocalizedData `
-        -BindingVariable LocalizedData `
-        -Filename MSFT_xDisk.strings.psd1 `
-        -BaseDirectory "${PSScriptRoot}\${PSUICulture}"
-}
-else
-{
-    #fallback to en-US
-    Import-LocalizedData `
-        -BindingVariable LocalizedData `
-        -Filename MSFT_xDisk.strings.psd1 `
-        -BaseDirectory "${PSScriptRoot}\en-US"
-}
-#endregion
+﻿# Suppressed as per PSSA Rule Severity guidelines for unit/integration tests:
+# https://github.com/PowerShell/DscResources/blob/master/PSSARuleSeverities.md
+[System.Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseShouldProcessForStateChangingFunctions', '')]
+param ()
+
+Import-Module -Name (Join-Path -Path (Split-Path $PSScriptRoot -Parent) `
+                               -ChildPath 'CommonResourceHelper.psm1')
+
+# Localized messages for Write-Verbose statements in this resource
+$script:localizedData = Get-LocalizedData -ResourceName 'MSFT_xDisk'
 
 # Import the common storage functions
 Import-Module -Name ( Join-Path `
@@ -72,7 +65,7 @@ function Get-TargetResource
         ) -join '' )
 
     # Validate the DriveLetter parameter
-    $DriveLetter = Test-DriveLetter -DriveLetter $DriveLetter
+    $DriveLetter = Assert-DriveLetterValid -DriveLetter $DriveLetter
 
     $disk = Get-Disk `
         -Number $DiskNumber `
@@ -140,7 +133,9 @@ function Get-TargetResource
 #>
 function Set-TargetResource
 {
-    [CmdletBinding()]
+    # Should process is called in a helper functions but not directly in Set-TargetResource
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSShouldProcess', '')]
+    [CmdletBinding(SupportsShouldProcess = $true)]
     param
     (
         [parameter(Mandatory)]
@@ -166,7 +161,7 @@ function Set-TargetResource
         ) -join '' )
 
     # Validate the DriveLetter parameter
-    $DriveLetter = Test-DriveLetter -DriveLetter $DriveLetter
+    $DriveLetter = Assert-DriveLetterValid -DriveLetter $DriveLetter
 
     $disk = Get-Disk `
         -Number $DiskNumber `
@@ -227,9 +222,8 @@ function Set-TargetResource
         default
         {
             # This disk is initialized but not as GPT - so raise an exception.
-            New-InvalidOperationError `
-                -ErrorId 'DiskAlreadyInitializedError' `
-                -ErrorMessage ($LocalizedData.DiskAlreadyInitializedError -f `
+            New-InvalidOperationException `
+                -Message ($LocalizedData.DiskAlreadyInitializedError -f `
                     $DiskNumber,$Disk.PartitionStyle)
         } # default
     } # switch
@@ -273,10 +267,9 @@ function Set-TargetResource
 
         # After creating the partition it can take a few seconds for it to become writeable
         # Wait for up to 30 seconds for the parition to become writeable
-        $timeout = 30000
-        $start = [DateTime]::Now
-        While ($partition.IsReadOnly `
-            -and ([DateTime]::Now - $start).TotalMilliseconds -lt $timeout)
+        $start = Get-Date
+        $timeout = (Get-Date) + (New-Timespan -Second 30)
+        While ($partition.IsReadOnly -and (Get-Date) -lt $timeout)
         {
             Write-Verbose -Message ( @(
                     "$($MyInvocation.MyCommand): "
@@ -293,9 +286,8 @@ function Set-TargetResource
         if ($partition.IsReadOnly)
         {
             # The partition is still readonly - throw an exception
-            New-InvalidOperationError `
-                -ErrorId 'NewParitionReadOnlyError' `
-                -ErrorMessage ($LocalizedData.ParitionIsReadOnlyError -f `
+            New-InvalidOperationException `
+                -Message ($LocalizedData.ParitionIsReadOnlyError -f `
                     $partition.DiskNumber,$partition.PartitionNumber)
         } # if
 
@@ -453,7 +445,7 @@ function Test-TargetResource
         ) -join '' )
 
     # Validate the DriveLetter parameter
-    $DriveLetter = Test-DriveLetter -DriveLetter $DriveLetter
+    $DriveLetter = Assert-DriveLetterValid -DriveLetter $DriveLetter
 
     Write-Verbose -Message ( @(
             "$($MyInvocation.MyCommand): "

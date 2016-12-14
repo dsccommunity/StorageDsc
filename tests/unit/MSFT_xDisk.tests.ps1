@@ -1,6 +1,8 @@
 $script:DSCModuleName      = 'xStorage'
 $script:DSCResourceName    = 'MSFT_xDisk'
 
+Import-Module -Name (Join-Path -Path (Join-Path -Path (Split-Path $PSScriptRoot -Parent) -ChildPath 'TestHelpers') -ChildPath 'CommonTestHelper.psm1')
+
 #region HEADER
 # Unit Test Template Version: 1.1.0
 [String] $script:moduleRoot = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
@@ -25,31 +27,6 @@ try
     # The InModuleScope command allows you to perform white-box unit testing on the internal
     # (non-exported) code of a Script Module.
     InModuleScope $script:DSCResourceName {
-        # Function to create a exception object for testing output exceptions
-        function Get-InvalidOperationError
-        {
-            [CmdletBinding()]
-            param
-            (
-                [Parameter(Mandatory)]
-                [ValidateNotNullOrEmpty()]
-                [System.String]
-                $ErrorId,
-
-                [Parameter(Mandatory)]
-                [ValidateNotNullOrEmpty()]
-                [System.String]
-                $ErrorMessage
-            )
-
-            $exception = New-Object -TypeName System.InvalidOperationException `
-                -ArgumentList $ErrorMessage
-            $errorCategory = [System.Management.Automation.ErrorCategory]::InvalidOperation
-            $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord `
-                -ArgumentList $exception, $ErrorId, $errorCategory, $null
-            return $errorRecord
-        } # end function Get-InvalidOperationError
-
         #region Pester Test Initialization
         $script:testDriveLetter = 'G'
 
@@ -652,9 +629,8 @@ try
                 Mock -CommandName Get-Volume
                 Mock -CommandName Set-Partition
 
-                $errorRecord = Get-InvalidOperationError `
-                    -ErrorId 'DiskAlreadyInitializedError' `
-                    -ErrorMessage ($LocalizedData.DiskAlreadyInitializedError -f `
+                $errorRecord = Get-InvalidOperationRecord `
+                    -Message ($LocalizedData.DiskAlreadyInitializedError -f `
                         0,$script:mockedDisk0Mbr.PartitionStyle)
 
                 It 'Should throw DiskAlreadyInitializedError' {

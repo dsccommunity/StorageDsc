@@ -1,20 +1,13 @@
-#region localizeddata
-if (Test-Path "${PSScriptRoot}\${PSUICulture}")
-{
-    Import-LocalizedData `
-        -BindingVariable LocalizedData `
-        -Filename MSFT_xWaitForDisk.strings.psd1 `
-        -BaseDirectory "${PSScriptRoot}\${PSUICulture}"
-}
-else
-{
-    #fallback to en-US
-    Import-LocalizedData `
-        -BindingVariable LocalizedData `
-        -Filename MSFT_xWaitForDisk.strings.psd1 `
-        -BaseDirectory "${PSScriptRoot}\en-US"
-}
-#endregion
+# Suppressed as per PSSA Rule Severity guidelines for unit/integration tests:
+# https://github.com/PowerShell/DscResources/blob/master/PSSARuleSeverities.md
+[System.Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseShouldProcessForStateChangingFunctions', '')]
+param ()
+
+Import-Module -Name (Join-Path -Path (Split-Path $PSScriptRoot -Parent) `
+                               -ChildPath 'CommonResourceHelper.psm1')
+
+# Localized messages for Write-Verbose statements in this resource
+$script:localizedData = Get-LocalizedData -ResourceName 'MSFT_xWaitForDisk'
 
 # Import the common storage functions
 Import-Module -Name ( Join-Path `
@@ -120,9 +113,8 @@ function Set-TargetResource
 
     if (-not $diskFound)
     {
-        New-InvalidOperationError `
-            -ErrorId 'DiskNotFoundAfterError' `
-            -ErrorMessage $($LocalizedData.DiskNotFoundAfterError -f $DiskNumber,$RetryCount)
+        New-InvalidOperationException `
+            -Message $($LocalizedData.DiskNotFoundAfterError -f $DiskNumber,$RetryCount)
     } # if
 } # function Set-TargetResource
 

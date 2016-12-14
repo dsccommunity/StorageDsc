@@ -1,20 +1,13 @@
-#region localizeddata
-if (Test-Path "${PSScriptRoot}\${PSUICulture}")
-{
-    Import-LocalizedData `
-        -BindingVariable LocalizedData `
-        -Filename MSFT_xWaitForVolume.strings.psd1 `
-        -BaseDirectory "${PSScriptRoot}\${PSUICulture}"
-}
-else
-{
-    #fallback to en-US
-    Import-LocalizedData `
-        -BindingVariable LocalizedData `
-        -Filename MSFT_xWaitForVolume.strings.psd1 `
-        -BaseDirectory "${PSScriptRoot}\en-US"
-}
-#endregion
+# Suppressed as per PSSA Rule Severity guidelines for unit/integration tests:
+# https://github.com/PowerShell/DscResources/blob/master/PSSARuleSeverities.md
+[System.Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseShouldProcessForStateChangingFunctions', '')]
+param ()
+
+Import-Module -Name (Join-Path -Path (Split-Path $PSScriptRoot -Parent) `
+                               -ChildPath 'CommonResourceHelper.psm1')
+
+# Localized messages for Write-Verbose statements in this resource
+$script:localizedData = Get-LocalizedData -ResourceName 'MSFT_xWaitForVolume'
 
 # Import the common storage functions
 Import-Module -Name ( Join-Path `
@@ -54,7 +47,7 @@ function Get-TargetResource
         ) -join '' )
 
     # Validate the DriveLetter parameter
-    $DriveLetter = Test-DriveLetter -DriveLetter $DriveLetter
+    $DriveLetter = Assert-DriveLetterValid -DriveLetter $DriveLetter
 
     $returnValue = @{
         DriveLetter      = $DriveLetter
@@ -96,7 +89,7 @@ function Set-TargetResource
         ) -join '' )
 
     # Validate the DriveLetter parameter
-    $DriveLetter = Test-DriveLetter -DriveLetter $DriveLetter
+    $DriveLetter = Assert-DriveLetterValid -DriveLetter $DriveLetter
 
     $volumeFound = $false
 
@@ -130,9 +123,8 @@ function Set-TargetResource
 
     if (-not $volumeFound)
     {
-        New-InvalidOperationError `
-            -ErrorId 'VolumeNotFoundAfterError' `
-            -ErrorMessage $($LocalizedData.VolumeNotFoundAfterError -f $DriveLetter,$RetryCount)
+        New-InvalidOperationException `
+            -Message $($LocalizedData.VolumeNotFoundAfterError -f $DriveLetter,$RetryCount)
     } # if
 } # function Set-TargetResource
 
@@ -169,7 +161,7 @@ function Test-TargetResource
         ) -join '' )
 
     # Validate the DriveLetter parameter
-    $DriveLetter = Test-DriveLetter -DriveLetter $DriveLetter
+    $DriveLetter = Assert-DriveLetterValid -DriveLetter $DriveLetter
 
     # This command forces a refresh of the PS Drive subsystem.
     # So triggers any "missing" drives to show up.

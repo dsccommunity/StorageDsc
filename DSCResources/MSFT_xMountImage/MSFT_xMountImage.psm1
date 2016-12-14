@@ -1,20 +1,13 @@
-#region localizeddata
-if (Test-Path "${PSScriptRoot}\${PSUICulture}")
-{
-    Import-LocalizedData `
-        -BindingVariable LocalizedData `
-        -Filename MSFT_xMountImage.strings.psd1 `
-        -BaseDirectory "${PSScriptRoot}\${PSUICulture}"
-}
-else
-{
-    #fallback to en-US
-    Import-LocalizedData `
-        -BindingVariable LocalizedData `
-        -Filename MSFT_xMountImage.strings.psd1 `
-        -BaseDirectory "${PSScriptRoot}\en-US"
-}
-#endregion
+# Suppressed as per PSSA Rule Severity guidelines for unit/integration tests:
+# https://github.com/PowerShell/DscResources/blob/master/PSSARuleSeverities.md
+[System.Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseShouldProcessForStateChangingFunctions', '')]
+param ()
+
+Import-Module -Name (Join-Path -Path (Split-Path $PSScriptRoot -Parent) `
+                               -ChildPath 'CommonResourceHelper.psm1')
+
+# Localized messages for Write-Verbose statements in this resource
+$script:localizedData = Get-LocalizedData -ResourceName 'MSFT_xMountImage'
 
 # Import the common storage functions
 Import-Module -Name ( Join-Path `
@@ -111,7 +104,9 @@ function Get-TargetResource
 #>
 function Set-TargetResource
 {
-    [CmdletBinding()]
+    # Should process is called in a helper functions but not directly in Set-TargetResource
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSShouldProcess', '')]
+    [CmdletBinding(SupportsShouldProcess = $true)]
     param
     (
         [parameter(Mandatory = $true)]
@@ -152,7 +147,7 @@ function Set-TargetResource
     if ($Ensure -eq 'Present')
     {
         # Get the normalized DriveLetter (colon removed)
-        $normalizedDriveLetter = Test-DriveLetter -DriveLetter $DriveLetter
+        $normalizedDriveLetter = Assert-DriveLetterValid -DriveLetter $DriveLetter
 
         # The Disk Image should be mounted
         $needsMount = $false
@@ -284,7 +279,7 @@ function Test-TargetResource
     if ($Ensure -eq 'Present')
     {
         # Get the normalized DriveLetter (colon removed)
-        $normalizedDriveLetter = Test-DriveLetter -DriveLetter $DriveLetter
+        $normalizedDriveLetter = Assert-DriveLetterValid -DriveLetter $DriveLetter
 
         # The Disk Image should be mounted
         if ($currentState.Ensure -eq 'Absent')
@@ -414,27 +409,24 @@ function Test-ParameterValid
         if ($PSBoundParameters.ContainsKey('DriveLetter'))
         {
             # The DriveLetter should not be set if Ensure is Absent
-            New-InvalidOperationError `
-                -ErrorId 'InvalidParameterSpecifiedError' `
-                -ErrorMessage ($LocalizedData.InvalidParameterSpecifiedError -f `
+            New-InvalidOperationException `
+                -Message ($LocalizedData.InvalidParameterSpecifiedError -f `
                     'Absent','DriveLetter')
         } # if
 
         if ($PSBoundParameters.ContainsKey('StorageType'))
         {
             # The StorageType should not be set if Ensure is Absent
-            New-InvalidOperationError `
-                -ErrorId 'InvalidParameterSpecifiedError' `
-                -ErrorMessage ($LocalizedData.InvalidParameterSpecifiedError -f `
+            New-InvalidOperationException `
+                -Message ($LocalizedData.InvalidParameterSpecifiedError -f `
                     'Absent','StorageType')
         } # if
 
         if ($PSBoundParameters.ContainsKey('Access'))
         {
             # The Access should not be set if Ensure is Absent
-            New-InvalidOperationError `
-                -ErrorId 'InvalidParameterSpecifiedError' `
-                -ErrorMessage ($LocalizedData.InvalidParameterSpecifiedError -f `
+            New-InvalidOperationException `
+                -Message ($LocalizedData.InvalidParameterSpecifiedError -f `
                     'Absent','Access')
         } # if
     }
@@ -443,23 +435,21 @@ function Test-ParameterValid
         if (-not (Test-Path -Path $ImagePath))
         {
             # The file specified by ImagePath should be found
-            New-InvalidOperationError `
-                -ErrorId 'DiskImageFileNotFoundError' `
-                -ErrorMessage ($LocalizedData.DiskImageFileNotFoundError -f `
+            New-InvalidOperationException `
+                -Message ($LocalizedData.DiskImageFileNotFoundError -f `
                     $ImagePath)
         } # if
 
         if ($PSBoundParameters.ContainsKey('DriveLetter'))
         {
             # Test the Drive Letter to ensure it is valid
-            $normalizedDriveLetter = Test-DriveLetter -DriveLetter $DriveLetter
+            $normalizedDriveLetter = Assert-DriveLetterValid -DriveLetter $DriveLetter
         }
         else
         {
             # Drive letter is not specified but Ensure is present.
-            New-InvalidOperationError `
-                -ErrorId 'InvalidParameterNotSpecifiedError' `
-                -ErrorMessage ($LocalizedData.InvalidParameterNotSpecifiedError -f `
+            New-InvalidOperationException `
+                -Message ($LocalizedData.InvalidParameterNotSpecifiedError -f `
                     'Present','DriveLetter')
         } # if
     } # if
@@ -504,7 +494,7 @@ function Mount-DiskImageToLetter
     )
 
     # Get the normalized DriveLetter (colon removed)
-    $normalizedDriveLetter = Test-DriveLetter -DriveLetter $DriveLetter
+    $normalizedDriveLetter = Assert-DriveLetterValid -DriveLetter $DriveLetter
 
     # Mount the Diskimage
     $mountParams = @{ ImagePath = $ImagePath }

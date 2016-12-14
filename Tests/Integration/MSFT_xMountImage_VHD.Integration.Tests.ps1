@@ -41,7 +41,7 @@ try
     $DriveLetter = [char](([int][char]$LastDrive)+1)
 
     # Create a VHDx with a partition
-    $VHDPath = Join-Path -Path $TestEnvironment.WorkingFolder `
+    $VHDPath = Join-Path -Path $ENV:Temp `
         -ChildPath 'TestDisk.vhdx'
     $null = New-VHD -Path $VHDPath -SizeBytes 10GB -Dynamic
     $null = Mount-DiskImage -ImagePath $VHDPath
@@ -72,9 +72,9 @@ try
             It 'Should compile without throwing' {
                 {
                     & "$($script:DSCResourceName)_Mount_Config" `
-                        -OutputPath $TestEnvironment.WorkingFolder `
+                        -OutputPath $TestDrive `
                         -ConfigurationData $ConfigData
-                    Start-DscConfiguration -Path $TestEnvironment.WorkingFolder `
+                    Start-DscConfiguration -Path $TestDrive `
                         -ComputerName localhost -Wait -Verbose -Force
                 } | Should not throw
             }
@@ -107,9 +107,9 @@ try
             It 'Should compile without throwing' {
                 {
                     & "$($script:DSCResourceName)_Dismount_Config" `
-                        -OutputPath $TestEnvironment.WorkingFolder `
+                        -OutputPath $TestDrive `
                         -ConfigurationData $ConfigData
-                    Start-DscConfiguration -Path $TestEnvironment.WorkingFolder `
+                    Start-DscConfiguration -Path $TestDrive `
                         -ComputerName localhost -Wait -Verbose -Force
                 } | Should not throw
             }
