@@ -134,6 +134,6 @@ function Test-HyperVInstalled
 } # end function Test-HyperVInstalled
 
 Export-ModuleMember -Function `
-    Test-HyperVInstalled `
+    Test-HyperVInstalled, `
     Get-InvalidArgumentRecord, `
     Get-InvalidOperationRecord
