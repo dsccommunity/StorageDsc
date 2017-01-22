@@ -4,8 +4,14 @@
 version: 2.9.{build}.0
 install:
     - git clone https://github.com/PlagueHO/DscResource.Tests
+    - npm install -g gulp
+    - npm install
 
     - ps: |
+        $moduleName = 'xStorage'
+        $mainModuleFolder = "Modules\$moduleName"
+        $harnessModulePath = "Tests\$($moduleName).TestHarness.psm1"
+        $harnessFunctionName = "Invoke-$($moduleName)Test"
         Import-Module "$env:APPVEYOR_BUILD_FOLDER\DscResource.Tests\AppVeyor.psm1"
         Start-AppveyorInstallTask
 
@@ -21,7 +27,11 @@ build: false
 
 test_script:
     - ps: |
-        Start-AppveyorTestScriptTask
+        Start-AppveyorTestScriptTask `
+            -Type 'Harness' `
+            -MainModulePath $mainModuleFolder `
+            -HarnessModulePath $harnessModulePath `
+            -HarnessFunctionName $harnessFunctionName
 
 #---------------------------------#
 #      deployment configuration   #
@@ -29,5 +39,8 @@ test_script:
 
 # scripts to run before deployment
 deploy_script:
-  - ps: |
-      Start-AppveyorAfterTestTask
+    - ps: |
+        Start-AppveyorAfterTestTask `
+            -Type 'Wiki' `
+            -MainModulePath $mainModuleFolder `
+            -ResourceModuleName $moduleName
