@@ -1,4 +1,4 @@
-Import-Module (Join-Path $PSScriptRoot "..\Tests\xNetworking.TestHarness.psm1" -Resolve)
+Import-Module (Join-Path $PSScriptRoot "..\Tests\xStorage.TestHarness.psm1" -Resolve)
 $dscTestsPath = Join-Path -Path $PSScriptRoot `
-                    -ChildPath "..\Modules\xNetworking\DscResource.Tests\Meta.Tests.ps1"
-Invoke-xNetworkingTest -DscTestsPath $dscTestsPath
+                    -ChildPath "..\Modules\xStorage\DscResource.Tests\Meta.Tests.ps1"
+Invoke-xStorageTest -DscTestsPath $dscTestsPath
