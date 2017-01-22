@@ -24,6 +24,7 @@ Configuration Example
              AccessPath = 'c:\SQLData'
              Size = 10GB
              FSLabel = 'SQLData1'
+             DependsOn = '[xWaitForDisk]Disk2'
         }
 
         xDiskAccessPath LogVolume
@@ -31,7 +32,7 @@ Configuration Example
              DiskNumber = 2
              AccessPath = 'c:\SQLLog'
              FSLabel = 'SQLLog1'
-             DependsOn = '[xDisk]DataVolume'
+             DependsOn = '[xDiskAccessPath]DataVolume'
         }
     }
 }
