@@ -675,6 +675,7 @@ try
                 # mocks that should not be called
                 Mock -CommandName Set-Disk
                 Mock -CommandName Initialize-Disk
+                Mock -CommandName New-Partition
                 Mock -CommandName Format-Volume
                 Mock -CommandName Set-Partition
 
