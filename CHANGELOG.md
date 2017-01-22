@@ -8,6 +8,7 @@
 - Correct name of MSFT_xDiskAccessPath.tests.ps1.
 - Move shared modules into Modules folder.
 - Fixed unit tests.
+- Removed support for WMI cmdlets.
 
 ## 2.9.0.0
 

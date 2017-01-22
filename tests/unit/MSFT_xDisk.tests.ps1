@@ -78,7 +78,7 @@ try
                 PartitionStyle = 'Raw'
             }
 
-        $script:mockedWmi = [pscustomobject] @{BlockSize=4096}
+        $script:mockedCim = [pscustomobject] @{BlockSize=4096}
 
         $script:mockedPartition = [pscustomobject] @{
                 DriveLetter = $script:testDriveLetter
@@ -207,7 +207,7 @@ try
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Get-CimInstance `
-                    -MockWith { $script:mockedWmi } `
+                    -MockWith { $script:mockedCim } `
                     -Verifiable
 
                 Mock `
@@ -224,9 +224,6 @@ try
                     -CommandName Get-Volume `
                     -MockWith { $script:mockedVolume } `
                     -Verifiable
-
-                # mocks that should not be called
-                Mock -CommandName Get-WmiObject
 
                 $resource = Get-TargetResource `
                     -DiskNumber 0 `
@@ -249,8 +246,8 @@ try
                     $resource.FSLabel | Should be $script:mockedVolume.FileSystemLabel
                 }
 
-                It "AllocationUnitSize should be $($script:mockedWmi.BlockSize)" {
-                    $resource.AllocationUnitSize | Should be $script:mockedWmi.BlockSize
+                It "AllocationUnitSize should be $($script:mockedCim.BlockSize)" {
+                    $resource.AllocationUnitSize | Should be $script:mockedCim.BlockSize
                 }
 
                 It "FSFormat should be $($script:mockedVolume.FileSystem)" {
@@ -266,10 +263,6 @@ try
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Get-CimInstance `
-                    -Verifiable
-
-                Mock `
-                    -CommandName Get-WmiObject `
                     -Verifiable
 
                 Mock `
@@ -317,7 +310,6 @@ try
                 It 'all the get mocks should be called' {
                     Assert-VerifiableMocks
                     Assert-MockCalled -CommandName Get-CimInstance -Exactly 1
-                    Assert-MockCalled -CommandName Get-WmiObject -Exactly 1
                     Assert-MockCalled -CommandName Get-Disk -Exactly 1
                     Assert-MockCalled -CommandName Get-Partition -Exactly 1
                     Assert-MockCalled -CommandName Get-Volume -Exactly 1
@@ -857,7 +849,7 @@ try
         Describe 'MSFT_xDisk\Test-TargetResource' {
             Mock `
                 -CommandName Get-CimInstance `
-                -MockWith { $script:mockedWmi }
+                -MockWith { $script:mockedCim }
 
             Context 'Test disk not initialized' {
                 # verifiable (should be called) mocks
@@ -869,7 +861,6 @@ try
                 # mocks that should not be called
                 Mock -CommandName Get-Volume
                 Mock -CommandName Get-Partition
-                Mock -CommandName Get-WmiObject
                 Mock -CommandName Get-CimInstance
 
                 $script:result = $null
@@ -893,7 +884,6 @@ try
                     Assert-MockCalled -CommandName Get-Disk -Times 1
                     Assert-MockCalled -CommandName Get-Partition -Times 0
                     Assert-MockCalled -CommandName Get-Volume -Times 0
-                    Assert-MockCalled -CommandName Get-WmiObject -Times 0
                     Assert-MockCalled -CommandName Get-CimInstance -Times 0
                 }
             }
@@ -908,7 +898,6 @@ try
                 # mocks that should not be called
                 Mock -CommandName Get-Volume
                 Mock -CommandName Get-Partition
-                Mock -CommandName Get-WmiObject
                 Mock -CommandName Get-CimInstance
 
                 $script:result = $null
@@ -932,7 +921,6 @@ try
                     Assert-MockCalled -CommandName Get-Disk -Times 1
                     Assert-MockCalled -CommandName Get-Partition -Times 0
                     Assert-MockCalled -CommandName Get-Volume -Times 0
-                    Assert-MockCalled -CommandName Get-WmiObject -Times 0
                     Assert-MockCalled -CommandName Get-CimInstance -Times 0
                 }
             }
@@ -947,7 +935,6 @@ try
                 # mocks that should not be called
                 Mock -CommandName Get-Volume
                 Mock -CommandName Get-Partition
-                Mock -CommandName Get-WmiObject
                 Mock -CommandName Get-CimInstance
 
                 $script:result = $null
@@ -971,7 +958,6 @@ try
                     Assert-MockCalled -CommandName Get-Disk -Times 1
                     Assert-MockCalled -CommandName Get-Partition -Times 0
                     Assert-MockCalled -CommandName Get-Volume -Times 0
-                    Assert-MockCalled -CommandName Get-WmiObject -Times 0
                     Assert-MockCalled -CommandName Get-CimInstance -Times 0
                 }
             }
@@ -995,11 +981,8 @@ try
 
                 Mock `
                     -CommandName Get-CimInstance `
-                    -MockWith { $script:mockedWmi } `
+                    -MockWith { $script:mockedCim } `
                     -Verifiable
-
-                # mocks that should not be called
-                Mock -CommandName Get-WmiObject
 
                 $script:result = $null
 
@@ -1023,7 +1006,6 @@ try
                     Assert-MockCalled -CommandName Get-Disk -Times 1
                     Assert-MockCalled -CommandName Get-Partition -Times 1
                     Assert-MockCalled -CommandName Get-Volume -Times 1
-                    Assert-MockCalled -CommandName Get-WmiObject -Times 0
                     Assert-MockCalled -CommandName Get-CimInstance -Times 1
                 }
             }
@@ -1042,12 +1024,11 @@ try
 
                 Mock `
                     -CommandName Get-CimInstance `
-                    -MockWith { $script:mockedWmi } `
+                    -MockWith { $script:mockedCim } `
                     -Verifiable
 
                 # mocks that should not be called
                 Mock -CommandName Get-Volume
-                Mock -CommandName Get-WmiObject
 
                 $script:result = $null
 
@@ -1071,7 +1052,6 @@ try
                     Assert-MockCalled -CommandName Get-Disk -Times 1
                     Assert-MockCalled -CommandName Get-Partition -Times 1
                     Assert-MockCalled -CommandName Get-Volume -Times 1
-                    Assert-MockCalled -CommandName Get-WmiObject -Times 0
                     Assert-MockCalled -CommandName Get-CimInstance -Times 1
                 }
             }
@@ -1095,11 +1075,8 @@ try
 
                 Mock `
                     -CommandName Get-CimInstance `
-                    -MockWith { $script:mockedWmi } `
+                    -MockWith { $script:mockedCim } `
                     -Verifiable
-
-                # mocks that should not be called
-                Mock -CommandName Get-WmiObject
 
                 $script:result = $null
 
@@ -1122,7 +1099,6 @@ try
                     Assert-MockCalled -CommandName Get-Disk -Times 1
                     Assert-MockCalled -CommandName Get-Partition -Times 1
                     Assert-MockCalled -CommandName Get-Volume -Times 1
-                    Assert-MockCalled -CommandName Get-WmiObject -Times 0
                     Assert-MockCalled -CommandName Get-CimInstance -Times 1
                 }
             }
@@ -1146,11 +1122,8 @@ try
 
                 Mock `
                     -CommandName Get-CimInstance `
-                    -MockWith { $script:mockedWmi } `
+                    -MockWith { $script:mockedCim } `
                     -Verifiable
-
-                # mocks that should not be called
-                Mock -CommandName Get-WmiObject
 
                 $script:result = $null
 
@@ -1173,7 +1146,6 @@ try
                     Assert-MockCalled -CommandName Get-Disk -Times 1
                     Assert-MockCalled -CommandName Get-Partition -Times 1
                     Assert-MockCalled -CommandName Get-Volume -Times 1
-                    Assert-MockCalled -CommandName Get-WmiObject -Times 0
                     Assert-MockCalled -CommandName Get-CimInstance -Times 1
                 }
             }
@@ -1197,11 +1169,8 @@ try
 
                 Mock `
                     -CommandName Get-CimInstance `
-                    -MockWith { $script:mockedWmi } `
+                    -MockWith { $script:mockedCim } `
                     -Verifiable
-
-                # mocks that should not be called
-                Mock -CommandName Get-WmiObject
 
                 $script:result = $null
 
@@ -1227,7 +1196,6 @@ try
                     Assert-MockCalled -CommandName Get-Disk -Times 1
                     Assert-MockCalled -CommandName Get-Partition -Times 1
                     Assert-MockCalled -CommandName Get-Volume -Times 1
-                    Assert-MockCalled -CommandName Get-WmiObject -Times 0
                     Assert-MockCalled -CommandName Get-CimInstance -Times 1
                 }
             }

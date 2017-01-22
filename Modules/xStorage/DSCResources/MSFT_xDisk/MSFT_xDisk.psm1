@@ -85,18 +85,6 @@ function Get-TargetResource
         -Query "SELECT BlockSize from Win32_Volume WHERE DriveLetter = '$($DriveLetter):'" `
         -ErrorAction SilentlyContinue).BlockSize
 
-    if ($blockSize)
-    {
-        $AllocationUnitSize = $blockSize
-    }
-    else
-    {
-        # If Get-CimInstance did not return a value, try again with Get-WmiObject
-        $blockSize = (Get-WmiObject `
-            -Query "SELECT BlockSize from Win32_Volume WHERE DriveLetter = '$($DriveLetter):'" `
-            -ErrorAction SilentlyContinue).BlockSize
-    } # if
-
     $returnValue = @{
         DiskNumber = $disk.Number
         DriveLetter = $partition.DriveLetter
@@ -525,13 +513,6 @@ function Test-TargetResource
     $blockSize = (Get-CimInstance `
         -Query "SELECT BlockSize from Win32_Volume WHERE DriveLetter = '$($DriveLetter):'" `
         -ErrorAction SilentlyContinue).BlockSize
-    if (-not ($blockSize))
-    {
-        # If Get-CimInstance did not return a value, try again with Get-WmiObject
-        $blockSize = (Get-WmiObject `
-            -Query "SELECT BlockSize from Win32_Volume WHERE DriveLetter = '$($DriveLetter):'" `
-            -ErrorAction SilentlyContinue).BlockSize
-    } # if
 
     if ($blockSize -gt 0 -and $AllocationUnitSize -ne 0)
     {

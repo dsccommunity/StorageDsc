@@ -80,24 +80,12 @@ function Get-TargetResource
     $fileSystem = $volume.FileSystem
     $FSLabel = $volume.FileSystemLabel
 
-    # Prepare the AccessPath used in the CIM/WMI query (replaces '\' with '\\')
+    # Prepare the AccessPath used in the CIM query (replaces '\' with '\\')
     $queryAccessPath = $AccessPath -replace '\\','\\'
 
     $blockSize = (Get-CimInstance `
         -Query "SELECT BlockSize from Win32_Volume WHERE Name = '$queryAccessPath'" `
         -ErrorAction SilentlyContinue).BlockSize
-
-    if ($blockSize)
-    {
-        $AllocationUnitSize = $blockSize
-    }
-    else
-    {
-        # If Get-CimInstance did not return a value, try again with Get-WmiObject
-        $blockSize = (Get-WmiObject `
-            -Query "SELECT BlockSize from Win32_Volume WHERE Name = '$queryAccessPath'" `
-            -ErrorAction SilentlyContinue).BlockSize
-    } # if
 
     $returnValue = @{
         DiskNumber = $disk.Number
@@ -556,19 +544,12 @@ function Test-TargetResource
         } # if
     } # if
 
-    # Prepare the AccessPath used in the CIM/WMI query (replaces '\' with '\\')
+    # Prepare the AccessPath used in the CIM query (replaces '\' with '\\')
     $queryAccessPath = $AccessPath -replace '\\','\\'
 
     $blockSize = (Get-CimInstance `
         -Query "SELECT BlockSize from Win32_Volume WHERE Name = '$queryAccessPath'" `
         -ErrorAction SilentlyContinue).BlockSize
-    if (-not ($blockSize))
-    {
-        # If Get-CimInstance did not return a value, try again with Get-WmiObject
-        $blockSize = (Get-WmiObject `
-            -Query "SELECT BlockSize from Win32_Volume WHERE Name = '$queryAccessPath'" `
-            -ErrorAction SilentlyContinue).BlockSize
-    } # if
 
     if ($blockSize -gt 0 -and $AllocationUnitSize -ne 0)
     {
