@@ -20,7 +20,7 @@ try
 {
     #region Pester Tests
 
-    $LocalizedData = InModuleScope $script:DSCResourceName {
+    $LocalizedData = InModuleScope $script:ModuleName {
         $LocalizedData
     }
 
@@ -37,7 +37,7 @@ try
     #endregion
 
     #region Function Assert-DriveLetterValid
-    Describe "StorageCommon\Assert-DriveLetterValid" {
+    Describe "StorageDsc.Common\Assert-DriveLetterValid" {
         Context 'drive letter is good, has no colon and colon is not required' {
             It "should return '$driveLetterGood'" {
                 Assert-DriveLetterValid -DriveLetter $driveLetterGood | Should Be $driveLetterGood
@@ -95,10 +95,10 @@ try
     #endregion
 
     #region Function Assert-AccessPathValid
-    Describe "StorageCommon\Assert-AccessPathValid" {
+    Describe "StorageDsc.Common\Assert-AccessPathValid" {
         Mock `
             -CommandName Test-Path `
-            -ModuleName StorageCommon `
+            -ModuleName StorageDsc.Common `
             -MockWith { $True }
 
         Context 'path is found, trailing slash included, not required' {
@@ -127,7 +127,7 @@ try
 
         Mock `
             -CommandName Test-Path `
-            -ModuleName StorageCommon `
+            -ModuleName StorageDsc.Common `
             -MockWith { $False }
 
         Context 'drive is not found' {
@@ -146,7 +146,5 @@ try
 finally
 {
     #region FOOTER
-    Restore-TestEnvironment -TestEnvironment $TestEnvironment
     #endregion
-
 }

@@ -126,7 +126,7 @@ try
                 Param
                 (
                     [CmdletBinding()]
-                    [Parameter(ValueFromPipeline)]
+                    [Parameter(ValueFromPipeline = $true)]
                     $Disk,
 
                     [Uint32]
@@ -141,7 +141,7 @@ try
                 Param
                 (
                     [CmdletBinding()]
-                    [Parameter(ValueFromPipeline)]
+                    [Parameter(ValueFromPipeline = $true)]
                     $Partition
                 )
             }
@@ -292,7 +292,7 @@ try
                 Param
                 (
                     [CmdletBinding()]
-                    [Parameter(ValueFromPipeline)]
+                    [Parameter(ValueFromPipeline = $true)]
                     $InputObject,
 
                     [Boolean]
@@ -307,7 +307,7 @@ try
                 Param
                 (
                     [CmdletBinding()]
-                    [Parameter(ValueFromPipeline)]
+                    [Parameter(ValueFromPipeline = $true)]
                     $InputObject,
 
                     [String]
@@ -319,7 +319,7 @@ try
                 Param
                 (
                     [CmdletBinding()]
-                    [Parameter(ValueFromPipeline)]
+                    [Parameter(ValueFromPipeline = $true)]
                     $Disk,
 
                     [Uint32]
@@ -334,7 +334,7 @@ try
                 Param
                 (
                     [CmdletBinding()]
-                    [Parameter(ValueFromPipeline)]
+                    [Parameter(ValueFromPipeline = $true)]
                     $Partition
                 )
             }
@@ -343,7 +343,7 @@ try
                 Param
                 (
                     [CmdletBinding()]
-                    [Parameter(ValueFromPipeline)]
+                    [Parameter(ValueFromPipeline = $true)]
                     $InputObject,
 
                     [String]
@@ -355,7 +355,7 @@ try
                 Param
                 (
                     [CmdletBinding()]
-                    [Parameter(ValueFromPipeline)]
+                    [Parameter(ValueFromPipeline = $true)]
                     $Partition,
 
                     [String]
@@ -909,7 +909,7 @@ try
                 Param
                 (
                     [CmdletBinding()]
-                    [Parameter(ValueFromPipeline)]
+                    [Parameter(ValueFromPipeline = $true)]
                     $Disk,
 
                     [Uint32]
@@ -924,7 +924,7 @@ try
                 Param
                 (
                     [CmdletBinding()]
-                    [Parameter(ValueFromPipeline)]
+                    [Parameter(ValueFromPipeline = $true)]
                     $Partition
                 )
             }

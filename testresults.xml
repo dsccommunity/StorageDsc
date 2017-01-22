@@ -1,0 +1,379 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<test-results xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="nunit_schema_2.5.xsd" name="Pester" total="227" errors="0" failures="5" not-run="0" inconclusive="0" ignored="2" skipped="0" invalid="0" date="2017-01-22" time="19:03:44">
+  <environment user="Daniel" machine-name="PLAGUE-WINDEV" cwd="C:\Users\Daniel\Source\GitHub\xStorage" user-domain="PLAGUE-WINDEV" platform="Microsoft Windows 10 Enterprise|C:\Windows|\Device\Harddisk0\Partition4" nunit-version="2.5.8.0" os-version="10.0.14393" clr-version="4.0.30319.42000" />
+  <culture-info current-culture="en-NZ" current-uiculture="en-US" />
+  <test-suite type="PowerShell" name="Pester" executed="True" result="Failure" success="False" time="38.0483" asserts="0">
+    <results>
+      <test-suite type="TestFixture" name="xStorage whole of module tests" executed="True" result="Success" success="True" time="9.5154" asserts="0" description="xStorage whole of module tests">
+        <results>
+          <test-case description="Should compile MOFs for all examples correctly" name="xStorage whole of module tests.Should compile MOFs for all examples correctly" time="8.671" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="Should not have errors in any markdown files" name="xStorage whole of module tests.Should not have errors in any markdown files" time="0.8444" asserts="0" success="True" result="Success" executed="True" />
+        </results>
+      </test-suite>
+      <test-suite type="TestFixture" name="MSFT_xDisk\Get-TargetResource" executed="True" result="Success" success="True" time="0.7139" asserts="0" description="MSFT_xDisk\Get-TargetResource">
+        <results>
+          <test-case description="DiskNumber should be 0" name="MSFT_xDisk\Get-TargetResource.DiskNumber should be 0" time="0.2238" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="DriveLetter should be G" name="MSFT_xDisk\Get-TargetResource.DriveLetter should be G" time="0.0265" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="Size should be 123" name="MSFT_xDisk\Get-TargetResource.Size should be 123" time="0.0222" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="FSLabel should be myLabel" name="MSFT_xDisk\Get-TargetResource.FSLabel should be myLabel" time="0.028" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="AllocationUnitSize should be 4096" name="MSFT_xDisk\Get-TargetResource.AllocationUnitSize should be 4096" time="0.0237" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="FSFormat should be NTFS" name="MSFT_xDisk\Get-TargetResource.FSFormat should be NTFS" time="0.0218" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="all the get mocks should be called" name="MSFT_xDisk\Get-TargetResource.all the get mocks should be called" time="0.0259" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="DiskNumber should be 0" name="MSFT_xDisk\Get-TargetResource.DiskNumber should be 0" time="0.1443" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="DriveLetter should be null" name="MSFT_xDisk\Get-TargetResource.DriveLetter should be null" time="0.0265" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="Size should be null" name="MSFT_xDisk\Get-TargetResource.Size should be null" time="0.02" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="FSLabel should be empty" name="MSFT_xDisk\Get-TargetResource.FSLabel should be empty" time="0.0317" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="AllocationUnitSize should be null" name="MSFT_xDisk\Get-TargetResource.AllocationUnitSize should be null" time="0.0295" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="FSFormat should be null" name="MSFT_xDisk\Get-TargetResource.FSFormat should be null" time="0.028" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="all the get mocks should be called" name="MSFT_xDisk\Get-TargetResource.all the get mocks should be called" time="0.062" asserts="0" success="True" result="Success" executed="True" />
+        </results>
+      </test-suite>
+      <test-suite type="TestFixture" name="MSFT_xDisk\Set-TargetResource" executed="True" result="Success" success="True" time="2.6134" asserts="0" description="MSFT_xDisk\Set-TargetResource">
+        <results>
+          <test-case description="Should not throw" name="MSFT_xDisk\Set-TargetResource.Should not throw" time="0.2848" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="the correct mocks were called" name="MSFT_xDisk\Set-TargetResource.the correct mocks were called" time="0.0758" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="Should not throw" name="MSFT_xDisk\Set-TargetResource.Should not throw" time="0.1771" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="the correct mocks were called" name="MSFT_xDisk\Set-TargetResource.the correct mocks were called" time="0.0696" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="Should not throw" name="MSFT_xDisk\Set-TargetResource.Should not throw" time="0.2348" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="the correct mocks were called" name="MSFT_xDisk\Set-TargetResource.the correct mocks were called" time="0.085" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="Should not throw" name="MSFT_xDisk\Set-TargetResource.Should not throw" time="0.177" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="the correct mocks were called" name="MSFT_xDisk\Set-TargetResource.the correct mocks were called" time="0.0778" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="Should not throw" name="MSFT_xDisk\Set-TargetResource.Should not throw" time="0.1867" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="the correct mocks were called" name="MSFT_xDisk\Set-TargetResource.the correct mocks were called" time="0.0748" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="Should throw DiskAlreadyInitializedError" name="MSFT_xDisk\Set-TargetResource.Should throw DiskAlreadyInitializedError" time="0.1297" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="the correct mocks were called" name="MSFT_xDisk\Set-TargetResource.the correct mocks were called" time="0.0706" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="Should not throw" name="MSFT_xDisk\Set-TargetResource.Should not throw" time="0.1438" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="the correct mocks were called" name="MSFT_xDisk\Set-TargetResource.the correct mocks were called" time="0.0677" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="Should not throw" name="MSFT_xDisk\Set-TargetResource.Should not throw" time="0.1702" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="the correct mocks were called" name="MSFT_xDisk\Set-TargetResource.the correct mocks were called" time="0.0859" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="Should not throw" name="MSFT_xDisk\Set-TargetResource.Should not throw" time="0.1564" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="the correct mocks were called" name="MSFT_xDisk\Set-TargetResource.the correct mocks were called" time="0.1047" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="Should not throw" name="MSFT_xDisk\Set-TargetResource.Should not throw" time="0.1576" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="the correct mocks were called" name="MSFT_xDisk\Set-TargetResource.the correct mocks were called" time="0.0835" asserts="0" success="True" result="Success" executed="True" />
+        </results>
+      </test-suite>
+      <test-suite type="TestFixture" name="MSFT_xDisk\Test-TargetResource" executed="True" result="Ignored" success="True" time="1.6706" asserts="0" description="MSFT_xDisk\Test-TargetResource">
+        <results>
+          <test-case description="calling test should not throw" name="MSFT_xDisk\Test-TargetResource.calling test should not throw" time="0.1869" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="result should be false" name="MSFT_xDisk\Test-TargetResource.result should be false" time="0.0172" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="the correct mocks were called" name="MSFT_xDisk\Test-TargetResource.the correct mocks were called" time="0.0408" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="calling test should not throw" name="MSFT_xDisk\Test-TargetResource.calling test should not throw" time="0.0971" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="result should be false" name="MSFT_xDisk\Test-TargetResource.result should be false" time="0.02" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="the correct mocks were called" name="MSFT_xDisk\Test-TargetResource.the correct mocks were called" time="0.0429" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="calling test should not throw" name="MSFT_xDisk\Test-TargetResource.calling test should not throw" time="0.117" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="result should be false" name="MSFT_xDisk\Test-TargetResource.result should be false" time="0.0231" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="the correct mocks were called" name="MSFT_xDisk\Test-TargetResource.the correct mocks were called" time="0.0433" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="calling test should not throw" name="MSFT_xDisk\Test-TargetResource.calling test should not throw" time="0.1376" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="result should be true" name="MSFT_xDisk\Test-TargetResource.result should be true" time="0.0237" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="the correct mocks were called" name="MSFT_xDisk\Test-TargetResource.the correct mocks were called" time="0.0605" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="calling test should not throw" name="MSFT_xDisk\Test-TargetResource.calling test should not throw" time="0.1313" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="result should be false" name="MSFT_xDisk\Test-TargetResource.result should be false" time="0.0093" asserts="0" success="True" result="Ignored" executed="False" />
+          <test-case description="the correct mocks were called" name="MSFT_xDisk\Test-TargetResource.the correct mocks were called" time="0.0615" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="calling test should not throw" name="MSFT_xDisk\Test-TargetResource.calling test should not throw" time="0.1475" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="result should be true" name="MSFT_xDisk\Test-TargetResource.result should be true" time="0.0286" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="the correct mocks were called" name="MSFT_xDisk\Test-TargetResource.the correct mocks were called" time="0.0544" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="calling test should not throw" name="MSFT_xDisk\Test-TargetResource.calling test should not throw" time="0.1343" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="result should be false" name="MSFT_xDisk\Test-TargetResource.result should be false" time="0.0236" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="the correct mocks were called" name="MSFT_xDisk\Test-TargetResource.the correct mocks were called" time="0.0635" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="calling test should not throw" name="MSFT_xDisk\Test-TargetResource.calling test should not throw" time="0.1292" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="result should be true" name="MSFT_xDisk\Test-TargetResource.result should be true" time="0.0205" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="the correct mocks were called" name="MSFT_xDisk\Test-TargetResource.the correct mocks were called" time="0.0568" asserts="0" success="True" result="Success" executed="True" />
+        </results>
+      </test-suite>
+      <test-suite type="TestFixture" name="MSFT_xDiskAccessPath\Get-TargetResource" executed="True" result="Success" success="True" time="0.7578" asserts="0" description="MSFT_xDiskAccessPath\Get-TargetResource">
+        <results>
+          <test-case description="DiskNumber should be 0" name="MSFT_xDiskAccessPath\Get-TargetResource.DiskNumber should be 0" time="0.2587" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="AccessPath should be c:\TestAccessPath" name="MSFT_xDiskAccessPath\Get-TargetResource.AccessPath should be c:\TestAccessPath" time="0.032" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="Size should be 1073741824" name="MSFT_xDiskAccessPath\Get-TargetResource.Size should be 1073741824" time="0.0212" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="FSLabel should be myLabel" name="MSFT_xDiskAccessPath\Get-TargetResource.FSLabel should be myLabel" time="0.0225" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="AllocationUnitSize should be 4096" name="MSFT_xDiskAccessPath\Get-TargetResource.AllocationUnitSize should be 4096" time="0.0335" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="FSFormat should be NTFS" name="MSFT_xDiskAccessPath\Get-TargetResource.FSFormat should be NTFS" time="0.0286" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="all the get mocks should be called" name="MSFT_xDiskAccessPath\Get-TargetResource.all the get mocks should be called" time="0.0466" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="DiskNumber should be 0" name="MSFT_xDiskAccessPath\Get-TargetResource.DiskNumber should be 0" time="0.1414" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="AccessPath should be c:\TestAccessPath" name="MSFT_xDiskAccessPath\Get-TargetResource.AccessPath should be c:\TestAccessPath" time="0.0218" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="Size should be null" name="MSFT_xDiskAccessPath\Get-TargetResource.Size should be null" time="0.0199" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="FSLabel should be empty" name="MSFT_xDiskAccessPath\Get-TargetResource.FSLabel should be empty" time="0.0245" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="AllocationUnitSize should be null" name="MSFT_xDiskAccessPath\Get-TargetResource.AllocationUnitSize should be null" time="0.0299" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="FSFormat should be null" name="MSFT_xDiskAccessPath\Get-TargetResource.FSFormat should be null" time="0.0252" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="all the get mocks should be called" name="MSFT_xDiskAccessPath\Get-TargetResource.all the get mocks should be called" time="0.0519" asserts="0" success="True" result="Success" executed="True" />
+        </results>
+      </test-suite>
+      <test-suite type="TestFixture" name="MSFT_xDiskAccessPath\Set-TargetResource" executed="True" result="Success" success="True" time="2.4721" asserts="0" description="MSFT_xDiskAccessPath\Set-TargetResource">
+        <results>
+          <test-case description="Should not throw" name="MSFT_xDiskAccessPath\Set-TargetResource.Should not throw" time="0.3051" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="the correct mocks were called" name="MSFT_xDiskAccessPath\Set-TargetResource.the correct mocks were called" time="0.0835" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="Should not throw" name="MSFT_xDiskAccessPath\Set-TargetResource.Should not throw" time="0.2265" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="the correct mocks were called" name="MSFT_xDiskAccessPath\Set-TargetResource.the correct mocks were called" time="0.0862" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="Should not throw" name="MSFT_xDiskAccessPath\Set-TargetResource.Should not throw" time="0.2171" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="the correct mocks were called" name="MSFT_xDiskAccessPath\Set-TargetResource.the correct mocks were called" time="0.0799" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="Should not throw" name="MSFT_xDiskAccessPath\Set-TargetResource.Should not throw" time="0.1966" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="the correct mocks were called" name="MSFT_xDiskAccessPath\Set-TargetResource.the correct mocks were called" time="0.0807" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="Should not throw" name="MSFT_xDiskAccessPath\Set-TargetResource.Should not throw" time="0.2189" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="the correct mocks were called" name="MSFT_xDiskAccessPath\Set-TargetResource.the correct mocks were called" time="0.0787" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="Should throw DiskAlreadyInitializedError" name="MSFT_xDiskAccessPath\Set-TargetResource.Should throw DiskAlreadyInitializedError" time="0.1249" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="the correct mocks were called" name="MSFT_xDiskAccessPath\Set-TargetResource.the correct mocks were called" time="0.0692" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="Should not throw" name="MSFT_xDiskAccessPath\Set-TargetResource.Should not throw" time="0.145" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="the correct mocks were called" name="MSFT_xDiskAccessPath\Set-TargetResource.the correct mocks were called" time="0.0762" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="Should not throw" name="MSFT_xDiskAccessPath\Set-TargetResource.Should not throw" time="0.1604" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="the correct mocks were called" name="MSFT_xDiskAccessPath\Set-TargetResource.the correct mocks were called" time="0.0751" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="Should not throw" name="MSFT_xDiskAccessPath\Set-TargetResource.Should not throw" time="0.1642" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="the correct mocks were called" name="MSFT_xDiskAccessPath\Set-TargetResource.the correct mocks were called" time="0.0839" asserts="0" success="True" result="Success" executed="True" />
+        </results>
+      </test-suite>
+      <test-suite type="TestFixture" name="MSFT_xDiskAccessPath\Test-TargetResource" executed="True" result="Ignored" success="True" time="1.6924" asserts="0" description="MSFT_xDiskAccessPath\Test-TargetResource">
+        <results>
+          <test-case description="calling test should not throw" name="MSFT_xDiskAccessPath\Test-TargetResource.calling test should not throw" time="0.1937" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="result should be false" name="MSFT_xDiskAccessPath\Test-TargetResource.result should be false" time="0.0218" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="the correct mocks were called" name="MSFT_xDiskAccessPath\Test-TargetResource.the correct mocks were called" time="0.0467" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="calling test should not throw" name="MSFT_xDiskAccessPath\Test-TargetResource.calling test should not throw" time="0.1051" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="result should be false" name="MSFT_xDiskAccessPath\Test-TargetResource.result should be false" time="0.0233" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="the correct mocks were called" name="MSFT_xDiskAccessPath\Test-TargetResource.the correct mocks were called" time="0.0512" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="calling test should not throw" name="MSFT_xDiskAccessPath\Test-TargetResource.calling test should not throw" time="0.117" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="result should be false" name="MSFT_xDiskAccessPath\Test-TargetResource.result should be false" time="0.0185" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="the correct mocks were called" name="MSFT_xDiskAccessPath\Test-TargetResource.the correct mocks were called" time="0.0508" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="calling test should not throw" name="MSFT_xDiskAccessPath\Test-TargetResource.calling test should not throw" time="0.1461" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="result should be true" name="MSFT_xDiskAccessPath\Test-TargetResource.result should be true" time="0.021" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="the correct mocks were called" name="MSFT_xDiskAccessPath\Test-TargetResource.the correct mocks were called" time="0.0535" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="calling test should not throw" name="MSFT_xDiskAccessPath\Test-TargetResource.calling test should not throw" time="0.1469" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="result should be false" name="MSFT_xDiskAccessPath\Test-TargetResource.result should be false" time="0.0069" asserts="0" success="True" result="Ignored" executed="False" />
+          <test-case description="the correct mocks were called" name="MSFT_xDiskAccessPath\Test-TargetResource.the correct mocks were called" time="0.0585" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="calling test should not throw" name="MSFT_xDiskAccessPath\Test-TargetResource.calling test should not throw" time="0.1227" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="result should be true" name="MSFT_xDiskAccessPath\Test-TargetResource.result should be true" time="0.0221" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="the correct mocks were called" name="MSFT_xDiskAccessPath\Test-TargetResource.the correct mocks were called" time="0.0536" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="calling test should not throw" name="MSFT_xDiskAccessPath\Test-TargetResource.calling test should not throw" time="0.1328" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="result should be false" name="MSFT_xDiskAccessPath\Test-TargetResource.result should be false" time="0.0205" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="the correct mocks were called" name="MSFT_xDiskAccessPath\Test-TargetResource.the correct mocks were called" time="0.0501" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="calling test should not throw" name="MSFT_xDiskAccessPath\Test-TargetResource.calling test should not throw" time="0.149" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="result should be true" name="MSFT_xDiskAccessPath\Test-TargetResource.result should be true" time="0.0198" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="the correct mocks were called" name="MSFT_xDiskAccessPath\Test-TargetResource.the correct mocks were called" time="0.0609" asserts="0" success="True" result="Success" executed="True" />
+        </results>
+      </test-suite>
+      <test-suite type="TestFixture" name="MSFT_xMountImage\Get-TargetResource" executed="True" result="Success" success="True" time="0.7951" asserts="0" description="MSFT_xMountImage\Get-TargetResource">
+        <results>
+          <test-case description="Should return expected values" name="MSFT_xMountImage\Get-TargetResource.Should return expected values" time="0.1642" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="all the get mocks should be called" name="MSFT_xMountImage\Get-TargetResource.all the get mocks should be called" time="0.0318" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="Should return expected values" name="MSFT_xMountImage\Get-TargetResource.Should return expected values" time="0.1007" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="all the get mocks should be called" name="MSFT_xMountImage\Get-TargetResource.all the get mocks should be called" time="0.0478" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="Should return expected values" name="MSFT_xMountImage\Get-TargetResource.Should return expected values" time="0.1013" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="all the get mocks should be called" name="MSFT_xMountImage\Get-TargetResource.all the get mocks should be called" time="0.0403" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="Should return expected values" name="MSFT_xMountImage\Get-TargetResource.Should return expected values" time="0.1149" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="all the get mocks should be called" name="MSFT_xMountImage\Get-TargetResource.all the get mocks should be called" time="0.0407" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="Should return expected values" name="MSFT_xMountImage\Get-TargetResource.Should return expected values" time="0.1088" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="all the get mocks should be called" name="MSFT_xMountImage\Get-TargetResource.all the get mocks should be called" time="0.0446" asserts="0" success="True" result="Success" executed="True" />
+        </results>
+      </test-suite>
+      <test-suite type="TestFixture" name="MSFT_xMountImage\Set-TargetResource" executed="True" result="Success" success="True" time="0.8862" asserts="0" description="MSFT_xMountImage\Set-TargetResource">
+        <results>
+          <test-case description="Should not throw exception" name="MSFT_xMountImage\Set-TargetResource.Should not throw exception" time="0.1374" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="all the get mocks should be called" name="MSFT_xMountImage\Set-TargetResource.all the get mocks should be called" time="0.0285" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="Should not throw exception" name="MSFT_xMountImage\Set-TargetResource.Should not throw exception" time="0.1051" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="all the get mocks should be called" name="MSFT_xMountImage\Set-TargetResource.all the get mocks should be called" time="0.0411" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="Should not throw exception" name="MSFT_xMountImage\Set-TargetResource.Should not throw exception" time="0.093" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="all the get mocks should be called" name="MSFT_xMountImage\Set-TargetResource.all the get mocks should be called" time="0.0361" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="Should not throw exception" name="MSFT_xMountImage\Set-TargetResource.Should not throw exception" time="0.1131" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="all the get mocks should be called" name="MSFT_xMountImage\Set-TargetResource.all the get mocks should be called" time="0.0426" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="Should not throw exception" name="MSFT_xMountImage\Set-TargetResource.Should not throw exception" time="0.0935" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="all the get mocks should be called" name="MSFT_xMountImage\Set-TargetResource.all the get mocks should be called" time="0.0385" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="Should not throw exception" name="MSFT_xMountImage\Set-TargetResource.Should not throw exception" time="0.1129" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="all the get mocks should be called" name="MSFT_xMountImage\Set-TargetResource.all the get mocks should be called" time="0.0443" asserts="0" success="True" result="Success" executed="True" />
+        </results>
+      </test-suite>
+      <test-suite type="TestFixture" name="MSFT_xMountImage\Test-TargetResource" executed="True" result="Success" success="True" time="0.8028" asserts="0" description="MSFT_xMountImage\Test-TargetResource">
+        <results>
+          <test-case description="Should return true" name="MSFT_xMountImage\Test-TargetResource.Should return true" time="0.126" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="all the get mocks should be called" name="MSFT_xMountImage\Test-TargetResource.all the get mocks should be called" time="0.0327" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="Should return false" name="MSFT_xMountImage\Test-TargetResource.Should return false" time="0.08" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="all the get mocks should be called" name="MSFT_xMountImage\Test-TargetResource.all the get mocks should be called" time="0.0299" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="Should return false" name="MSFT_xMountImage\Test-TargetResource.Should return false" time="0.098" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="all the get mocks should be called" name="MSFT_xMountImage\Test-TargetResource.all the get mocks should be called" time="0.041" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="Should return false" name="MSFT_xMountImage\Test-TargetResource.Should return false" time="0.0958" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="all the get mocks should be called" name="MSFT_xMountImage\Test-TargetResource.all the get mocks should be called" time="0.0379" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="Should return true" name="MSFT_xMountImage\Test-TargetResource.Should return true" time="0.0912" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="all the get mocks should be called" name="MSFT_xMountImage\Test-TargetResource.all the get mocks should be called" time="0.0321" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="Should return false" name="MSFT_xMountImage\Test-TargetResource.Should return false" time="0.1077" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="all the get mocks should be called" name="MSFT_xMountImage\Test-TargetResource.all the get mocks should be called" time="0.0304" asserts="0" success="True" result="Success" executed="True" />
+        </results>
+      </test-suite>
+      <test-suite type="TestFixture" name="MSFT_xMountImage\Test-ParameterValid" executed="True" result="Success" success="True" time="0.4832" asserts="0" description="MSFT_xMountImage\Test-ParameterValid">
+        <results>
+          <test-case description="Should throw InvalidParameterSpecifiedError exception" name="MSFT_xMountImage\Test-ParameterValid.Should throw InvalidParameterSpecifiedError exception" time="0.0955" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="Should throw InvalidParameterSpecifiedError exception" name="MSFT_xMountImage\Test-ParameterValid.Should throw InvalidParameterSpecifiedError exception" time="0.0586" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="Should throw InvalidParameterSpecifiedError exception" name="MSFT_xMountImage\Test-ParameterValid.Should throw InvalidParameterSpecifiedError exception" time="0.0587" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="Should not throw exception" name="MSFT_xMountImage\Test-ParameterValid.Should not throw exception" time="0.0562" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="Should throw InvalidParameterSpecifiedError exception" name="MSFT_xMountImage\Test-ParameterValid.Should throw InvalidParameterSpecifiedError exception" time="0.0825" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="Should throw InvalidParameterSpecifiedError exception" name="MSFT_xMountImage\Test-ParameterValid.Should throw InvalidParameterSpecifiedError exception" time="0.0646" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="Should not throw exception" name="MSFT_xMountImage\Test-ParameterValid.Should not throw exception" time="0.0671" asserts="0" success="True" result="Success" executed="True" />
+        </results>
+      </test-suite>
+      <test-suite type="TestFixture" name="MSFT_xMountImage\Mount-DiskImageToLetter" executed="True" result="Success" success="True" time="0.7623" asserts="0" description="MSFT_xMountImage\Mount-DiskImageToLetter">
+        <results>
+          <test-case description="Should not throw exception" name="MSFT_xMountImage\Mount-DiskImageToLetter.Should not throw exception" time="0.183" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="all the get mocks should be called" name="MSFT_xMountImage\Mount-DiskImageToLetter.all the get mocks should be called" time="0.0739" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="Should not throw exception" name="MSFT_xMountImage\Mount-DiskImageToLetter.Should not throw exception" time="0.1112" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="all the get mocks should be called" name="MSFT_xMountImage\Mount-DiskImageToLetter.all the get mocks should be called" time="0.0565" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="Should not throw exception" name="MSFT_xMountImage\Mount-DiskImageToLetter.Should not throw exception" time="0.1163" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="all the get mocks should be called" name="MSFT_xMountImage\Mount-DiskImageToLetter.all the get mocks should be called" time="0.0481" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="Should not throw exception" name="MSFT_xMountImage\Mount-DiskImageToLetter.Should not throw exception" time="0.1199" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="all the get mocks should be called" name="MSFT_xMountImage\Mount-DiskImageToLetter.all the get mocks should be called" time="0.0533" asserts="0" success="True" result="Success" executed="True" />
+        </results>
+      </test-suite>
+      <test-suite type="TestFixture" name="MSFT_xWaitForDisk\Get-TargetResource" executed="True" result="Success" success="True" time="0.1455" asserts="0" description="MSFT_xWaitForDisk\Get-TargetResource">
+        <results>
+          <test-case description="DiskNumber Should Be 0" name="MSFT_xWaitForDisk\Get-TargetResource.DiskNumber Should Be 0" time="0.0938" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="RetryIntervalSec Should Be 5" name="MSFT_xWaitForDisk\Get-TargetResource.RetryIntervalSec Should Be 5" time="0.018" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="RetryIntervalSec Should Be 20" name="MSFT_xWaitForDisk\Get-TargetResource.RetryIntervalSec Should Be 20" time="0.0211" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="the correct mocks were called" name="MSFT_xWaitForDisk\Get-TargetResource.the correct mocks were called" time="0.0126" asserts="0" success="True" result="Success" executed="True" />
+        </results>
+      </test-suite>
+      <test-suite type="TestFixture" name="MSFT_xWaitForDisk\Set-TargetResource" executed="True" result="Success" success="True" time="0.5633" asserts="0" description="MSFT_xWaitForDisk\Set-TargetResource">
+        <results>
+          <test-case description="should not throw" name="MSFT_xWaitForDisk\Set-TargetResource.should not throw" time="0.094" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="the correct mocks were called" name="MSFT_xWaitForDisk\Set-TargetResource.the correct mocks were called" time="0.0241" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="should throw DiskNotFoundAfterError" name="MSFT_xWaitForDisk\Set-TargetResource.should throw DiskNotFoundAfterError" time="0.3702" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="the correct mocks were called" name="MSFT_xWaitForDisk\Set-TargetResource.the correct mocks were called" time="0.075" asserts="0" success="True" result="Success" executed="True" />
+        </results>
+      </test-suite>
+      <test-suite type="TestFixture" name="MSFT_xWaitForDisk\Test-TargetResource" executed="True" result="Success" success="True" time="0.2541" asserts="0" description="MSFT_xWaitForDisk\Test-TargetResource">
+        <results>
+          <test-case description="calling test should not throw" name="MSFT_xWaitForDisk\Test-TargetResource.calling test should not throw" time="0.1053" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="result Should Be true" name="MSFT_xWaitForDisk\Test-TargetResource.result Should Be true" time="0.0198" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="the correct mocks were called" name="MSFT_xWaitForDisk\Test-TargetResource.the correct mocks were called" time="0.018" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="calling test should not throw" name="MSFT_xWaitForDisk\Test-TargetResource.calling test should not throw" time="0.0702" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="result Should Be false" name="MSFT_xWaitForDisk\Test-TargetResource.result Should Be false" time="0.0215" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="the correct mocks were called" name="MSFT_xWaitForDisk\Test-TargetResource.the correct mocks were called" time="0.0193" asserts="0" success="True" result="Success" executed="True" />
+        </results>
+      </test-suite>
+      <test-suite type="TestFixture" name="MSFT_xWaitForVolume\Get-TargetResource" executed="True" result="Success" success="True" time="0.1409" asserts="0" description="MSFT_xWaitForVolume\Get-TargetResource">
+        <results>
+          <test-case description="DriveLetter Should Be C" name="MSFT_xWaitForVolume\Get-TargetResource.DriveLetter Should Be C" time="0.0934" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="RetryIntervalSec Should Be 5" name="MSFT_xWaitForVolume\Get-TargetResource.RetryIntervalSec Should Be 5" time="0.0139" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="RetryIntervalSec Should Be 20" name="MSFT_xWaitForVolume\Get-TargetResource.RetryIntervalSec Should Be 20" time="0.0175" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="the correct mocks were called" name="MSFT_xWaitForVolume\Get-TargetResource.the correct mocks were called" time="0.0162" asserts="0" success="True" result="Success" executed="True" />
+        </results>
+      </test-suite>
+      <test-suite type="TestFixture" name="MSFT_xWaitForVolume\Set-TargetResource" executed="True" result="Success" success="True" time="0.6874" asserts="0" description="MSFT_xWaitForVolume\Set-TargetResource">
+        <results>
+          <test-case description="should not throw" name="MSFT_xWaitForVolume\Set-TargetResource.should not throw" time="0.0926" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="the correct mocks were called" name="MSFT_xWaitForVolume\Set-TargetResource.the correct mocks were called" time="0.027" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="should throw VolumeNotFoundAfterError" name="MSFT_xWaitForVolume\Set-TargetResource.should throw VolumeNotFoundAfterError" time="0.4815" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="the correct mocks were called" name="MSFT_xWaitForVolume\Set-TargetResource.the correct mocks were called" time="0.0863" asserts="0" success="True" result="Success" executed="True" />
+        </results>
+      </test-suite>
+      <test-suite type="TestFixture" name="MSFT_xWaitForVolume\Test-TargetResource" executed="True" result="Success" success="True" time="0.2661" asserts="0" description="MSFT_xWaitForVolume\Test-TargetResource">
+        <results>
+          <test-case description="calling test should not throw" name="MSFT_xWaitForVolume\Test-TargetResource.calling test should not throw" time="0.1103" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="result Should Be true" name="MSFT_xWaitForVolume\Test-TargetResource.result Should Be true" time="0.0198" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="the correct mocks were called" name="MSFT_xWaitForVolume\Test-TargetResource.the correct mocks were called" time="0.0277" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="calling test should not throw" name="MSFT_xWaitForVolume\Test-TargetResource.calling test should not throw" time="0.0686" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="result Should Be false" name="MSFT_xWaitForVolume\Test-TargetResource.result Should Be false" time="0.018" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="the correct mocks were called" name="MSFT_xWaitForVolume\Test-TargetResource.the correct mocks were called" time="0.0217" asserts="0" success="True" result="Success" executed="True" />
+        </results>
+      </test-suite>
+      <test-suite type="TestFixture" name="StorageDsc.Common\Assert-DriveLetterValid" executed="True" result="Success" success="True" time="0.4829" asserts="0" description="StorageDsc.Common\Assert-DriveLetterValid">
+        <results>
+          <test-case description="should return 'C'" name="StorageDsc.Common\Assert-DriveLetterValid.should return 'C'" time="0.1211" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="should return 'C:'" name="StorageDsc.Common\Assert-DriveLetterValid.should return 'C:'" time="0.0583" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="should return 'C'" name="StorageDsc.Common\Assert-DriveLetterValid.should return 'C'" time="0.0553" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="should return 'C:'" name="StorageDsc.Common\Assert-DriveLetterValid.should return 'C:'" time="0.0578" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="should throw InvalidDriveLetterFormatError" name="StorageDsc.Common\Assert-DriveLetterValid.should throw InvalidDriveLetterFormatError" time="0.064" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="should throw InvalidDriveLetterFormatError" name="StorageDsc.Common\Assert-DriveLetterValid.should throw InvalidDriveLetterFormatError" time="0.0628" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="should throw InvalidDriveLetterFormatError" name="StorageDsc.Common\Assert-DriveLetterValid.should throw InvalidDriveLetterFormatError" time="0.0636" asserts="0" success="True" result="Success" executed="True" />
+        </results>
+      </test-suite>
+      <test-suite type="TestFixture" name="StorageDsc.Common\Assert-AccessPathValid" executed="True" result="Success" success="True" time="0.4495" asserts="0" description="StorageDsc.Common\Assert-AccessPathValid">
+        <results>
+          <test-case description="should return 'c:\Good'" name="StorageDsc.Common\Assert-AccessPathValid.should return 'c:\Good'" time="0.1314" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="should return 'c:\Good\'" name="StorageDsc.Common\Assert-AccessPathValid.should return 'c:\Good\'" time="0.0638" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="should return 'c:\Good\'" name="StorageDsc.Common\Assert-AccessPathValid.should return 'c:\Good\'" time="0.0916" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="should return 'c:\Good'" name="StorageDsc.Common\Assert-AccessPathValid.should return 'c:\Good'" time="0.0714" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="should throw InvalidAccessPathError" name="StorageDsc.Common\Assert-AccessPathValid.should throw InvalidAccessPathError" time="0.0913" asserts="0" success="True" result="Success" executed="True" />
+        </results>
+      </test-suite>
+      <test-suite type="TestFixture" name="Error in C:\Users\Daniel\Source\GitHub\xStorage\Tests\Integration\MSFT_xMountImage_ISO.Integration.Tests.ps1" executed="True" result="Failure" success="False" time="5.7083" asserts="0" description="Error in C:\Users\Daniel\Source\GitHub\xStorage\Tests\Integration\MSFT_xMountImage_ISO.Integration.Tests.ps1">
+        <results>
+          <test-case description="Error occurred in test script 'C:\Users\Daniel\Source\GitHub\xStorage\Tests\Integration\MSFT_xMountImage_ISO.Integration.Tests.ps1'" name="Error in C:\Users\Daniel\Source\GitHub\xStorage\Tests\Integration\MSFT_xMountImage_ISO.Integration.Tests.ps1.Error occurred in test script 'C:\Users\Daniel\Source\GitHub\xStorage\Tests\Integration\MSFT_xMountImage_ISO.Integration.Tests.ps1'" time="5.7083" asserts="0" success="False" result="Failure" executed="True">
+            <failure>
+              <message>At C:\Users\Daniel\Source\GitHub\xStorage\Tests\Integration\MSFT_xMountImage_mount.config.ps1:3 char:5
++     Import-DscResource -ModuleName xStorage
++     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Multiple versions of the module 'xStorage' were found. You can run 'Get-Module -ListAvailable -FullyQualifiedName xStorage' to see available versions on the system, and then use the fully qualified name '@{ModuleName="xStorage"; RequiredVersion="Version"}'.</message>
+              <stack-trace>at &lt;ScriptBlock&gt;, C:\Users\Daniel\Source\GitHub\xStorage\Tests\Integration\MSFT_xMountImage_ISO.Integration.Tests.ps1: line 58</stack-trace>
+            </failure>
+          </test-case>
+        </results>
+      </test-suite>
+      <test-suite type="TestFixture" name="Error in C:\Users\Daniel\Source\GitHub\xStorage\Tests\Integration\MSFT_xWaitForDisk.Integration.Tests.ps1" executed="True" result="Failure" success="False" time="3.4064" asserts="0" description="Error in C:\Users\Daniel\Source\GitHub\xStorage\Tests\Integration\MSFT_xWaitForDisk.Integration.Tests.ps1">
+        <results>
+          <test-case description="Error occurred in test script 'C:\Users\Daniel\Source\GitHub\xStorage\Tests\Integration\MSFT_xWaitForDisk.Integration.Tests.ps1'" name="Error in C:\Users\Daniel\Source\GitHub\xStorage\Tests\Integration\MSFT_xWaitForDisk.Integration.Tests.ps1.Error occurred in test script 'C:\Users\Daniel\Source\GitHub\xStorage\Tests\Integration\MSFT_xWaitForDisk.Integration.Tests.ps1'" time="3.4064" asserts="0" success="False" result="Failure" executed="True">
+            <failure>
+              <message>At C:\Users\Daniel\Source\GitHub\xStorage\Tests\Integration\MSFT_xWaitForDisk.config.ps1:8 char:5
++     Import-DscResource -ModuleName xStorage
++     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Multiple versions of the module 'xStorage' were found. You can run 'Get-Module -ListAvailable -FullyQualifiedName xStorage' to see available versions on the system, and then use the fully qualified name '@{ModuleName="xStorage"; RequiredVersion="Version"}'.</message>
+              <stack-trace>at &lt;ScriptBlock&gt;, C:\Users\Daniel\Source\GitHub\xStorage\Tests\Integration\MSFT_xWaitForDisk.Integration.Tests.ps1: line 27</stack-trace>
+            </failure>
+          </test-case>
+        </results>
+      </test-suite>
+      <test-suite type="TestFixture" name="Error in C:\Users\Daniel\Source\GitHub\xStorage\Tests\Integration\MSFT_xWaitForVolume.Integration.Tests.ps1" executed="True" result="Failure" success="False" time="1.4484" asserts="0" description="Error in C:\Users\Daniel\Source\GitHub\xStorage\Tests\Integration\MSFT_xWaitForVolume.Integration.Tests.ps1">
+        <results>
+          <test-case description="Error occurred in test script 'C:\Users\Daniel\Source\GitHub\xStorage\Tests\Integration\MSFT_xWaitForVolume.Integration.Tests.ps1'" name="Error in C:\Users\Daniel\Source\GitHub\xStorage\Tests\Integration\MSFT_xWaitForVolume.Integration.Tests.ps1.Error occurred in test script 'C:\Users\Daniel\Source\GitHub\xStorage\Tests\Integration\MSFT_xWaitForVolume.Integration.Tests.ps1'" time="1.4484" asserts="0" success="False" result="Failure" executed="True">
+            <failure>
+              <message>At C:\Users\Daniel\Source\GitHub\xStorage\Tests\Integration\MSFT_xWaitForVolume.config.ps1:8 char:5
++     Import-DscResource -ModuleName xStorage
++     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Multiple versions of the module 'xStorage' were found. You can run 'Get-Module -ListAvailable -FullyQualifiedName xStorage' to see available versions on the system, and then use the fully qualified name '@{ModuleName="xStorage"; RequiredVersion="Version"}'.</message>
+              <stack-trace>at &lt;ScriptBlock&gt;, C:\Users\Daniel\Source\GitHub\xStorage\Tests\Integration\MSFT_xWaitForVolume.Integration.Tests.ps1: line 27</stack-trace>
+            </failure>
+          </test-case>
+        </results>
+      </test-suite>
+      <test-suite type="TestFixture" name="Common Tests - File Formatting" executed="True" result="Failure" success="False" time="0.3435" asserts="0" description="Common Tests - File Formatting">
+        <results>
+          <test-case description="Should not contain any files with Unicode file encoding" name="Common Tests - File Formatting.Should not contain any files with Unicode file encoding" time="0.1327" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="Should not contain any files with tab characters" name="Common Tests - File Formatting.Should not contain any files with tab characters" time="0.0752" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="Should not contain empty files" name="Common Tests - File Formatting.Should not contain empty files" time="0.0675" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="Should not contain files without a newline at the end" name="Common Tests - File Formatting.Should not contain files without a newline at the end" time="0.0681" asserts="0" success="False" result="Failure" executed="True">
+            <failure>
+              <message>Expected: {False}
+But was:  {True}</message>
+              <stack-trace>at line: 98 in C:\Users\Daniel\Source\GitHub\xStorage\DscResource.Tests\Meta.Tests.ps1
+98:         $containsFileWithoutNewLine | Should Be $false
+</stack-trace>
+            </failure>
+          </test-case>
+        </results>
+      </test-suite>
+      <test-suite type="TestFixture" name="Common Tests - .psm1 File Parsing" executed="True" result="Success" success="True" time="0.8775" asserts="0" description="Common Tests - .psm1 File Parsing">
+        <results>
+          <test-case description="Should not contain parse errors" name="Common Tests - .psm1 File Parsing.Should not contain parse errors" time="0.076" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="Should not contain parse errors" name="Common Tests - .psm1 File Parsing.Should not contain parse errors" time="0.0499" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="Should not contain parse errors" name="Common Tests - .psm1 File Parsing.Should not contain parse errors" time="0.0671" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="Should not contain parse errors" name="Common Tests - .psm1 File Parsing.Should not contain parse errors" time="0.0523" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="Should not contain parse errors" name="Common Tests - .psm1 File Parsing.Should not contain parse errors" time="0.0528" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="Should not contain parse errors" name="Common Tests - .psm1 File Parsing.Should not contain parse errors" time="0.0524" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="Should not contain parse errors" name="Common Tests - .psm1 File Parsing.Should not contain parse errors" time="0.0507" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="Should not contain parse errors" name="Common Tests - .psm1 File Parsing.Should not contain parse errors" time="0.0577" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="Should not contain parse errors" name="Common Tests - .psm1 File Parsing.Should not contain parse errors" time="0.0558" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="Should not contain parse errors" name="Common Tests - .psm1 File Parsing.Should not contain parse errors" time="0.0507" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="Should not contain parse errors" name="Common Tests - .psm1 File Parsing.Should not contain parse errors" time="0.0575" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="Should not contain parse errors" name="Common Tests - .psm1 File Parsing.Should not contain parse errors" time="0.0485" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="Should not contain parse errors" name="Common Tests - .psm1 File Parsing.Should not contain parse errors" time="0.0535" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="Should not contain parse errors" name="Common Tests - .psm1 File Parsing.Should not contain parse errors" time="0.05" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="Should not contain parse errors" name="Common Tests - .psm1 File Parsing.Should not contain parse errors" time="0.0511" asserts="0" success="True" result="Success" executed="True" />
+          <test-case description="Should not contain parse errors" name="Common Tests - .psm1 File Parsing.Should not contain parse errors" time="0.0517" asserts="0" success="True" result="Success" executed="True" />
+        </results>
+      </test-suite>
+      <test-suite type="TestFixture" name="Common Tests - Module Manifest" executed="True" result="Failure" success="False" time="0.1093" asserts="0" description="Common Tests - Module Manifest">
+        <results>
+          <test-case description="Should contain a PowerShellVersion property of at least 4.0 based on resource types" name="Common Tests - Module Manifest.Should contain a PowerShellVersion property of at least 4.0 based on resource types" time="0.1093" asserts="0" success="False" result="Failure" executed="True">
+            <failure>
+              <message>The property 'PowerShellVersion' cannot be found on this object. Verify that the property exists.</message>
+              <stack-trace>at line: 151 in C:\Users\Daniel\Source\GitHub\xStorage\DscResource.Tests\Meta.Tests.ps1</stack-trace>
+            </failure>
+          </test-case>
+        </results>
+      </test-suite>
+    </results>
+  </test-suite>
+</test-results>
