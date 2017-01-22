@@ -57,7 +57,3 @@ deploy_script:
           Write-Host "Pushing package $_ as Appveyor artifact"
           Push-AppveyorArtifact $_
         }
-
-
-
-
