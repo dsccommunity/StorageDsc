@@ -87,7 +87,7 @@ If you would like to contribute to this repository, please read the DSC Resource
 
 ### Unreleased
 
-- Converted AppVeyor build process to use AppVeyor.yml.
+- Converted AppVeyor build process to use AppVeyor.psm1.
 
 ### 2.9.0.0
 
