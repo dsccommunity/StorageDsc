@@ -3,9 +3,7 @@
 #---------------------------------#
 version: 2.9.{build}.0
 install:
-    - git clone https://github.com/PlagueHO/DscResource.Tests
-    - npm install -g gulp
-    - npm install
+    - git clone https://github.com/PowerShell/DscResource.Tests
 
     - ps: |
         $moduleName = 'xStorage'
