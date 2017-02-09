@@ -9,6 +9,7 @@
 - Move shared modules into Modules folder.
 - Fixed unit tests.
 - Removed support for WMI cmdlets.
+- Opted in to Markdown and Example tests.
 
 ## 2.9.0.0
 
