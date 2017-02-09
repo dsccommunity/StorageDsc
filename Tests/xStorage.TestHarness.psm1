@@ -14,23 +14,21 @@ function Invoke-xStorageTest
 
     $testCoverageFiles = @()
     Get-ChildItem -Path "$repoDir\modules\xStorage\DSCResources\**\*.psm1" -Recurse | ForEach-Object {
-        if ($_.FullName -notlike '*\DSCResource.Tests\*') {
+        if ($_.FullName -notlike '*\DSCResource.Tests\*')
+        {
             $testCoverageFiles += $_.FullName
         }
     }
 
     $testResultSettings = @{ }
-    if ([String]::IsNullOrEmpty($TestResultsFile) -eq $false) {
+    if ([String]::IsNullOrEmpty($TestResultsFile) -eq $false)
+    {
         $testResultSettings.Add('OutputFormat', 'NUnitXml' )
         $testResultSettings.Add('OutputFile', $TestResultsFile)
     }
 
     Import-Module -Name "$repoDir\modules\xStorage\xStorage.psd1"
     $testsToRun = @()
-
-    # Helper tests
-    $helperTestsPath = Join-Path -Path $repoDir -ChildPath 'Tests\Helper'
-    $testsToRun += @( (Get-ChildItem -Path $helperTestsPath).FullName )
 
     # Run Unit Tests
     $unitTestsPath = Join-Path -Path $repoDir -ChildPath 'Tests\Unit'
