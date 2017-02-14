@@ -1,11 +1,13 @@
-function Invoke-xStorageTest
+function Invoke-TestHarness
 {
     [CmdletBinding()]
     param
     (
-        [System.String] $TestResultsFile,
+        [System.String]
+        $TestResultsFile,
 
-        [System.String] $DscTestsPath
+        [System.String]
+        $DscTestsPath
     )
 
     Write-Verbose -Message 'Commencing all xStorage tests'
