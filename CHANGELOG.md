@@ -10,6 +10,7 @@
 - Fixed unit tests.
 - Removed support for WMI cmdlets.
 - Opted in to Markdown and Example tests.
+- Added CodeCov.io support.
 
 ## 2.9.0.0
 
