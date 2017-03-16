@@ -41,5 +41,5 @@ Configuration Sample_DataDisk
     }
 }
 
-DataDisk -outputpath C:\Sample_DataDisk
+Sample_DataDisk -outputpath C:\Sample_DataDisk
 Start-DscConfiguration -Path C:\Sample_DataDisk -Wait -Force -Verbose
