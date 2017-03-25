@@ -12,7 +12,8 @@
 - Opted in to Markdown and Example tests.
 - Added CodeCov.io support.
 - Removed requirement on using Pester 3.4.6 because Pester bug fixed in 4.0.3.
-- Fixed unit tests for MSFT_xDiskAccessPath resource to be compatible with Pester 4.0.3.
+- Fixed unit tests for MSFT_xDiskAccessPath resource to be compatible with
+  Pester 4.0.3.
 
 ## 2.9.0.0
 
