@@ -14,6 +14,9 @@
 - Removed requirement on using Pester 3.4.6 because Pester bug fixed in 4.0.3.
 - Fixed unit tests for MSFT_xDiskAccessPath resource to be compatible with
   Pester 4.0.3.
+- Fixed style violations in xDisk.
+- Added DiskUniqueId parameter to xDisk to allow alternate selection of disk.
+- Changed DiskNumber parameter in xDisk to be optional to allow alternate of disk.
 
 ## 2.9.0.0
 

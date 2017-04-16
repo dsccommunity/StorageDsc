@@ -21,7 +21,10 @@ $localizedData = Get-LocalizedData `
     Specifies the preferred letter to assign to the disk volume.
 
     .PARAMETER DiskNumber
-    Specifies the disk number for which disk to modify.
+    Specifies the disk number for which disk to modify. Should not be set if DiskUniqueId is set.
+
+    .PARAMETER DiskUniqueId
+    Specifies the disk unique id for which disk to modify. Should not be set if DiskNumber is set.
 
     .PARAMETER Size
     Specifies the size of new volume (use all available space on disk if not provided).
@@ -42,32 +45,44 @@ function Get-TargetResource
     param
     (
         [parameter(Mandatory)]
-        [System.String] $DriveLetter,
+        [System.String]
+        $DriveLetter,
 
-        [parameter(Mandatory)]
-        [uint32] $DiskNumber,
+        [System.UInt32]
+        $DiskNumber,
 
-        [UInt64] $Size,
+        [System.String]
+        $DiskUniqueId,
 
-        [System.String] $FSLabel,
+        [System.UInt64]
+        $Size,
 
-        [UInt32] $AllocationUnitSize,
+        [System.String]
+        $FSLabel,
+
+        [System.UInt32]
+        $AllocationUnitSize,
 
         [ValidateSet("NTFS","ReFS")]
         [System.String]
         $FSFormat = 'NTFS'
     )
 
+    # Validate and get the Disk Identifier parameter to use for getting the disk
+    $diskIdParameter = Get-DiskIdentifierParameter @PSBoundParameters
+    $diskIdParameterName = $($diskIdParameter.Keys[0])
+    $diskIdParameterValue = $($diskIdParameter[$diskIdParameter.Keys[0]])
+
     Write-Verbose -Message ( @(
             "$($MyInvocation.MyCommand): "
-            $($localizedData.GettingDiskMessage -f $DiskNumber,$DriveLetter)
+            $($localizedData.GettingDiskMessage -f $diskIdParameterName,$diskIdParameterValue,$DriveLetter)
         ) -join '' )
 
     # Validate the DriveLetter parameter
     $DriveLetter = Assert-DriveLetterValid -DriveLetter $DriveLetter
 
     $disk = Get-Disk `
-        -Number $DiskNumber `
+        @diskIdParameter `
         -ErrorAction SilentlyContinue
 
     $partition = Get-Partition `
@@ -87,6 +102,7 @@ function Get-TargetResource
 
     $returnValue = @{
         DiskNumber = $disk.Number
+        DiskUniqueId = $disk.UniqueId
         DriveLetter = $partition.DriveLetter
         Size = $partition.Size
         FSLabel = $FSLabel
@@ -104,7 +120,10 @@ function Get-TargetResource
     Specifies the preferred letter to assign to the disk volume.
 
     .PARAMETER DiskNumber
-    Specifies the disk number for which disk to modify.
+    Specifies the disk number for which disk to modify. Should not be set if DiskUniqueId is set.
+
+    .PARAMETER DiskUniqueId
+    Specifies the disk unique id for which disk to modify. Should not be set if DiskNumber is set.
 
     .PARAMETER Size
     Specifies the size of new volume (use all available space on disk if not provided).
@@ -126,32 +145,44 @@ function Set-TargetResource
     param
     (
         [parameter(Mandatory)]
-        [System.String] $DriveLetter,
+        [System.String]
+        $DriveLetter,
 
-        [parameter(Mandatory)]
-        [uint32] $DiskNumber,
+        [System.UInt32]
+        $DiskNumber,
 
-        [UInt64] $Size,
+        [System.String]
+        $DiskUniqueId,
 
-        [System.String] $FSLabel,
+        [System.UInt64]
+        $Size,
 
-        [UInt32] $AllocationUnitSize,
+        [System.String]
+        $FSLabel,
+
+        [System.UInt32]
+        $AllocationUnitSize,
 
         [ValidateSet("NTFS","ReFS")]
         [System.String]
         $FSFormat = 'NTFS'
     )
 
+    # Validate and get the Disk Identifier parameter to use for getting the disk
+    $diskIdParameter = Get-DiskIdentifierParameter @PSBoundParameters
+    $diskIdParameterName = $($diskIdParameter.Keys[0])
+    $diskIdParameterValue = $($diskIdParameter[$diskIdParameter.Keys[0]])
+
     Write-Verbose -Message ( @(
             "$($MyInvocation.MyCommand): "
-            $($localizedData.SettingDiskMessage -f $DiskNumber,$DriveLetter)
+            $($localizedData.SettingDiskMessage -f $diskIdParameterName,$diskIdParameterValue,$DriveLetter)
         ) -join '' )
 
     # Validate the DriveLetter parameter
     $DriveLetter = Assert-DriveLetterValid -DriveLetter $DriveLetter
 
     $disk = Get-Disk `
-        -Number $DiskNumber `
+        @diskIdParameter `
         -ErrorAction Stop
 
     if ($disk.IsOffline)
@@ -159,7 +190,7 @@ function Set-TargetResource
         # Disk is offline, so bring it online
         Write-Verbose -Message ( @(
                 "$($MyInvocation.MyCommand): "
-                $($localizedData.SetDiskOnlineMessage -f $DiskNumber)
+                $($localizedData.SetDiskOnlineMessage -f $diskIdParameterName,$diskIdParameterValue)
             ) -join '' )
 
         $disk | Set-Disk -IsOffline $false
@@ -170,7 +201,7 @@ function Set-TargetResource
         # Disk is read-only, so make it read/write
         Write-Verbose -Message ( @(
                 "$($MyInvocation.MyCommand): "
-                $($localizedData.SetDiskReadwriteMessage -f $DiskNumber)
+                $($localizedData.SetDiskReadwriteMessage -f $diskIdParameterName,$diskIdParameterValue)
             ) -join '' )
 
         $disk | Set-Disk -IsReadOnly $false
@@ -178,7 +209,7 @@ function Set-TargetResource
 
     Write-Verbose -Message ( @(
             "$($MyInvocation.MyCommand): "
-            $($localizedData.CheckingDiskPartitionStyleMessage -f $DiskNumber)
+            $($localizedData.CheckingDiskPartitionStyleMessage -f $diskIdParameterName,$diskIdParameterValue)
         ) -join '' )
 
     switch ($disk.PartitionStyle)
@@ -188,7 +219,7 @@ function Set-TargetResource
             # The disk partition table is not yet initialized, so initialize it with GPT
             Write-Verbose -Message ( @(
                     "$($MyInvocation.MyCommand): "
-                    $($localizedData.InitializingDiskMessage -f $DiskNumber)
+                    $($localizedData.InitializingDiskMessage -f $diskIdParameterName,$diskIdParameterValue)
                 ) -join '' )
 
             $disk | Initialize-Disk `
@@ -201,7 +232,7 @@ function Set-TargetResource
             # The disk partition is already initialized with GPT.
             Write-Verbose -Message ( @(
                     "$($MyInvocation.MyCommand): "
-                    $($localizedData.DiskAlreadyInitializedMessage -f $DiskNumber)
+                    $($localizedData.DiskAlreadyInitializedMessage -f $diskIdParameterName,$diskIdParameterValue)
                 ) -join '' )
 
             break
@@ -211,7 +242,7 @@ function Set-TargetResource
             # This disk is initialized but not as GPT - so raise an exception.
             New-InvalidOperationException `
                 -Message ($localizedData.DiskAlreadyInitializedError -f `
-                    $DiskNumber,$Disk.PartitionStyle)
+                    $diskIdParameterName,$diskIdParameterValue,$Disk.PartitionStyle)
         } # default
     } # switch
 
@@ -223,7 +254,6 @@ function Set-TargetResource
         # There is no partiton on the disk, so create one
         $partitionParams = @{
             DriveLetter = $DriveLetter
-            DiskNumber = $DiskNumber
         }
 
         if ($Size)
@@ -232,7 +262,7 @@ function Set-TargetResource
             Write-Verbose -Message ( @(
                     "$($MyInvocation.MyCommand): "
                     $($localizedData.CreatingPartitionMessage `
-                        -f $DiskNumber,$DriveLetter,"$($Size/1KB) KB")
+                        -f $diskIdParameterName,$diskIdParameterValue,$DriveLetter,"$($Size/1KB) KB")
                 ) -join '' )
 
             $partitionParams["Size"] = $Size
@@ -243,14 +273,14 @@ function Set-TargetResource
             Write-Verbose -Message ( @(
                     "$($MyInvocation.MyCommand): "
                     $($localizedData.CreatingPartitionMessage `
-                        -f $DiskNumber,$DriveLetter,'all free space')
+                        -f $diskIdParameterName,$diskIdParameterValue,$DriveLetter,'all free space')
                 ) -join '' )
 
             $partitionParams["UseMaximumSize"] = $true
         } # if
 
         # Create the partition.
-        $partition = New-Partition @partitionParams
+        $partition = $disk | New-Partition @partitionParams
 
         # After creating the partition it can take a few seconds for it to become writeable
         # Wait for up to 30 seconds for the parition to become writeable
@@ -261,7 +291,7 @@ function Set-TargetResource
             Write-Verbose -Message ( @(
                     "$($MyInvocation.MyCommand): "
                     ($localizedData.NewPartitionIsReadOnlyMessage `
-                        -f $partition.DiskNumber,$partition.PartitionNumber)
+                        -f $diskIdParameterName,$diskIdParameterValue,$partition.PartitionNumber)
                 ) -join '' )
 
             Start-Sleep -Seconds 1
@@ -275,7 +305,7 @@ function Set-TargetResource
             # The partition is still readonly - throw an exception
             New-InvalidOperationException `
                 -Message ($localizedData.ParitionIsReadOnlyError -f `
-                    $partition.DiskNumber,$partition.PartitionNumber)
+                    $diskIdParameterName,$diskIdParameterValue,$partition.PartitionNumber)
         } # if
 
         $volParams = @{
@@ -358,7 +388,7 @@ function Set-TargetResource
                 ) -join '' )
 
             Set-Partition `
-                -DiskNumber $DiskNumber `
+                @diskIdParameter `
                 -PartitionNumber 2 `
                 -NewDriveLetter $DriveLetter
         } # if
@@ -389,7 +419,10 @@ function Set-TargetResource
     Specifies the preferred letter to assign to the disk volume.
 
     .PARAMETER DiskNumber
-    Specifies the disk number for which disk to modify.
+    Specifies the disk number for which disk to modify. Should not be set if DiskUniqueId is set.
+
+    .PARAMETER DiskUniqueId
+    Specifies the disk unique id for which disk to modify. Should not be set if DiskNumber is set.
 
     .PARAMETER Size
     Specifies the size of new volume (use all available space on disk if not provided).
@@ -410,25 +443,37 @@ function Test-TargetResource
     param
     (
         [parameter(Mandatory)]
-        [System.String] $DriveLetter,
+        [System.String]
+        $DriveLetter,
 
-        [parameter(Mandatory)]
-        [uint32] $DiskNumber,
+        [System.UInt32]
+        $DiskNumber,
 
-        [UInt64] $Size,
+        [System.String]
+        $DiskUniqueId,
 
-        [System.String] $FSLabel,
+        [System.UInt64]
+        $Size,
 
-        [UInt32] $AllocationUnitSize,
+        [System.String]
+        $FSLabel,
+
+        [System.UInt32]
+        $AllocationUnitSize,
 
         [ValidateSet("NTFS","ReFS")]
         [System.String]
         $FSFormat = 'NTFS'
     )
 
+    # Validate and get the Disk Identifier parameter to use for getting the disk
+    $diskIdParameter = Get-DiskIdentifierParameter @PSBoundParameters
+    $diskIdParameterName = $($diskIdParameter.Keys[0])
+    $diskIdParameterValue = $($diskIdParameter[$diskIdParameter.Keys[0]])
+
     Write-Verbose -Message ( @(
             "$($MyInvocation.MyCommand): "
-            $($localizedData.TestingDiskMessage -f $DiskNumber,$DriveLetter)
+            $($localizedData.TestingDiskMessage -f $diskIdParameterName,$diskIdParameterValue,$DriveLetter)
         ) -join '' )
 
     # Validate the DriveLetter parameter
@@ -436,18 +481,18 @@ function Test-TargetResource
 
     Write-Verbose -Message ( @(
             "$($MyInvocation.MyCommand): "
-            $($localizedData.CheckDiskInitializedMessage -f $DiskNumber)
+            $($localizedData.CheckDiskInitializedMessage -f $diskIdParameterName,$diskIdParameterValue)
         ) -join '' )
 
     $disk = Get-Disk `
-        -Number $DiskNumber `
+        @diskIdParameter `
         -ErrorAction SilentlyContinue
 
     if (-not $disk)
     {
         Write-Verbose -Message ( @(
                 "$($MyInvocation.MyCommand): "
-                $($localizedData.DiskNotFoundMessage -f $DiskNumber)
+                $($localizedData.DiskNotFoundMessage -f $diskIdParameterName,$diskIdParameterValue)
             ) -join '' )
 
         return $false
@@ -457,7 +502,7 @@ function Test-TargetResource
     {
         Write-Verbose -Message ( @(
                 "$($MyInvocation.MyCommand): "
-                $($localizedData.DiskNotOnlineMessage -f $DiskNumber)
+                $($localizedData.DiskNotOnlineMessage -f $diskIdParameterName,$diskIdParameterValue)
             ) -join '' )
 
         return $false
@@ -467,7 +512,7 @@ function Test-TargetResource
     {
         Write-Verbose -Message ( @(
                 "$($MyInvocation.MyCommand): "
-                $($localizedData.DiskReadOnlyMessage -f $DiskNumber)
+                $($localizedData.DiskReadOnlyMessage -f $diskIdParameterName,$diskIdParameterValue)
             ) -join '' )
 
         return $false
@@ -477,7 +522,7 @@ function Test-TargetResource
     {
         Write-Verbose -Message ( @(
                 "$($MyInvocation.MyCommand): "
-                $($localizedData.DiskNotGPTMessage -f $DiskNumber,$Disk.PartitionStyle)
+                $($localizedData.DiskNotGPTMessage -f $diskIdParameterName,$diskIdParameterValue,$Disk.PartitionStyle)
             ) -join '' )
 
         return $false
@@ -566,5 +611,84 @@ function Test-TargetResource
 
     return $true
 } # Test-TargetResource
+
+<#
+    .SYNOPSIS
+    Returns a hashtable containing the parameter to use to identify the disk to work with.
+
+    .PARAMETER DiskNumber
+    Specifies the disk number for which disk to modify. Should not be set if DiskUniqueId is set.
+
+    .PARAMETER DiskUniqueId
+    Specifies the disk unique id for which disk to modify. Should not be set if DiskNumber is set.
+
+    .PARAMETER Size
+    Specifies the size of new volume (use all available space on disk if not provided).
+
+    .PARAMETER FSLabel
+    Specifies the volume label to assign to the volume.
+
+    .PARAMETER AllocationUnitSize
+    Specifies the allocation unit size to use when formatting the volume.
+
+    .PARAMETER FSFormat
+    Specifies the file system format of the new volume.
+#>
+function Get-DiskIdentifierParameter
+{
+    [CmdletBinding()]
+    [OutputType([System.Collections.Hashtable])]
+    param
+    (
+        [parameter(Mandatory)]
+        [System.String]
+        $DriveLetter,
+
+        [System.UInt32]
+        $DiskNumber,
+
+        [System.String]
+        $DiskUniqueId,
+
+        [System.UInt64]
+        $Size,
+
+        [System.String]
+        $FSLabel,
+
+        [System.UInt32]
+        $AllocationUnitSize,
+
+        [ValidateSet("NTFS","ReFS")]
+        [System.String]
+        $FSFormat = 'NTFS'
+    )
+
+    $containsDiskNumber = $PSBoundParameters.ContainsKey('DiskNumber')
+    $containsDiskUniqueId = $PSBoundParameters.ContainsKey('DiskUniqueId')
+
+    if ($containsDiskNumber -and $containsDiskUniqueId)
+    {
+        New-InvalidArgumentException `
+            -Message $LocalizedData.InvalidDiskIdParameterCombination `
+            -ArgumentName 'DiskUniqueId'
+    }
+    elseif ($containsDiskNumber)
+    {
+        $diskIdParameter = @{ Number = $DiskNumber }
+    }
+    elseif ($containsDiskUniqueId)
+    {
+
+        $diskIdParameter = @{ UniqueId = $DiskUniqueId }
+    }
+    else
+    {
+        New-InvalidArgumentException `
+            -Message $LocalizedData.MissingDiskIdParameters `
+            -ArgumentName 'DiskNumber'
+    }
+    return $diskIdParameter
+} # Get-DiskIdentifierParameter
 
 Export-ModuleMember -Function *-TargetResource

@@ -29,10 +29,12 @@ try
     InModuleScope $script:DSCResourceName {
         #region Pester Test Initialization
         $script:testDriveLetter = 'G'
+        $script:testDriveUniqueId = 'TESTDISKUNIQUEID'
 
         $script:mockedDisk0 = [pscustomobject] @{
                 Number = 0
                 DiskNumber = 0
+                UniqueId = $script:testDriveUniqueId
                 IsOffline = $false
                 IsReadOnly = $false
                 PartitionStyle = 'GPT'
@@ -41,6 +43,7 @@ try
         $script:mockedDisk0Mbr = [pscustomobject] @{
                 Number = 0
                 DiskNumber = 0
+                UniqueId = $script:testDriveUniqueId
                 IsOffline = $false
                 IsReadOnly = $false
                 PartitionStyle = 'MBR'
@@ -49,6 +52,7 @@ try
         $script:mockedDisk0Offline = [pscustomobject] @{
                 Number = 0
                 DiskNumber = 0
+                UniqueId = $script:testDriveUniqueId
                 IsOffline = $true
                 IsReadOnly = $false
                 PartitionStyle = 'GPT'
@@ -57,6 +61,7 @@ try
         $script:mockedDisk0OfflineRaw = [pscustomobject] @{
                 Number = 0
                 DiskNumber = 0
+                UniqueId = $script:testDriveUniqueId
                 IsOffline = $true
                 IsReadOnly = $false
                 PartitionStyle = 'Raw'
@@ -65,6 +70,7 @@ try
         $script:mockedDisk0Readonly = [pscustomobject] @{
                 Number = 0
                 DiskNumber = 0
+                UniqueId = $script:testDriveUniqueId
                 IsOffline = $false
                 IsReadOnly = $true
                 PartitionStyle = 'GPT'
@@ -73,6 +79,7 @@ try
         $script:mockedDisk0Raw = [pscustomobject] @{
                 Number = 0
                 DiskNumber = 0
+                UniqueId = $script:testDriveUniqueId
                 IsOffline = $false
                 IsReadOnly = $false
                 PartitionStyle = 'Raw'
@@ -152,6 +159,24 @@ try
             )
         }
 
+        function New-Partition {
+            Param
+            (
+                [CmdletBinding()]
+                [Parameter(ValueFromPipeline)]
+                $Disk,
+
+                [String]
+                $DriveLetter,
+
+                [Boolean]
+                $UseMaximumSize,
+
+                [UInt64]
+                $Size
+            )
+        }
+
         function Get-Volume {
             Param
             (
@@ -203,7 +228,7 @@ try
 
         #region Function Get-TargetResource
         Describe 'MSFT_xDisk\Get-TargetResource' {
-            Context 'Online GPT disk with a partition/volume and correct Drive Letter assigned' {
+            Context 'Online GPT disk with a partition/volume and correct Drive Letter assigned using DiskNumber' {
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Get-CimInstance `
@@ -259,7 +284,63 @@ try
                 }
             }
 
-            Context 'Online GPT disk with no partition' {
+            Context 'Online GPT disk with a partition/volume and correct Drive Letter assigned using DiskUniqueId' {
+                # verifiable (should be called) mocks
+                Mock `
+                    -CommandName Get-CimInstance `
+                    -MockWith { $script:mockedCim } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-Disk `
+                    -MockWith { $script:mockedDisk0 } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-Partition `
+                    -MockWith { $script:mockedPartition } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-Volume `
+                    -MockWith { $script:mockedVolume } `
+                    -Verifiable
+
+                $resource = Get-TargetResource `
+                    -DiskUniqueId $script:testDriveUniqueId `
+                    -DriveLetter $script:testDriveLetter `
+                    -Verbose
+
+                It "DiskUniqueId should be $($script:mockedDisk0.UniqueId)" {
+                    $resource.DiskUniqueId | Should be $script:mockedDisk0.UniqueId
+                }
+
+                It "DriveLetter should be $($script:testDriveLetter)" {
+                    $resource.DriveLetter | Should be $script:testDriveLetter
+                }
+
+                It "Size should be $($script:mockedPartition.Size)" {
+                    $resource.Size | Should be $script:mockedPartition.Size
+                }
+
+                It "FSLabel should be $($script:mockedVolume.FileSystemLabel)" {
+                    $resource.FSLabel | Should be $script:mockedVolume.FileSystemLabel
+                }
+
+                It "AllocationUnitSize should be $($script:mockedCim.BlockSize)" {
+                    $resource.AllocationUnitSize | Should be $script:mockedCim.BlockSize
+                }
+
+                It "FSFormat should be $($script:mockedVolume.FileSystem)" {
+                    $resource.FSFormat | Should be $script:mockedVolume.FileSystem
+                }
+
+                It 'all the get mocks should be called' {
+                    Assert-VerifiableMocks
+                }
+            }
+
+            Context 'Online GPT disk with no partition using DiskNumber' {
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Get-CimInstance `
@@ -285,6 +366,63 @@ try
 
                 It "DiskNumber should be $($script:mockedDisk0.Number)" {
                     $resource.DiskNumber | Should be $script:mockedDisk0.Number
+                }
+
+                It "DriveLetter should be null" {
+                    $resource.DriveLetter | Should be $null
+                }
+
+                It "Size should be null" {
+                    $resource.Size | Should be $null
+                }
+
+                It "FSLabel should be empty" {
+                    $resource.FSLabel | Should be ''
+                }
+
+                It "AllocationUnitSize should be null" {
+                    $resource.AllocationUnitSize | Should be $null
+                }
+
+                It "FSFormat should be null" {
+                    $resource.FSFormat | Should be $null
+                }
+
+                It 'all the get mocks should be called' {
+                    Assert-VerifiableMocks
+                    Assert-MockCalled -CommandName Get-CimInstance -Exactly 1
+                    Assert-MockCalled -CommandName Get-Disk -Exactly 1
+                    Assert-MockCalled -CommandName Get-Partition -Exactly 1
+                    Assert-MockCalled -CommandName Get-Volume -Exactly 1
+                }
+            }
+
+            Context 'Online GPT disk with no partition using DiskUniqueId' {
+                # verifiable (should be called) mocks
+                Mock `
+                    -CommandName Get-CimInstance `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-Disk `
+                    -MockWith { $script:mockedDisk0 } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-Partition `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-Volume `
+                    -Verifiable
+
+                $resource = Get-TargetResource `
+                    -DiskUniqueId $script:testDriveUniqueId `
+                    -DriveLetter $script:testDriveLetter `
+                    -Verbose
+
+                It "DiskUniqueId should be $($script:mockedDisk0.UniqueId)" {
+                    $resource.DiskUniqueId | Should be $script:mockedDisk0.UniqueId
                 }
 
                 It "DriveLetter should be null" {
@@ -354,7 +492,7 @@ try
 
                 It 'Should not throw' {
                     {
-                        Set-targetResource `
+                        Set-TargetResource `
                             -DiskNumber 0 `
                             -Driveletter $script:testDriveLetter `
                             -Verbose
@@ -411,7 +549,7 @@ try
 
                 It 'Should not throw' {
                     {
-                        Set-targetResource `
+                        Set-TargetResource `
                             -DiskNumber 0 `
                             -Driveletter $script:testDriveLetter `
                             -Verbose
@@ -471,7 +609,7 @@ try
 
                 It 'Should not throw' {
                     {
-                        Set-targetResource `
+                        Set-TargetResource `
                             -DiskNumber 0 `
                             -Driveletter $script:testDriveLetter `
                             -Verbose
@@ -528,7 +666,7 @@ try
 
                 It 'Should not throw' {
                     {
-                        Set-targetResource `
+                        Set-TargetResource `
                             -DiskNumber 0 `
                             -Driveletter $script:testDriveLetter `
                             -Verbose
@@ -582,7 +720,7 @@ try
 
                 It 'Should not throw' {
                     {
-                        Set-targetResource `
+                        Set-TargetResource `
                             -DiskNumber 0 `
                             -Driveletter $script:testDriveLetter `
                             -Verbose
@@ -623,11 +761,11 @@ try
 
                 $errorRecord = Get-InvalidOperationRecord `
                     -Message ($LocalizedData.DiskAlreadyInitializedError -f `
-                        0,$script:mockedDisk0Mbr.PartitionStyle)
+                        'Number',0,$script:mockedDisk0Mbr.PartitionStyle)
 
                 It 'Should throw DiskAlreadyInitializedError' {
                     {
-                        Set-targetResource `
+                        Set-TargetResource `
                             -DiskNumber 0 `
                             -Driveletter $script:testDriveLetter `
                             -Verbose
@@ -673,7 +811,7 @@ try
 
                 It 'Should not throw' {
                     {
-                        Set-targetResource `
+                        Set-TargetResource `
                             -DiskNumber 0 `
                             -Driveletter $script:testDriveLetter `
                             -Verbose
@@ -722,7 +860,7 @@ try
 
                 It 'Should not throw' {
                     {
-                        Set-targetResource `
+                        Set-TargetResource `
                             -DiskNumber 0 `
                             -Driveletter $script:testDriveLetter `
                             -Verbose
@@ -771,7 +909,7 @@ try
 
                 It 'Should not throw' {
                     {
-                        Set-targetResource `
+                        Set-TargetResource `
                             -DiskNumber 0 `
                             -Driveletter 'H' `
                             -Verbose
@@ -821,7 +959,7 @@ try
 
                 It 'Should not throw' {
                     {
-                        Set-targetResource `
+                        Set-TargetResource `
                             -DiskNumber 0 `
                             -Driveletter $script:testDriveLetter `
                             -FSLabel 'NewLabel' `
@@ -1197,6 +1335,62 @@ try
                     Assert-MockCalled -CommandName Get-Partition -Times 1
                     Assert-MockCalled -CommandName Get-Volume -Times 1
                     Assert-MockCalled -CommandName Get-CimInstance -Times 1
+                }
+            }
+        }
+        #endregion
+
+        #region Function Get-DiskIdentifierParameter
+        Describe 'MSFT_xDisk\Get-DiskIdentifierParameter' {
+            Context 'DiskNumber and DiskUniqueId passed' {
+                $errorRecord = Get-InvalidArgumentRecord `
+                    -Message $LocalizedData.InvalidDiskIdParameterCombination `
+                    -ArgumentName 'DiskUniqueId'
+
+                It 'should throw InvalidDiskIdParameterCombination' {
+                    { $diskIdentifierParameter = Get-DiskIdentifierParameter `
+                        -DriveLetter $script:testDriveLetter `
+                        -DiskNumber 0 `
+                        -DiskUniqueId $script:testDriveUniqueId `
+                        -Verbose } | Should Throw $errorRecord
+                }
+            }
+
+            Context 'DiskNumber and DiskUniqueId not passed' {
+                $errorRecord = Get-InvalidArgumentRecord `
+                    -Message $LocalizedData.MissingDiskIdParameters `
+                    -ArgumentName 'DiskNumber'
+
+                It 'should throw MissingDiskIdParameters' {
+                    { $diskIdentifierParameter = Get-DiskIdentifierParameter `
+                        -DriveLetter $script:testDriveLetter `
+                        -Verbose } | Should Throw $errorRecord
+                }
+            }
+
+            Context 'DiskNumber passed' {
+                $diskIdentifierParameter = Get-DiskIdentifierParameter `
+                    -DiskNumber 0 `
+                    -DriveLetter $script:testDriveLetter `
+                    -Verbose
+                
+                It 'should return hashtable with Number set to 0' {
+                    $diskIdentifierParameter | Should BeOfType System.Collections.Hashtable
+                    $diskIdentifierParameter.Keys[0] | Should Be 'Number'
+                    $diskIdentifierParameter[$diskIdentifierParameter.Keys[0]] | Should Be 0
+                }
+            }
+
+            Context 'DiskUniqueId passed' {
+                $diskIdentifierParameter = Get-DiskIdentifierParameter `
+                    -DiskUniqueId $script:testDriveUniqueId `
+                    -DriveLetter $script:testDriveLetter `
+                    -Verbose
+                
+                It "should return hashtable with UniqueId set to '$($script:testDriveUniqueId)'" {
+                    $diskIdentifierParameter | Should BeOfType System.Collections.Hashtable
+                    $diskIdentifierParameter.Keys[0] | Should Be 'UniqueId'
+                    $diskIdentifierParameter[$diskIdentifierParameter.Keys[0]] | Should Be $script:testDriveUniqueId
                 }
             }
         }

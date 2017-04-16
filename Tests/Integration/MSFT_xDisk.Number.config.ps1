@@ -1,4 +1,4 @@
-configuration MSFT_xDisk_Config {
+configuration MSFT_xDisk_Number_Config {
 
     Import-DscResource -ModuleName xStorage
 
