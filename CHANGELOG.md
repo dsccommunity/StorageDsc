@@ -15,8 +15,10 @@
 - Fixed unit tests for MSFT_xDiskAccessPath resource to be compatible with
   Pester 4.0.3.
 - Fixed style violations in xDisk.
-- Added DiskUniqueId parameter to xDisk to allow alternate selection of disk.
-- Changed DiskNumber parameter in xDisk to be optional to allow alternate of disk.
+- BREAKING CHANGE: Renamed DiskNumber parameter to DiskId to enable it to contain
+  either DiskNumber or UniqueId.
+- Added DiskIdType parameter to enable specifying the type of identifer the DiskId
+  contains.
 
 ## 2.9.0.0
 

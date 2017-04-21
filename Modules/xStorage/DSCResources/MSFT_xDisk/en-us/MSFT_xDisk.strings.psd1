@@ -27,6 +27,4 @@
 
     DiskAlreadyInitializedError = Disk with {0} '{1}' is already initialized with {2}.
     NewParitionIsReadOnlyError = New partition '{2}' on disk with {0} '{1}' did not become writable in the expected time.
-    InvalidDiskIdParameterCombination = DiskNumber and DiskUniqueId parameters are both empty. Please set a value for one of these parameters.
-    MissingDiskIdParameters = DiskNumber and DiskUniqueId parameters are both set. Please only set a value for one of these parameters.
 '@

@@ -29,10 +29,10 @@ try
     }
 
     #region Integration Tests for DiskNumber
-    $ConfigFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:DSCResourceName).Number.config.ps1"
+    $ConfigFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:DSCResourceName).config.ps1"
     . $ConfigFile -Verbose -ErrorAction Stop
 
-    Describe "$($script:DSCResourceName)_DiskNumber_Integration" {
+    Describe "$($script:DSCResourceName)_Integration" {
         Context 'Partition and format newly provisioned disk and assign a Drive Letter' {
             # Create a VHDx and attach it to the computer
             $VHDPath = Join-Path -Path $TestDrive `
@@ -57,13 +57,14 @@ try
                             @{
                                 NodeName    = 'localhost'
                                 DriveLetter = $DriveLetter
-                                DiskNumber  = $Disk.Number
+                                DiskId      = $Disk.Number
+                                DiskIdType  = 'Number'
                                 FSLabel     = $FSLabel
                             }
                         )
                     }
 
-                    & "$($script:DSCResourceName)_Number_Config" `
+                    & "$($script:DSCResourceName)_Config" `
                         -OutputPath $TestDrive `
                         -ConfigurationData $ConfigData
                     Start-DscConfiguration -Path $TestDrive `
@@ -78,9 +79,9 @@ try
 
             It 'Should have set the resource and all the parameters should match' {
                 $current = Get-DscConfiguration | Where-Object {
-                    $_.ConfigurationName -eq "$($script:DSCResourceName)_Number_Config"
+                    $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
                 }
-                $current.DiskNumber       | Should Be $Disk.Number
+                $current.DiskId           | Should Be $Disk.Number
                 $current.DriveLetter      | Should Be $DriveLetter
                 $current.FSLabel          | Should Be $FSLabel
             }
@@ -92,10 +93,10 @@ try
     #endregion
 
     #region Integration Tests for DiskId
-    $ConfigFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:DSCResourceName).UniqueId.config.ps1"
+    $ConfigFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:DSCResourceName).config.ps1"
     . $ConfigFile -Verbose -ErrorAction Stop
 
-    Describe "$($script:DSCResourceName)_DiskUniqueId_Integration" {
+    Describe "$($script:DSCResourceName)_Integration" {
         Context 'Partition and format newly provisioned disk and assign a Drive Letter' {
             # Create a VHDx and attach it to the computer
             $VHDPath = Join-Path -Path $TestDrive `
@@ -120,13 +121,14 @@ try
                             @{
                                 NodeName      = 'localhost'
                                 DriveLetter   = $DriveLetter
-                                DiskUniqueId  = $Disk.UniqueId
+                                DiskId        = $Disk.UniqueId
+                                DiskIdType    = 'UniqueId'
                                 FSLabel       = $FSLabel
                             }
                         )
                     }
 
-                    & "$($script:DSCResourceName)_UniqueId_Config" `
+                    & "$($script:DSCResourceName)_Config" `
                         -OutputPath $TestDrive `
                         -ConfigurationData $ConfigData
                     Start-DscConfiguration -Path $TestDrive `
@@ -141,9 +143,9 @@ try
 
             It 'Should have set the resource and all the parameters should match' {
                 $current = Get-DscConfiguration | Where-Object {
-                    $_.ConfigurationName -eq "$($script:DSCResourceName)_UniqueId_Config"
+                    $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
                 }
-                $current.DiskUniqueId     | Should Be $Disk.UniqueId
+                $current.DiskId           | Should Be $Disk.UniqueId
                 $current.DriveLetter      | Should Be $DriveLetter
                 $current.FSLabel          | Should Be $FSLabel
             }

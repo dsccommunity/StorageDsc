@@ -3,8 +3,8 @@
 class MSFT_xDisk : OMI_BaseResource
 {
     [Key, Description("Specifies the identifier for which disk to modify.")] String DriveLetter;
-    [Write, Description("Specifies the disk number for which disk to modify. Should not be set if DiskUniqueId is set.")] Uint32 DiskNumber;
-    [Write, Description("Specifies the disk unique id for which disk to modify. Should not be set if DiskNumber is set.")] String DiskUniqueId;
+    [Required, Description("Specifies the disk identifier for which disk to modify.")] String DiskId;
+    [Write, Description("Specifies the identifier type the disk identifier contains. Defaults to Number."), ValueMap{"Number","UniqueId"}, Values{"Number","UniqueId"}] String DiskIdType;
     [Write, Description("Specifies the size of new volume.")] Uint64 Size;
     [Write, Description("Define volume label if required.")] String FSLabel;
     [Write, Description("Specifies the allocation unit size to use when formatting the volume.")] uint32 AllocationUnitSize;

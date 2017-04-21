@@ -13,21 +13,21 @@ Configuration Example
     {
         xWaitforDisk Disk2
         {
-             DiskNumber = 2
+             DiskId = 2
              RetryIntervalSec = 60
              RetryCount = 60
         }
 
         xDisk GVolume
         {
-             DiskNumber = 2
+             DiskId = 2
              DriveLetter = 'G'
              Size = 10GB
         }
 
         xDisk JVolume
         {
-             DiskNumber = 2
+             DiskId = 2
              DriveLetter = 'J'
              FSLabel = 'Data'
              DependsOn = '[xDisk]GVolume'
@@ -35,7 +35,7 @@ Configuration Example
 
         xDisk DataVolume
         {
-             DiskNumber = 3
+             DiskId = 3
              DriveLetter = 'S'
              Size = 100GB
              FSFormat = 'ReFS'
