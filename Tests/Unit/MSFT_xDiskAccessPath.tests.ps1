@@ -688,7 +688,7 @@ try
                 }
             }
 
-            Context 'Online RAW disk using Disk Number' {
+            Context 'Online RAW disk with Size using Disk Number' {
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Assert-AccessPathValid `

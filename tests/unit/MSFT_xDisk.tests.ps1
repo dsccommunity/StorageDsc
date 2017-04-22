@@ -682,7 +682,7 @@ try
                 }
             }
 
-            Context 'Online RAW disk using Disk Number' {
+            Context 'Online RAW disk with Size using Disk Number' {
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Get-Disk `
@@ -726,6 +726,7 @@ try
                         Set-TargetResource `
                             -DiskId $script:mockedDisk0Raw.Number `
                             -Driveletter $script:testDriveLetter `
+                            -Size $script:mockedPartitionSize `
                             -Verbose
                     } | Should not throw
                 }
