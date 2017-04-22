@@ -28,38 +28,40 @@ try
         Return
     }
 
-    #region Integration Tests for DiskNumber
     $ConfigFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:DSCResourceName).config.ps1"
     . $ConfigFile -Verbose -ErrorAction Stop
 
+    #region Integration Tests for DiskNumber
     Describe "$($script:DSCResourceName)_Integration" {
         Context 'Partition and format newly provisioned disk using Disk Number with two volumes and assign Drive Letters' {
-            # Create a VHDx and attach it to the computer
-            $VHDPath = Join-Path -Path $TestDrive `
-                -ChildPath 'TestDisk.vhdx'
-            New-VHD -Path $VHDPath -SizeBytes 1GB -Dynamic
-            Mount-DiskImage -ImagePath $VHDPath -StorageType VHDX -NoDriveLetter
-            $Disk = Get-Disk | Where-Object -FilterScript {
-                $_.Location -eq $VHDPath
-            }
-            $FSLabelA = 'TestDiskA'
-            $FSLabelB = 'TestDiskB'
+            BeforeAll {
+                # Create a VHDx and attach it to the computer
+                $VHDPath = Join-Path -Path $TestDrive `
+                    -ChildPath 'TestDisk.vhdx'
+                New-VHD -Path $VHDPath -SizeBytes 1GB -Dynamic
+                Mount-DiskImage -ImagePath $VHDPath -StorageType VHDX -NoDriveLetter
+                $disk = Get-Disk | Where-Object -FilterScript {
+                    $_.Location -eq $VHDPath
+                }
+                $FSLabelA = 'TestDiskA'
+                $FSLabelB = 'TestDiskB'
 
-            # Get a spare drive letters
-            $LastDrive = ((Get-Volume).DriveLetter | Sort-Object | Select-Object -Last 1)
-            $DriveLetterA = [char](([int][char]$LastDrive)+1)
-            $DriveLetterB = [char](([int][char]$LastDrive)+2)
+                # Get a spare drive letters
+                $lastDrive = ((Get-Volume).DriveLetter | Sort-Object | Select-Object -Last 1)
+                $driveLetterA = [char](([int][char]$lastDrive)+1)
+                $driveLetterB = [char](([int][char]$lastDrive)+2)
+            }
 
             #region DEFAULT TESTS
             It 'Should compile without throwing' {
                 {
                     # This is to pass to the Config
-                    $ConfigData = @{
+                    $configData = @{
                         AllNodes = @(
                             @{
                                 NodeName    = 'localhost'
-                                DriveLetter = $DriveLetterA
-                                DiskId      = $Disk.Number
+                                DriveLetter = $driveLetterA
+                                DiskId      = $disk.Number
                                 DiskIdType  = 'Number'
                                 FSLabel     = $FSLabelA
                                 Size        = 100MB
@@ -69,7 +71,7 @@ try
 
                     & "$($script:DSCResourceName)_Config" `
                         -OutputPath $TestDrive `
-                        -ConfigurationData $ConfigData
+                        -ConfigurationData $configData
                     Start-DscConfiguration -Path $TestDrive `
                         -ComputerName localhost -Wait -Verbose -Force
                 } | Should not throw
@@ -84,8 +86,8 @@ try
                 $current = Get-DscConfiguration | Where-Object {
                     $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
                 }
-                $current.DiskId           | Should Be $Disk.Number
-                $current.DriveLetter      | Should Be $DriveLetterA
+                $current.DiskId           | Should Be $disk.Number
+                $current.DriveLetter      | Should Be $driveLetterA
                 $current.FSLabel          | Should Be $FSLabelA
                 $current.Size             | Should Be 100MB
             }
@@ -93,12 +95,12 @@ try
             It 'Should compile without throwing' {
                 {
                     # This is to pass to the Config
-                    $ConfigData = @{
+                    $configData = @{
                         AllNodes = @(
                             @{
                                 NodeName    = 'localhost'
-                                DriveLetter = $DriveLetterB
-                                DiskId      = $Disk.Number
+                                DriveLetter = $driveLetterB
+                                DiskId      = $disk.Number
                                 DiskIdType  = 'Number'
                                 FSLabel     = $FSLabelB
                             }
@@ -107,7 +109,7 @@ try
 
                     & "$($script:DSCResourceName)_Config" `
                         -OutputPath $TestDrive `
-                        -ConfigurationData $ConfigData
+                        -ConfigurationData $configData
                     Start-DscConfiguration -Path $TestDrive `
                         -ComputerName localhost -Wait -Verbose -Force
                 } | Should not throw
@@ -122,50 +124,51 @@ try
                 $current = Get-DscConfiguration | Where-Object {
                     $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
                 }
-                $current.DiskId           | Should Be $Disk.Number
-                $current.DriveLetter      | Should Be $DriveLetterB
+                $current.DiskId           | Should Be $disk.Number
+                $current.DriveLetter      | Should Be $driveLetterB
                 $current.FSLabel          | Should Be $FSLabelB
                 $current.Size             | Should Be 100MB
             }
 
-            Dismount-DiskImage -ImagePath $VHDPath -StorageType VHDx
-            Remove-Item -Path $VHDPath -Force
+            AfterAll {
+                Dismount-DiskImage -ImagePath $VHDPath -StorageType VHDx
+                Remove-Item -Path $VHDPath -Force
+            }
         }
     }
     #endregion
 
-    #region Integration Tests for DiskId
-    $ConfigFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:DSCResourceName).config.ps1"
-    . $ConfigFile -Verbose -ErrorAction Stop
-
+    #region Integration Tests for Disk Unique Id
     Describe "$($script:DSCResourceName)_Integration" {
         Context 'Partition and format newly provisioned disk using Unique Id with two volumes and assign Drive Letters' {
-            # Create a VHDx and attach it to the computer
-            $VHDPath = Join-Path -Path $TestDrive `
-                -ChildPath 'TestDisk.vhdx'
-            New-VHD -Path $VHDPath -SizeBytes 1GB -Dynamic
-            Mount-DiskImage -ImagePath $VHDPath -StorageType VHDX -NoDriveLetter
-            $Disk = Get-Disk | Where-Object -FilterScript {
-                $_.Location -eq $VHDPath
-            }
-            $FSLabelA = 'TestDiskA'
-            $FSLabelB = 'TestDiskB'
+            BeforeAll {
+                # Create a VHDx and attach it to the computer
+                $VHDPath = Join-Path -Path $TestDrive `
+                    -ChildPath 'TestDisk.vhdx'
+                New-VHD -Path $VHDPath -SizeBytes 1GB -Dynamic
+                Mount-DiskImage -ImagePath $VHDPath -StorageType VHDX -NoDriveLetter
+                $disk = Get-Disk | Where-Object -FilterScript {
+                    $_.Location -eq $VHDPath
+                }
+                $FSLabelA = 'TestDiskA'
+                $FSLabelB = 'TestDiskB'
 
-            # Get a spare drive letter
-            $LastDrive = ((Get-Volume).DriveLetter | Sort-Object | Select-Object -Last 1)
-            $DriveLetterA = [char](([int][char]$LastDrive)+1)
-            $DriveLetterB = [char](([int][char]$LastDrive)+2)
+                # Get a spare drive letter
+                $lastDrive = ((Get-Volume).DriveLetter | Sort-Object | Select-Object -Last 1)
+                $driveLetterA = [char](([int][char]$lastDrive)+1)
+                $driveLetterB = [char](([int][char]$lastDrive)+2)
+            }
 
             #region DEFAULT TESTS
             It 'Should compile without throwing' {
                 {
                     # This is to pass to the Config
-                    $ConfigData = @{
+                    $configData = @{
                         AllNodes = @(
                             @{
                                 NodeName      = 'localhost'
-                                DriveLetter   = $DriveLetterA
-                                DiskId        = $Disk.UniqueId
+                                DriveLetter   = $driveLetterA
+                                DiskId        = $disk.UniqueId
                                 DiskIdType    = 'UniqueId'
                                 FSLabel       = $FSLabelA
                                 Size          = 100MB
@@ -175,7 +178,7 @@ try
 
                     & "$($script:DSCResourceName)_Config" `
                         -OutputPath $TestDrive `
-                        -ConfigurationData $ConfigData
+                        -ConfigurationData $configData
                     Start-DscConfiguration -Path $TestDrive `
                         -ComputerName localhost -Wait -Verbose -Force
                 } | Should not throw
@@ -190,8 +193,8 @@ try
                 $current = Get-DscConfiguration | Where-Object {
                     $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
                 }
-                $current.DiskId           | Should Be $Disk.UniqueId
-                $current.DriveLetter      | Should Be $DriveLetterA
+                $current.DiskId           | Should Be $disk.UniqueId
+                $current.DriveLetter      | Should Be $driveLetterA
                 $current.FSLabel          | Should Be $FSLabelA
                 $current.Size             | Should Be 100MB
             }
@@ -200,12 +203,12 @@ try
             It 'Should compile without throwing' {
                 {
                     # This is to pass to the Config
-                    $ConfigData = @{
+                    $configData = @{
                         AllNodes = @(
                             @{
                                 NodeName      = 'localhost'
-                                DriveLetter   = $DriveLetterB
-                                DiskId        = $Disk.UniqueId
+                                DriveLetter   = $driveLetterB
+                                DiskId        = $disk.UniqueId
                                 DiskIdType    = 'UniqueId'
                                 FSLabel       = $FSLabelB
                             }
@@ -214,7 +217,7 @@ try
 
                     & "$($script:DSCResourceName)_Config" `
                         -OutputPath $TestDrive `
-                        -ConfigurationData $ConfigData
+                        -ConfigurationData $configData
                     Start-DscConfiguration -Path $TestDrive `
                         -ComputerName localhost -Wait -Verbose -Force
                 } | Should not throw
@@ -229,14 +232,16 @@ try
                 $current = Get-DscConfiguration | Where-Object {
                     $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
                 }
-                $current.DiskId           | Should Be $Disk.UniqueId
-                $current.DriveLetter      | Should Be $DriveLetterB
+                $current.DiskId           | Should Be $disk.UniqueId
+                $current.DriveLetter      | Should Be $driveLetterB
                 $current.FSLabel          | Should Be $FSLabelB
                 $current.Size             | Should Be 100MB
             }
 
-            Dismount-DiskImage -ImagePath $VHDPath -StorageType VHDx
-            Remove-Item -Path $VHDPath -Force
+            AfterAll {
+                Dismount-DiskImage -ImagePath $VHDPath -StorageType VHDx
+                Remove-Item -Path $VHDPath -Force
+            }
         }
     }
     #endregion

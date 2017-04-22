@@ -21,7 +21,7 @@ $localizedData = Get-LocalizedData `
     Specifies the preferred letter to assign to the disk volume.
 
     .PARAMETER DiskId
-    Specifies the disk identifier for which disk to modify.
+    Specifies the disk identifier for the disk to modify.
 
     .PARAMETER DiskIdType
     Specifies the identifier type the DiskId contains.
@@ -119,7 +119,7 @@ function Get-TargetResource
     Specifies the preferred letter to assign to the disk volume.
 
     .PARAMETER DiskId
-    Specifies the disk identifier for which disk to modify.
+    Specifies the disk identifier for the disk to modify.
 
     .PARAMETER DiskIdType
     Specifies the identifier type the DiskId contains.
@@ -415,7 +415,7 @@ function Set-TargetResource
     Specifies the preferred letter to assign to the disk volume.
 
     .PARAMETER DiskId
-    Specifies the disk identifier for which disk to modify.
+    Specifies the disk identifier for the disk to modify.
 
     .PARAMETER DiskIdType
     Specifies the identifier type the DiskId contains.

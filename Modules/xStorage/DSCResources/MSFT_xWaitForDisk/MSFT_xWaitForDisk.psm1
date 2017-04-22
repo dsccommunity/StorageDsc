@@ -17,8 +17,11 @@ $localizedData = Get-LocalizedData `
     .SYNOPSIS
     Returns the current state of the wait for disk resource.
 
-    .PARAMETER DiskNumber
-    Specifies the identifier for which disk to wait for.
+    .PARAMETER DiskId
+    Specifies the disk identifier for the disk to wait for.
+
+    .PARAMETER DiskIdType
+    Specifies the identifier type the DiskId contains.
 
     .PARAMETER RetryIntervalSec
     Specifies the number of seconds to wait for the disk to become available.
@@ -32,21 +35,29 @@ function Get-TargetResource
     [OutputType([System.Collections.Hashtable])]
     param
     (
-        [parameter(Mandatory)]
-        [UInt32] $DiskNumber,
+        [parameter(Mandatory = $true)]
+        [System.String]
+        $DiskId,
 
-        [UInt32] $RetryIntervalSec = 10,
+        [ValidateSet("Number","UniqueId")]
+        [System.String]
+        $DiskIdType = 'Number',
 
-        [UInt32] $RetryCount = 60
+        [System.UInt32]
+        $RetryIntervalSec = 10,
+
+        [System.UInt32]
+        $RetryCount = 60
     )
 
     Write-Verbose -Message ( @(
             "$($MyInvocation.MyCommand): "
-            $($localizedData.GettingWaitForDiskStatusMessage -f $DiskNumber)
+            $($localizedData.GettingWaitForDiskStatusMessage -f $DiskIdType,$DiskId)
         ) -join '' )
 
     $returnValue = @{
-        DiskNumber       = $DiskNumber
+        DiskId           = $DiskId
+        DiskIdType       = $DiskIdType
         RetryIntervalSec = $RetryIntervalSec
         RetryCount       = $RetryCount
     }
@@ -57,8 +68,11 @@ function Get-TargetResource
     .SYNOPSIS
     Sets the current state of the wait for disk resource.
 
-    .PARAMETER DiskNumber
-    Specifies the identifier for which disk to wait for.
+    .PARAMETER DiskId
+    Specifies the disk identifier for the disk to wait for.
+
+    .PARAMETER DiskIdType
+    Specifies the identifier type the DiskId contains.
 
     .PARAMETER RetryIntervalSec
     Specifies the number of seconds to wait for the disk to become available.
@@ -71,29 +85,40 @@ function Set-TargetResource
     [CmdletBinding()]
     param
     (
-        [parameter(Mandatory)]
-        [UInt32] $DiskNumber,
+        [parameter(Mandatory = $true)]
+        [System.String]
+        $DiskId,
 
-        [UInt32] $RetryIntervalSec = 10,
+        [ValidateSet("Number","UniqueId")]
+        [System.String]
+        $DiskIdType = 'Number',
 
-        [UInt32] $RetryCount = 60
+        [System.UInt32]
+        $RetryIntervalSec = 10,
+
+        [System.UInt32]
+        $RetryCount = 60
     )
 
     Write-Verbose -Message ( @(
             "$($MyInvocation.MyCommand): "
-            $($localizedData.CheckingForDiskMessage -f $DiskNumber)
+            $($localizedData.CheckingForDiskStatusMessage -f $DiskIdType,$DiskId)
         ) -join '' )
 
     $diskFound = $false
 
+    $diskIdParameter = @{ $DiskIdType = $DiskId }
+
     for ($count = 0; $count -lt $RetryCount; $count++)
     {
-        $disk = Get-Disk -Number $DiskNumber -ErrorAction SilentlyContinue
+        $disk = Get-Disk `
+            @diskIdParameter `
+            -ErrorAction SilentlyContinue
         if ($disk)
         {
             Write-Verbose -Message ( @(
                     "$($MyInvocation.MyCommand): "
-                    $($localizedData.DiskFoundMessage -f $DiskNumber,$disk.FriendlyName)
+                    $($localizedData.DiskFoundMessage -f $DiskIdType,$DiskId,$disk.FriendlyName)
                 ) -join '' )
 
             $diskFound = $true
@@ -103,7 +128,7 @@ function Set-TargetResource
         {
             Write-Verbose -Message ( @(
                     "$($MyInvocation.MyCommand): "
-                    $($localizedData.DiskNotFoundMessage -f $DiskNumber,$RetryIntervalSec)
+                    $($localizedData.DiskNotFoundMessage -f $DiskIdType,$DiskId,$RetryIntervalSec)
                 ) -join '' )
 
             Start-Sleep -Seconds $RetryIntervalSec
@@ -113,7 +138,7 @@ function Set-TargetResource
     if (-not $diskFound)
     {
         New-InvalidOperationException `
-            -Message $($localizedData.DiskNotFoundAfterError -f $DiskNumber,$RetryCount)
+            -Message $($localizedData.DiskNotFoundAfterError -f $DiskIdType,$DiskId,$RetryCount)
     } # if
 } # function Set-TargetResource
 
@@ -121,8 +146,11 @@ function Set-TargetResource
     .SYNOPSIS
     Tests the current state of the wait for disk resource.
 
-    .PARAMETER DiskNumber
-    Specifies the identifier for which disk to wait for.
+    .PARAMETER DiskId
+    Specifies the disk identifier for the disk to wait for.
+
+    .PARAMETER DiskIdType
+    Specifies the identifier type the DiskId contains.
 
     .PARAMETER RetryIntervalSec
     Specifies the number of seconds to wait for the disk to become available.
@@ -136,25 +164,37 @@ function Test-TargetResource
     [OutputType([System.Boolean])]
     param
     (
-        [parameter(Mandatory)]
-        [UInt32] $DiskNumber,
+        [parameter(Mandatory = $true)]
+        [System.String]
+        $DiskId,
 
-        [UInt32] $RetryIntervalSec = 10,
+        [ValidateSet("Number","UniqueId")]
+        [System.String]
+        $DiskIdType = 'Number',
 
-        [UInt32] $RetryCount = 60
+        [System.UInt32]
+        $RetryIntervalSec = 10,
+
+        [System.UInt32]
+        $RetryCount = 60
     )
 
     Write-Verbose -Message ( @(
             "$($MyInvocation.MyCommand): "
-            $($localizedData.CheckingForDiskMessage -f $DiskNumber)
+            $($localizedData.CheckingForDiskStatusMessage -f $DiskIdType,$DiskId)
         ) -join '' )
 
-    $disk = Get-Disk -Number $DiskNumber -ErrorAction SilentlyContinue
+    $diskIdParameter = @{ $DiskIdType = $DiskId }
+
+    $disk = Get-Disk `
+        @diskIdParameter `
+        -ErrorAction SilentlyContinue
+
     if ($disk)
     {
         Write-Verbose -Message ( @(
                 "$($MyInvocation.MyCommand): "
-                $($localizedData.DiskFoundMessage -f $DiskNumber,$disk.FriendlyName)
+                $($localizedData.DiskFoundMessage -f $DiskIdType,$DiskId,$disk.FriendlyName)
             ) -join '' )
 
         return $true
@@ -162,7 +202,7 @@ function Test-TargetResource
 
     Write-Verbose -Message ( @(
             "$($MyInvocation.MyCommand): "
-            $($localizedData.DiskNotFoundMessage -f $DiskNumber)
+            $($localizedData.DiskNotFoundMessage -f $DiskIdType,$DiskId)
         ) -join '' )
 
     return $false

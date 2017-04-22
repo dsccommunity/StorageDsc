@@ -28,13 +28,23 @@ try
     # (non-exported) code of a Script Module.
     InModuleScope $script:DSCResourceName {
         #region Pester Test Initialization
+        $script:testDiskUniqueId = 'TESTDISKUNIQUEID'
+
         $mockedDisk0 = [pscustomobject] @{
             Number = 0
+            UniqueId = $script:testDiskUniqueId
             FriendlyName = 'Test Disk'
         }
 
-        $disk0Parameters = @{
-            DiskNumber = 00
+        $disk0ParametersByNumber = @{
+            DiskId = 0
+            RetryIntervalSec = 5
+            RetryCount = 20
+        }
+
+        $disk0ParametersByUniqueId = @{
+            DiskId = $script:testDiskUniqueId
+            DiskIdType = 'UniqueId'
             RetryIntervalSec = 5
             RetryCount = 20
         }
@@ -42,59 +52,145 @@ try
 
         #region Function Get-TargetResource
         Describe "MSFT_xWaitForDisk\Get-TargetResource" {
-            $resource = Get-TargetResource @disk0Parameters -Verbose
-            It "DiskNumber Should Be $($disk0Parameters.DiskNumber)" {
-                $resource.DiskNumber | Should Be $disk0Parameters.DiskNumber
+            Context 'disk is specified by Number' {
+                $script:result = $null
+
+                It 'should not throw' {
+                    {
+                        $script:result = Get-TargetResource @disk0ParametersByNumber -Verbose
+                    } | Should Not Throw
+                }
+
+                It "should return a DiskId of $($disk0ParametersByNumber.DiskId)" {
+                    $script:result.DiskId | Should Be $disk0ParametersByNumber.DiskId
+                }
+
+                It "should return a DiskIdType of Number" {
+                    $script:result.DiskIdType | Should Be 'Number'
+                }
+
+                It "should return a RetryIntervalSec of $($disk0ParametersByNumber.RetryIntervalSec)" {
+                    $script:result.RetryIntervalSec | Should Be $disk0ParametersByNumber.RetryIntervalSec
+                }
+
+                It "should return a RetryIntervalSec of $($disk0ParametersByNumber.RetryCount)" {
+                    $script:result.RetryCount | Should Be $disk0ParametersByNumber.RetryCount
+                }
             }
 
-            It "RetryIntervalSec Should Be $($disk0Parameters.RetryIntervalSec)" {
-                $resource.RetryIntervalSec | Should Be $disk0Parameters.RetryIntervalSec
-            }
+            Context 'disk is specified by Unique Id' {
+                $script:result = $null
 
-            It "RetryIntervalSec Should Be $($disk0Parameters.RetryCount)" {
-                $resource.RetryCount | Should Be $disk0Parameters.RetryCount
-            }
+                It 'should not throw' {
+                    {
+                        $script:result = Get-TargetResource @disk0ParametersByUniqueId -Verbose
+                    } | Should Not Throw
+                }
 
-            It 'the correct mocks were called' {
-                Assert-VerifiableMocks
+                It "should return a DiskId of $($disk0ParametersByUniqueId.DiskId)" {
+                    $script:result.DiskId | Should Be $disk0ParametersByUniqueId.DiskId
+                }
+
+                It "should return a DiskIdType of UniqueId" {
+                    $script:result.DiskIdType | Should Be 'UniqueId'
+                }
+
+                It "should return a RetryIntervalSec of $($disk0ParametersByUniqueId.RetryIntervalSec)" {
+                    $script:result.RetryIntervalSec | Should Be $disk0ParametersByUniqueId.RetryIntervalSec
+                }
+
+                It "should return a RetryIntervalSec of $($disk0ParametersByUniqueId.RetryCount)" {
+                    $script:result.RetryCount | Should Be $disk0ParametersByUniqueId.RetryCount
+                }
             }
         }
         #endregion
 
         #region Function Set-TargetResource
         Describe 'MSFT_xWaitForDisk\Set-TargetResource' {
-            Mock Start-Sleep
+            Mock -CommandName Start-Sleep
 
-            Context 'disk 0 is ready' {
+            Context 'disk number 0 is ready' {
                 # verifiable (Should Be called) mocks
-                Mock Get-Disk -MockWith { return $mockedDisk0 } -Verifiable
+                Mock `
+                    -CommandName Get-Disk `
+                    -ParameterFilter { $Number[0] -eq 0 } `
+                    -MockWith { return $mockedDisk0 } `
+                    -Verifiable
 
                 It 'should not throw' {
-                    { Set-targetResource @disk0Parameters -Verbose } | Should Not throw
+                    { Set-targetResource @disk0ParametersByNumber -Verbose } | Should Not throw
                 }
 
-                It 'the correct mocks were called' {
+                It 'should call the correct mocks' {
                     Assert-VerifiableMocks
                     Assert-MockCalled -CommandName Start-Sleep -Times 0
-                    Assert-MockCalled -CommandName Get-Disk -Times 1
+                    Assert-MockCalled -CommandName Get-Disk -ParameterFilter { $Number[0] -eq 0 } -Times 1
                 }
             }
-            Context 'disk 0 does not become ready' {
+
+            Context "disk with unique id '$script:testDiskUniqueId' is ready" {
                 # verifiable (Should Be called) mocks
-                Mock Get-Disk -MockWith { } -Verifiable
+                Mock `
+                    -CommandName Get-Disk `
+                    -ParameterFilter { $UniqueId -eq $script:testDiskUniqueId } `
+                    -MockWith { return $mockedDisk0 } `
+                    -Verifiable
+
+                It 'should not throw' {
+                    { Set-targetResource @disk0ParametersByUniqueId -Verbose } | Should Not throw
+                }
+
+                It 'should call the correct mocks' {
+                    Assert-VerifiableMocks
+                    Assert-MockCalled -CommandName Start-Sleep -Times 0
+                    Assert-MockCalled -CommandName Get-Disk -ParameterFilter { $UniqueId -eq $script:testDiskUniqueId } -Times 1
+                }
+            }
+
+            Context 'disk number 0 does not become ready' {
+                # verifiable (Should Be called) mocks
+                Mock `
+                    -CommandName Get-Disk `
+                    -ParameterFilter { $Number[0] -eq 0 } `
+                    -MockWith { } `
+                    -Verifiable
 
                 $errorRecord = Get-InvalidOperationRecord `
                     -Message $($LocalizedData.DiskNotFoundAfterError `
-                        -f $disk0Parameters.DiskNumber,$disk0Parameters.RetryCount)
+                        -f 'Number',$disk0ParametersByNumber.DiskId,$disk0ParametersByNumber.RetryCount)
 
                 It 'should throw DiskNotFoundAfterError' {
-                    { Set-targetResource @disk0Parameters -Verbose } | Should Throw $errorRecord
+                    { Set-targetResource @disk0ParametersByNumber -Verbose } | Should Throw $errorRecord
                 }
 
-                It 'the correct mocks were called' {
+                It 'should call the correct mocks' {
                     Assert-VerifiableMocks
-                    Assert-MockCalled -CommandName Start-Sleep -Times $disk0Parameters.RetryCount
-                    Assert-MockCalled -CommandName Get-Disk -Times 1
+                    Assert-MockCalled -CommandName Start-Sleep -Times $disk0ParametersByNumber.RetryCount
+                    Assert-MockCalled -CommandName Get-Disk -ParameterFilter { $Number[0] -eq 0 } -Times 1
+                }
+            }
+
+            Context "disk with unique id '$script:testDiskUniqueId' does not become ready" {
+                # verifiable (Should Be called) mocks
+                Mock `
+                    -CommandName Get-Disk `
+                    -ParameterFilter { $UniqueId -eq $script:testDiskUniqueId } `
+                    -MockWith { } `
+                    -Verifiable
+
+                $errorRecord = Get-InvalidOperationRecord `
+                    -Message $($LocalizedData.DiskNotFoundAfterError `
+                        -f 'UniqueId',$disk0ParametersByUniqueId.DiskId,$disk0ParametersByUniqueId.RetryCount)
+
+                It 'should throw DiskNotFoundAfterError' {
+                    { Set-targetResource @disk0ParametersByUniqueId -Verbose } | Should Throw $errorRecord
+                }
+
+                It 'should call the correct mocks' {
+                    Assert-VerifiableMocks
+                    Assert-MockCalled -CommandName Start-Sleep -Times $disk0ParametersByUniqueId.RetryCount
+                    Assert-MockCalled -CommandName Get-Disk -ParameterFilter { $UniqueId -eq $script:testDiskUniqueId } -Times 1
                 }
             }
         }
@@ -102,36 +198,71 @@ try
 
         #region Function Test-TargetResource
         Describe 'MSFT_xWaitForDisk\Test-TargetResource' {
-            Context 'disk 0 is ready' {
+            Context 'disk number 0 is ready' {
                 # verifiable (Should Be called) mocks
-                Mock Get-Disk -MockWith { return $mockedDisk0 } -Verifiable
+                Mock `
+                    -CommandName Get-Disk `
+                    -ParameterFilter { $Number[0] -eq 0 } `
+                    -MockWith { return $mockedDisk0 } `
+                    -Verifiable
 
                 $script:result = $null
 
-                It 'calling test should not throw' {
+                It 'should not throw' {
                     {
-                        $script:result = Test-TargetResource @disk0Parameters -Verbose
+                        $script:result = Test-TargetResource @disk0ParametersByNumber -Verbose
                     } | Should Not Throw
                 }
 
-                It "result Should Be true" {
+                It "should return a result of true" {
                     $script:result | Should Be $true
                 }
 
-                It "the correct mocks were called" {
+                It 'should call the correct mocks' {
                     Assert-VerifiableMocks
-                    Assert-MockCalled -CommandName Get-Disk -Times 1
+                    Assert-MockCalled -CommandName Get-Disk -ParameterFilter { $Number[0] -eq 0 } -Times 1
                 }
             }
-            Context 'disk 0 is not ready' {
+
+            Context "disk with unique id '$script:testDiskUniqueId' is ready" {
                 # verifiable (Should Be called) mocks
-                Mock Get-Disk -MockWith { } -Verifiable
+                Mock `
+                    -CommandName Get-Disk `
+                    -ParameterFilter { $UniqueId -eq $script:testDiskUniqueId } `
+                    -MockWith { return $mockedDisk0 } `
+                    -Verifiable
+
+                $script:result = $null
+
+                It 'should not throw' {
+                    {
+                        $script:result = Test-TargetResource @disk0ParametersByUniqueId -Verbose
+                    } | Should Not Throw
+                }
+
+                It "should return a result of true" {
+                    $script:result | Should Be $true
+                }
+
+                It 'should call the correct mocks' {
+                    Assert-VerifiableMocks
+                    Assert-MockCalled -CommandName Get-Disk -ParameterFilter { $UniqueId -eq $script:testDiskUniqueId } -Times 1
+                }
+            }
+
+            Context 'disk number 0 does not become ready' {
+                # verifiable (Should Be called) mocks
+                Mock `
+                    -CommandName Get-Disk `
+                    -ParameterFilter { $Number[0] -eq 0 } `
+                    -MockWith { } `
+                    -Verifiable
 
                 $script:result = $null
 
                 It 'calling test should not throw' {
                     {
-                        $script:result = Test-TargetResource @disk0Parameters -Verbose
+                        $script:result = Test-TargetResource @disk0ParametersByNumber -Verbose
                     } | Should Not Throw
                 }
 
@@ -141,7 +272,33 @@ try
 
                 It 'the correct mocks were called' {
                     Assert-VerifiableMocks
-                    Assert-MockCalled -CommandName Get-Disk -Times 1
+                    Assert-MockCalled -CommandName Get-Disk -ParameterFilter { $Number[0] -eq 0 } -Times 1
+                }
+            }
+
+            Context "disk with unique id '$script:testDiskUniqueId' does not become ready" {
+                # verifiable (Should Be called) mocks
+                Mock `
+                    -CommandName Get-Disk `
+                    -ParameterFilter { $UniqueId -eq $script:testDiskUniqueId } `
+                    -MockWith { } `
+                    -Verifiable
+
+                $script:result = $null
+
+                It 'calling test should not throw' {
+                    {
+                        $script:result = Test-TargetResource @disk0ParametersByUniqueId -Verbose
+                    } | Should Not Throw
+                }
+
+                It 'result Should Be false' {
+                    $script:result | Should Be $false
+                }
+
+                It 'the correct mocks were called' {
+                    Assert-VerifiableMocks
+                    Assert-MockCalled -CommandName Get-Disk -ParameterFilter { $UniqueId -eq $script:testDiskUniqueId } -Times 1
                 }
             }
         }

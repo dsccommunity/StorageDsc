@@ -28,40 +28,42 @@ try
         Return
     }
 
-    #region Integration Tests
     $ConfigFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:DSCResourceName).config.ps1"
     . $ConfigFile -Verbose -ErrorAction Stop
 
+    #region Integration Tests for DiskNumber
     Describe "$($script:DSCResourceName)_Integration" {
         Context 'Partition and format newly provisioned disk using Disk Number with two volumes and assign Access Paths' {
-            # Create a VHDx and attach it to the computer
-            $VHDPath = Join-Path -Path $TestDrive `
-                -ChildPath 'TestDisk.vhdx'
-            New-VHD -Path $VHDPath -SizeBytes 1GB -Dynamic
-            Mount-DiskImage -ImagePath $VHDPath -StorageType VHDX -NoDriveLetter
-            $disk = Get-Disk | Where-Object -FilterScript {
-                $_.Location -eq $VHDPath
-            }
-            $FSLabelA = 'TestDiskA'
-            $FSLabelB = 'TestDiskB'
+            BeforeAll {
+                # Create a VHDx and attach it to the computer
+                $VHDPath = Join-Path -Path $TestDrive `
+                    -ChildPath 'TestDisk.vhdx'
+                New-VHD -Path $VHDPath -SizeBytes 1GB -Dynamic
+                Mount-DiskImage -ImagePath $VHDPath -StorageType VHDX -NoDriveLetter
+                $disk = Get-Disk | Where-Object -FilterScript {
+                    $_.Location -eq $VHDPath
+                }
+                $FSLabelA = 'TestDiskA'
+                $FSLabelB = 'TestDiskB'
 
-            # Get a couple of mount point paths
-            $accessPathA = Join-Path -Path $ENV:Temp -ChildPath 'xDiskAccessPath_MountA'
-            if (-not (Test-Path -Path $accessPathA))
-            {
-                New-Item -Path $accessPathA -ItemType Directory
-            } # if
-            $accessPathB = Join-Path -Path $ENV:Temp -ChildPath 'xDiskAccessPath_MountB'
-            if (-not (Test-Path -Path $accessPathB))
-            {
-                New-Item -Path $accessPathB -ItemType Directory
-            } # if
+                # Get a couple of mount point paths
+                $accessPathA = Join-Path -Path $ENV:Temp -ChildPath 'xDiskAccessPath_MountA'
+                if (-not (Test-Path -Path $accessPathA))
+                {
+                    New-Item -Path $accessPathA -ItemType Directory
+                } # if
+                $accessPathB = Join-Path -Path $ENV:Temp -ChildPath 'xDiskAccessPath_MountB'
+                if (-not (Test-Path -Path $accessPathB))
+                {
+                    New-Item -Path $accessPathB -ItemType Directory
+                } # if
+            }
 
             #region DEFAULT TESTS
             It 'Should compile without throwing' {
                 {
                     # This is to pass to the Config
-                    $ConfigData = @{
+                    $configData = @{
                         AllNodes = @(
                             @{
                                 NodeName    = 'localhost'
@@ -76,7 +78,7 @@ try
 
                     & "$($script:DSCResourceName)_Config" `
                         -OutputPath $TestDrive `
-                        -ConfigurationData $ConfigData
+                        -ConfigurationData $configData
                     Start-DscConfiguration -Path $TestDrive `
                         -ComputerName localhost -Wait -Verbose -Force
                 } | Should not throw
@@ -111,7 +113,7 @@ try
             It 'Should compile without throwing' {
                 {
                     # This is to pass to the Config
-                    $ConfigData = @{
+                    $configData = @{
                         AllNodes = @(
                             @{
                                 NodeName    = 'localhost'
@@ -125,7 +127,7 @@ try
 
                     & "$($script:DSCResourceName)_Config" `
                         -OutputPath $TestDrive `
-                        -ConfigurationData $ConfigData
+                        -ConfigurationData $configData
                     Start-DscConfiguration -Path $TestDrive `
                         -ComputerName localhost -Wait -Verbose -Force
                 } | Should not throw
@@ -153,7 +155,7 @@ try
             It 'Should compile without throwing' {
                 {
                     # This is to pass to the Config
-                    $ConfigData = @{
+                    $configData = @{
                         AllNodes = @(
                             @{
                                 NodeName    = 'localhost'
@@ -167,7 +169,7 @@ try
 
                     & "$($script:DSCResourceName)_Config" `
                         -OutputPath $TestDrive `
-                        -ConfigurationData $ConfigData
+                        -ConfigurationData $configData
                     Start-DscConfiguration -Path $TestDrive `
                         -ComputerName localhost -Wait -Verbose -Force
                 } | Should not throw
@@ -187,48 +189,54 @@ try
             }
             #endregion
 
-            # Clean up
-            $disk | Remove-PartitionAccessPath `
-                -PartitionNumber 2 `
-                -AccessPath $accessPathA
-            $disk | Remove-PartitionAccessPath `
-                -PartitionNumber 2 `
-                -AccessPath $accessPathB
-            Remove-Item -Path $accessPathA -Force
-            Remove-Item -Path $accessPathB -Force
-            Dismount-DiskImage -ImagePath $VHDPath -StorageType VHDx
-            Remove-Item -Path $VHDPath -Force
+            AfterAll {
+                # Clean up
+                $disk | Remove-PartitionAccessPath `
+                    -PartitionNumber 2 `
+                    -AccessPath $accessPathA
+                $disk | Remove-PartitionAccessPath `
+                    -PartitionNumber 2 `
+                    -AccessPath $accessPathB
+                Remove-Item -Path $accessPathA -Force
+                Remove-Item -Path $accessPathB -Force
+                Dismount-DiskImage -ImagePath $VHDPath -StorageType VHDx
+                Remove-Item -Path $VHDPath -Force
+            }
         }
+        #endregion
 
+        #region Integration Tests for Disk Unique Id
         Context 'Partition and format newly provisioned disk using Disk Unique Id with two volumes and assign Access Paths' {
-            # Create a VHDx and attach it to the computer
-            $VHDPath = Join-Path -Path $TestDrive `
-                -ChildPath 'TestDisk.vhdx'
-            New-VHD -Path $VHDPath -SizeBytes 1GB -Dynamic
-            Mount-DiskImage -ImagePath $VHDPath -StorageType VHDX -NoDriveLetter
-            $disk = Get-Disk | Where-Object -FilterScript {
-                $_.Location -eq $VHDPath
-            }
-            $FSLabelA = 'TestDiskA'
-            $FSLabelB = 'TestDiskB'
+            BeforeAll {
+                # Create a VHDx and attach it to the computer
+                $VHDPath = Join-Path -Path $TestDrive `
+                    -ChildPath 'TestDisk.vhdx'
+                New-VHD -Path $VHDPath -SizeBytes 1GB -Dynamic
+                Mount-DiskImage -ImagePath $VHDPath -StorageType VHDX -NoDriveLetter
+                $disk = Get-Disk | Where-Object -FilterScript {
+                    $_.Location -eq $VHDPath
+                }
+                $FSLabelA = 'TestDiskA'
+                $FSLabelB = 'TestDiskB'
 
-            # Get a couple of mount point paths
-            $accessPathA = Join-Path -Path $ENV:Temp -ChildPath 'xDiskAccessPath_MountA'
-            if (-not (Test-Path -Path $accessPathA))
-            {
-                New-Item -Path $accessPathA -ItemType Directory
-            } # if
-            $accessPathB = Join-Path -Path $ENV:Temp -ChildPath 'xDiskAccessPath_MountB'
-            if (-not (Test-Path -Path $accessPathB))
-            {
-                New-Item -Path $accessPathB -ItemType Directory
-            } # if
+                # Get a couple of mount point paths
+                $accessPathA = Join-Path -Path $ENV:Temp -ChildPath 'xDiskAccessPath_MountA'
+                if (-not (Test-Path -Path $accessPathA))
+                {
+                    New-Item -Path $accessPathA -ItemType Directory
+                } # if
+                $accessPathB = Join-Path -Path $ENV:Temp -ChildPath 'xDiskAccessPath_MountB'
+                if (-not (Test-Path -Path $accessPathB))
+                {
+                    New-Item -Path $accessPathB -ItemType Directory
+                } # if
+            }
 
             #region DEFAULT TESTS
             It 'Should compile without throwing' {
                 {
                     # This is to pass to the Config
-                    $ConfigData = @{
+                    $configData = @{
                         AllNodes = @(
                             @{
                                 NodeName    = 'localhost'
@@ -243,7 +251,7 @@ try
 
                     & "$($script:DSCResourceName)_Config" `
                         -OutputPath $TestDrive `
-                        -ConfigurationData $ConfigData
+                        -ConfigurationData $configData
                     Start-DscConfiguration -Path $TestDrive `
                         -ComputerName localhost -Wait -Verbose -Force
                 } | Should not throw
@@ -278,7 +286,7 @@ try
             It 'Should compile without throwing' {
                 {
                     # This is to pass to the Config
-                    $ConfigData = @{
+                    $configData = @{
                         AllNodes = @(
                             @{
                                 NodeName    = 'localhost'
@@ -292,7 +300,7 @@ try
 
                     & "$($script:DSCResourceName)_Config" `
                         -OutputPath $TestDrive `
-                        -ConfigurationData $ConfigData
+                        -ConfigurationData $configData
                     Start-DscConfiguration -Path $TestDrive `
                         -ComputerName localhost -Wait -Verbose -Force
                 } | Should not throw
@@ -320,7 +328,7 @@ try
             It 'Should compile without throwing' {
                 {
                     # This is to pass to the Config
-                    $ConfigData = @{
+                    $configData = @{
                         AllNodes = @(
                             @{
                                 NodeName    = 'localhost'
@@ -334,7 +342,7 @@ try
 
                     & "$($script:DSCResourceName)_Config" `
                         -OutputPath $TestDrive `
-                        -ConfigurationData $ConfigData
+                        -ConfigurationData $configData
                     Start-DscConfiguration -Path $TestDrive `
                         -ComputerName localhost -Wait -Verbose -Force
                 } | Should not throw
@@ -354,17 +362,19 @@ try
             }
             #endregion
 
-            # Clean up
-            $disk | Remove-PartitionAccessPath `
-                -PartitionNumber 2 `
-                -AccessPath $accessPathA
-            $disk | Remove-PartitionAccessPath `
-                -PartitionNumber 2 `
-                -AccessPath $accessPathB
-            Remove-Item -Path $accessPathA -Force
-            Remove-Item -Path $accessPathB -Force
-            Dismount-DiskImage -ImagePath $VHDPath -StorageType VHDx
-            Remove-Item -Path $VHDPath -Force
+            AfterAll {
+                # Clean up
+                $disk | Remove-PartitionAccessPath `
+                    -PartitionNumber 2 `
+                    -AccessPath $accessPathA
+                $disk | Remove-PartitionAccessPath `
+                    -PartitionNumber 2 `
+                    -AccessPath $accessPathB
+                Remove-Item -Path $accessPathA -Force
+                Remove-Item -Path $accessPathB -Force
+                Dismount-DiskImage -ImagePath $VHDPath -StorageType VHDx
+                Remove-Item -Path $VHDPath -Force
+            }
         }
     }
     #endregion

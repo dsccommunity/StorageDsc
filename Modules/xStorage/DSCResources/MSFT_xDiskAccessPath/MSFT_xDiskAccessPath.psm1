@@ -21,7 +21,7 @@ $localizedData = Get-LocalizedData `
     Specifies the access path folder to the assign the disk volume to
 
     .PARAMETER DiskId
-    Specifies the disk identifier for which disk to modify.
+    Specifies the disk identifier for the disk to modify.
 
     .PARAMETER DiskIdType
     Specifies the identifier type the DiskId contains.
@@ -123,7 +123,7 @@ function Get-TargetResource
     Specifies the access path folder to the assign the disk volume to
 
     .PARAMETER DiskId
-    Specifies the disk identifier for which disk to modify.
+    Specifies the disk identifier for the disk to modify.
 
     .PARAMETER DiskIdType
     Specifies the identifier type the DiskId contains.
@@ -452,7 +452,7 @@ function Set-TargetResource
     Specifies the access path folder to the assign the disk volume to
 
     .PARAMETER DiskId
-    Specifies the disk identifier for which disk to modify.
+    Specifies the disk identifier for the disk to modify.
 
     .PARAMETER DiskIdType
     Specifies the identifier type the DiskId contains.
