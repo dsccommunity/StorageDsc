@@ -20,7 +20,7 @@
     DiskReadOnlyMessage = Disk with {0} '{1}'is readonly.
     DiskNotGPTMessage = Disk with {0} '{1}' is initialised with '{2}' partition style. GPT required.
     AccessPathNotFoundMessage = A volume assigned to access path '{0}' was not found.
-    SizeMismatchMessage = Volume assigned to access path '{0}' has size {1}, which does not match expected size {2}.
+    SizeMismatchMessage = Partition assigned to access path '{0}' has size {1}, which does not match expected size {2}.
     AllocationUnitSizeMismatchMessage = Volume assigned to access path '{0}' has allocation unit size {1} KB does not match expected allocation unit size {2} KB.
     FileSystemFormatMismatch = Volume assigned to access path '{0}' filesystem format '{1}' does not match expected format '{2}'.
     DriveLabelMismatch = Volume assigned to access path '{0}' label '{1}' does not match expected label '{2}'.

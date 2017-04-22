@@ -18,12 +18,15 @@
     DiskNotFoundMessage = Disk with {0} '{1}' was not found.
     DiskNotOnlineMessage = Disk with {0} '{1}' is not online.
     DiskReadOnlyMessage = Disk with {0} '{1}' is readonly.
-    DiskNotGPTMessage = disk with {0} '{1}' is initialized with '{2}' partition style. GPT required.
+    DiskNotGPTMessage = Disk with {0} '{1}' is initialized with '{2}' partition style. GPT required.
     DriveLetterNotFoundMessage = Drive {0} was not found.
-    DriveSizeMismatchMessage = Drive {0} size {1} does not match expected size {2}.
-    DriveAllocationUnitSizeMismatchMessage = Drive {0} allocation unit size {1} KB does not match expected allocation unit size {2} KB.
-    FileSystemFormatMismatch = Drive {0} filesystem format '{1}' does not match expected format '{2}'.
-    DriveLabelMismatch = Drive {0} label '{1}' does not match expected label '{2}'.
+    SizeMismatchMessage = Partition assigned to drive {0} has size {1}, which does not match expected size {2}.
+    AllocationUnitSizeMismatchMessage = Volume assigned to drive {0} has allocation unit size {1} KB does not match expected allocation unit size {2} KB.
+    FileSystemFormatMismatch = Volume assigned to drive {0} filesystem format '{1}' does not match expected format '{2}'.
+    DriveLabelMismatch = Volume assigned to drive {0} label '{1}' does not match expected label '{2}'.
+    PartitionAlreadyAssignedMessage = Partition '{1}' is already assigned as drive {0}.
+    MatchingPartitionNotFoundMessage = Disk with {0} '{1}' already contains paritions, but none match required size.
+    MatchingPartitionFoundMessage = Disk with {0} '{1}' already contains paritions, and partition '{2}' matches required size.
 
     DiskAlreadyInitializedError = Disk with {0} '{1}' is already initialized with {2}.
     NewParitionIsReadOnlyError = New partition '{2}' on disk with {0} '{1}' did not become writable in the expected time.

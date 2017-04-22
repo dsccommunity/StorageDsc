@@ -163,6 +163,7 @@ try
                                 DiskId      = $disk.Number
                                 DiskIdType  = 'Number'
                                 FSLabel     = $FSLabelB
+                                Size        = 200MB
                             }
                         )
                     }
@@ -186,6 +187,11 @@ try
                 $current.DiskId           | Should Be $disk.Number
                 $current.AccessPath       | Should Be "$($accessPathB)\"
                 $current.FSLabel          | Should Be $FSLabelB
+                $current.Size             | Should Be 200MB
+            }
+
+            It 'should have 3 partitions on disk' {
+                ($disk | Get-Partition).Count | Should Be 3
             }
             #endregion
 
@@ -336,6 +342,7 @@ try
                                 DiskId      = $disk.UniqueId
                                 DiskIdType  = 'UniqueId'
                                 FSLabel     = $FSLabelB
+                                Size        = 200MB
                             }
                         )
                     }
@@ -359,6 +366,11 @@ try
                 $current.DiskId           | Should Be $disk.UniqueId
                 $current.AccessPath       | Should Be "$($accessPathB)\"
                 $current.FSLabel          | Should Be $FSLabelB
+                $current.Size             | Should Be 200MB
+            }
+
+            It 'should have 3 partitions on disk' {
+                ($disk | Get-Partition).Count | Should Be 3
             }
             #endregion
 

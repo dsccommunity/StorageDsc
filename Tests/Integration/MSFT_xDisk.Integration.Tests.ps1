@@ -53,7 +53,7 @@ try
             }
 
             #region DEFAULT TESTS
-            It 'Should compile without throwing' {
+            It 'should compile without throwing' {
                 {
                     # This is to pass to the Config
                     $configData = @{
@@ -74,25 +74,25 @@ try
                         -ConfigurationData $configData
                     Start-DscConfiguration -Path $TestDrive `
                         -ComputerName localhost -Wait -Verbose -Force
-                } | Should not throw
+                } | should not throw
             }
 
             It 'should be able to call Get-DscConfiguration without throwing' {
-                { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should Not throw
+                { Get-DscConfiguration -Verbose -ErrorAction Stop } | should Not throw
             }
             #endregion
 
-            It 'Should have set the resource and all the parameters should match' {
+            It 'should have set the resource and all the parameters should match' {
                 $current = Get-DscConfiguration | Where-Object {
                     $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
                 }
-                $current.DiskId           | Should Be $disk.Number
-                $current.DriveLetter      | Should Be $driveLetterA
-                $current.FSLabel          | Should Be $FSLabelA
-                $current.Size             | Should Be 100MB
+                $current.DiskId           | should Be $disk.Number
+                $current.DriveLetter      | should Be $driveLetterA
+                $current.FSLabel          | should Be $FSLabelA
+                $current.Size             | should Be 100MB
             }
 
-            It 'Should compile without throwing' {
+            It 'should compile without throwing' {
                 {
                     # This is to pass to the Config
                     $configData = @{
@@ -103,6 +103,7 @@ try
                                 DiskId      = $disk.Number
                                 DiskIdType  = 'Number'
                                 FSLabel     = $FSLabelB
+                                Size        = 200MB
                             }
                         )
                     }
@@ -112,22 +113,34 @@ try
                         -ConfigurationData $configData
                     Start-DscConfiguration -Path $TestDrive `
                         -ComputerName localhost -Wait -Verbose -Force
-                } | Should not throw
+                } | should not throw
             }
 
             It 'should be able to call Get-DscConfiguration without throwing' {
-                { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should Not throw
+                { Get-DscConfiguration -Verbose -ErrorAction Stop } | should Not throw
             }
             #endregion
 
-            It 'Should have set the resource and all the parameters should match' {
+            It 'should have set the resource and all the parameters should match' {
                 $current = Get-DscConfiguration | Where-Object {
                     $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
                 }
-                $current.DiskId           | Should Be $disk.Number
-                $current.DriveLetter      | Should Be $driveLetterB
-                $current.FSLabel          | Should Be $FSLabelB
-                $current.Size             | Should Be 100MB
+                $current.DiskId           | should Be $disk.Number
+                $current.DriveLetter      | should Be $driveLetterB
+                $current.FSLabel          | should Be $FSLabelB
+                $current.Size             | should Be 200MB
+            }
+
+            It 'should have 3 partitions on disk' {
+                ($disk | Get-Partition).Count | Should Be 3
+            }
+
+            It "should have attached drive $driveLetterA" {
+                Get-PSDrive -Name $driveLetterA -ErrorAction SilentlyContinue | Should Not BeNullOrEmpty
+            }
+
+            It "should have attached drive $driveLetterB" {
+                Get-PSDrive -Name $driveLetterB -ErrorAction SilentlyContinue | Should Not BeNullOrEmpty
             }
 
             AfterAll {
@@ -160,7 +173,7 @@ try
             }
 
             #region DEFAULT TESTS
-            It 'Should compile without throwing' {
+            It 'should compile without throwing' {
                 {
                     # This is to pass to the Config
                     $configData = @{
@@ -181,26 +194,26 @@ try
                         -ConfigurationData $configData
                     Start-DscConfiguration -Path $TestDrive `
                         -ComputerName localhost -Wait -Verbose -Force
-                } | Should not throw
+                } | should not throw
             }
 
             It 'should be able to call Get-DscConfiguration without throwing' {
-                { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should Not throw
+                { Get-DscConfiguration -Verbose -ErrorAction Stop } | should Not throw
             }
             #endregion
 
-            It 'Should have set the resource and all the parameters should match' {
+            It 'should have set the resource and all the parameters should match' {
                 $current = Get-DscConfiguration | Where-Object {
                     $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
                 }
-                $current.DiskId           | Should Be $disk.UniqueId
-                $current.DriveLetter      | Should Be $driveLetterA
-                $current.FSLabel          | Should Be $FSLabelA
-                $current.Size             | Should Be 100MB
+                $current.DiskId           | should Be $disk.UniqueId
+                $current.DriveLetter      | should Be $driveLetterA
+                $current.FSLabel          | should Be $FSLabelA
+                $current.Size             | should Be 100MB
             }
 
             #region DEFAULT TESTS
-            It 'Should compile without throwing' {
+            It 'should compile without throwing' {
                 {
                     # This is to pass to the Config
                     $configData = @{
@@ -211,6 +224,7 @@ try
                                 DiskId        = $disk.UniqueId
                                 DiskIdType    = 'UniqueId'
                                 FSLabel       = $FSLabelB
+                                Size          = 200MB
                             }
                         )
                     }
@@ -220,22 +234,34 @@ try
                         -ConfigurationData $configData
                     Start-DscConfiguration -Path $TestDrive `
                         -ComputerName localhost -Wait -Verbose -Force
-                } | Should not throw
+                } | should not throw
             }
 
             It 'should be able to call Get-DscConfiguration without throwing' {
-                { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should Not throw
+                { Get-DscConfiguration -Verbose -ErrorAction Stop } | should Not throw
             }
             #endregion
 
-            It 'Should have set the resource and all the parameters should match' {
+            It 'should have set the resource and all the parameters should match' {
                 $current = Get-DscConfiguration | Where-Object {
                     $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
                 }
-                $current.DiskId           | Should Be $disk.UniqueId
-                $current.DriveLetter      | Should Be $driveLetterB
-                $current.FSLabel          | Should Be $FSLabelB
-                $current.Size             | Should Be 100MB
+                $current.DiskId           | should Be $disk.UniqueId
+                $current.DriveLetter      | should Be $driveLetterB
+                $current.FSLabel          | should Be $FSLabelB
+                $current.Size             | should Be 200MB
+            }
+
+            It 'should have 3 partitions on disk' {
+                ($disk | Get-Partition).Count | Should Be 3
+            }
+
+            It "should have attached drive $driveLetterA" {
+                Get-PSDrive -Name $driveLetterA -ErrorAction SilentlyContinue | Should Not BeNullOrEmpty
+            }
+
+            It "should have attached drive $driveLetterB" {
+                Get-PSDrive -Name $driveLetterB -ErrorAction SilentlyContinue | Should Not BeNullOrEmpty
             }
 
             AfterAll {

@@ -984,12 +984,15 @@ try
                     -MockWith { $script:mockedVolume } `
                     -Verifiable
 
+                Mock `
+                    -CommandName Add-PartitionAccessPath `
+                    -Verifiable
+
                 # mocks that should not be called
                 Mock -CommandName Set-Disk
                 Mock -CommandName Initialize-Disk
                 Mock -CommandName New-Partition
                 Mock -CommandName Format-Volume
-                Mock -CommandName Add-PartitionAccessPath
 
                 It 'Should not throw' {
                     {
