@@ -27,16 +27,8 @@ try
     . $ConfigFile -Verbose -ErrorAction Stop
 
     Describe "$($script:DSCResourceName)_Integration" {
-        # Create a VHDx and attach it to the computer
-        BeforeAll {
-            $VHDPath = Join-Path -Path $TestDrive `
-                -ChildPath 'TestDisk.vhdx'
-            New-VHD -Path $VHDPath -SizeBytes 1GB -Dynamic
-            Mount-DiskImage -ImagePath $VHDPath -StorageType VHDX -NoDriveLetter
-            $Disk = Get-Disk | Where-Object -FilterScript {
-                $_.Location -eq $VHDPath
-            }
-        }
+        # Identify a disk to use for tests
+        $disk = Get-Disk | Select-Object -First 1
 
         Context 'Wait for a Disk using Disk Number' {
             #region DEFAULT TESTS
@@ -116,11 +108,6 @@ try
                 $current.RetryIntervalSec | Should Be 1
                 $current.RetryCount       | Should Be 5
             }
-        }
-
-        AfterAll {
-            Dismount-DiskImage -ImagePath $VHDPath -StorageType VHDx
-            Remove-Item -Path $VHDPath -Force
         }
     }
     #endregion
