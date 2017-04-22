@@ -423,68 +423,6 @@ try
                     Assert-MockCalled -CommandName Get-Volume -Exactly 0
                 }
             }
-
-            Context 'Online GPT disk with no partition using Disk Unique Id' {
-                # verifiable (should be called) mocks
-                Mock `
-                    -CommandName Assert-AccessPathValid `
-                    -MockWith { $script:testAccessPath } `
-                    -Verifiable
-
-                Mock `
-                    -CommandName Get-CimInstance `
-                    -Verifiable
-
-                Mock `
-                    -CommandName Get-Disk `
-                    -MockWith { $script:mockedDisk0 } `
-                    -Verifiable
-
-                Mock `
-                    -CommandName Get-Partition `
-                    -Verifiable
-
-                # mocks that should not be called
-                Mock -CommandName Get-Volume
-
-                $resource = Get-TargetResource `
-                    -DiskId $script:mockedDisk0.UniqueId `
-                    -DiskIdType 'UniqueId' `
-                    -AccessPath $script:testAccessPath `
-                    -Verbose
-
-                It "DiskId should be $($script:mockedDisk0.UniqueId)" {
-                    $resource.DiskId | Should be $script:mockedDisk0.UniqueId
-                }
-
-                It "AccessPath should be $($script:testAccessPath)" {
-                    $resource.AccessPath | Should be $script:testAccessPath
-                }
-
-                It "Size should be null" {
-                    $resource.Size | Should be $null
-                }
-
-                It "FSLabel should be empty" {
-                    $resource.FSLabel | Should be ''
-                }
-
-                It "AllocationUnitSize should be null" {
-                    $resource.AllocationUnitSize | Should be $null
-                }
-
-                It "FSFormat should be null" {
-                    $resource.FSFormat | Should be $null
-                }
-
-                It 'all the get mocks should be called' {
-                    Assert-VerifiableMocks
-                    Assert-MockCalled -CommandName Get-CimInstance -Exactly 1
-                    Assert-MockCalled -CommandName Get-Disk -Exactly 1
-                    Assert-MockCalled -CommandName Get-Partition -Exactly 1
-                    Assert-MockCalled -CommandName Get-Volume -Exactly 0
-                }
-            }
         }
         #endregion
 
@@ -535,6 +473,71 @@ try
                     {
                         Set-targetResource `
                             -DiskId $script:mockedDisk0Offline.Number `
+                            -AccessPath $script:testAccessPath `
+                            -Verbose
+                    } | Should not throw
+                }
+
+                It 'the correct mocks were called' {
+                    Assert-VerifiableMocks
+                    Assert-MockCalled -CommandName Assert-AccessPathValid -Times 1
+                    Assert-MockCalled -CommandName Get-Disk -Times 1
+                    Assert-MockCalled -CommandName Set-Disk -Times 1
+                    Assert-MockCalled -CommandName Initialize-Disk -Times 0
+                    Assert-MockCalled -CommandName Get-Partition -Times 1
+                    Assert-MockCalled -CommandName Get-Volume -Times 1
+                    Assert-MockCalled -CommandName New-Partition -Times 1
+                    Assert-MockCalled -CommandName Format-Volume -Times 1
+                    Assert-MockCalled -CommandName Add-PartitionAccessPath -Times 1
+                }
+            }
+
+            Context 'Offline GPT disk using Disk Unique Id' {
+                # verifiable (should be called) mocks
+                Mock `
+                    -CommandName Assert-AccessPathValid `
+                    -MockWith { $script:testAccessPath } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-Disk `
+                    -MockWith { $script:mockedDisk0Offline } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Set-Disk `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-Partition `
+                    -Verifiable
+
+                Mock `
+                    -CommandName New-Partition `
+                    -MockWith { $script:mockedPartitionNoAccess } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-Volume `
+                    -MockWith { $script:mockedVolumeUnformatted } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Format-Volume `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Add-PartitionAccessPath `
+                    -Verifiable
+
+                # mocks that should not be called
+                Mock -CommandName Initialize-Disk
+
+                It 'Should not throw' {
+                    {
+                        Set-targetResource `
+                            -DiskId $script:mockedDisk0Offline.UniqueId `
+                            -DiskIdType 'UniqueId' `
                             -AccessPath $script:testAccessPath `
                             -Verbose
                     } | Should not throw
@@ -858,6 +861,55 @@ try
                 }
             }
 
+            Context 'Online MBR disk using Disk Unique Id' {
+                # verifiable (should be called) mocks
+                Mock `
+                    -CommandName Assert-AccessPathValid `
+                    -MockWith { $script:testAccessPath } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-Disk `
+                    -MockWith { $script:mockedDisk0Mbr } `
+                    -Verifiable
+
+                # mocks that should not be called
+                Mock -CommandName Set-Disk
+                Mock -CommandName Initialize-Disk
+                Mock -CommandName Get-Partition
+                Mock -CommandName New-Partition
+                Mock -CommandName Format-Volume
+                Mock -CommandName Get-Volume
+                Mock -CommandName Add-PartitionAccessPath
+
+                $errorRecord = Get-InvalidOperationRecord `
+                    -Message ($LocalizedData.DiskAlreadyInitializedError -f `
+                        'UniqueId',$script:mockedDisk0Mbr.UniqueId,$script:mockedDisk0Mbr.PartitionStyle)
+
+                It 'Should throw DiskAlreadyInitializedError' {
+                    {
+                        Set-targetResource `
+                            -DiskId $script:mockedDisk0Mbr.UniqueId `
+                            -DiskIdType 'UniqueId' `
+                            -AccessPath $script:testAccessPath `
+                            -Verbose
+                    } | Should Throw $errorRecord
+                }
+
+                It 'the correct mocks were called' {
+                    Assert-VerifiableMocks
+                    Assert-MockCalled -CommandName Assert-AccessPathValid -Times 1
+                    Assert-MockCalled -CommandName Get-Disk -Times 1
+                    Assert-MockCalled -CommandName Set-Disk -Times 0
+                    Assert-MockCalled -CommandName Initialize-Disk -Times 0
+                    Assert-MockCalled -CommandName Get-Partition -Times 0
+                    Assert-MockCalled -CommandName Get-Volume -Times 0
+                    Assert-MockCalled -CommandName New-Partition -Times 0
+                    Assert-MockCalled -CommandName Format-Volume -Times 0
+                    Assert-MockCalled -CommandName Add-PartitionAccessPath -Times 0
+                }
+            }
+
             Context 'Online GPT disk with partition/volume already assigned using Disk Number' {
                 # verifiable (should be called) mocks
                 Mock `
@@ -1052,6 +1104,50 @@ try
                     {
                         $script:result = Test-TargetResource `
                             -DiskId $script:mockedDisk0Offline.Number `
+                            -AccessPath $script:testAccessPath `
+                            -AllocationUnitSize 4096 `
+                            -Verbose
+                    } | Should not throw
+                }
+
+                It 'result should be false' {
+                    $script:result | Should be $false
+                }
+
+                It 'the correct mocks were called' {
+                    Assert-VerifiableMocks
+                    Assert-MockCalled -CommandName Assert-AccessPathValid -Times 1
+                    Assert-MockCalled -CommandName Get-Disk -Times 1
+                    Assert-MockCalled -CommandName Get-Partition -Times 0
+                    Assert-MockCalled -CommandName Get-Volume -Times 0
+                    Assert-MockCalled -CommandName Get-CimInstance -Times 0
+                }
+            }
+
+            Context 'Test disk not initialized using Disk Unique Id' {
+                # verifiable (should be called) mocks
+                Mock `
+                    -CommandName Assert-AccessPathValid `
+                    -MockWith { $script:testAccessPath } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-Disk `
+                    -MockWith { $script:mockedDisk0Offline } `
+                    -Verifiable
+
+                # mocks that should not be called
+                Mock -CommandName Get-Volume
+                Mock -CommandName Get-Partition
+                Mock -CommandName Get-CimInstance
+
+                $script:result = $null
+
+                It 'calling test should not throw' {
+                    {
+                        $script:result = Test-TargetResource `
+                            -DiskId $script:mockedDisk0Offline.UniqueId `
+                            -DiskIdType 'UniqueId' `
                             -AccessPath $script:testAccessPath `
                             -AllocationUnitSize 4096 `
                             -Verbose
