@@ -14,22 +14,25 @@
 - Removed requirement on using Pester 3.4.6 because Pester bug fixed in 4.0.3.
 - Fixed unit tests for MSFT_xDiskAccessPath resource to be compatible with
   Pester 4.0.3.
-- Fixed style violations in xDisk.
-- BREAKING CHANGE: Renamed xDisk parameter DiskNumber to DiskId to enable it to
-  contain either DiskNumber or UniqueId - See [Issue 81](https://github.com/PowerShell/xStorage/issues/81).
-- Added DiskIdType parameter to xDisk to enable specifying the type of identifer
-  the DiskId parameter contains - See [Issue 81](https://github.com/PowerShell/xStorage/issues/81).
-- Changed xDisk to use xDiskAccessPath pattern to fix issue with Windows Server
-  2016 - See [Issue 80](https://github.com/PowerShell/xStorage/issues/80).
-- BREAKING CHANGE: Renamed xDiskAccessPath parameter DiskNumber to DiskId to
-  enable it to contain either DiskNumber or UniqueId - See [Issue 81](https://github.com/PowerShell/xStorage/issues/81).
-- Added DiskIdType parameter to xDiskAccessPath to enable specifying the type
-  of identifer the DiskId parameter contains - See [Issue 81](https://github.com/PowerShell/xStorage/issues/81).
-- Fixed incorrect logging messages in xDiskAccessPath when changing volume label.
-- BREAKING CHANGE: Renamed xWaitForDisk parameter DiskNumber to DiskId to
-  enable it to contain either DiskNumber or UniqueId - See [Issue 81](https://github.com/PowerShell/xStorage/issues/81).
-- Added DiskIdType parameter to xWaitForDisk to enable specifying the type
-  of identifer the DiskId parameter contains - See [Issue 81](https://github.com/PowerShell/xStorage/issues/81).
+- xDisk:
+  - BREAKING CHANGE: Renamed parameter DiskNumber to DiskId to enable it to
+    contain either DiskNumber or UniqueId - See [Issue 81](https://github.com/PowerShell/xStorage/issues/81).
+  - Added DiskIdType parameter to enable specifying the type of identifer
+    the DiskId parameter contains - See [Issue 81](https://github.com/PowerShell/xStorage/issues/81).
+  - Changed to use xDiskAccessPath pattern to fix issue with Windows Server
+    2016 - See [Issue 80](https://github.com/PowerShell/xStorage/issues/80).
+  - Fixed style violations in xDisk.
+- xDiskAccessPath:
+  - BREAKING CHANGE: Renamed parameter DiskNumber to DiskId to
+    enable it to contain either DiskNumber or UniqueId - See [Issue 81](https://github.com/PowerShell/xStorage/issues/81).
+  - Added DiskIdType parameter to enable specifying the type
+    of identifer the DiskId parameter contains - See [Issue 81](https://github.com/PowerShell/xStorage/issues/81).
+  - Fixed incorrect logging messages when changing volume label.
+- xWaitForDisk:
+  - BREAKING CHANGE: Renamed parameter DiskNumber to DiskId to
+    enable it to contain either DiskNumber or UniqueId - See [Issue 81](https://github.com/PowerShell/xStorage/issues/81).
+  - Added DiskIdType parameter to enable specifying the type
+    of identifer the DiskId parameter contains - See [Issue 81](https://github.com/PowerShell/xStorage/issues/81).
 
 ## 2.9.0.0
 

@@ -26,7 +26,7 @@ function Get-TargetResource
     [OutputType([System.Collections.Hashtable])]
     param
     (
-        [parameter(Mandatory = $true)]
+        [Parameter(Mandatory = $true)]
         [System.String]
         $ImagePath
     )
@@ -59,7 +59,7 @@ function Get-TargetResource
         else
         {
             # Look up the disk and find out if it is readwrite.
-            $disk = Get-Disk | Where-Object -Property Location -EQ -Value $ImagePath
+            $disk = Get-Disk | Where-Object -Property Location -eq -Value $ImagePath
             if (-not $disk.IsReadOnly)
             {
                 $returnValue.Access = 'ReadWrite'
@@ -108,21 +108,25 @@ function Set-TargetResource
     [CmdletBinding(SupportsShouldProcess = $true)]
     param
     (
-        [parameter(Mandatory = $true)]
+        [Parameter(Mandatory = $true)]
         [System.String]
         $ImagePath,
 
+        [Parameter()]
         [System.String]
         $DriveLetter,
 
+        [Parameter()]
         [ValidateSet("ISO","VHD","VHDx","VHDSet")]
         [System.String]
         $StorageType,
 
+        [Parameter()]
         [ValidateSet("ReadOnly","ReadWrite")]
         [System.String]
         $Access,
 
+        [Parameter()]
         [ValidateSet("Present","Absent")]
         [System.String]
         $Ensure = 'Present'
@@ -243,21 +247,25 @@ function Test-TargetResource
     [OutputType([System.Boolean])]
     param
     (
-        [parameter(Mandatory = $true)]
+        [Parameter(Mandatory = $true)]
         [System.String]
         $ImagePath,
 
+        [Parameter()]
         [System.String]
         $DriveLetter,
 
+        [Parameter()]
         [ValidateSet("ISO","VHD","VHDx","VHDSet")]
         [System.String]
         $StorageType,
 
+        [Parameter()]
         [ValidateSet("ReadOnly","ReadWrite")]
         [System.String]
         $Access,
 
+        [Parameter()]
         [ValidateSet("Present","Absent")]
         [System.String]
         $Ensure = 'Present'
@@ -383,21 +391,25 @@ function Test-ParameterValid
     [OutputType([String[]])]
     param
     (
-        [parameter(Mandatory = $true)]
+        [Parameter(Mandatory = $true)]
         [System.String]
         $ImagePath,
 
+        [Parameter()]
         [System.String]
         $DriveLetter,
 
+        [Parameter()]
         [ValidateSet("ISO","VHD","VHDx","VHDSet")]
         [System.String]
         $StorageType,
 
+        [Parameter()]
         [ValidateSet("ReadOnly","ReadWrite")]
         [System.String]
         $Access,
 
+        [Parameter()]
         [ValidateSet("Present","Absent")]
         [System.String]
         $Ensure = 'Present'
@@ -476,17 +488,20 @@ function Mount-DiskImageToLetter
     [OutputType([String[]])]
     param
     (
-        [parameter(Mandatory = $true)]
+        [Parameter(Mandatory = $true)]
         [System.String]
         $ImagePath,
 
+        [Parameter()]
         [System.String]
         $DriveLetter,
 
+        [Parameter()]
         [ValidateSet("ISO","VHD","VHDx","VHDSet")]
         [System.String]
         $StorageType,
 
+        [Parameter()]
         [ValidateSet("ReadOnly","ReadWrite")]
         [System.String]
         $Access
@@ -521,7 +536,7 @@ function Mount-DiskImageToLetter
     else
     {
         # This is a VHD/VHDx/VHDSet diskimage
-        $disk = Get-Disk | Where-Object -Property Location -EQ -Value $ImagePath
+        $disk = Get-Disk | Where-Object -Property Location -eq -Value $ImagePath
 
         # Lookup the volume and get the first mounted Drive Letter.
         $volumes = $disk | Get-Partition | Get-Volume

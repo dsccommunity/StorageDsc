@@ -24,7 +24,7 @@ $localizedData = Get-LocalizedData `
     Specifies the disk identifier for the disk to modify.
 
     .PARAMETER DiskIdType
-    Specifies the identifier type the DiskId contains.
+    Specifies the identifier type the DiskId contains. Defaults to Number.
 
     .PARAMETER Size
     Specifies the size of new volume (use all available space on disk if not provided).
@@ -44,28 +44,33 @@ function Get-TargetResource
     [OutputType([System.Collections.Hashtable])]
     param
     (
-        [parameter(Mandatory = $true)]
+        [Parameter(Mandatory = $true)]
         [System.String]
         $DriveLetter,
 
-        [parameter(Mandatory = $true)]
+        [Parameter(Mandatory = $true)]
         [System.String]
         $DiskId,
 
-        [ValidateSet("Number","UniqueId")]
+        [Parameter()]
+        [ValidateSet('Number','UniqueId')]
         [System.String]
         $DiskIdType = 'Number',
 
+        [Parameter()]
         [System.UInt64]
         $Size,
 
+        [Parameter()]
         [System.String]
         $FSLabel,
 
+        [Parameter()]
         [System.UInt32]
         $AllocationUnitSize,
 
-        [ValidateSet("NTFS","ReFS")]
+        [Parameter()]
+        [ValidateSet('NTFS','ReFS')]
         [System.String]
         $FSFormat = 'NTFS'
     )
@@ -78,7 +83,9 @@ function Get-TargetResource
     # Validate the DriveLetter parameter
     $DriveLetter = Assert-DriveLetterValid -DriveLetter $DriveLetter
 
-    $diskIdParameter = @{ $DiskIdType = $DiskId }
+    $diskIdParameter = @{
+        $DiskIdType = $DiskId
+    }
 
     $disk = Get-Disk `
         @diskIdParameter `
@@ -122,7 +129,7 @@ function Get-TargetResource
     Specifies the disk identifier for the disk to modify.
 
     .PARAMETER DiskIdType
-    Specifies the identifier type the DiskId contains.
+    Specifies the identifier type the DiskId contains. Defaults to Number.
 
     .PARAMETER Size
     Specifies the size of new volume (use all available space on disk if not provided).
@@ -143,28 +150,33 @@ function Set-TargetResource
     [CmdletBinding(SupportsShouldProcess = $true)]
     param
     (
-        [parameter(Mandatory = $true)]
+        [Parameter(Mandatory = $true)]
         [System.String]
         $DriveLetter,
 
-        [parameter(Mandatory = $true)]
+        [Parameter(Mandatory = $true)]
         [System.String]
         $DiskId,
 
-        [ValidateSet("Number","UniqueId")]
+        [Parameter()]
+        [ValidateSet('Number','UniqueId')]
         [System.String]
         $DiskIdType = 'Number',
 
+        [Parameter()]
         [System.UInt64]
         $Size,
 
+        [Parameter()]
         [System.String]
         $FSLabel,
 
+        [Parameter()]
         [System.UInt32]
         $AllocationUnitSize,
 
-        [ValidateSet("NTFS","ReFS")]
+        [Parameter()]
+        [ValidateSet('NTFS','ReFS')]
         [System.String]
         $FSFormat = 'NTFS'
     )
@@ -177,7 +189,9 @@ function Set-TargetResource
     # Validate the DriveLetter parameter
     $DriveLetter = Assert-DriveLetterValid -DriveLetter $DriveLetter
 
-    $diskIdParameter = @{ $DiskIdType = $DiskId }
+    $diskIdParameter = @{
+        $DiskIdType = $DiskId
+    }
 
     $disk = Get-Disk `
         @diskIdParameter `
@@ -212,7 +226,7 @@ function Set-TargetResource
 
     switch ($disk.PartitionStyle)
     {
-        "RAW"
+        'RAW'
         {
             # The disk partition table is not yet initialized, so initialize it with GPT
             Write-Verbose -Message ( @(
@@ -221,11 +235,12 @@ function Set-TargetResource
                 ) -join '' )
 
             $disk | Initialize-Disk `
-                -PartitionStyle "GPT"
+                -PartitionStyle 'GPT'
 
             break
-        } # "RAW"
-        "GPT"
+        } # 'RAW'
+
+        'GPT'
         {
             # The disk partition is already initialized with GPT.
             Write-Verbose -Message ( @(
@@ -234,7 +249,8 @@ function Set-TargetResource
                 ) -join '' )
 
             break
-        } # "GPT"
+        } # 'GPT'
+
         default
         {
             # This disk is initialized but not as GPT - so raise an exception.
@@ -249,7 +265,7 @@ function Set-TargetResource
 
     # Check if the disk has an existing partition assigned to the drive letter
     $assignedPartition = $partition |
-            Where-Object -Property DriveLetter -EQ DriveLetter
+            Where-Object -Property DriveLetter -eq DriveLetter
 
     # Check if existing partition already has file system on it
     if ($null -eq $assignedPartition)
@@ -309,7 +325,7 @@ function Set-TargetResource
                             -f $DiskIdType,$DiskId,$DriveLetter,"$($Size/1KB) KB")
                     ) -join '' )
 
-                $partitionParams["Size"] = $Size
+                $partitionParams['Size'] = $Size
             }
             else
             {
@@ -320,17 +336,19 @@ function Set-TargetResource
                             -f $DiskIdType,$DiskId,$DriveLetter,'all free space')
                     ) -join '' )
 
-                $partitionParams["UseMaximumSize"] = $true
+                $partitionParams['UseMaximumSize'] = $true
             } # if
 
             # Create the partition.
             $partition = $disk | New-Partition @partitionParams
 
-            # After creating the partition it can take a few seconds for it to become writeable
-            # Wait for up to 30 seconds for the parition to become writeable
+            <#
+                After creating the partition it can take a few seconds for it to become writeable
+                Wait for up to 30 seconds for the parition to become writeable
+            #>
             $start = Get-Date
             $timeout = (Get-Date) + (New-Timespan -Second 30)
-            While ($partition.IsReadOnly -and (Get-Date) -lt $timeout)
+            while ($partition.IsReadOnly -and (Get-Date) -lt $timeout)
             {
                 Write-Verbose -Message ( @(
                         "$($MyInvocation.MyCommand): "
@@ -459,7 +477,7 @@ function Set-TargetResource
     Specifies the disk identifier for the disk to modify.
 
     .PARAMETER DiskIdType
-    Specifies the identifier type the DiskId contains.
+    Specifies the identifier type the DiskId contains. Defaults to Number.
 
     .PARAMETER Size
     Specifies the size of new volume (use all available space on disk if not provided).
@@ -479,28 +497,33 @@ function Test-TargetResource
     [OutputType([System.Boolean])]
     param
     (
-        [parameter(Mandatory = $true)]
+        [Parameter(Mandatory = $true)]
         [System.String]
         $DriveLetter,
 
-        [parameter(Mandatory = $true)]
+        [Parameter(Mandatory = $true)]
         [System.String]
         $DiskId,
 
-        [ValidateSet("Number","UniqueId")]
+        [Parameter()]
+        [ValidateSet('Number','UniqueId')]
         [System.String]
         $DiskIdType = 'Number',
 
+        [Parameter()]
         [System.UInt64]
         $Size,
 
+        [Parameter()]
         [System.String]
         $FSLabel,
 
+        [Parameter()]
         [System.UInt32]
         $AllocationUnitSize,
 
-        [ValidateSet("NTFS","ReFS")]
+        [Parameter()]
+        [ValidateSet('NTFS','ReFS')]
         [System.String]
         $FSFormat = 'NTFS'
     )
@@ -513,7 +536,9 @@ function Test-TargetResource
     # Validate the DriveLetter parameter
     $DriveLetter = Assert-DriveLetterValid -DriveLetter $DriveLetter
 
-    $diskIdParameter = @{ $DiskIdType = $DiskId }
+    $diskIdParameter = @{
+        $DiskIdType = $DiskId
+    }
 
     Write-Verbose -Message ( @(
             "$($MyInvocation.MyCommand): "
@@ -554,7 +579,7 @@ function Test-TargetResource
         return $false
     } # if
 
-    if ($disk.PartitionStyle -ne "GPT")
+    if ($disk.PartitionStyle -ne 'GPT')
     {
         Write-Verbose -Message ( @(
                 "$($MyInvocation.MyCommand): "

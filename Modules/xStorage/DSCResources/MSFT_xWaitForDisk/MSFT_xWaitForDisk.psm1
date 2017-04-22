@@ -21,7 +21,7 @@ $localizedData = Get-LocalizedData `
     Specifies the disk identifier for the disk to wait for.
 
     .PARAMETER DiskIdType
-    Specifies the identifier type the DiskId contains.
+    Specifies the identifier type the DiskId contains. Defaults to Number.
 
     .PARAMETER RetryIntervalSec
     Specifies the number of seconds to wait for the disk to become available.
@@ -35,17 +35,20 @@ function Get-TargetResource
     [OutputType([System.Collections.Hashtable])]
     param
     (
-        [parameter(Mandatory = $true)]
+        [Parameter(Mandatory = $true)]
         [System.String]
         $DiskId,
 
-        [ValidateSet("Number","UniqueId")]
+        [Parameter()]
+        [ValidateSet('Number','UniqueId')]
         [System.String]
         $DiskIdType = 'Number',
 
+        [Parameter()]
         [System.UInt32]
         $RetryIntervalSec = 10,
 
+        [Parameter()]
         [System.UInt32]
         $RetryCount = 60
     )
@@ -72,7 +75,7 @@ function Get-TargetResource
     Specifies the disk identifier for the disk to wait for.
 
     .PARAMETER DiskIdType
-    Specifies the identifier type the DiskId contains.
+    Specifies the identifier type the DiskId contains. Defaults to Number.
 
     .PARAMETER RetryIntervalSec
     Specifies the number of seconds to wait for the disk to become available.
@@ -85,17 +88,20 @@ function Set-TargetResource
     [CmdletBinding()]
     param
     (
-        [parameter(Mandatory = $true)]
+        [Parameter(Mandatory = $true)]
         [System.String]
         $DiskId,
 
-        [ValidateSet("Number","UniqueId")]
+        [Parameter()]
+        [ValidateSet('Number','UniqueId')]
         [System.String]
         $DiskIdType = 'Number',
 
+        [Parameter()]
         [System.UInt32]
         $RetryIntervalSec = 10,
 
+        [Parameter()]
         [System.UInt32]
         $RetryCount = 60
     )
@@ -107,7 +113,9 @@ function Set-TargetResource
 
     $diskFound = $false
 
-    $diskIdParameter = @{ $DiskIdType = $DiskId }
+    $diskIdParameter = @{
+        $DiskIdType = $DiskId
+    }
 
     for ($count = 0; $count -lt $RetryCount; $count++)
     {
@@ -150,7 +158,7 @@ function Set-TargetResource
     Specifies the disk identifier for the disk to wait for.
 
     .PARAMETER DiskIdType
-    Specifies the identifier type the DiskId contains.
+    Specifies the identifier type the DiskId contains. Defaults to Number.
 
     .PARAMETER RetryIntervalSec
     Specifies the number of seconds to wait for the disk to become available.
@@ -164,17 +172,20 @@ function Test-TargetResource
     [OutputType([System.Boolean])]
     param
     (
-        [parameter(Mandatory = $true)]
+        [Parameter(Mandatory = $true)]
         [System.String]
         $DiskId,
 
-        [ValidateSet("Number","UniqueId")]
+        [Parameter()]
+        [ValidateSet('Number','UniqueId')]
         [System.String]
         $DiskIdType = 'Number',
 
+        [Parameter()]
         [System.UInt32]
         $RetryIntervalSec = 10,
 
+        [Parameter()]
         [System.UInt32]
         $RetryCount = 60
     )
@@ -184,7 +195,9 @@ function Test-TargetResource
             $($localizedData.CheckingForDiskStatusMessage -f $DiskIdType,$DiskId)
         ) -join '' )
 
-    $diskIdParameter = @{ $DiskIdType = $DiskId }
+    $diskIdParameter = @{
+        $DiskIdType = $DiskId
+    }
 
     $disk = Get-Disk `
         @diskIdParameter `
