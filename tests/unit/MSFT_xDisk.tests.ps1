@@ -33,7 +33,6 @@ try
 
         $script:mockedDisk0 = [pscustomobject] @{
                 Number = 0
-                DiskNumber = 0
                 UniqueId = $script:testDiskUniqueId
                 IsOffline = $false
                 IsReadOnly = $false
@@ -42,7 +41,6 @@ try
 
         $script:mockedDisk0Mbr = [pscustomobject] @{
                 Number = 0
-                DiskNumber = 0
                 UniqueId = $script:testDiskUniqueId
                 IsOffline = $false
                 IsReadOnly = $false
@@ -51,7 +49,6 @@ try
 
         $script:mockedDisk0Offline = [pscustomobject] @{
                 Number = 0
-                DiskNumber = 0
                 UniqueId = $script:testDiskUniqueId
                 IsOffline = $true
                 IsReadOnly = $false
@@ -60,7 +57,6 @@ try
 
         $script:mockedDisk0OfflineRaw = [pscustomobject] @{
                 Number = 0
-                DiskNumber = 0
                 UniqueId = $script:testDiskUniqueId
                 IsOffline = $true
                 IsReadOnly = $false
@@ -69,7 +65,6 @@ try
 
         $script:mockedDisk0Readonly = [pscustomobject] @{
                 Number = 0
-                DiskNumber = 0
                 UniqueId = $script:testDiskUniqueId
                 IsOffline = $false
                 IsReadOnly = $true
@@ -78,7 +73,6 @@ try
 
         $script:mockedDisk0Raw = [pscustomobject] @{
                 Number = 0
-                DiskNumber = 0
                 UniqueId = $script:testDiskUniqueId
                 IsOffline = $false
                 IsReadOnly = $false
@@ -155,7 +149,7 @@ try
                 $DiskNumber,
 
                 [Uint32]
-                $ParitionNumber
+                $PartitionNumber
             )
         }
 
@@ -174,6 +168,21 @@ try
 
                 [UInt64]
                 $Size
+            )
+        }
+
+        function Set-Partition {
+            Param
+            (
+                [CmdletBinding()]
+                [Parameter(ValueFromPipeline)]
+                $Disk,
+
+                [String]
+                $DriveLetter,
+
+                [String]
+                $NewDriveLetter
             )
         }
 

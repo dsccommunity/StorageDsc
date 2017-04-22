@@ -33,7 +33,7 @@ try
     . $ConfigFile -Verbose -ErrorAction Stop
 
     Describe "$($script:DSCResourceName)_Integration" {
-        Context 'Partition and format newly provisioned disk and assign a Drive Letter' {
+        Context 'Partition and format newly provisioned disk using Disk Number with two volumes and assign Drive Letters' {
             # Create a VHDx and attach it to the computer
             $VHDPath = Join-Path -Path $TestDrive `
                 -ChildPath 'TestDisk.vhdx'
@@ -42,24 +42,27 @@ try
             $Disk = Get-Disk | Where-Object -FilterScript {
                 $_.Location -eq $VHDPath
             }
-            $FSLabel = 'TestDisk'
+            $FSLabelA = 'TestDiskA'
+            $FSLabelB = 'TestDiskB'
 
-            # Get a spare drive letter
+            # Get a spare drive letters
             $LastDrive = ((Get-Volume).DriveLetter | Sort-Object | Select-Object -Last 1)
-            $DriveLetter = [char](([int][char]$LastDrive)+1)
+            $DriveLetterA = [char](([int][char]$LastDrive)+1)
+            $DriveLetterB = [char](([int][char]$LastDrive)+2)
 
             #region DEFAULT TESTS
             It 'Should compile without throwing' {
                 {
-                    # This is so that the
+                    # This is to pass to the Config
                     $ConfigData = @{
                         AllNodes = @(
                             @{
                                 NodeName    = 'localhost'
-                                DriveLetter = $DriveLetter
+                                DriveLetter = $DriveLetterA
                                 DiskId      = $Disk.Number
                                 DiskIdType  = 'Number'
-                                FSLabel     = $FSLabel
+                                FSLabel     = $FSLabelA
+                                Size        = 100MB
                             }
                         )
                     }
@@ -82,8 +85,47 @@ try
                     $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
                 }
                 $current.DiskId           | Should Be $Disk.Number
-                $current.DriveLetter      | Should Be $DriveLetter
-                $current.FSLabel          | Should Be $FSLabel
+                $current.DriveLetter      | Should Be $DriveLetterA
+                $current.FSLabel          | Should Be $FSLabelA
+                $current.Size             | Should Be 100MB
+            }
+
+            It 'Should compile without throwing' {
+                {
+                    # This is to pass to the Config
+                    $ConfigData = @{
+                        AllNodes = @(
+                            @{
+                                NodeName    = 'localhost'
+                                DriveLetter = $DriveLetterB
+                                DiskId      = $Disk.Number
+                                DiskIdType  = 'Number'
+                                FSLabel     = $FSLabelB
+                            }
+                        )
+                    }
+
+                    & "$($script:DSCResourceName)_Config" `
+                        -OutputPath $TestDrive `
+                        -ConfigurationData $ConfigData
+                    Start-DscConfiguration -Path $TestDrive `
+                        -ComputerName localhost -Wait -Verbose -Force
+                } | Should not throw
+            }
+
+            It 'should be able to call Get-DscConfiguration without throwing' {
+                { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should Not throw
+            }
+            #endregion
+
+            It 'Should have set the resource and all the parameters should match' {
+                $current = Get-DscConfiguration | Where-Object {
+                    $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
+                }
+                $current.DiskId           | Should Be $Disk.Number
+                $current.DriveLetter      | Should Be $DriveLetterB
+                $current.FSLabel          | Should Be $FSLabelB
+                $current.Size             | Should Be 100MB
             }
 
             Dismount-DiskImage -ImagePath $VHDPath -StorageType VHDx
@@ -97,7 +139,7 @@ try
     . $ConfigFile -Verbose -ErrorAction Stop
 
     Describe "$($script:DSCResourceName)_Integration" {
-        Context 'Partition and format newly provisioned disk and assign a Drive Letter' {
+        Context 'Partition and format newly provisioned disk using Unique Id with two volumes and assign Drive Letters' {
             # Create a VHDx and attach it to the computer
             $VHDPath = Join-Path -Path $TestDrive `
                 -ChildPath 'TestDisk.vhdx'
@@ -106,24 +148,27 @@ try
             $Disk = Get-Disk | Where-Object -FilterScript {
                 $_.Location -eq $VHDPath
             }
-            $FSLabel = 'TestDisk'
+            $FSLabelA = 'TestDiskA'
+            $FSLabelB = 'TestDiskB'
 
             # Get a spare drive letter
             $LastDrive = ((Get-Volume).DriveLetter | Sort-Object | Select-Object -Last 1)
-            $DriveLetter = [char](([int][char]$LastDrive)+1)
+            $DriveLetterA = [char](([int][char]$LastDrive)+1)
+            $DriveLetterB = [char](([int][char]$LastDrive)+2)
 
             #region DEFAULT TESTS
             It 'Should compile without throwing' {
                 {
-                    # This is so that the
+                    # This is to pass to the Config
                     $ConfigData = @{
                         AllNodes = @(
                             @{
                                 NodeName      = 'localhost'
-                                DriveLetter   = $DriveLetter
+                                DriveLetter   = $DriveLetterA
                                 DiskId        = $Disk.UniqueId
                                 DiskIdType    = 'UniqueId'
-                                FSLabel       = $FSLabel
+                                FSLabel       = $FSLabelA
+                                Size          = 100MB
                             }
                         )
                     }
@@ -146,8 +191,48 @@ try
                     $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
                 }
                 $current.DiskId           | Should Be $Disk.UniqueId
-                $current.DriveLetter      | Should Be $DriveLetter
-                $current.FSLabel          | Should Be $FSLabel
+                $current.DriveLetter      | Should Be $DriveLetterA
+                $current.FSLabel          | Should Be $FSLabelA
+                $current.Size             | Should Be 100MB
+            }
+
+            #region DEFAULT TESTS
+            It 'Should compile without throwing' {
+                {
+                    # This is to pass to the Config
+                    $ConfigData = @{
+                        AllNodes = @(
+                            @{
+                                NodeName      = 'localhost'
+                                DriveLetter   = $DriveLetterB
+                                DiskId        = $Disk.UniqueId
+                                DiskIdType    = 'UniqueId'
+                                FSLabel       = $FSLabelB
+                            }
+                        )
+                    }
+
+                    & "$($script:DSCResourceName)_Config" `
+                        -OutputPath $TestDrive `
+                        -ConfigurationData $ConfigData
+                    Start-DscConfiguration -Path $TestDrive `
+                        -ComputerName localhost -Wait -Verbose -Force
+                } | Should not throw
+            }
+
+            It 'should be able to call Get-DscConfiguration without throwing' {
+                { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should Not throw
+            }
+            #endregion
+
+            It 'Should have set the resource and all the parameters should match' {
+                $current = Get-DscConfiguration | Where-Object {
+                    $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
+                }
+                $current.DiskId           | Should Be $Disk.UniqueId
+                $current.DriveLetter      | Should Be $DriveLetterB
+                $current.FSLabel          | Should Be $FSLabelB
+                $current.Size             | Should Be 100MB
             }
 
             Dismount-DiskImage -ImagePath $VHDPath -StorageType VHDx

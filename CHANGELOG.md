@@ -19,6 +19,11 @@
   contain either DiskNumber or UniqueId.
 - Added DiskIdType parameter to xDisk to enable specifying the type of identifer
   the DiskId parameter contains.
+- BREAKING CHANGE: Renamed xDiskAccessPath parameter DiskNumber to DiskId to enable it to
+  contain either DiskNumber or UniqueId.
+- Added DiskIdType parameter to xDiskAccessPath to enable specifying the type of identifer
+  the DiskId parameter contains.
+- Fixed incorrect logging messages in xDiskAccessPath when changing volume label.
 
 ## 2.9.0.0
 

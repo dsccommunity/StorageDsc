@@ -24,7 +24,7 @@ $localizedData = Get-LocalizedData `
     Specifies the disk identifier for which disk to modify.
 
     .PARAMETER DiskIdType
-    Specifies the identifier type the disk identifier contains.
+    Specifies the identifier type the DiskId contains.
 
     .PARAMETER Size
     Specifies the size of new volume (use all available space on disk if not provided).
@@ -122,7 +122,7 @@ function Get-TargetResource
     Specifies the disk identifier for which disk to modify.
 
     .PARAMETER DiskIdType
-    Specifies the identifier type the disk identifier contains.
+    Specifies the identifier type the DiskId contains.
 
     .PARAMETER Size
     Specifies the size of new volume (use all available space on disk if not provided).
@@ -385,12 +385,8 @@ function Set-TargetResource
                     $($localizedData.AssigningDriveLetterMessage -f $DriveLetter)
                 ) -join '' )
 
-            $partitionDiskIdParameter = @{ "Disk$DiskIdType" = $DiskId }
-
-            Set-Partition `
-                @paritionDiskIdParameter `
-                -PartitionNumber 2 `
-                -NewDriveLetter $DriveLetter
+            $partition = $disk | Get-Partition -PartitionNumber 2
+            $partition | Set-Partition -NewDriveLetter $DriveLetter
         } # if
 
         if ($PSBoundParameters.ContainsKey('FSLabel'))
@@ -422,7 +418,7 @@ function Set-TargetResource
     Specifies the disk identifier for which disk to modify.
 
     .PARAMETER DiskIdType
-    Specifies the identifier type the disk identifier contains.
+    Specifies the identifier type the DiskId contains.
 
     .PARAMETER Size
     Specifies the size of new volume (use all available space on disk if not provided).
