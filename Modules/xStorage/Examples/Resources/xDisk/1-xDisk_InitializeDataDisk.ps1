@@ -23,6 +23,7 @@ Configuration Example
              DiskId = 2
              DriveLetter = 'G'
              Size = 10GB
+             DependsOn = '[xWaitForDisk]Disk2'
         }
 
         xDisk JVolume
@@ -33,13 +34,21 @@ Configuration Example
              DependsOn = '[xDisk]GVolume'
         }
 
-        xDisk DataVolume
+        xWaitforDisk Disk3
+        {
+             DiskId = 3
+             RetryIntervalSec = 60
+             RetryCount = 60
+        }
+
+        xDisk SVolume
         {
              DiskId = 3
              DriveLetter = 'S'
              Size = 100GB
              FSFormat = 'ReFS'
              AllocationUnitSize = 64KB
+             DependsOn = '[xWaitForDisk]Disk3'
         }
     }
 }

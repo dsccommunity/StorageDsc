@@ -53,7 +53,7 @@ try
             }
 
             #region DEFAULT TESTS
-            It 'should compile without throwing' {
+            It 'should compile and apply the MOF without throwing' {
                 {
                     # This is to pass to the Config
                     $configData = @{
@@ -74,11 +74,11 @@ try
                         -ConfigurationData $configData
                     Start-DscConfiguration -Path $TestDrive `
                         -ComputerName localhost -Wait -Verbose -Force
-                } | should not throw
+                } | Should Not Throw
             }
 
             It 'should be able to call Get-DscConfiguration without throwing' {
-                { Get-DscConfiguration -Verbose -ErrorAction Stop } | should Not throw
+                { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should Not Throw
             }
             #endregion
 
@@ -86,13 +86,13 @@ try
                 $current = Get-DscConfiguration | Where-Object {
                     $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
                 }
-                $current.DiskId           | should Be $disk.Number
-                $current.DriveLetter      | should Be $driveLetterA
-                $current.FSLabel          | should Be $FSLabelA
-                $current.Size             | should Be 100MB
+                $current.DiskId           | Should Be $disk.Number
+                $current.DriveLetter      | Should Be $driveLetterA
+                $current.FSLabel          | Should Be $FSLabelA
+                $current.Size             | Should Be 100MB
             }
 
-            It 'should compile without throwing' {
+            It 'should compile and apply the MOF without throwing' {
                 {
                     # This is to pass to the Config
                     $configData = @{
@@ -113,11 +113,11 @@ try
                         -ConfigurationData $configData
                     Start-DscConfiguration -Path $TestDrive `
                         -ComputerName localhost -Wait -Verbose -Force
-                } | should not throw
+                } | Should Not Throw
             }
 
             It 'should be able to call Get-DscConfiguration without throwing' {
-                { Get-DscConfiguration -Verbose -ErrorAction Stop } | should Not throw
+                { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should Not Throw
             }
             #endregion
 
@@ -125,10 +125,10 @@ try
                 $current = Get-DscConfiguration | Where-Object {
                     $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
                 }
-                $current.DiskId           | should Be $disk.Number
-                $current.DriveLetter      | should Be $driveLetterB
-                $current.FSLabel          | should Be $FSLabelB
-                $current.Size             | should Be 200MB
+                $current.DiskId           | Should Be $disk.Number
+                $current.DriveLetter      | Should Be $driveLetterB
+                $current.FSLabel          | Should Be $FSLabelB
+                $current.Size             | Should Be 200MB
             }
 
             It 'should have 3 partitions on disk' {
@@ -173,7 +173,7 @@ try
             }
 
             #region DEFAULT TESTS
-            It 'should compile without throwing' {
+            It 'should compile and apply the MOF without throwing' {
                 {
                     # This is to pass to the Config
                     $configData = @{
@@ -194,11 +194,11 @@ try
                         -ConfigurationData $configData
                     Start-DscConfiguration -Path $TestDrive `
                         -ComputerName localhost -Wait -Verbose -Force
-                } | should not throw
+                } | Should Not Throw
             }
 
             It 'should be able to call Get-DscConfiguration without throwing' {
-                { Get-DscConfiguration -Verbose -ErrorAction Stop } | should Not throw
+                { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should Not Throw
             }
             #endregion
 
@@ -206,14 +206,14 @@ try
                 $current = Get-DscConfiguration | Where-Object {
                     $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
                 }
-                $current.DiskId           | should Be $disk.UniqueId
-                $current.DriveLetter      | should Be $driveLetterA
-                $current.FSLabel          | should Be $FSLabelA
-                $current.Size             | should Be 100MB
+                $current.DiskId           | Should Be $disk.UniqueId
+                $current.DriveLetter      | Should Be $driveLetterA
+                $current.FSLabel          | Should Be $FSLabelA
+                $current.Size             | Should Be 100MB
             }
 
             #region DEFAULT TESTS
-            It 'should compile without throwing' {
+            It 'should compile and apply the MOF without throwing' {
                 {
                     # This is to pass to the Config
                     $configData = @{
@@ -234,11 +234,11 @@ try
                         -ConfigurationData $configData
                     Start-DscConfiguration -Path $TestDrive `
                         -ComputerName localhost -Wait -Verbose -Force
-                } | should not throw
+                } | Should Not Throw
             }
 
             It 'should be able to call Get-DscConfiguration without throwing' {
-                { Get-DscConfiguration -Verbose -ErrorAction Stop } | should Not throw
+                { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should Not Throw
             }
             #endregion
 
@@ -246,12 +246,13 @@ try
                 $current = Get-DscConfiguration | Where-Object {
                     $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
                 }
-                $current.DiskId           | should Be $disk.UniqueId
-                $current.DriveLetter      | should Be $driveLetterB
-                $current.FSLabel          | should Be $FSLabelB
-                $current.Size             | should Be 200MB
+                $current.DiskId           | Should Be $disk.UniqueId
+                $current.DriveLetter      | Should Be $driveLetterB
+                $current.FSLabel          | Should Be $FSLabelB
+                $current.Size             | Should Be 200MB
             }
 
+            # A system partition will have been added to the disk as well as the 2 test partitions
             It 'should have 3 partitions on disk' {
                 ($disk | Get-Partition).Count | Should Be 3
             }

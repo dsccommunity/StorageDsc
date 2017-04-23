@@ -68,7 +68,7 @@ try
                 # verifiable (Should Be called) mocks
                 Mock Get-Volume -MockWith { return $mockedDriveC } -Verifiable
 
-                It 'should not throw' {
+                It 'Should Not Throw' {
                     { Set-targetResource @driveCParameters -Verbose } | Should Not throw
                 }
 
@@ -111,7 +111,7 @@ try
 
                 $script:result = $null
 
-                It 'calling test should not throw' {
+                It 'calling test Should Not Throw' {
                     {
                         $script:result = Test-TargetResource @driveCParameters -Verbose
                     } | Should Not Throw
@@ -133,7 +133,7 @@ try
 
                 $script:result = $null
 
-                It 'calling test should not throw' {
+                It 'calling test Should Not Throw' {
                     {
                         $script:result = Test-TargetResource @driveCParameters -Verbose
                     } | Should Not Throw

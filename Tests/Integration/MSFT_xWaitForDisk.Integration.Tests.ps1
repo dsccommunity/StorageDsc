@@ -33,7 +33,7 @@ try
         Context 'Wait for a Disk using Disk Number' {
             #region DEFAULT TESTS
 
-            It 'Should compile without throwing' {
+            It 'should compile and apply the MOF without throwing' {
                 {
                     # This is to pass to the Config
                     $configData = @{
@@ -73,7 +73,7 @@ try
         Context 'Wait for a Disk using Disk Unique Id' {
             #region DEFAULT TESTS
 
-            It 'Should compile without throwing' {
+            It 'should compile and apply the MOF without throwing' {
                 {
                     # This is to pass to the Config
                     $configData = @{

@@ -60,7 +60,7 @@ try
             }
 
             #region DEFAULT TESTS
-            It 'Should compile without throwing' {
+            It 'should compile and apply the MOF without throwing' {
                 {
                     # This is to pass to the Config
                     $configData = @{
@@ -110,7 +110,7 @@ try
                 -PartitionNumber 2 `
                 -AccessPath $accessPathA
 
-            It 'Should compile without throwing' {
+            It 'should compile and apply the MOF without throwing' {
                 {
                     # This is to pass to the Config
                     $configData = @{
@@ -152,7 +152,7 @@ try
                 Get-Content -Path $testFilePath -Raw | Should Be 'Test'
             }
 
-            It 'Should compile without throwing' {
+            It 'should compile and apply the MOF without throwing' {
                 {
                     # This is to pass to the Config
                     $configData = @{
@@ -190,6 +190,7 @@ try
                 $current.Size             | Should Be 200MB
             }
 
+            # A system partition will have been added to the disk as well as the 2 test partitions
             It 'should have 3 partitions on disk' {
                 ($disk | Get-Partition).Count | Should Be 3
             }
@@ -239,7 +240,7 @@ try
             }
 
             #region DEFAULT TESTS
-            It 'Should compile without throwing' {
+            It 'should compile and apply the MOF without throwing' {
                 {
                     # This is to pass to the Config
                     $configData = @{
@@ -289,7 +290,7 @@ try
                 -PartitionNumber 2 `
                 -AccessPath $accessPathA
 
-            It 'Should compile without throwing' {
+            It 'should compile and apply the MOF without throwing' {
                 {
                     # This is to pass to the Config
                     $configData = @{
@@ -331,7 +332,7 @@ try
                 Get-Content -Path $testFilePath -Raw | Should Be 'Test'
             }
 
-            It 'Should compile without throwing' {
+            It 'should compile and apply the MOF without throwing' {
                 {
                     # This is to pass to the Config
                     $configData = @{

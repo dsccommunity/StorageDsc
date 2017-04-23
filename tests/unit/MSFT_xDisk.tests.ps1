@@ -278,27 +278,27 @@ try
                     -Verbose
 
                 It "DiskId should be $($script:mockedDisk0.Number)" {
-                    $resource.DiskId | Should be $script:mockedDisk0.Number
+                    $resource.DiskId | Should Be $script:mockedDisk0.Number
                 }
 
                 It "DriveLetter should be $($script:testDriveLetter)" {
-                    $resource.DriveLetter | Should be $script:testDriveLetter
+                    $resource.DriveLetter | Should Be $script:testDriveLetter
                 }
 
                 It "Size should be $($script:mockedPartition.Size)" {
-                    $resource.Size | Should be $script:mockedPartition.Size
+                    $resource.Size | Should Be $script:mockedPartition.Size
                 }
 
                 It "FSLabel should be $($script:mockedVolume.FileSystemLabel)" {
-                    $resource.FSLabel | Should be $script:mockedVolume.FileSystemLabel
+                    $resource.FSLabel | Should Be $script:mockedVolume.FileSystemLabel
                 }
 
                 It "AllocationUnitSize should be $($script:mockedCim.BlockSize)" {
-                    $resource.AllocationUnitSize | Should be $script:mockedCim.BlockSize
+                    $resource.AllocationUnitSize | Should Be $script:mockedCim.BlockSize
                 }
 
                 It "FSFormat should be $($script:mockedVolume.FileSystem)" {
-                    $resource.FSFormat | Should be $script:mockedVolume.FileSystem
+                    $resource.FSFormat | Should Be $script:mockedVolume.FileSystem
                 }
 
                 It 'all the get mocks should be called' {
@@ -335,27 +335,27 @@ try
                     -Verbose
 
                 It "DiskId should be $($script:mockedDisk0.UniqueId)" {
-                    $resource.DiskId | Should be $script:mockedDisk0.UniqueId
+                    $resource.DiskId | Should Be $script:mockedDisk0.UniqueId
                 }
 
                 It "DriveLetter should be $($script:testDriveLetter)" {
-                    $resource.DriveLetter | Should be $script:testDriveLetter
+                    $resource.DriveLetter | Should Be $script:testDriveLetter
                 }
 
                 It "Size should be $($script:mockedPartition.Size)" {
-                    $resource.Size | Should be $script:mockedPartition.Size
+                    $resource.Size | Should Be $script:mockedPartition.Size
                 }
 
                 It "FSLabel should be $($script:mockedVolume.FileSystemLabel)" {
-                    $resource.FSLabel | Should be $script:mockedVolume.FileSystemLabel
+                    $resource.FSLabel | Should Be $script:mockedVolume.FileSystemLabel
                 }
 
                 It "AllocationUnitSize should be $($script:mockedCim.BlockSize)" {
-                    $resource.AllocationUnitSize | Should be $script:mockedCim.BlockSize
+                    $resource.AllocationUnitSize | Should Be $script:mockedCim.BlockSize
                 }
 
                 It "FSFormat should be $($script:mockedVolume.FileSystem)" {
-                    $resource.FSFormat | Should be $script:mockedVolume.FileSystem
+                    $resource.FSFormat | Should Be $script:mockedVolume.FileSystem
                 }
 
                 It 'all the get mocks should be called' {
@@ -388,27 +388,27 @@ try
                     -Verbose
 
                 It "DiskId should be $($script:mockedDisk0.Number)" {
-                    $resource.DiskId | Should be $script:mockedDisk0.Number
+                    $resource.DiskId | Should Be $script:mockedDisk0.Number
                 }
 
                 It "DriveLetter should be null" {
-                    $resource.DriveLetter | Should be $null
+                    $resource.DriveLetter | Should Be $null
                 }
 
                 It "Size should be null" {
-                    $resource.Size | Should be $null
+                    $resource.Size | Should Be $null
                 }
 
                 It "FSLabel should be empty" {
-                    $resource.FSLabel | Should be ''
+                    $resource.FSLabel | Should Be ''
                 }
 
                 It "AllocationUnitSize should be null" {
-                    $resource.AllocationUnitSize | Should be $null
+                    $resource.AllocationUnitSize | Should Be $null
                 }
 
                 It "FSFormat should be null" {
-                    $resource.FSFormat | Should be $null
+                    $resource.FSFormat | Should Be $null
                 }
 
                 It 'all the get mocks should be called' {
@@ -1112,7 +1112,7 @@ try
 
                 $script:result = $null
 
-                It 'calling test should not throw' {
+                It 'calling test Should Not Throw' {
                     {
                         $script:result = Test-TargetResource `
                             -DiskId $script:mockedDisk0Offline.Number `
@@ -1123,7 +1123,7 @@ try
                 }
 
                 It 'result should be false' {
-                    $script:result | Should be $false
+                    $script:result | Should Be $false
                 }
 
                 It 'the correct mocks were called' {
@@ -1149,7 +1149,7 @@ try
 
                 $script:result = $null
 
-                It 'calling test should not throw' {
+                It 'calling test Should Not Throw' {
                     {
                         $script:result = Test-TargetResource `
                             -DiskId $script:mockedDisk0Offline.UniqueId `
@@ -1161,7 +1161,7 @@ try
                 }
 
                 It 'result should be false' {
-                    $script:result | Should be $false
+                    $script:result | Should Be $false
                 }
 
                 It 'the correct mocks were called' {
@@ -1187,7 +1187,7 @@ try
 
                 $script:result = $null
 
-                It 'calling test should not throw' {
+                It 'calling test Should Not Throw' {
                     {
                         $script:result = Test-TargetResource `
                             -DiskId $script:mockedDisk0Readonly.Number `
@@ -1198,7 +1198,7 @@ try
                 }
 
                 It 'result should be false' {
-                    $script:result | Should be $false
+                    $script:result | Should Be $false
                 }
 
                 It 'the correct mocks were called' {
@@ -1224,7 +1224,7 @@ try
 
                 $script:result = $null
 
-                It 'calling test should not throw' {
+                It 'calling test Should Not Throw' {
                     {
                         $script:result = Test-TargetResource `
                             -DiskId $script:mockedDisk0Raw.Number `
@@ -1235,7 +1235,7 @@ try
                 }
 
                 It 'result should be false' {
-                    $script:result | Should be $false
+                    $script:result | Should Be $false
                 }
 
                 It 'the correct mocks were called' {
@@ -1271,7 +1271,7 @@ try
 
                 $script:result = $null
 
-                It 'calling test should not throw' {
+                It 'calling test Should Not Throw' {
                     {
                         $script:result = Test-TargetResource `
                             -DiskId $script:mockedDisk0.Number `
@@ -1283,7 +1283,7 @@ try
                 }
 
                 It 'result should be true' {
-                    $script:result | Should be $true
+                    $script:result | Should Be $true
                 }
 
                 It 'the correct mocks were called' {
@@ -1317,7 +1317,7 @@ try
 
                 $script:result = $null
 
-                It 'calling test should not throw' {
+                It 'calling test Should Not Throw' {
                     {
                         $script:result = Test-TargetResource `
                             -DiskId $script:mockedDisk0.Number `
@@ -1329,7 +1329,7 @@ try
 
                 # skipped due to:  https://github.com/PowerShell/xStorage/issues/22
                 It 'result should be false' -skip {
-                    $script:result | Should be $false
+                    $script:result | Should Be $false
                 }
 
                 It 'the correct mocks were called' {
@@ -1365,7 +1365,7 @@ try
 
                 $script:result = $null
 
-                It 'calling test should not throw' {
+                It 'calling test Should Not Throw' {
                     {
                         $script:result = Test-TargetResource `
                             -DiskId $script:mockedDisk0.Number `
@@ -1376,7 +1376,7 @@ try
                 }
 
                 It 'result should be true' {
-                    $script:result | Should be $true
+                    $script:result | Should Be $true
                 }
 
                 It 'the correct mocks were called' {
@@ -1412,7 +1412,7 @@ try
 
                 $script:result = $null
 
-                It 'calling test should not throw' {
+                It 'calling test Should Not Throw' {
                     {
                         $script:result = Test-TargetResource `
                             -DiskId $script:mockedDisk0.Number `
@@ -1423,7 +1423,7 @@ try
                 }
 
                 It 'result should be false' {
-                    $script:result | Should be $false
+                    $script:result | Should Be $false
                 }
 
                 It 'the correct mocks were called' {
@@ -1459,7 +1459,7 @@ try
 
                 $script:result = $null
 
-                It 'calling test should not throw' {
+                It 'calling test Should Not Throw' {
                     {
                         $script:result = Test-TargetResource `
                             -DiskId $script:mockedDisk0.Number `
@@ -1473,7 +1473,7 @@ try
                 }
 
                 It 'result should be true' {
-                    $script:result | Should be $true
+                    $script:result | Should Be $true
                 }
 
                 It 'the correct mocks were called' {

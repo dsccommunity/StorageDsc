@@ -55,7 +55,7 @@ try
             Context 'disk is specified by Number' {
                 $script:result = $null
 
-                It 'should not throw' {
+                It 'Should Not Throw' {
                     {
                         $script:result = Get-TargetResource @disk0ParametersByNumber -Verbose
                     } | Should Not Throw
@@ -81,7 +81,7 @@ try
             Context 'disk is specified by Unique Id' {
                 $script:result = $null
 
-                It 'should not throw' {
+                It 'Should Not Throw' {
                     {
                         $script:result = Get-TargetResource @disk0ParametersByUniqueId -Verbose
                     } | Should Not Throw
@@ -118,7 +118,7 @@ try
                     -MockWith { return $mockedDisk0 } `
                     -Verifiable
 
-                It 'should not throw' {
+                It 'Should Not Throw' {
                     { Set-targetResource @disk0ParametersByNumber -Verbose } | Should Not throw
                 }
 
@@ -137,7 +137,7 @@ try
                     -MockWith { return $mockedDisk0 } `
                     -Verifiable
 
-                It 'should not throw' {
+                It 'Should Not Throw' {
                     { Set-targetResource @disk0ParametersByUniqueId -Verbose } | Should Not throw
                 }
 
@@ -208,7 +208,7 @@ try
 
                 $script:result = $null
 
-                It 'should not throw' {
+                It 'Should Not Throw' {
                     {
                         $script:result = Test-TargetResource @disk0ParametersByNumber -Verbose
                     } | Should Not Throw
@@ -234,7 +234,7 @@ try
 
                 $script:result = $null
 
-                It 'should not throw' {
+                It 'Should Not Throw' {
                     {
                         $script:result = Test-TargetResource @disk0ParametersByUniqueId -Verbose
                     } | Should Not Throw
@@ -260,7 +260,7 @@ try
 
                 $script:result = $null
 
-                It 'calling test should not throw' {
+                It 'calling test Should Not Throw' {
                     {
                         $script:result = Test-TargetResource @disk0ParametersByNumber -Verbose
                     } | Should Not Throw
@@ -286,7 +286,7 @@ try
 
                 $script:result = $null
 
-                It 'calling test should not throw' {
+                It 'calling test Should Not Throw' {
                     {
                         $script:result = Test-TargetResource @disk0ParametersByUniqueId -Verbose
                     } | Should Not Throw
