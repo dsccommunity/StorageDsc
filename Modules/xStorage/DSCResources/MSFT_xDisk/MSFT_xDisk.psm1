@@ -265,12 +265,17 @@ function Set-TargetResource
 
     # Check if the disk has an existing partition assigned to the drive letter
     $assignedPartition = $partition |
-            Where-Object -Property DriveLetter -eq DriveLetter
+            Where-Object -Property DriveLetter -eq $DriveLetter
 
     # Check if existing partition already has file system on it
     if ($null -eq $assignedPartition)
     {
         # There is no partiton with this drive letter
+        Write-Verbose -Message ( @(
+                "$($MyInvocation.MyCommand): "
+                $($localizedData.DriveNotFoundOnPartitionMessage -f $DiskIdType,$DiskId,$DriveLetter)
+            ) -join '' )
+
         $createPartition = $true
 
         # Are there any partitions defined on this disk?
@@ -286,10 +291,8 @@ function Set-TargetResource
             }
             else
             {
-                # Find the first basic partition of any size
-                $partition = $partition |
-                    Where-Object -Filter { $_.Type -eq 'Basic' } |
-                    Select-Object -First 1
+                # No size specified so a partition needs to be created
+                $partition = $null
             } # if
 
             if ($partition)

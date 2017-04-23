@@ -103,7 +103,6 @@ try
                                 DiskId      = $disk.Number
                                 DiskIdType  = 'Number'
                                 FSLabel     = $FSLabelB
-                                Size        = 200MB
                             }
                         )
                     }
@@ -128,7 +127,7 @@ try
                 $current.DiskId           | Should Be $disk.Number
                 $current.DriveLetter      | Should Be $driveLetterB
                 $current.FSLabel          | Should Be $FSLabelB
-                $current.Size             | Should Be 200MB
+                $current.Size             | Should Be 935198720
             }
 
             It 'should have 3 partitions on disk' {
@@ -224,7 +223,6 @@ try
                                 DiskId        = $disk.UniqueId
                                 DiskIdType    = 'UniqueId'
                                 FSLabel       = $FSLabelB
-                                Size          = 200MB
                             }
                         )
                     }
@@ -249,7 +247,7 @@ try
                 $current.DiskId           | Should Be $disk.UniqueId
                 $current.DriveLetter      | Should Be $driveLetterB
                 $current.FSLabel          | Should Be $FSLabelB
-                $current.Size             | Should Be 200MB
+                $current.Size             | Should Be 935198720
             }
 
             # A system partition will have been added to the disk as well as the 2 test partitions

@@ -1007,6 +1007,14 @@ try
                     -Verifiable
 
                 Mock `
+                    -CommandName New-Partition `
+                    -ParameterFilter {
+                        $DriveLetter -eq 'H'
+                    } `
+                    -MockWith { $script:mockedPartitionNoDriveLetter } `
+                    -Verifiable
+
+                Mock `
                     -CommandName Set-Partition `
                     -Verifiable
 
@@ -1032,7 +1040,7 @@ try
                     Assert-MockCalled -CommandName Initialize-Disk -Times 0
                     Assert-MockCalled -CommandName Get-Partition -Times 1
                     Assert-MockCalled -CommandName Get-Volume -Times 1
-                    Assert-MockCalled -CommandName New-Partition -Times 0
+                    Assert-MockCalled -CommandName New-Partition -Times 1
                     Assert-MockCalled -CommandName Format-Volume -Times 0
                     Assert-MockCalled -CommandName Set-Partition -Times 1
                 }

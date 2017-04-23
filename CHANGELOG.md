@@ -22,12 +22,16 @@
   - Changed to use xDiskAccessPath pattern to fix issue with Windows Server
     2016 - See [Issue 80](https://github.com/PowerShell/xStorage/issues/80).
   - Fixed style violations in xDisk.
+  - Fixed issue when creating multiple partitions on a single disk with no size
+    specified - See [Issue 86](https://github.com/PowerShell/xStorage/issues/86).
 - xDiskAccessPath:
   - BREAKING CHANGE: Renamed parameter DiskNumber to DiskId to
     enable it to contain either DiskNumber or UniqueId - See [Issue 81](https://github.com/PowerShell/xStorage/issues/81).
   - Added DiskIdType parameter to enable specifying the type
     of identifer the DiskId parameter contains - See [Issue 81](https://github.com/PowerShell/xStorage/issues/81).
   - Fixed incorrect logging messages when changing volume label.
+  - Fixed issue when creating multiple partitions on a single disk with no size
+    specified - See [Issue 86](https://github.com/PowerShell/xStorage/issues/86).
 - xWaitForDisk:
   - BREAKING CHANGE: Renamed parameter DiskNumber to DiskId to
     enable it to contain either DiskNumber or UniqueId - See [Issue 81](https://github.com/PowerShell/xStorage/issues/81).

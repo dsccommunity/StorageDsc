@@ -121,6 +121,7 @@ try
                                 DiskId      = $disk.Number
                                 DiskIdType  = 'Number'
                                 FSLabel     = $FSLabelA
+                                Size        = 100MB
                             }
                         )
                     }
@@ -163,7 +164,6 @@ try
                                 DiskId      = $disk.Number
                                 DiskIdType  = 'Number'
                                 FSLabel     = $FSLabelB
-                                Size        = 200MB
                             }
                         )
                     }
@@ -187,7 +187,7 @@ try
                 $current.DiskId           | Should Be $disk.Number
                 $current.AccessPath       | Should Be "$($accessPathB)\"
                 $current.FSLabel          | Should Be $FSLabelB
-                $current.Size             | Should Be 200MB
+                $current.Size             | Should Be 935198720
             }
 
             # A system partition will have been added to the disk as well as the 2 test partitions
@@ -202,7 +202,7 @@ try
                     -PartitionNumber 2 `
                     -AccessPath $accessPathA
                 $disk | Remove-PartitionAccessPath `
-                    -PartitionNumber 2 `
+                    -PartitionNumber 3 `
                     -AccessPath $accessPathB
                 Remove-Item -Path $accessPathA -Force
                 Remove-Item -Path $accessPathB -Force
@@ -301,6 +301,7 @@ try
                                 DiskId      = $disk.UniqueId
                                 DiskIdType  = 'UniqueId'
                                 FSLabel     = $FSLabelA
+                                Size        = 100MB
                             }
                         )
                     }
@@ -343,7 +344,6 @@ try
                                 DiskId      = $disk.UniqueId
                                 DiskIdType  = 'UniqueId'
                                 FSLabel     = $FSLabelB
-                                Size        = 200MB
                             }
                         )
                     }
@@ -367,7 +367,7 @@ try
                 $current.DiskId           | Should Be $disk.UniqueId
                 $current.AccessPath       | Should Be "$($accessPathB)\"
                 $current.FSLabel          | Should Be $FSLabelB
-                $current.Size             | Should Be 200MB
+                $current.Size             | Should Be 935198720
             }
 
             It 'should have 3 partitions on disk' {
@@ -381,7 +381,7 @@ try
                     -PartitionNumber 2 `
                     -AccessPath $accessPathA
                 $disk | Remove-PartitionAccessPath `
-                    -PartitionNumber 2 `
+                    -PartitionNumber 3 `
                     -AccessPath $accessPathB
                 Remove-Item -Path $accessPathA -Force
                 Remove-Item -Path $accessPathB -Force

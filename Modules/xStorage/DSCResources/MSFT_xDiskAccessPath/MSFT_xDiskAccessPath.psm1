@@ -272,6 +272,11 @@ function Set-TargetResource
     if ($null -eq $assignedPartition)
     {
         # There is no partiton with this access path
+        Write-Verbose -Message ( @(
+                "$($MyInvocation.MyCommand): "
+                $($localizedData.AccessPathNotFoundOnPartitionMessage -f $DiskIdType,$DiskId,$AccessPath)
+            ) -join '' )
+
         $createPartition = $true
 
         # Are there any partitions defined on this disk?
@@ -287,10 +292,8 @@ function Set-TargetResource
             }
             else
             {
-                # Find the first basic partition of any size
-                $partition = $partition |
-                    Where-Object -Filter { $_.Type -eq 'Basic' } |
-                    Select-Object -First 1
+                # No size specified so a partition needs to be created
+                $partition = $null
             } # if
 
             if ($partition)
@@ -321,7 +324,7 @@ function Set-TargetResource
                 Write-Verbose -Message ( @(
                         "$($MyInvocation.MyCommand): "
                         $($localizedData.CreatingPartitionMessage `
-                            -f $DiskId,$DiskIdType,"$($Size/1KB) KB")
+                            -f $DiskIdType,$DiskId,"$($Size/1KB) KB")
                     ) -join '' )
                 $partitionParams['Size'] = $Size
             }
@@ -331,7 +334,7 @@ function Set-TargetResource
                 Write-Verbose -Message ( @(
                         "$($MyInvocation.MyCommand): "
                         $($localizedData.CreatingPartitionMessage `
-                            -f $DiskId,$DiskIdType,'all free space')
+                            -f $DiskIdType,$DiskId,'all free space')
                     ) -join '' )
                 $partitionParams['UseMaximumSize'] = $true
             } # if
@@ -362,7 +365,7 @@ function Set-TargetResource
             # The partition is still readonly - throw an exception
             New-InvalidOperationException `
                 -Message ($localizedData.ParitionIsReadOnlyError -f `
-                    $DiskId,$DiskIdType,$partition.PartitionNumber)
+                    $DiskIdType,$DiskId,$partition.PartitionNumber)
         } # if
 
         $assignAccessPath = $true
@@ -526,7 +529,7 @@ function Test-TargetResource
 
     Write-Verbose -Message ( @(
             "$($MyInvocation.MyCommand): "
-            $($localizedData.TestingDiskMessage -f $DiskId,$DiskIdType,$AccessPath)
+            $($localizedData.TestingDiskMessage -f $DiskIdType,$DiskId,$AccessPath)
         ) -join '' )
 
     # Validate the AccessPath parameter adding a trailing slash
@@ -534,7 +537,7 @@ function Test-TargetResource
 
     Write-Verbose -Message ( @(
             "$($MyInvocation.MyCommand): "
-            $($localizedData.CheckDiskInitializedMessage -f $DiskId,$DiskIdType)
+            $($localizedData.CheckDiskInitializedMessage -f $DiskIdType,$DiskId)
         ) -join '' )
 
     $diskIdParameter = @{
@@ -549,7 +552,7 @@ function Test-TargetResource
     {
         Write-Verbose -Message ( @(
                 "$($MyInvocation.MyCommand): "
-                $($localizedData.DiskNotFoundMessage -f $DiskId,$DiskIdType)
+                $($localizedData.DiskNotFoundMessage -f $DiskIdType,$DiskId)
             ) -join '' )
         return $false
     } # if
@@ -558,7 +561,7 @@ function Test-TargetResource
     {
         Write-Verbose -Message ( @(
                 "$($MyInvocation.MyCommand): "
-                $($localizedData.DiskNotOnlineMessage -f $DiskId,$DiskIdType)
+                $($localizedData.DiskNotOnlineMessage -f $DiskIdType,$DiskId)
             ) -join '' )
         return $false
     } # if
@@ -567,7 +570,7 @@ function Test-TargetResource
     {
         Write-Verbose -Message ( @(
                 "$($MyInvocation.MyCommand): "
-                $($localizedData.DiskReadOnlyMessage -f $DiskId,$DiskIdType)
+                $($localizedData.DiskReadOnlyMessage -f $DiskIdType,$DiskId)
             ) -join '' )
         return $false
     } # if
@@ -576,7 +579,7 @@ function Test-TargetResource
     {
         Write-Verbose -Message ( @(
                 "$($MyInvocation.MyCommand): "
-                $($localizedData.DiskNotGPTMessage -f $DiskId,$DiskIdType,$Disk.PartitionStyle)
+                $($localizedData.DiskNotGPTMessage -f $DiskIdType,$DiskId,$Disk.PartitionStyle)
             ) -join '' )
         return $false
     } # if
