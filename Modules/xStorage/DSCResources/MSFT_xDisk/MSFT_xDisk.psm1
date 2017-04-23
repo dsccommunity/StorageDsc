@@ -213,7 +213,7 @@ function Set-TargetResource
         # Disk is read-only, so make it read/write
         Write-Verbose -Message ( @(
                 "$($MyInvocation.MyCommand): "
-                $($localizedData.SetDiskReadwriteMessage -f $DiskIdType,$DiskId)
+                $($localizedData.SetDiskReadWriteMessage -f $DiskIdType,$DiskId)
             ) -join '' )
 
         $disk | Set-Disk -IsReadOnly $false

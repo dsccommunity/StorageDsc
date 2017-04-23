@@ -117,17 +117,17 @@ function Set-TargetResource
         $DriveLetter,
 
         [Parameter()]
-        [ValidateSet("ISO","VHD","VHDx","VHDSet")]
+        [ValidateSet('ISO','VHD','VHDx','VHDSet')]
         [System.String]
         $StorageType,
 
         [Parameter()]
-        [ValidateSet("ReadOnly","ReadWrite")]
+        [ValidateSet('ReadOnly','ReadWrite')]
         [System.String]
         $Access,
 
         [Parameter()]
-        [ValidateSet("Present","Absent")]
+        [ValidateSet('Present','Absent')]
         [System.String]
         $Ensure = 'Present'
     )
@@ -256,17 +256,17 @@ function Test-TargetResource
         $DriveLetter,
 
         [Parameter()]
-        [ValidateSet("ISO","VHD","VHDx","VHDSet")]
+        [ValidateSet('ISO','VHD','VHDx','VHDSet')]
         [System.String]
         $StorageType,
 
         [Parameter()]
-        [ValidateSet("ReadOnly","ReadWrite")]
+        [ValidateSet('ReadOnly','ReadWrite')]
         [System.String]
         $Access,
 
         [Parameter()]
-        [ValidateSet("Present","Absent")]
+        [ValidateSet('Present','Absent')]
         [System.String]
         $Ensure = 'Present'
     )
@@ -400,17 +400,17 @@ function Test-ParameterValid
         $DriveLetter,
 
         [Parameter()]
-        [ValidateSet("ISO","VHD","VHDx","VHDSet")]
+        [ValidateSet('ISO','VHD','VHDx','VHDSet')]
         [System.String]
         $StorageType,
 
         [Parameter()]
-        [ValidateSet("ReadOnly","ReadWrite")]
+        [ValidateSet('ReadOnly','ReadWrite')]
         [System.String]
         $Access,
 
         [Parameter()]
-        [ValidateSet("Present","Absent")]
+        [ValidateSet('Present','Absent')]
         [System.String]
         $Ensure = 'Present'
     )
@@ -497,12 +497,12 @@ function Mount-DiskImageToLetter
         $DriveLetter,
 
         [Parameter()]
-        [ValidateSet("ISO","VHD","VHDx","VHDSet")]
+        [ValidateSet('ISO','VHD','VHDx','VHDSet')]
         [System.String]
         $StorageType,
 
         [Parameter()]
-        [ValidateSet("ReadOnly","ReadWrite")]
+        [ValidateSet('ReadOnly','ReadWrite')]
         [System.String]
         $Access
     )

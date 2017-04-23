@@ -1,9 +1,9 @@
 <#
     .EXAMPLE
-        This configuration will wait for disk with Unique Id '5E1E50A401000000001517FFFF0AEB84' to become
+        This configuration will wait for disk 2 with Unique Id '5E1E50A401000000001517FFFF0AEB84' to become
         available, and then make the disk available as two new formatted volumes, 'G' and 'J', with 'J'
         using all available space after 'G' has been created. It also creates a new ReFS formated
-        volume on Disk 3 attached as drive letter 'S'.
+        volume on Disk 3 with Unique Id '5E1E50A4010000000029AB39450AC9A5' attached as drive letter 'S'.
 #>
 Configuration Example
 {
@@ -14,7 +14,7 @@ Configuration Example
     {
         xWaitforDisk Disk2
         {
-             DiskId = '5E1E50A401000000001517FFFF0AEB84'
+             DiskId = '5E1E50A401000000001517FFFF0AEB84' # Disk 2
              DiskIdType = 'UniqueId'
              RetryIntervalSec = 60
              RetryCount = 60
@@ -22,7 +22,7 @@ Configuration Example
 
         xDisk GVolume
         {
-             DiskId = '5E1E50A401000000001517FFFF0AEB84'
+             DiskId = '5E1E50A401000000001517FFFF0AEB84' # Disk 2
              DiskIdType = 'UniqueId'
              DriveLetter = 'G'
              Size = 10GB
@@ -30,7 +30,7 @@ Configuration Example
 
         xDisk JVolume
         {
-             DiskId = '5E1E50A401000000001517FFFF0AEB84'
+             DiskId = '5E1E50A401000000001517FFFF0AEB84' # Disk 2
              DiskIdType = 'UniqueId'
              DriveLetter = 'J'
              FSLabel = 'Data'
@@ -39,7 +39,7 @@ Configuration Example
 
         xDisk DataVolume
         {
-             DiskId = '5E1E50A401000000001517FFFF0AEB84'
+             DiskId = '5E1E50A4010000000029AB39450AC9A5' # Disk 3
              DiskIdType = 'UniqueId'
              DriveLetter = 'S'
              Size = 100GB
