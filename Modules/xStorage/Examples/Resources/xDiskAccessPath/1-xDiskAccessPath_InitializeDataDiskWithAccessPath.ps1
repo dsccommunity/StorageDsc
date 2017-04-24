@@ -1,6 +1,6 @@
 <#
     .EXAMPLE
-        This configuration will wait for Disk 2 to become available, and then make the disk available as
+        This configuration will wait for disk 2 to become available, and then make the disk available as
         two new formatted volumes mounted to folders c:\SQLData and c:\SQLLog, with c:\SQLLog using all
         available space after c:\SQLData has been created.
 #>

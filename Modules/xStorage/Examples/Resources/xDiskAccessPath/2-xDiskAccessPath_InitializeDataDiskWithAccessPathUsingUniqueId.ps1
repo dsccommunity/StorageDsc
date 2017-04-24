@@ -1,6 +1,6 @@
 <#
     .EXAMPLE
-        This configuration will wait for Disk 2 with Unique Id '5E1E50A401000000001517FFFF0AEB84' to become
+        This configuration will wait for disk 2 with Unique Id '5E1E50A401000000001517FFFF0AEB84' to become
         available, and then make the disk available as two new formatted volumes mounted to folders 
         c:\SQLData and c:\SQLLog, with c:\SQLLog using all available space after c:\SQLData has been created.
 #>
