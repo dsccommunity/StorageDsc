@@ -130,6 +130,7 @@ try
                 $current.Size             | Should Be 935198720
             }
 
+            # A system partition will have been added to the disk as well as the 2 test partitions
             It 'should have 3 partitions on disk' {
                 ($disk | Get-Partition).Count | Should Be 3
             }
