@@ -1,6 +1,6 @@
 <#
     .EXAMPLE
-        This configuration will wait for disk 2 to become available, and then make the disk available as
+        This configuration will wait for Disk 2 to become available, and then make the disk available as
         two new formatted volumes, 'G' and 'J', with 'J' using all available space after 'G' has been
         created. It also creates a new ReFS formated volume on Disk 3 attached as drive letter 'S'.
 #>

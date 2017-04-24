@@ -277,8 +277,6 @@ function Set-TargetResource
                 $($localizedData.AccessPathNotFoundOnPartitionMessage -f $DiskIdType,$DiskId,$AccessPath)
             ) -join '' )
 
-        $createPartition = $true
-
         # Are there any partitions defined on this disk?
         if ($partition)
         {
@@ -289,31 +287,29 @@ function Set-TargetResource
                 $partition = $partition |
                     Where-Object -Filter { $_.Type -eq 'Basic' -and $_.Size -eq $Size } |
                     Select-Object -First 1
+
+                if ($partition)
+                {
+                    # A partition matching the required size was found
+                    Write-Verbose -Message ($localizedData.MatchingPartitionFoundMessage -f `
+                        $DiskIdType,$DiskId,$partition.PartitionNumber)
+                }
+                else
+                {
+                    # A partition matching the required size was not found
+                    Write-Verbose -Message ($localizedData.MatchingPartitionNotFoundMessage -f `
+                        $DiskIdType,$DiskId)
+                } # if
             }
             else
             {
-                # No size specified so a partition needs to be created
+                # No size specified so no partition can be matched
                 $partition = $null
-            } # if
-
-            if ($partition)
-            {
-                # A partition matching the required size was found
-                Write-Verbose -Message ($localizedData.MatchingPartitionFoundMessage -f `
-                    $DiskIdType,$DiskId,$partition.PartitionNumber)
-
-                $createPartition = $false
-            }
-            else
-            {
-                # A partition matching the required size was not found
-                Write-Verbose -Message ($localizedData.MatchingPartitionNotFoundMessage -f `
-                    $DiskIdType,$DiskId)
             } # if
         } # if
 
         # Do we need to create a new partition?
-        if ($createPartition)
+        if (-not $partition)
         {
             # Attempt to create a new partition
             $partitionParams = @{}
