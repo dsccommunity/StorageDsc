@@ -42,7 +42,7 @@ try
         -ChildPath 'TestDisk.vhdx'
     $null = New-VHD -Path $VHDPath -SizeBytes 10GB -Dynamic
     $null = Mount-DiskImage -ImagePath $VHDPath
-    $disk = Get-Disk | Where-Object -Property Location -EQ -Value $VHDPath
+    $disk = Get-Disk | Where-Object -Property Location -eq -Value $VHDPath
     $null = $disk | Initialize-Disk -PartitionStyle GPT
     $partition = $disk | New-Partition -UseMaximumSize
     $null = $partition | Get-Volume | Format-Volume -FileSystem NTFS
@@ -66,7 +66,7 @@ try
     Describe "$($script:DSCResourceName)_MountVHD_Integration" {
         Context 'Mount an VHDX and assign a Drive Letter' {
             #region DEFAULT TESTS
-            It 'Should compile without throwing' {
+            It 'should compile and apply the MOF without throwing' {
                 {
                     & "$($script:DSCResourceName)_Mount_Config" `
                         -OutputPath $TestDrive `
@@ -101,7 +101,7 @@ try
     Describe "$($script:DSCResourceName)_DismountVHD_Integration" {
         Context 'Dismount a previously mounted ISO' {
             #region DEFAULT TESTS
-            It 'Should compile without throwing' {
+            It 'should compile and apply the MOF without throwing' {
                 {
                     & "$($script:DSCResourceName)_Dismount_Config" `
                         -OutputPath $TestDrive `

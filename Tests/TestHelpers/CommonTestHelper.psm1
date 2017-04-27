@@ -128,9 +128,9 @@ function Test-HyperVInstalled
     if ($HyperVInstalled -eq $false)
     {
         Write-Verbose -Message "Integration tests cannot be run because Hyper-V Components not installed." -Verbose
-        Return $false
+        return $false
     }
-    Return $True
+    return $true
 } # end function Test-HyperVInstalled
 
 Export-ModuleMember -Function `

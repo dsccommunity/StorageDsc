@@ -13,14 +13,14 @@ Configuration Example
     {
         xWaitforDisk Disk2
         {
-             DiskNumber = 2
+             DiskId = 2
              RetryIntervalSec = 60
              RetryCount = 60
         }
 
         xDiskAccessPath DataVolume
         {
-             DiskNumber = 2
+             DiskId = 2
              AccessPath = 'c:\SQLData'
              Size = 10GB
              FSLabel = 'SQLData1'
@@ -29,7 +29,7 @@ Configuration Example
 
         xDiskAccessPath LogVolume
         {
-             DiskNumber = 2
+             DiskId = 2
              AccessPath = 'c:\SQLLog'
              FSLabel = 'SQLLog1'
              DependsOn = '[xDiskAccessPath]DataVolume'

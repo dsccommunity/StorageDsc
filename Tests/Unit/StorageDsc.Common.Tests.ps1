@@ -99,7 +99,7 @@ try
         Mock `
             -CommandName Test-Path `
             -ModuleName StorageDsc.Common `
-            -MockWith { $True }
+            -MockWith { $true }
 
         Context 'path is found, trailing slash included, not required' {
             It "should return '$accessPathGood'" {
@@ -128,7 +128,7 @@ try
         Mock `
             -CommandName Test-Path `
             -ModuleName StorageDsc.Common `
-            -MockWith { $False }
+            -MockWith { $false }
 
         Context 'drive is not found' {
             $errorRecord = Get-InvalidArgumentRecord `

@@ -118,7 +118,7 @@ try
             ObjectId           = '{1}\\TEST\root/Microsoft/Windows/Storage/Providers_v2\WSP_Disk.ObjectId="{bba18018-e7a1-11e3-824e-806e6f6e6963}:DI:\\?\scsi#disk&ven_msft&prod_virtual_disk#2&1f4adffe&0&000003#{53f56307-b6bf-11d0-94f2-00a0c91efb8b}"'
             AllocatedSize      = 10GB
             FriendlyName       = 'Msft Virtual Disk'
-            IsReadOnly         = $False
+            IsReadOnly         = $false
             Location           = $script:DiskImageVHDXPath
             Number             = 3
             Path               = '\\?\scsi#disk&ven_msft&prod_virtual_disk#2&1f4adffe&0&000003#{53f56307-b6bf-11d0-94f2-00a0c91efb8b}'
@@ -131,7 +131,7 @@ try
             ObjectId           = '{1}\\TEST\root/Microsoft/Windows/Storage/Providers_v2\WSP_Disk.ObjectId="{bba18018-e7a1-11e3-824e-806e6f6e6963}:DI:\\?\scsi#disk&ven_msft&prod_virtual_disk#2&1f4adffe&0&000003#{53f56307-b6bf-11d0-94f2-00a0c91efb8b}"'
             AllocatedSize      = 10GB
             FriendlyName       = 'Msft Virtual Disk'
-            IsReadOnly         = $True
+            IsReadOnly         = $true
             Location           = $script:DiskImageVHDXPath
             Number             = 3
             Path               = '\\?\scsi#disk&ven_msft&prod_virtual_disk#2&1f4adffe&0&000003#{53f56307-b6bf-11d0-94f2-00a0c91efb8b}'
@@ -147,7 +147,7 @@ try
             DiskId             = '\\?\scsi#disk&ven_msft&prod_virtual_disk#2&1f4adffe&0&000003#{53f56307-b6bf-11d0-94f2-00a0c91efb8b}'
             DiskNumber         = 3
             DriveLetter        = $script:DriveLetter
-            IsReadOnly         = $False
+            IsReadOnly         = $false
             PartitionNumber    = 2
             Size               = 10GB
         }
@@ -641,7 +641,7 @@ try
                         -ImagePath $script:DiskImageISOPath `
                         -DriveLetter $script:DriveLetter `
                         -Ensure 'Present' `
-                        -Verbose | Should Be $True
+                        -Verbose | Should Be $true
                 }
 
                 It 'all the get mocks should be called' {
@@ -663,7 +663,7 @@ try
                         -ImagePath $script:DiskImageISOPath `
                         -DriveLetter 'Y' `
                         -Ensure 'Present' `
-                        -Verbose | Should Be $False
+                        -Verbose | Should Be $false
                 }
 
                 It 'all the get mocks should be called' {
@@ -685,7 +685,7 @@ try
                         -ImagePath $script:DiskImageISOPath `
                         -DriveLetter $script:DriveLetter `
                         -Ensure 'Present' `
-                        -Verbose | Should Be $False
+                        -Verbose | Should Be $false
                 }
 
                 It 'all the get mocks should be called' {
@@ -706,7 +706,7 @@ try
                     Test-TargetResource `
                         -ImagePath $script:DiskImageISOPath `
                         -Ensure 'Absent' `
-                        -Verbose | Should Be $False
+                        -Verbose | Should Be $false
                 }
 
                 It 'all the get mocks should be called' {
@@ -727,7 +727,7 @@ try
                     Test-TargetResource `
                         -ImagePath $script:DiskImageISOPath `
                         -Ensure 'Absent' `
-                        -Verbose | Should Be $True
+                        -Verbose | Should Be $true
                 }
 
                 It 'all the get mocks should be called' {
@@ -750,7 +750,7 @@ try
                         -DriveLetter $script:DriveLetter `
                         -Access 'ReadWrite' `
                         -Ensure 'Present' `
-                        -Verbose | Should Be $False
+                        -Verbose | Should Be $false
                 }
 
                 It 'all the get mocks should be called' {

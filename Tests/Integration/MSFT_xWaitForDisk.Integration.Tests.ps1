@@ -27,11 +27,30 @@ try
     . $ConfigFile -Verbose -ErrorAction Stop
 
     Describe "$($script:DSCResourceName)_Integration" {
-        Context 'Wait for a Disk' {
+        # Identify a disk to use for tests
+        $disk = Get-Disk | Select-Object -First 1
+
+        Context 'Wait for a Disk using Disk Number' {
             #region DEFAULT TESTS
-            It 'Should compile without throwing' {
+
+            It 'should compile and apply the MOF without throwing' {
                 {
-                    & "$($script:DSCResourceName)_Config" -OutputPath $TestDrive
+                    # This is to pass to the Config
+                    $configData = @{
+                        AllNodes = @(
+                            @{
+                                NodeName         = 'localhost'
+                                DiskId           = $disk.Number
+                                DiskIdType       = 'Number'
+                                RetryIntervalSec = 1
+                                RetryCount       = 5
+                            }
+                        )
+                    }
+
+                    & "$($script:DSCResourceName)_Config" `
+                        -OutputPath $TestDrive `
+                        -ConfigurationData $configData
                     Start-DscConfiguration -Path $TestDrive -ComputerName localhost -Wait -Verbose -Force
                 } | Should not throw
             }
@@ -45,9 +64,49 @@ try
                 $current = Get-DscConfiguration | Where-Object {
                     $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
                 }
-                $current.DiskNumber       | Should Be $TestWaitForDisk.DiskNumber
-                $current.RetryIntervalSec | Should Be $TestWaitForDisk.RetryIntervalSec
-                $current.RetryCount       | Should Be $TestWaitForDisk.RetryCount
+                $current.DiskId           | Should Be $Disk.Number
+                $current.RetryIntervalSec | Should Be 1
+                $current.RetryCount       | Should Be 5
+            }
+        }
+
+        Context 'Wait for a Disk using Disk Unique Id' {
+            #region DEFAULT TESTS
+
+            It 'should compile and apply the MOF without throwing' {
+                {
+                    # This is to pass to the Config
+                    $configData = @{
+                        AllNodes = @(
+                            @{
+                                NodeName         = 'localhost'
+                                DiskId           = $disk.UniqueId
+                                DiskIdType       = 'UniqueId'
+                                RetryIntervalSec = 1
+                                RetryCount       = 5
+                            }
+                        )
+                    }
+
+                    & "$($script:DSCResourceName)_Config" `
+                        -OutputPath $TestDrive `
+                        -ConfigurationData $configData
+                    Start-DscConfiguration -Path $TestDrive -ComputerName localhost -Wait -Verbose -Force
+                } | Should not throw
+            }
+
+            It 'should be able to call Get-DscConfiguration without throwing' {
+                { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should Not throw
+            }
+            #endregion
+
+            It 'Should have set the resource and all the parameters should match' {
+                $current = Get-DscConfiguration | Where-Object {
+                    $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
+                }
+                $current.DiskId           | Should Be $Disk.UniqueId
+                $current.RetryIntervalSec | Should Be 1
+                $current.RetryCount       | Should Be 5
             }
         }
     }

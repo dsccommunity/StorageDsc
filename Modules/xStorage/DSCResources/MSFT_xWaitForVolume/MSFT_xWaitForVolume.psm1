@@ -32,12 +32,17 @@ function Get-TargetResource
     [OutputType([System.Collections.Hashtable])]
     param
     (
-        [parameter(Mandatory)]
-        [String] $DriveLetter,
+        [Parameter(Mandatory = $true)]
+        [String]
+        $DriveLetter,
 
-        [UInt32] $RetryIntervalSec = 10,
+        [Parameter()]
+        [UInt32]
+        $RetryIntervalSec = 10,
 
-        [UInt32] $RetryCount = 60
+        [Parameter()]
+        [UInt32]
+        $RetryCount = 60
     )
 
     Write-Verbose -Message ( @(
@@ -74,12 +79,17 @@ function Set-TargetResource
     [CmdletBinding()]
     param
     (
-        [parameter(Mandatory)]
-        [String] $DriveLetter,
+        [Parameter(Mandatory = $true)]
+        [String]
+        $DriveLetter,
 
-        [UInt32] $RetryIntervalSec = 10,
+        [Parameter()]
+        [UInt32]
+        $RetryIntervalSec = 10,
 
-        [UInt32] $RetryCount = 60
+        [Parameter()]
+        [UInt32]
+        $RetryCount = 60
     )
 
     Write-Verbose -Message ( @(
@@ -146,12 +156,17 @@ function Test-TargetResource
     [OutputType([System.Boolean])]
     param
     (
-        [parameter(Mandatory)]
-        [String] $DriveLetter,
+        [Parameter(Mandatory = $true)]
+        [String]
+        $DriveLetter,
 
-        [UInt32] $RetryIntervalSec = 10,
+        [Parameter()]
+        [UInt32]
+        $RetryIntervalSec = 10,
 
-        [UInt32] $RetryCount = 60
+        [Parameter()]
+        [UInt32]
+        $RetryCount = 60
     )
 
     Write-Verbose -Message ( @(

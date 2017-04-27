@@ -1,8 +1,8 @@
 <#
     .EXAMPLE
-        This configuration will wait for disk 2 to become available, and then make the disk available as
-        two new formatted volumes mounted to folders c:\SQLData and c:\SQLLog, with c:\SQLLog using all
-        available space after c:\SQLData has been created.
+        This configuration will wait for disk with Unique Id '5E1E50A401000000001517FFFF0AEB84' to become
+        available, and then make the disk available as two new formatted volumes mounted to folders 
+        c:\SQLData and c:\SQLLog, with c:\SQLLog using all available space after c:\SQLData has been created.
 #>
 Configuration Example
 {
@@ -13,14 +13,16 @@ Configuration Example
     {
         xWaitforDisk Disk2
         {
-             DiskId = 2
+             DiskId = '5E1E50A401000000001517FFFF0AEB84'
+             DiskIdType = 'UniqueId'
              RetryIntervalSec = 60
              RetryCount = 60
         }
 
         xDiskAccessPath DataVolume
         {
-             DiskId = 2
+             DiskId = '5E1E50A401000000001517FFFF0AEB84'
+             DiskIdType = 'UniqueId'
              AccessPath = 'c:\SQLData'
              Size = 10GB
              FSLabel = 'SQLData1'
@@ -29,7 +31,8 @@ Configuration Example
 
         xDiskAccessPath LogVolume
         {
-             DiskId = 2
+             DiskId = '5E1E50A401000000001517FFFF0AEB84'
+             DiskIdType = 'UniqueId'
              AccessPath = 'c:\SQLLog'
              FSLabel = 'SQLLog1'
              DependsOn = '[xDiskAccessPath]DataVolume'

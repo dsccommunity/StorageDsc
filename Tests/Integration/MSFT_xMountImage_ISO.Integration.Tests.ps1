@@ -60,7 +60,7 @@ try
     Describe "$($script:DSCResourceName)_MountISO_Integration" {
         Context 'Mount an ISO and assign a Drive Letter' {
             #region DEFAULT TESTS
-            It 'Should compile without throwing' {
+            It 'should compile and apply the MOF without throwing' {
                 {
                     & "$($script:DSCResourceName)_Mount_Config" `
                         -OutputPath $TestDrive `
@@ -95,7 +95,7 @@ try
     Describe "$($script:DSCResourceName)_DismountISO_Integration" {
         Context 'Dismount a previously mounted ISO' {
             #region DEFAULT TESTS
-            It 'Should compile without throwing' {
+            It 'should compile and apply the MOF without throwing' {
                 {
                     & "$($script:DSCResourceName)_Dismount_Config" `
                         -OutputPath $TestDrive `

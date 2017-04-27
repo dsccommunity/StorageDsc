@@ -1,5 +1,5 @@
 $script:DSCModuleName      = 'xStorage'
-$script:DSCResourceName    = 'MSFT_xWaitForDisk'
+$script:DSCResourceName    = 'MSFT_xWaitForVolume'
 
 Import-Module -Name (Join-Path -Path (Join-Path -Path (Split-Path $PSScriptRoot -Parent) -ChildPath 'TestHelpers') -ChildPath 'CommonTestHelper.psm1') -Global
 
@@ -28,31 +28,29 @@ try
     # (non-exported) code of a Script Module.
     InModuleScope $script:DSCResourceName {
         #region Pester Test Initialization
-        $mockedDisk0 = [pscustomobject] @{
-            Number = 0
-            FriendlyName = 'Test Disk'
+        $mockedDriveC = [pscustomobject] @{
+            DriveLetter      = 'C'
         }
-
-        $disk0Parameters = @{
-            DiskNumber = 00
+        $driveCParameters = @{
+            DriveLetter      = 'C'
             RetryIntervalSec = 5
-            RetryCount = 20
+            RetryCount       = 20
         }
         #endregion
 
         #region Function Get-TargetResource
-        Describe "MSFT_xWaitForDisk\Get-TargetResource" {
-            $resource = Get-TargetResource @disk0Parameters -Verbose
-            It "DiskNumber Should Be $($disk0Parameters.DiskNumber)" {
-                $resource.DiskNumber | Should Be $disk0Parameters.DiskNumber
+        Describe "MSFT_xWaitForVolume\Get-TargetResource" {
+            $resource = Get-TargetResource @driveCParameters -Verbose
+            It "DriveLetter Should Be $($driveCParameters.DriveLetter)" {
+                $resource.DriveLetter | Should Be $driveCParameters.DriveLetter
             }
 
-            It "RetryIntervalSec Should Be $($disk0Parameters.RetryIntervalSec)" {
-                $resource.RetryIntervalSec | Should Be $disk0Parameters.RetryIntervalSec
+            It "RetryIntervalSec Should Be $($driveCParameters.RetryIntervalSec)" {
+                $resource.RetryIntervalSec | Should Be $driveCParameters.RetryIntervalSec
             }
 
-            It "RetryIntervalSec Should Be $($disk0Parameters.RetryCount)" {
-                $resource.RetryCount | Should Be $disk0Parameters.RetryCount
+            It "RetryIntervalSec Should Be $($driveCParameters.RetryCount)" {
+                $resource.RetryCount | Should Be $driveCParameters.RetryCount
             }
 
             It 'the correct mocks were called' {
@@ -62,55 +60,60 @@ try
         #endregion
 
         #region Function Set-TargetResource
-        Describe 'MSFT_xWaitForDisk\Set-TargetResource' {
+        Describe 'MSFT_xWaitForVolume\Set-TargetResource' {
             Mock Start-Sleep
+            Mock Get-PSDrive
 
-            Context 'disk 0 is ready' {
+            Context 'drive C is ready' {
                 # verifiable (Should Be called) mocks
-                Mock Get-Disk -MockWith { return $mockedDisk0 } -Verifiable
+                Mock Get-Volume -MockWith { return $mockedDriveC } -Verifiable
 
-                It 'should not throw' {
-                    { Set-targetResource @disk0Parameters -Verbose } | Should Not throw
+                It 'Should Not Throw' {
+                    { Set-targetResource @driveCParameters -Verbose } | Should Not throw
                 }
 
                 It 'the correct mocks were called' {
                     Assert-VerifiableMocks
                     Assert-MockCalled -CommandName Start-Sleep -Times 0
-                    Assert-MockCalled -CommandName Get-Disk -Times 1
+                    Assert-MockCalled -CommandName Get-PSDrive -Times 0
+                    Assert-MockCalled -CommandName Get-Volume -Times 1
                 }
             }
-            Context 'disk 0 does not become ready' {
+            Context 'drive C does not become ready' {
                 # verifiable (Should Be called) mocks
-                Mock Get-Disk -MockWith { } -Verifiable
+                Mock Get-Volume -MockWith { } -Verifiable
 
                 $errorRecord = Get-InvalidOperationRecord `
-                    -Message $($LocalizedData.DiskNotFoundAfterError `
-                        -f $disk0Parameters.DiskNumber,$disk0Parameters.RetryCount)
+                    -Message $($LocalizedData.VolumeNotFoundAfterError `
+                        -f $driveCParameters.DriveLetter,$driveCParameters.RetryCount)
 
-                It 'should throw DiskNotFoundAfterError' {
-                    { Set-targetResource @disk0Parameters -Verbose } | Should Throw $errorRecord
+                It 'should throw VolumeNotFoundAfterError' {
+                    { Set-targetResource @driveCParameters -Verbose } | Should Throw $errorRecord
                 }
 
                 It 'the correct mocks were called' {
                     Assert-VerifiableMocks
-                    Assert-MockCalled -CommandName Start-Sleep -Times $disk0Parameters.RetryCount
-                    Assert-MockCalled -CommandName Get-Disk -Times 1
+                    Assert-MockCalled -CommandName Start-Sleep -Times $driveCParameters.RetryCount
+                    Assert-MockCalled -CommandName Get-PSDrive -Times $driveCParameters.RetryCount
+                    Assert-MockCalled -CommandName Get-Volume -Times $driveCParameters.RetryCount
                 }
             }
         }
         #endregion
 
         #region Function Test-TargetResource
-        Describe 'MSFT_xWaitForDisk\Test-TargetResource' {
-            Context 'disk 0 is ready' {
+        Describe 'MSFT_xWaitForVolume\Test-TargetResource' {
+            Mock Get-PSDrive
+
+            Context 'drive C is ready' {
                 # verifiable (Should Be called) mocks
-                Mock Get-Disk -MockWith { return $mockedDisk0 } -Verifiable
+                Mock Get-Volume -MockWith { return $mockedDriveC } -Verifiable
 
                 $script:result = $null
 
-                It 'calling test should not throw' {
+                It 'calling test Should Not Throw' {
                     {
-                        $script:result = Test-TargetResource @disk0Parameters -Verbose
+                        $script:result = Test-TargetResource @driveCParameters -Verbose
                     } | Should Not Throw
                 }
 
@@ -120,18 +123,19 @@ try
 
                 It "the correct mocks were called" {
                     Assert-VerifiableMocks
-                    Assert-MockCalled -CommandName Get-Disk -Times 1
+                    Assert-MockCalled -CommandName Get-PSDrive -Times 1
+                    Assert-MockCalled -CommandName Get-Volume -Times 1
                 }
             }
-            Context 'disk 0 is not ready' {
+            Context 'drive C is not ready' {
                 # verifiable (Should Be called) mocks
-                Mock Get-Disk -MockWith { } -Verifiable
+                Mock Get-Volume -MockWith { } -Verifiable
 
                 $script:result = $null
 
-                It 'calling test should not throw' {
+                It 'calling test Should Not Throw' {
                     {
-                        $script:result = Test-TargetResource @disk0Parameters -Verbose
+                        $script:result = Test-TargetResource @driveCParameters -Verbose
                     } | Should Not Throw
                 }
 
@@ -141,7 +145,8 @@ try
 
                 It 'the correct mocks were called' {
                     Assert-VerifiableMocks
-                    Assert-MockCalled -CommandName Get-Disk -Times 1
+                    Assert-MockCalled -CommandName Get-PSDrive -Times 1
+                    Assert-MockCalled -CommandName Get-Volume -Times 1
                 }
             }
         }
