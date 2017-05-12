@@ -11,7 +11,7 @@ Configuration Example
 
     Node localhost
     {
-        xWaitforDisk Disk2
+        xWaitForDisk Disk2
         {
              DiskId = 2
              RetryIntervalSec = 60
@@ -34,7 +34,7 @@ Configuration Example
              DependsOn = '[xDisk]GVolume'
         }
 
-        xWaitforDisk Disk3
+        xWaitForDisk Disk3
         {
              DiskId = 3
              RetryIntervalSec = 60
