@@ -1,5 +1,5 @@
-$script:DSCModuleName      = 'xStorage'
-$script:DSCResourceName    = 'MSFT_xDisk'
+$script:DSCModuleName = 'xStorage'
+$script:DSCResourceName = 'MSFT_xDisk'
 
 Import-Module -Name (Join-Path -Path (Join-Path -Path (Split-Path $PSScriptRoot -Parent) -ChildPath 'TestHelpers') -ChildPath 'CommonTestHelper.psm1') -Global
 
@@ -7,9 +7,9 @@ Import-Module -Name (Join-Path -Path (Join-Path -Path (Split-Path $PSScriptRoot 
 # Unit Test Template Version: 1.1.0
 [string] $script:moduleRoot = Join-Path -Path $(Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $Script:MyInvocation.MyCommand.Path))) -ChildPath 'Modules\xStorage'
 if ( (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests'))) -or `
-     (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1'))) )
+    (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1'))) )
 {
-    & git @('clone','https://github.com/PowerShell/DscResource.Tests.git',(Join-Path -Path $script:moduleRoot -ChildPath '\DSCResource.Tests\'))
+    & git @('clone', 'https://github.com/PowerShell/DscResource.Tests.git', (Join-Path -Path $script:moduleRoot -ChildPath '\DSCResource.Tests\'))
 }
 
 Import-Module (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1') -Force
@@ -32,96 +32,97 @@ try
         $script:testDiskUniqueId = 'TESTDISKUNIQUEID'
 
         $script:mockedDisk0 = [pscustomobject] @{
-                Number = 0
-                UniqueId = $script:testDiskUniqueId
-                IsOffline = $false
-                IsReadOnly = $false
-                PartitionStyle = 'GPT'
-            }
+            Number         = 0
+            UniqueId       = $script:testDiskUniqueId
+            IsOffline      = $false
+            IsReadOnly     = $false
+            PartitionStyle = 'GPT'
+        }
 
         $script:mockedDisk0Mbr = [pscustomobject] @{
-                Number = 0
-                UniqueId = $script:testDiskUniqueId
-                IsOffline = $false
-                IsReadOnly = $false
-                PartitionStyle = 'MBR'
-            }
+            Number         = 0
+            UniqueId       = $script:testDiskUniqueId
+            IsOffline      = $false
+            IsReadOnly     = $false
+            PartitionStyle = 'MBR'
+        }
 
         $script:mockedDisk0Offline = [pscustomobject] @{
-                Number = 0
-                UniqueId = $script:testDiskUniqueId
-                IsOffline = $true
-                IsReadOnly = $false
-                PartitionStyle = 'GPT'
-            }
+            Number         = 0
+            UniqueId       = $script:testDiskUniqueId
+            IsOffline      = $true
+            IsReadOnly     = $false
+            PartitionStyle = 'GPT'
+        }
 
         $script:mockedDisk0OfflineRaw = [pscustomobject] @{
-                Number = 0
-                UniqueId = $script:testDiskUniqueId
-                IsOffline = $true
-                IsReadOnly = $false
-                PartitionStyle = 'Raw'
-            }
+            Number         = 0
+            UniqueId       = $script:testDiskUniqueId
+            IsOffline      = $true
+            IsReadOnly     = $false
+            PartitionStyle = 'Raw'
+        }
 
         $script:mockedDisk0Readonly = [pscustomobject] @{
-                Number = 0
-                UniqueId = $script:testDiskUniqueId
-                IsOffline = $false
-                IsReadOnly = $true
-                PartitionStyle = 'GPT'
-            }
+            Number         = 0
+            UniqueId       = $script:testDiskUniqueId
+            IsOffline      = $false
+            IsReadOnly     = $true
+            PartitionStyle = 'GPT'
+        }
 
         $script:mockedDisk0Raw = [pscustomobject] @{
-                Number = 0
-                UniqueId = $script:testDiskUniqueId
-                IsOffline = $false
-                IsReadOnly = $false
-                PartitionStyle = 'Raw'
-            }
+            Number         = 0
+            UniqueId       = $script:testDiskUniqueId
+            IsOffline      = $false
+            IsReadOnly     = $false
+            PartitionStyle = 'Raw'
+        }
 
-        $script:mockedCim = [pscustomobject] @{BlockSize=4096}
+        $script:mockedCim = [pscustomobject] @{BlockSize = 4096}
 
         $script:mockedPartitionSize = 1GB
 
         $script:mockedPartition = [pscustomobject] @{
-                DriveLetter = $script:testDriveLetter
-                Size = $script:mockedPartitionSize
-                PartitionNumber = 1
-                Type = 'Basic'
-            }
+            DriveLetter     = $script:testDriveLetter
+            Size            = $script:mockedPartitionSize
+            PartitionNumber = 1
+            Type            = 'Basic'
+        }
 
         $script:mockedPartitionNoDriveLetter = [pscustomobject] @{
-                DriveLetter = ''
-                Size = $script:mockedPartitionSize
-                PartitionNumber = 1
-                Type = 'Basic'
-            }
+            DriveLetter     = ''
+            Size            = $script:mockedPartitionSize
+            PartitionNumber = 1
+            Type            = 'Basic'
+        }
 
         $script:mockedVolume = [pscustomobject] @{
-                FileSystemLabel = 'myLabel'
-                FileSystem = 'NTFS'
-            }
+            FileSystemLabel = 'myLabel'
+            FileSystem      = 'NTFS'
+        }
 
         $script:mockedVolumeUnformatted = [pscustomobject] @{
-                FileSystemLabel = ''
-                FileSystem = ''
-            }
+            FileSystemLabel = ''
+            FileSystem      = ''
+        }
 
         $script:mockedVolumeNoDriveLetter = [pscustomobject] @{
-                FileSystemLabel = 'myLabel'
-                FileSystem = 'NTFS'
-            }
+            FileSystemLabel = 'myLabel'
+            FileSystem      = 'NTFS'
+        }
 
         $script:mockedVolumeReFS = [pscustomobject] @{
-                FileSystemLabel = 'myLabel'
-                FileSystem = 'ReFS'
-            }
+            FileSystemLabel = 'myLabel'
+            FileSystem      = 'ReFS'
+        }
         #endregion
 
         #region functions for mocking pipeline
         # These functions are required to be able to mock functions where
         # values are passed in via the pipeline.
-        function Set-Disk {
+        function Set-Disk
+        {
             Param
             (
                 [CmdletBinding()]
@@ -136,7 +137,8 @@ try
             )
         }
 
-        function Initialize-Disk {
+        function Initialize-Disk
+        {
             Param
             (
                 [CmdletBinding()]
@@ -148,7 +150,8 @@ try
             )
         }
 
-        function Get-Partition {
+        function Get-Partition
+        {
             Param
             (
                 [CmdletBinding()]
@@ -166,7 +169,8 @@ try
             )
         }
 
-        function New-Partition {
+        function New-Partition
+        {
             Param
             (
                 [CmdletBinding()]
@@ -184,7 +188,8 @@ try
             )
         }
 
-        function Set-Partition {
+        function Set-Partition
+        {
             Param
             (
                 [CmdletBinding()]
@@ -199,7 +204,8 @@ try
             )
         }
 
-        function Get-Volume {
+        function Get-Volume
+        {
             Param
             (
                 [CmdletBinding()]
@@ -211,7 +217,8 @@ try
             )
         }
 
-        function Set-Volume {
+        function Set-Volume
+        {
             Param
             (
                 [CmdletBinding()]
@@ -223,7 +230,8 @@ try
             )
         }
 
-        function Format-Volume {
+        function Format-Volume
+        {
             Param
             (
                 [CmdletBinding()]
@@ -243,7 +251,33 @@ try
                 $NewFileSystemLabel,
 
                 [Uint32]
-                $AllocationUnitSize
+                $AllocationUnitSize,
+
+                [Switch]
+                $Force
+            )
+        }
+
+        function Get-PartitionSupportedSize
+        {
+            param
+            (
+                [Parameter(ValueFromPipeline = $true)]
+                [String]
+                $DriveLetter
+            )
+        }
+
+        function Resize-Partition
+        {
+            param
+            (
+                [Parameter(ValueFromPipeline = $true)]
+                [String]
+                $DriveLetter,
+
+                [UInt64]
+                $Size
             )
         }
         #endregion
@@ -442,8 +476,8 @@ try
                 Mock `
                     -CommandName New-Partition `
                     -ParameterFilter {
-                        $DriveLetter -eq $script:testDriveLetter
-                    } `
+                    $DriveLetter -eq $script:testDriveLetter
+                } `
                     -MockWith { $script:mockedPartitionNoDriveLetter } `
                     -Verifiable
 
@@ -481,8 +515,8 @@ try
                     Assert-MockCalled -CommandName Get-Volume -Times 1
                     Assert-MockCalled -CommandName New-Partition -Times 1 `
                         -ParameterFilter {
-                            $DriveLetter -eq $script:testDriveLetter
-                        }
+                        $DriveLetter -eq $script:testDriveLetter
+                    }
                     Assert-MockCalled -CommandName Format-Volume -Times 1
                     Assert-MockCalled -CommandName Set-Partition -Times 1
                 }
@@ -506,8 +540,8 @@ try
                 Mock `
                     -CommandName New-Partition `
                     -ParameterFilter {
-                        $DriveLetter -eq $script:testDriveLetter
-                    } `
+                    $DriveLetter -eq $script:testDriveLetter
+                } `
                     -MockWith { $script:mockedPartitionNoDriveLetter } `
                     -Verifiable
 
@@ -546,8 +580,8 @@ try
                     Assert-MockCalled -CommandName Get-Volume -Times 1
                     Assert-MockCalled -CommandName New-Partition -Times 1 `
                         -ParameterFilter {
-                            $DriveLetter -eq $script:testDriveLetter
-                        }
+                        $DriveLetter -eq $script:testDriveLetter
+                    }
                     Assert-MockCalled -CommandName Format-Volume -Times 1
                     Assert-MockCalled -CommandName Set-Partition -Times 1
                 }
@@ -571,8 +605,8 @@ try
                 Mock `
                     -CommandName New-Partition `
                     -ParameterFilter {
-                        $DriveLetter -eq $script:testDriveLetter
-                    } `
+                    $DriveLetter -eq $script:testDriveLetter
+                } `
                     -MockWith { $script:mockedPartitionNoDriveLetter } `
                     -Verifiable
 
@@ -610,8 +644,8 @@ try
                     Assert-MockCalled -CommandName Get-Volume -Times 1
                     Assert-MockCalled -CommandName New-Partition -Times 1 `
                         -ParameterFilter {
-                            $DriveLetter -eq $script:testDriveLetter
-                        }
+                        $DriveLetter -eq $script:testDriveLetter
+                    }
                     Assert-MockCalled -CommandName Format-Volume -Times 1
                     Assert-MockCalled -CommandName Set-Partition -Times 1
                 }
@@ -639,8 +673,8 @@ try
                 Mock `
                     -CommandName New-Partition `
                     -ParameterFilter {
-                        $DriveLetter -eq $script:testDriveLetter
-                    } `
+                    $DriveLetter -eq $script:testDriveLetter
+                } `
                     -MockWith { $script:mockedPartitionNoDriveLetter } `
                     -Verifiable
 
@@ -675,8 +709,8 @@ try
                     Assert-MockCalled -CommandName Get-Volume -Times 1
                     Assert-MockCalled -CommandName New-Partition -Times 1 `
                         -ParameterFilter {
-                            $DriveLetter -eq $script:testDriveLetter
-                        }
+                        $DriveLetter -eq $script:testDriveLetter
+                    }
                     Assert-MockCalled -CommandName Format-Volume -Times 1
                     Assert-MockCalled -CommandName Set-Partition -Times 1
                 }
@@ -700,8 +734,8 @@ try
                 Mock `
                     -CommandName New-Partition `
                     -ParameterFilter {
-                        $DriveLetter -eq $script:testDriveLetter
-                    } `
+                    $DriveLetter -eq $script:testDriveLetter
+                } `
                     -MockWith { $script:mockedPartitionNoDriveLetter } `
                     -Verifiable
 
@@ -740,8 +774,8 @@ try
                     Assert-MockCalled -CommandName Get-Volume -Times 1
                     Assert-MockCalled -CommandName New-Partition -Times 1 `
                         -ParameterFilter {
-                            $DriveLetter -eq $script:testDriveLetter
-                        }
+                        $DriveLetter -eq $script:testDriveLetter
+                    }
                     Assert-MockCalled -CommandName Format-Volume -Times 1
                     Assert-MockCalled -CommandName Set-Partition -Times 1
                 }
@@ -761,8 +795,8 @@ try
                 Mock `
                     -CommandName New-Partition `
                     -ParameterFilter {
-                        $DriveLetter -eq $script:testDriveLetter
-                    } `
+                    $DriveLetter -eq $script:testDriveLetter
+                } `
                     -MockWith { $script:mockedPartitionNoDriveLetter } `
                     -Verifiable
 
@@ -801,8 +835,8 @@ try
                     Assert-MockCalled -CommandName Get-Volume -Times 1
                     Assert-MockCalled -CommandName New-Partition -Times 1 `
                         -ParameterFilter {
-                            $DriveLetter -eq $script:testDriveLetter
-                        }
+                        $DriveLetter -eq $script:testDriveLetter
+                    }
                     Assert-MockCalled -CommandName Format-Volume -Times 1
                     Assert-MockCalled -CommandName Set-Partition -Times 1
                 }
@@ -826,7 +860,7 @@ try
 
                 $errorRecord = Get-InvalidOperationRecord `
                     -Message ($LocalizedData.DiskAlreadyInitializedError -f `
-                        'Number',$script:mockedDisk0Mbr.Number,$script:mockedDisk0Mbr.PartitionStyle)
+                        'Number', $script:mockedDisk0Mbr.Number, $script:mockedDisk0Mbr.PartitionStyle)
 
                 It 'Should throw DiskAlreadyInitializedError' {
                     {
@@ -868,7 +902,7 @@ try
 
                 $errorRecord = Get-InvalidOperationRecord `
                     -Message ($LocalizedData.DiskAlreadyInitializedError -f `
-                        'UniqueId',$script:mockedDisk0Mbr.UniqueId,$script:mockedDisk0Mbr.PartitionStyle)
+                        'UniqueId', $script:mockedDisk0Mbr.UniqueId, $script:mockedDisk0Mbr.PartitionStyle)
 
                 It 'Should throw DiskAlreadyInitializedError' {
                     {
@@ -1009,8 +1043,8 @@ try
                 Mock `
                     -CommandName New-Partition `
                     -ParameterFilter {
-                        $DriveLetter -eq 'H'
-                    } `
+                    $DriveLetter -eq 'H'
+                } `
                     -MockWith { $script:mockedPartitionNoDriveLetter } `
                     -Verifiable
 
@@ -1080,6 +1114,187 @@ try
                             -DiskId $script:mockedDisk0.Number `
                             -Driveletter $script:testDriveLetter `
                             -FSLabel 'NewLabel' `
+                            -Verbose
+                    } | Should not throw
+                }
+
+                It 'the correct mocks were called' {
+                    Assert-VerifiableMocks
+                    Assert-MockCalled -CommandName Get-Disk -Times 1
+                    Assert-MockCalled -CommandName Set-Disk -Times 0
+                    Assert-MockCalled -CommandName Initialize-Disk -Times 0
+                    Assert-MockCalled -CommandName Get-Partition -Times 1
+                    Assert-MockCalled -CommandName Get-Volume -Times 1
+                    Assert-MockCalled -CommandName New-Partition -Times 0
+                    Assert-MockCalled -CommandName Format-Volume -Times 0
+                    Assert-MockCalled -CommandName Set-Partition -Times 0
+                    Assert-MockCalled -CommandName Set-Volume -Times 1
+                }
+            }
+
+            Context 'AllowDestructive: Online GPT disk with matching partition/volume but wrong size' {
+                # verifiable (should be called) mocks
+                Mock `
+                    -CommandName Get-Disk `
+                    -MockWith { $script:mockedDisk0 } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-Partition `
+                    -MockWith { $script:mockedPartition } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-Volume `
+                    -MockWith { $script:mockedVolume } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Set-Volume `
+                    -Verifiable
+                Mock `
+                    -CommandName Resize-Partition `
+                    -Verifiable
+                Mock `
+                    -CommandName Get-PartitionSupportedSize `
+                    -MockWith {
+                    return @{
+                        SizeMin = 0
+                        SizeMax = [int64]::MaxValue
+                    }
+                } `
+                    -Verifiable
+
+                # mocks that should not be called
+                Mock -CommandName Set-Disk
+                Mock -CommandName Initialize-Disk
+                Mock -CommandName New-Partition
+                Mock -CommandName Format-Volume
+                Mock -CommandName Set-Partition
+
+                It 'Should not throw' {
+                    {
+                        Set-TargetResource `
+                            -DiskId $script:mockedDisk0.Number `
+                            -Driveletter $script:testDriveLetter `
+                            -Size ($script:mockedPartitionSize + 1024) `
+                            -AllowDestructive $true `
+                            -FSLabel 'NewLabel' `
+                            -Verbose
+                    } | Should not throw
+                }
+
+                It 'the correct mocks were called' {
+                    Assert-VerifiableMocks
+                    Assert-MockCalled -CommandName Get-Disk -Times 1
+                    Assert-MockCalled -CommandName Set-Disk -Times 0
+                    Assert-MockCalled -CommandName Initialize-Disk -Times 0
+                    Assert-MockCalled -CommandName Get-Partition -Times 1
+                    Assert-MockCalled -CommandName Get-Volume -Times 1
+                    Assert-MockCalled -CommandName New-Partition -Times 0
+                    Assert-MockCalled -CommandName Format-Volume -Times 0
+                    Assert-MockCalled -CommandName Set-Partition -Times 0
+                    Assert-MockCalled -CommandName Set-Volume -Times 1
+                }
+            }
+
+            Context 'AllowDestructive: Online GPT disk with matching partition/volume but wrong format' {
+                # verifiable (should be called) mocks
+                Mock `
+                    -CommandName Get-Disk `
+                    -MockWith { $script:mockedDisk0 } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-Partition `
+                    -MockWith { $script:mockedPartition } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-Volume `
+                    -MockWith { $script:mockedVolume } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Set-Volume `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Format-Volume `
+                    -Verifiable
+
+                # mocks that should not be called
+                Mock -CommandName Set-Disk
+                Mock -CommandName Initialize-Disk
+                Mock -CommandName New-Partition                
+                Mock -CommandName Set-Partition
+
+                It 'Should not throw' {
+                    {
+                        Set-TargetResource `
+                            -DiskId $script:mockedDisk0.Number `
+                            -Driveletter $script:testDriveLetter `
+                            -Size $script:mockedPartitionSize `
+                            -FSFormat 'ReFS' `
+                            -FSLabel 'NewLabel' `
+                            -AllowDestructive $true `
+                            -Verbose
+                    } | Should not throw
+                }
+
+                It 'the correct mocks were called' {
+                    Assert-VerifiableMocks
+                    Assert-MockCalled -CommandName Get-Disk -Times 1
+                    Assert-MockCalled -CommandName Set-Disk -Times 0
+                    Assert-MockCalled -CommandName Initialize-Disk -Times 0
+                    Assert-MockCalled -CommandName Get-Partition -Times 1
+                    Assert-MockCalled -CommandName Get-Volume -Times 1
+                    Assert-MockCalled -CommandName New-Partition -Times 0
+                    Assert-MockCalled -CommandName Set-Partition -Times 0
+                    Assert-MockCalled -CommandName Set-Volume -Times 1
+                }
+            }
+
+            Context 'AllowDestructive: Online GPT disk containing arbitrary partitions' {
+                # verifiable (should be called) mocks
+                Mock `
+                    -CommandName Get-Disk `
+                    -MockWith { $script:mockedDisk0 } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-Partition `
+                    -MockWith { $script:mockedPartition } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-Volume `
+                    -MockWith { $script:mockedVolume } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Set-Volume `
+                    -Verifiable
+                Mock `
+                    -CommandName Clear-Disk `
+                    -Verifiable
+
+                # mocks that should not be called
+                Mock -CommandName Set-Disk
+                Mock -CommandName Initialize-Disk
+                Mock -CommandName New-Partition
+                Mock -CommandName Format-Volume
+                Mock -CommandName Set-Partition
+
+                It 'Should not throw' {
+                    {
+                        Set-TargetResource `
+                            -DiskId $script:mockedDisk0.Number `
+                            -Driveletter $script:testDriveLetter `
+                            -Size $script:mockedPartitionSize `
+                            -FSLabel 'NewLabel' `
+                            -AllowDestructive $true `
+                            -ClearDisk $true `
                             -Verbose
                     } | Should not throw
                 }
