@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 3.0.0.0
+
 - Converted AppVeyor build process to use AppVeyor.psm1.
 - Added support for auto generating wiki, help files, markdown linting
   and checking examples.
