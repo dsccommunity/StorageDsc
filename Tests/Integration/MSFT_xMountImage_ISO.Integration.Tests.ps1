@@ -7,9 +7,11 @@
 $script:DSCModuleName      = 'xStorage'
 $script:DSCResourceName    = 'MSFT_xMountImage'
 
+Import-Module -Name (Join-Path -Path (Join-Path -Path (Split-Path $PSScriptRoot -Parent) -ChildPath 'TestHelpers') -ChildPath 'CommonTestHelper.psm1') -Global
+
 #region HEADER
 # Integration Test Template Version: 1.1.1
-[String] $script:moduleRoot = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
+[string] $script:moduleRoot = Join-Path -Path $(Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $Script:MyInvocation.MyCommand.Path))) -ChildPath 'Modules\xStorage'
 if ( (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests'))) -or `
      (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1'))) )
 {
@@ -58,7 +60,7 @@ try
     Describe "$($script:DSCResourceName)_MountISO_Integration" {
         Context 'Mount an ISO and assign a Drive Letter' {
             #region DEFAULT TESTS
-            It 'Should compile without throwing' {
+            It 'should compile and apply the MOF without throwing' {
                 {
                     & "$($script:DSCResourceName)_Mount_Config" `
                         -OutputPath $TestDrive `
@@ -93,7 +95,7 @@ try
     Describe "$($script:DSCResourceName)_DismountISO_Integration" {
         Context 'Dismount a previously mounted ISO' {
             #region DEFAULT TESTS
-            It 'Should compile without throwing' {
+            It 'should compile and apply the MOF without throwing' {
                 {
                     & "$($script:DSCResourceName)_Dismount_Config" `
                         -OutputPath $TestDrive `
