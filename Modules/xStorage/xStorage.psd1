@@ -61,7 +61,7 @@ PowerShellVersion = '4.0'
 # FormatsToProcess = @()
 
 # Modules to import as nested modules of the module specified in RootModule/ModuleToProcess
-NestedModules = @('Modules\StorageDsc.Common\StorageDsc.Common.psm1','Modules\StorageDsc.ResourceHelper\StorageDsc.ResourceHelper.psm1')
+# NestedModules = @()
 
 # Functions to export from this module
 FunctionsToExport = '*'
