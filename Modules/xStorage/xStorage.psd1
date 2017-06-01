@@ -10,7 +10,7 @@
 # RootModule = ''
 
 # Version number of this module.
-ModuleVersion = '3.0.0.0'
+ModuleVersion = '3.1.0.0'
 
 # ID used to uniquely identify this module
 GUID = '00d73ca1-58b5-46b7-ac1a-5bfcf5814faf'
@@ -102,41 +102,9 @@ PrivateData = @{
         # IconUri = ''
 
         # ReleaseNotes of this module
-        ReleaseNotes = '- Converted AppVeyor build process to use AppVeyor.psm1.
-- Added support for auto generating wiki, help files, markdown linting
-  and checking examples.
-- Correct name of MSFT_xDiskAccessPath.tests.ps1.
-- Move shared modules into Modules folder.
-- Fixed unit tests.
-- Removed support for WMI cmdlets.
-- Opted in to Markdown and Example tests.
-- Added CodeCov.io support.
-- Removed requirement on using Pester 3.4.6 because Pester bug fixed in 4.0.3.
-- Fixed unit tests for MSFT_xDiskAccessPath resource to be compatible with
-  Pester 4.0.3.
-- xDisk:
-  - BREAKING CHANGE: Renamed parameter DiskNumber to DiskId to enable it to
-    contain either DiskNumber or UniqueId - See [Issue 81](https://github.com/PowerShell/xStorage/issues/81).
-  - Added DiskIdType parameter to enable specifying the type of identifer
-    the DiskId parameter contains - See [Issue 81](https://github.com/PowerShell/xStorage/issues/81).
-  - Changed to use xDiskAccessPath pattern to fix issue with Windows Server
-    2016 - See [Issue 80](https://github.com/PowerShell/xStorage/issues/80).
-  - Fixed style violations in xDisk.
-  - Fixed issue when creating multiple partitions on a single disk with no size
-    specified - See [Issue 86](https://github.com/PowerShell/xStorage/issues/86).
-- xDiskAccessPath:
-  - BREAKING CHANGE: Renamed parameter DiskNumber to DiskId to
-    enable it to contain either DiskNumber or UniqueId - See [Issue 81](https://github.com/PowerShell/xStorage/issues/81).
-  - Added DiskIdType parameter to enable specifying the type
-    of identifer the DiskId parameter contains - See [Issue 81](https://github.com/PowerShell/xStorage/issues/81).
-  - Fixed incorrect logging messages when changing volume label.
-  - Fixed issue when creating multiple partitions on a single disk with no size
-    specified - See [Issue 86](https://github.com/PowerShell/xStorage/issues/86).
-- xWaitForDisk:
-  - BREAKING CHANGE: Renamed parameter DiskNumber to DiskId to
-    enable it to contain either DiskNumber or UniqueId - See [Issue 81](https://github.com/PowerShell/xStorage/issues/81).
-  - Added DiskIdType parameter to enable specifying the type
-    of identifer the DiskId parameter contains - See [Issue 81](https://github.com/PowerShell/xStorage/issues/81).
+        ReleaseNotes = '- Added integration test to test for conflicts with other common resource kit modules.
+- Prevented ResourceHelper and Common module cmdlets from being exported to resolve
+  conflicts with other resource modules.
 
 '
 
@@ -151,6 +119,7 @@ PrivateData = @{
 # DefaultCommandPrefix = ''
 
 }
+
 
 
 
