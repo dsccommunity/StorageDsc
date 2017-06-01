@@ -5,12 +5,12 @@ param ()
 
 $modulePath = Join-Path -Path (Split-Path -Path (Split-Path -Path $PSScriptRoot -Parent) -Parent) -ChildPath 'Modules'
 
-# Import the Networking Common Modules
+# Import the Storage Common Modules
 Import-Module -Name (Join-Path -Path $modulePath `
                                -ChildPath (Join-Path -Path 'StorageDsc.Common' `
                                                      -ChildPath 'StorageDsc.Common.psm1'))
 
-# Import the Networking Resource Helper Module
+# Import the Storage Resource Helper Module
 Import-Module -Name (Join-Path -Path $modulePath `
                                -ChildPath (Join-Path -Path 'StorageDsc.ResourceHelper' `
                                                      -ChildPath 'StorageDsc.ResourceHelper.psm1'))
