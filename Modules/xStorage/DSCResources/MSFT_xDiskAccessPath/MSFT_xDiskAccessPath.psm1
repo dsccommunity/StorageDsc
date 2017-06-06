@@ -349,7 +349,6 @@ function Set-TargetResource
                 After creating the partition it can take a few seconds for it to become writeable
                 Wait for up to 30 seconds for the partition to become writeable
             #>
-            $start = Get-Date
             $timeout = (Get-Date) + (New-Timespan -Second 30)
             while ($partition.IsReadOnly -and (Get-Date) -lt $timeout)
             {
@@ -367,7 +366,7 @@ function Set-TargetResource
         {
             # The partition is still readonly - throw an exception
             New-InvalidOperationException `
-                -Message ($localizedData.ParitionIsReadOnlyError -f `
+                -Message ($localizedData.NewParitionIsReadOnlyError -f `
                     $DiskIdType,$DiskId,$partition.PartitionNumber)
         } # if
 
