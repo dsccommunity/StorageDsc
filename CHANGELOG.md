@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+- xDisk:
+  - Fix error message when new partition does not become writable before timeout.
+  - Removed unneeded timeout initialization code.
+- xDiskAccessPath:
+  - Fix error message when new partition does not become writable before timeout.
+  - Removed unneeded timeout initialization code.
+
 ## 3.1.0.0
 
 - Added integration test to test for conflicts with other common resource kit modules.
