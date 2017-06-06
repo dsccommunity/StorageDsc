@@ -1,0 +1,7 @@
+
+[ClassVersion("1.0.0.0"), FriendlyName("xStorageSpace")]
+class xStorageSpace : OMI_BaseResource
+{
+    [Key] String FriendlyName;
+
+};
