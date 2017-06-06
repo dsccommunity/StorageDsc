@@ -11,16 +11,16 @@ Configuration Example
 
     Node localhost
     {
-        xWaitforDisk Disk2
+        xWaitForDisk Disk2
         {
-             DiskId = 2
+             DiskNumber = 2
              RetryIntervalSec = 60
              RetryCount = 60
         }
 
         xDisk GVolume
         {
-             DiskId = 2
+             DiskNumber = 2
              DriveLetter = 'G'
              Size = 10GB
              DependsOn = '[xWaitForDisk]Disk2'
@@ -28,22 +28,22 @@ Configuration Example
 
         xDisk JVolume
         {
-             DiskId = 2
+             DiskNumber = 2
              DriveLetter = 'J'
              FSLabel = 'Data'
              DependsOn = '[xDisk]GVolume'
         }
 
-        xWaitforDisk Disk3
+        xWaitForDisk Disk3
         {
-             DiskId = 3
+             DiskNumber = 3
              RetryIntervalSec = 60
              RetryCount = 60
         }
 
         xDisk SVolume
         {
-             DiskId = 3
+             DiskNumber = 3
              DriveLetter = 'S'
              Size = 100GB
              FSFormat = 'ReFS'

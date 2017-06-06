@@ -29,6 +29,7 @@
 - Removed requirement on using Pester 3.4.6 because Pester bug fixed in 4.0.3.
 - Fixed unit tests for MSFT_xDiskAccessPath resource to be compatible with
   Pester 4.0.3.
+- Updated xDisk examples to use DiskNumber rather than DiskId. See [Issue 81] and first item in the xDisk and xDiskAccessPath section
 - xDisk:
   - BREAKING CHANGE: Renamed parameter DiskNumber to DiskId to enable it to
     contain either DiskNumber or UniqueId - See [Issue 81](https://github.com/PowerShell/xStorage/issues/81).
