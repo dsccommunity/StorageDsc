@@ -103,7 +103,7 @@ try
                 Mock `
                     -CommandName Set-CimInstance `
                     -ParameterFilter {
-                        $Property -eq @{ "DriveLetter=$script:testDriveLetter" }
+                        $Property -eq @{ DriveLetter="$script:testDriveLetter" }
                     } `
                     -MockWith { $script:mockedWrongLetterCDROM } `
                     -Verifiable
@@ -128,7 +128,7 @@ try
         }
         #endregion
     }
-}
+} 
 finally
 {
     #region FOOTER
