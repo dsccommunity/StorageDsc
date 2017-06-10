@@ -23,28 +23,38 @@ function Get-TargetResource
     $DriveLetter = $DriveLetter[0] + ":"
 
     Write-Verbose "Using Get-CimInstance to get the cdrom drives in the system"
-    try {
-        $currentDriveLetter = (Get-CimInstance -ClassName win32_cdromdrive | Where-Object {
-                                    $_.Caption -eq "Microsoft Virtual DVD-ROM"
-                                    }
-                               ).Drive
-    }
-    catch
+
+    # Get the current drive letter corresponding to the virtual cdrom drive
+    # the Caption and DeviceID properties are used to avoid mounted ISO images in Windows 2012+ and Windows 10.
+    # with the Device ID, we look for the length of the string after the final backslash (crude, but appears to work so far)
+
+    # Example DeviceID for a virtual drive in a Hyper-V VM - SCSI\CDROM&VEN_MSFT&PROD_VIRTUAL_DVD-ROM\000006
+    # Example DeviceID for a mounted ISO   in a Hyper-V VM - SCSI\CDROM&VEN_MSFT&PROD_VIRTUAL_DVD-ROM\2&1F4ADFFE&0&000002
+    $currentDriveLetter = (Get-CimInstance -ClassName win32_cdromdrive | Where-Object {
+                        -not (
+                                $_.Caption -eq "Microsoft Virtual DVD-ROM" -and
+                                ($_.DeviceID.Split("\")[-1]).Length -gt 10
+                            )
+                        }
+                        ).Drive
+    
+    if (-not $currentDriveLetter)
     {
         Write-Verbose "Without a cdrom drive in the system, this resource has nothing to do."
         $Ensure = 'Present'
     }
-
-    # check if $driveletter is the location of the CD drive
-    if ($currentDriveLetter -eq $DriveLetter)
-    {
-        Write-Verbose "cdrom is currently set to $DriveLetter as requested"
-        $Ensure = 'Present'
-    }
-    else
-    {
-        Write-Verbose "cdrom is currently set to $currentDriveLetter, not $DriveLetter as requested"
-        $Ensure = 'Absent'
+    else {
+        # check if $driveletter is the location of the CD drive
+        if ($currentDriveLetter -eq $DriveLetter)
+        {
+            Write-Verbose "cdrom is currently set to $DriveLetter as requested"
+            $Ensure = 'Present'
+        }
+        else
+        {
+            Write-Verbose "cdrom is currently set to $currentDriveLetter, not $DriveLetter as requested"
+            $Ensure = 'Absent'
+        }       
     }
 
     $returnValue = @{
@@ -87,7 +97,7 @@ function Set-TargetResource
     $DriveLetter = $DriveLetter[0] + ":"
 
     # Get the current drive letter corresponding to the virtual cdrom drive
-    # the Caption and DeviceID properties are used to avoid mounted ISO images
+    # the Caption and DeviceID properties are used to avoid mounted ISO images in Windows 2012+ and Windows 10.
     # with the Device ID, we look for the length of the string after the final backslash (crude, but appears to work so far)
 
     # Example DeviceID for a virtual drive in a Hyper-V VM - SCSI\CDROM&VEN_MSFT&PROD_VIRTUAL_DVD-ROM\000006
@@ -104,16 +114,19 @@ function Set-TargetResource
         return 
     }
 
-    Write-Verbose "The current drive letter is $currentDriveLetter, attempting to set to $driveletter"
-
     # assuming a drive letter is found
     if ($currentDriveLetter)
     {
+        Write-Verbose "The current drive letter is $currentDriveLetter, attempting to set to $driveletter"
+
         # get the volume corresponding to the drive letter, and set the drive letter of this volume to $DriveLetter
         if ($PSCmdlet.ShouldProcess("Setting cdrom drive letter to $DriveLetter")) {
             Get-CimInstance -ClassName Win32_Volume -Filter "DriveLetter = '$currentDriveLetter'" | 
             Set-CimInstance -Property @{ DriveLetter="$DriveLetter"}
         }
+    }
+    else {
+        Write-Verbose "No CDROM can be found.  Note that this resource does not change the drive letter of mounted ISOs "
     }
 } # Set-TargetResource
 
