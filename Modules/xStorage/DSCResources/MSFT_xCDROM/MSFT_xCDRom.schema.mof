@@ -3,6 +3,6 @@
 class MSFT_xCDROM : OMI_BaseResource
 {
     [Key, Description("Specifies the drive letter of the CDROM to modify.")] String DriveLetter;
-    [Write, Description("Determines whether the CDROM drive letter should be changed or not.") ValueMap{"Present","Absent"}, Values{"Present","Absent"}] string Ensure;
+    [Write, Description("Determines whether the CDROM drive letter should be changed or not."), ValueMap{"Present","Absent"}, Values{"Present","Absent"}] string Ensure;
 };
 
