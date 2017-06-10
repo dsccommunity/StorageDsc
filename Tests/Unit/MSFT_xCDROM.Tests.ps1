@@ -30,7 +30,7 @@ try
 
         $script:testDriveLetter = 'X:'
 
-        $script:mockedNoCDROM = [pscustomobject] @{}
+        $script:mockedNoCDROM = $null
 
         $script:mockedCDROM  = [pscustomobject] @{
                 Drive        = $script:testDriveLetter
