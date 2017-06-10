@@ -94,6 +94,48 @@ try
                     Assert-VerifiableMocks
                 }
             }
+
+            Context 'CDROM drive present with incorrect drive letter' {
+                # verifiable (should be called) mocks
+                Mock `
+                    -CommandName Get-CimInstance `
+                    -ParameterFilter {
+                        $ClassName -eq "win32_cdromdrive"
+                    } `
+                    -MockWith { $script:mockedWrongLetterCDROM } `
+                    -Verifiable
+
+                $resource = Get-TargetResource `
+                    -DriveLetter $script:testDriveLetter `
+                    -Verbose
+
+                It "DriveLetter should be $($script:testDriveLetter)" {
+                    $resource.DriveLetter | Should Not Be $script:testDriveLetter
+                }
+
+                It 'all the get mocks should be called' {
+                    Assert-VerifiableMocks
+                }
+            }
+
+            Context 'CDROM drive not present' {
+                # verifiable (should be called) mocks
+                Mock `
+                    -CommandName Get-CimInstance `
+                    -ParameterFilter {
+                        $ClassName -eq "win32_cdromdrive"
+                    } `
+                    -MockWith { $script:mockedNoCDROM } `
+                    -Verifiable
+
+                $resource = Get-TargetResource `
+                    -DriveLetter $script:testDriveLetter `
+                    -Verbose
+
+                It 'all the get mocks should be called' {
+                    Assert-VerifiableMocks
+                }
+            }            
         }
 
         #region Function Set-TargetResource
