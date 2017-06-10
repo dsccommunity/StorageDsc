@@ -9,7 +9,7 @@ Configuration Example
 
     Node localhost
     {
-        xCDROM
+        xCDROM MapCDROMToZ
         {
              DriveLetter = "Z"
         }
