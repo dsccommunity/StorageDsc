@@ -174,7 +174,7 @@ function Test-TargetResource
     if ($cdrom)
     {
         Write-Verbose ("cdrom found with device id: " + $cdrom.id)
-        if ($volumeDriveType) {
+        if ($volumeDriveType.DriveType -eq 5) {
             Write-Verbose ("volume with driveletter $driveletter is type " + $volumeDriveType.DriveType + " (5 is a cdrom drive).")
         }
         else {
