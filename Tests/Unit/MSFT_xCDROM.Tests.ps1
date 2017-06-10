@@ -32,14 +32,16 @@ try
 
         $script:mockedNoCDROM = [pscustomobject] @{}
 
-        $script:mockedCDROM = [pscustomobject] @{
-                Drive       = $script:testDriveLetter
-                Caption     = 'Microsoft Virtual DVD-ROM'
-                DeviceID    = 'SCSI\CDROM&VEN_MSFT&PROD_VIRTUAL_DVD-ROM\000006'
+        $script:mockedCDROM  = [pscustomobject] @{
+                Drive        = $script:testDriveLetter
+                Caption      = 'Microsoft Virtual DVD-ROM'
+                DeviceID     = 'SCSI\CDROM&VEN_MSFT&PROD_VIRTUAL_DVD-ROM\000006'
+                Id           = $script:testDriveLetter
             }
 
         $script:mockedVolume = [pscustomobject] @{
                 DriveLetter  = $script:testDriveLetter
+                DriveType    = 5
             }
 
         $script:mockedWrongLetterCDROM = [pscustomobject] @{
@@ -50,6 +52,11 @@ try
 
         $script:mockedWrongVolume = [pscustomobject] @{
                 DriveLetter       = 'W:'
+            }
+
+        $script:mockedVolumeNotCDROM = [pscustomobject] @{
+                DriveLetter  =  $script:testDriveLetter
+                DriveType    = 3
             }
 
         $script:mockedCDROMiso = [pscustomobject] @{
@@ -173,7 +180,7 @@ try
         }
 
         #region Function Set-TargetResource
-        Describe 'MSFT_xDisk\Set-TargetResource' {
+        Describe 'MSFT_xCDROM\Set-TargetResource' {
             Context 'CDROM with the correct drive letter' {
                 # verifiable (should be called) mocks
                 Mock `
@@ -188,6 +195,44 @@ try
                     {
                         Set-TargetResource `
                             -Driveletter $script:testDriveLetter `
+                            -Verbose
+                    } | Should not throw
+                }
+
+                It 'the correct mocks were called' {
+                    Assert-VerifiableMocks
+                    Assert-MockCalled -CommandName Get-CimInstance -Times 1                    
+                }
+            }
+
+            Context 'CDROM with the correct drive letter when Ensure is set to Absent' {
+                # verifiable (should be called) mocks
+                Mock `
+                    -CommandName Get-CimInstance `
+                    -ParameterFilter {
+                        $ClassName -eq "win32_cdromdrive"
+                    } `
+                    -MockWith { $script:mockedCDROM } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-CimInstance  `
+                    -ParameterFilter {
+                        $ClassName -eq "win32_volume"
+                    } `
+                    -MockWith { $script:mockedVolume } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Set-CimInstance `
+                    -MockWith {  } `
+                    -Verifiable
+
+                It 'Should not throw' {
+                    {
+                        Set-TargetResource `
+                            -Driveletter $script:testDriveLetter `
+                            -Ensure 'Absent' `
                             -Verbose
                     } | Should not throw
                 }
@@ -299,6 +344,121 @@ try
                 }
             }                        
         }
+
+        Describe 'MSFT_xCDROM\Test-TargetResource' {
+
+            Context 'Drive letter is a valid cdrom drive' {
+                # verifiable (should be called) mocks
+                Mock `
+                    -CommandName Get-CimInstance `
+                    -ParameterFilter {
+                        $ClassName -eq "win32_cdromdrive"
+                    } `
+                    -MockWith { $script:mockedCDROM } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-CimInstance  `
+                    -ParameterFilter {
+                        $ClassName -eq "win32_volume"
+                    } `
+                    -MockWith { $script:mockedVolume } `
+                    -Verifiable
+
+                $resource = Test-TargetResource `
+                    -DriveLetter $script:testDriveLetter `
+                    -Verbose | Should Be $true
+
+                It 'all the get mocks should be called' {
+                    Assert-VerifiableMocks
+                }
+            }
+
+            Context 'Drive letter is a valid cdrom drive and $Ensure is set to Absent' {
+                # verifiable (should be called) mocks
+                Mock `
+                    -CommandName Get-CimInstance `
+                    -ParameterFilter {
+                        $ClassName -eq "win32_cdromdrive"
+                    } `
+                    -MockWith { $script:mockedCDROM } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-CimInstance  `
+                    -ParameterFilter {
+                        $ClassName -eq "win32_volume"
+                    } `
+                    -MockWith { $script:mockedVolume } `
+                    -Verifiable
+
+                $resource = Test-TargetResource `
+                    -DriveLetter $script:testDriveLetter `
+                    -Ensure 'Absent' `
+                    -Verbose | Should Be $false
+
+                It 'all the get mocks should be called' {
+                    Assert-VerifiableMocks
+                }
+            }
+
+            Context 'There is no cdrom drive' {
+                # verifiable (should be called) mocks
+                Mock `
+                    -CommandName Get-CimInstance `
+                    -ParameterFilter {
+                        $ClassName -eq "win32_cdromdrive"
+                    } `
+                    -MockWith { $script:mockedNoCDROM } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-CimInstance  `
+                    -ParameterFilter {
+                        $ClassName -eq "win32_volume"
+                    } `
+                    -MockWith { $script:mockedWrongVolume } `
+                    -Verifiable
+
+                $resource = Test-TargetResource `
+                    -DriveLetter $script:testDriveLetter `
+                    -Ensure 'Present' `
+                    -Verbose | Should Be $false
+
+                It 'all the get mocks should be called' {
+                    Assert-VerifiableMocks
+                }
+            }
+
+            Context 'The drive letter already exists on a volume that is not a cdrom drive' {
+                # verifiable (should be called) mocks
+                Mock `
+                    -CommandName Get-CimInstance `
+                    -ParameterFilter {
+                        $ClassName -eq "win32_cdromdrive"
+                    } `
+                    -MockWith { $script:mockedCDROM } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-CimInstance  `
+                    -ParameterFilter {
+                        $ClassName -eq "win32_volume"
+                    } `
+                    -MockWith { $script:mockedVolumeNotCDROM } `
+                    -Verifiable
+
+                $resource = Test-TargetResource `
+                    -DriveLetter $script:testDriveLetter `
+                    -Ensure 'Present' `
+                    -Verbose | Should Be $false
+
+                It 'all the get mocks should be called' {
+                    Assert-VerifiableMocks
+                }
+            }              
+        }
+
         #endregion
     }
 } 

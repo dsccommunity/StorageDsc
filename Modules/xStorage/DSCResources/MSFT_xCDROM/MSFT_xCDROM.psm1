@@ -110,7 +110,7 @@ function Set-TargetResource
                         }
                    ).Drive
     
-    if ($currentDriveLetter -eq $DriveLetter) { 
+    if ($currentDriveLetter -eq $DriveLetter -and $Ensure -eq 'Present') { 
         return 
     }
 
@@ -119,10 +119,15 @@ function Set-TargetResource
     {
         Write-Verbose "The current drive letter is $currentDriveLetter, attempting to set to $driveletter"
 
-        # get the volume corresponding to the drive letter, and set the drive letter of this volume to $DriveLetter
         if ($PSCmdlet.ShouldProcess("Setting cdrom drive letter to $DriveLetter")) {
+
+            # if $Ensure -eq Absent this will remove the drive letter from the cdrom
+            if ($Ensure -eq 'Absent')
+            {
+                $DriveLetter = $null
+            }
             Get-CimInstance -ClassName Win32_Volume -Filter "DriveLetter = '$currentDriveLetter'" | 
-            Set-CimInstance -Property @{ DriveLetter="$DriveLetter"}
+            Set-CimInstance -Property @{ DriveLetter=$DriveLetter}
         }
     }
     else {
@@ -161,35 +166,34 @@ function Test-TargetResource
     $DriveLetter = $DriveLetter[0] + ":"
 
     # is there a cdrom
-    $cdrom = Get-CimInstance -ClassName WIn32_cdromdrive -Property Id
+    $cdrom = Get-CimInstance -ClassName Win32_cdromdrive -Property Id
     # what type of drive is attached to $driveletter
     $volumeDriveType = Get-CimInstance -ClassName Win32_Volume -Filter "DriveLetter = '$DriveLetter'" -Property DriveType
     
-    if ($Ensure -eq 'Present')
+    # check there is a cdrom
+    if ($cdrom)
     {
-        # check there is a cdrom
-        if ($cdrom)
-        {
-            Write-Verbose ("cdrom found with device id: " + $cdrom.id)
-            if ($volumeDriveType) {
-                Write-Verbose ("volume with driveletter $driveletter is type " + $volumeDriveType.DriveType + " (5 is a cdrom drive).")
-            }
-            else {
-                Write-Verbose ("there doesn't appear to be a driveletter $driveletter")
-            }            
-            # return true if the requested volume is a cdrom
-            $result = [System.Boolean]($volumeDriveType.DriveType -eq 5)
+        Write-Verbose ("cdrom found with device id: " + $cdrom.id)
+        if ($volumeDriveType) {
+            Write-Verbose ("volume with driveletter $driveletter is type " + $volumeDriveType.DriveType + " (5 is a cdrom drive).")
         }
-        else { 
-            # return true if there is no cdrom - can't set what isn't there!
-            Write-Verbose ("No cdrom found.")
-            $result = $true 
+        else {
+            Write-Warning ("volume with driveletter $driveletter is already present but is not a cdrom drive")
+        }
+        
+        # return true if the drive letter is a cdrom resource
+        $result = [System.Boolean]($volumeDriveType.DriveType -eq 5)
+        
+        # return false if the drive letter specified is a cdrom resource & $Ensure -eq 'Absent'
+        if ($Ensure -eq 'Absent')
+        {
+            $result = -not $result
         }
     }
-    # $Ensure -eq 'Absent', do nothing
     else { 
-        Write-Verbose 'When $Ensure is set to Absent this resource does nothing.'
-        $result = $true 
+        # return true if there is no cdrom - can't set what isn't there!
+        Write-Warning ("There is no cdrom in this system, so no drive letter can be set.")
+        $result = $false 
     }
           
     $result
