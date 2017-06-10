@@ -34,7 +34,7 @@ try
 
         $script:mockedCDROM = [pscustomobject] @{
                 Drive       = $script:testDriveLetter
-                Caption     = "Microsoft Virtual DVD-ROM"
+                Caption     = 'Microsoft Virtual DVD-ROM'
                 DeviceID    = 'SCSI\CDROM&VEN_MSFT&PROD_VIRTUAL_DVD-ROM\000006'
             }
 
@@ -44,7 +44,7 @@ try
 
         $script:mockedWrongLetterCDROM = [pscustomobject] @{
                 Drive          = 'W:'
-                Caption     = "Microsoft Virtual DVD-ROM"                
+                Caption        = 'Microsoft Virtual DVD-ROM'
                 DeviceID       = 'SCSI\CDROM&VEN_MSFT&PROD_VIRTUAL_DVD-ROM\000006'
             }
 
@@ -54,8 +54,14 @@ try
 
         $script:mockedCDROMiso = [pscustomobject] @{
                 Drive          = 'I:'
-                Caption     = "Microsoft Virtual DVD-ROM"                
+                Caption        = 'Microsoft Virtual DVD-ROM'
                 DeviceID       = 'SCSI\CDROM&VEN_MSFT&PROD_VIRTUAL_DVD-ROM\2&1F4ADFFE&0&000002'
+            }
+
+        $script:mockedCDROMide = [pscustomobject] @{
+                Drive          = 'I:'
+                Caption        = 'Msft Virtual CD/ROM ATA Device'
+                DeviceID       = 'IDE\CDROMMSFT_VIRTUAL_CD/ROM_____________________1.0_____\5&CFB56DE&0&1.0.0'
             }
         
         function Set-CimInstance {
@@ -118,6 +124,30 @@ try
                 }
             }
 
+
+            Context 'IDE CDROM drive present with incorrect drive letter' {
+                # verifiable (should be called) mocks
+                Mock `
+                    -CommandName Get-CimInstance `
+                    -ParameterFilter {
+                        $ClassName -eq "win32_cdromdrive"
+                    } `
+                    -MockWith { $script:mockedCDROMide } `
+                    -Verifiable
+
+                $resource = Get-TargetResource `
+                    -DriveLetter $script:testDriveLetter `
+                    -Verbose
+
+                It "DriveLetter should be $($script:testDriveLetter)" {
+                    $resource.DriveLetter | Should Not Be $script:testDriveLetter
+                }
+
+                It 'all the get mocks should be called' {
+                    Assert-VerifiableMocks
+                }
+            }
+
             Context 'CDROM drive not present' {
                 # verifiable (should be called) mocks
                 Mock `
@@ -131,6 +161,10 @@ try
                 $resource = Get-TargetResource `
                     -DriveLetter $script:testDriveLetter `
                     -Verbose
+
+                It "DriveLetter should be null" {
+                    $resource.DriveLetter | Should Be $null
+                }
 
                 It 'all the get mocks should be called' {
                     Assert-VerifiableMocks
@@ -184,7 +218,45 @@ try
 
                 Mock `
                     -CommandName Set-CimInstance `
-                    -MockWith { $script:mockedWrongLetterCDROM } `
+                    -MockWith {  } `
+                    -Verifiable
+
+                It 'Should not throw' {
+                    {
+                        Set-TargetResource `
+                            -Driveletter $script:testDriveLetter `
+                            -Verbose
+                    } | Should not throw
+                }
+
+                It 'the correct mocks were called' {
+                    Assert-VerifiableMocks
+                    Assert-MockCalled -CommandName Get-CimInstance -Times 2
+                    Assert-MockCalled -CommandName Set-CimInstance -Times 1               
+                }
+            }
+
+            Context 'IDE CDROM with the wrong drive letter' {
+                # verifiable (should be called) mocks
+                Mock `
+                    -CommandName Get-CimInstance `
+                    -ParameterFilter {
+                        $ClassName -eq "win32_cdromdrive"
+                    } `
+                    -MockWith { $script:mockedCDROMide } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-CimInstance  `
+                    -ParameterFilter {
+                        $ClassName -eq "win32_volume"
+                    } `
+                    -MockWith { $script:mockedWrongVolume } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Set-CimInstance `
+                    -MockWith { } `
                     -Verifiable
 
                 It 'Should not throw' {
