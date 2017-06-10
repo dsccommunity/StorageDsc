@@ -8,8 +8,6 @@
 - xDiskAccessPath:
   - Fix error message when new partition does not become writable before timeout.
   - Removed unneeded timeout initialization code.
-- xCDROM:
-  - Added new resource to set drive letter of CDROM drive.
 
 ## 3.1.0.0
 
