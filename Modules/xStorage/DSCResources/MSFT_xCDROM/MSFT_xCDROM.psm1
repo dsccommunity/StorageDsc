@@ -24,8 +24,8 @@ function Get-TargetResource
 
     Write-Verbose "Using Get-CimInstance to get the cdrom drives in the system"
     try {
-        $currentDriveLetter = (Get-CimInstance -ClassName WIn32_cdromdrive | Where-Object {
-                                    $_.Caption -ne "Microsoft Virtual DVD-ROM"
+        $currentDriveLetter = (Get-CimInstance -ClassName win32_cdromdrive | Where-Object {
+                                    $_.Caption -eq "Microsoft Virtual DVD-ROM"
                                     }
                                ).Drive
     }
@@ -100,6 +100,10 @@ function Set-TargetResource
                         }
                    ).Drive
     
+    if ($currentDriveLetter -eq $DriveLetter) { 
+        return 
+    }
+
     Write-Verbose "The current drive letter is $currentDriveLetter, attempting to set to $driveletter"
 
     # assuming a drive letter is found

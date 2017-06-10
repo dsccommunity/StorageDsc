@@ -28,24 +28,47 @@ try
     # (non-exported) code of a Script Module.
     InModuleScope $script:DSCResourceName {
 
-        $script:testDriveLetter = 'X'
+        $script:testDriveLetter = 'X:'
 
         $script:mockedNoCDROM = [pscustomobject] @{}
 
         $script:mockedCDROM = [pscustomobject] @{
-                DriveLetter    = $script:testDriveLetter
-                DeviceID       = 'SCSI\CDROM&VEN_MSFT&PROD_VIRTUAL_DVD-ROM\000006'
+                Drive       = $script:testDriveLetter
+                Caption     = "Microsoft Virtual DVD-ROM"
+                DeviceID    = 'SCSI\CDROM&VEN_MSFT&PROD_VIRTUAL_DVD-ROM\000006'
+            }
+
+        $script:mockedVolume = [pscustomobject] @{
+                DriveLetter  = $script:testDriveLetter
             }
 
         $script:mockedWrongLetterCDROM = [pscustomobject] @{
-                DriveLetter    = 'W'
+                Drive          = 'W:'
+                Caption     = "Microsoft Virtual DVD-ROM"                
                 DeviceID       = 'SCSI\CDROM&VEN_MSFT&PROD_VIRTUAL_DVD-ROM\000006'
             }
 
+        $script:mockedWrongVolume = [pscustomobject] @{
+                DriveLetter       = 'W:'
+            }
+
         $script:mockedCDROMiso = [pscustomobject] @{
-                DriveLetter    = 'I'
+                Drive          = 'I:'
+                Caption     = "Microsoft Virtual DVD-ROM"                
                 DeviceID       = 'SCSI\CDROM&VEN_MSFT&PROD_VIRTUAL_DVD-ROM\2&1F4ADFFE&0&000002'
             }
+        
+        function Set-CimInstance {
+            Param
+            (
+                [CmdletBinding()]
+                [Parameter(ValueFromPipeline)]
+                $InputObject,
+
+                [hashtable]
+                $Property                
+            )
+        }
 
         #region Function Get-TargetResource
         Describe 'MSFT_xCDROM\Get-TargetResource' {
@@ -53,6 +76,9 @@ try
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Get-CimInstance `
+                    -ParameterFilter {
+                        $ClassName -eq "win32_cdromdrive"
+                    } `
                     -MockWith { $script:mockedCDROM } `
                     -Verifiable
 
@@ -76,6 +102,9 @@ try
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Get-CimInstance `
+                    -ParameterFilter {
+                        $ClassName -eq "win32_cdromdrive"
+                    } `
                     -MockWith { $script:mockedCDROM } `
                     -Verifiable
 
@@ -89,7 +118,7 @@ try
 
                 It 'the correct mocks were called' {
                     Assert-VerifiableMocks
-                    Assert-MockCalled -CommandName Get-CimInstance -Times 1
+                    Assert-MockCalled -CommandName Get-CimInstance -Times 1                    
                 }
             }
 
@@ -97,14 +126,22 @@ try
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Get-CimInstance `
+                    -ParameterFilter {
+                        $ClassName -eq "win32_cdromdrive"
+                    } `
                     -MockWith { $script:mockedWrongLetterCDROM } `
                     -Verifiable
 
                 Mock `
-                    -CommandName Set-CimInstance `
+                    -CommandName Get-CimInstance  `
                     -ParameterFilter {
-                        $Property -eq @{ DriveLetter="$script:testDriveLetter" }
+                        $ClassName -eq "win32_volume"
                     } `
+                    -MockWith { $script:mockedWrongVolume } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Set-CimInstance `
                     -MockWith { $script:mockedWrongLetterCDROM } `
                     -Verifiable
 
@@ -119,12 +156,34 @@ try
                 It 'the correct mocks were called' {
                     Assert-VerifiableMocks
                     Assert-MockCalled -CommandName Get-CimInstance -Times 2
-                    Assert-MockCalled -CommandName Set-CimInstance -Times 1 `
-                        -ParameterFilter {
-                            $Property -eq @{ DriveLetter="$script:testDriveLetter" }
-                        }                    
+                    Assert-MockCalled -CommandName Set-CimInstance -Times 1               
                 }
-            }            
+            }
+
+            # This resource does not change the drive letter of mounted ISO images.
+            Context 'Mounted ISO with the wrong drive letter' {
+                # verifiable (should be called) mocks
+                Mock `
+                    -CommandName Get-CimInstance `
+                    -ParameterFilter {
+                        $ClassName -eq "win32_cdromdrive"
+                    } `
+                    -MockWith { $script:mockedCDROMiso } `
+                    -Verifiable
+
+                It 'Should not throw' {
+                    {
+                        Set-TargetResource `
+                            -Driveletter $script:testDriveLetter `
+                            -Verbose
+                    } | Should not throw
+                }
+
+                It 'the correct mocks were called' {
+                    Assert-VerifiableMocks
+                    Assert-MockCalled -CommandName Get-CimInstance -Times 1                    
+                }
+            }                        
         }
         #endregion
     }
