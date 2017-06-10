@@ -39,6 +39,16 @@ try
     . $ConfigFile -Verbose -ErrorAction Stop
 
     Describe "$($script:DSCResourceName)_Integration" {
+        BeforeAll {
+            $currentDriveLetter = (Get-CimInstance -ClassName win32_cdromdrive | Where-Object {
+                                -not (
+                                        $_.Caption -eq "Microsoft Virtual DVD-ROM" -and
+                                        ($_.DeviceID.Split("\")[-1]).Length -gt 10
+                                    )
+                                }
+                                ).Drive
+        }
+
         Context 'Assign a Drive Letter to the CDROM' {
             #region DEFAULT TESTS
             It 'should compile and apply the MOF without throwing' {
@@ -56,12 +66,18 @@ try
             }
             #endregion
 
-            It 'Should have set the resource and all the parameters should match' {
-                $current = Get-DscConfiguration | Where-Object {
-                    $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
+            if ($currentDriveLetter)
+            {
+                It 'Should have set the resource and all the parameters should match' {
+                    $current = Get-DscConfiguration | Where-Object {
+                        $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
+                    }
+                    $current.DriveLetter      | Should Be $DriveLetter
+                    $current.Ensure           | Should Be 'Present'
                 }
-                $current.DriveLetter      | Should Be $DriveLetter
-                $current.Ensure           | Should Be 'Present'
+            }
+            else {
+                Write-Verbose 'A cdrom is required to test the resource sets all the parameters correctly.  Mounted ISOs are ignored'
             }
         }
     }
