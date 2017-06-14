@@ -789,6 +789,73 @@ try
                 }
             }
 
+            Context 'Online RAW disk with Size, FSLabel and AllocationUnit using Disk Number' {
+                # verifiable (should be called) mocks
+                Mock `
+                    -CommandName Get-Disk `
+                    -MockWith { $script:mockedDisk0Raw } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Initialize-Disk `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-Partition `
+                    -Verifiable
+
+                Mock `
+                    -CommandName New-Partition `
+                    -ParameterFilter {
+                    $DriveLetter -eq $script:testDriveLetter
+                } `
+                    -MockWith { $script:mockedPartitionNoDriveLetter } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-Volume `
+                    -MockWith { $script:mockedVolumeUnformatted } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Format-Volume `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Set-Partition `
+                    -Verifiable
+
+                # mocks that should not be called
+                Mock -CommandName Set-Disk
+
+                It 'Should not throw' {
+                    {
+                        Set-TargetResource `
+                            -DiskId $script:mockedDisk0Raw.Number `
+                            -Driveletter $script:testDriveLetter `
+                            -Size $script:mockedPartitionSize `
+                            -AllocationUnitSize 64 `
+                            -FSLabel 'MyDisk' `
+                            -Verbose
+                    } | Should not throw
+                }
+
+                It 'the correct mocks were called' {
+                    Assert-VerifiableMocks
+                    Assert-MockCalled -CommandName Get-Disk -Times 1
+                    Assert-MockCalled -CommandName Set-Disk -Times 0
+                    Assert-MockCalled -CommandName Initialize-Disk -Times 1
+                    Assert-MockCalled -CommandName Get-Partition -Times 1
+                    Assert-MockCalled -CommandName Get-Volume -Times 1
+                    Assert-MockCalled -CommandName New-Partition -Times 1 `
+                        -ParameterFilter {
+                        $DriveLetter -eq $script:testDriveLetter
+                    }
+                    Assert-MockCalled -CommandName Format-Volume -Times 1
+                    Assert-MockCalled -CommandName Set-Partition -Times 1
+                }
+            }
+
             Context 'Online GPT disk with no partitions using Disk Number' {
                 # verifiable (should be called) mocks
                 Mock `
@@ -1321,6 +1388,64 @@ try
                     Assert-MockCalled -CommandName Format-Volume -Times 0
                     Assert-MockCalled -CommandName Set-Partition -Times 0
                     Assert-MockCalled -CommandName Set-Volume -Times 1
+                }
+            }
+
+            Context 'AllowDestructive: Online GPT disk with matching partition/volume but wrong size and remaining size too small' {
+                # verifiable (should be called) mocks
+                Mock `
+                    -CommandName Get-Disk `
+                    -MockWith { $script:mockedDisk0 } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-Partition `
+                    -MockWith { $script:mockedPartition } `
+                    -Verifiable
+               
+                Mock `
+                    -CommandName Get-PartitionSupportedSize `
+                    -MockWith {
+                    return @{
+                        SizeMin = 0
+                        SizeMax = 1
+                    }
+                } `
+                    -Verifiable
+
+                # mocks that should not be called
+                Mock -CommandName Set-Disk
+                Mock -CommandName Initialize-Disk
+                Mock -CommandName New-Partition
+                Mock -CommandName Format-Volume
+                Mock -CommandName Set-Partition
+                Mock -CommandName Get-Volume
+                Mock -CommandName Set-Volume
+                Mock -CommandName Resize-Partition
+
+                It 'Should throw' {
+                    {
+                        Set-TargetResource `
+                            -DiskId $script:mockedDisk0.Number `
+                            -Driveletter $script:testDriveLetter `
+                            -Size ($script:mockedPartitionSize + 1024) `
+                            -AllowDestructive $true `
+                            -FSLabel 'NewLabel' `
+                            -Verbose
+                    } | Should throw
+                }
+
+                It 'the correct mocks were called' {
+                    Assert-VerifiableMocks
+                    Assert-MockCalled -CommandName Get-Disk -Times 1
+                    Assert-MockCalled -CommandName Set-Disk -Times 0
+                    Assert-MockCalled -CommandName Initialize-Disk -Times 0
+                    Assert-MockCalled -CommandName Get-Partition -Times 1
+                    Assert-MockCalled -CommandName Get-Volume -Times 0
+                    Assert-MockCalled -CommandName New-Partition -Times 0
+                    Assert-MockCalled -CommandName Format-Volume -Times 0
+                    Assert-MockCalled -CommandName Set-Partition -Times 0
+                    Assert-MockCalled -CommandName Set-Volume -Times 0
                 }
             }
 
