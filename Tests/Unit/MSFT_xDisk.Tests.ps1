@@ -97,6 +97,14 @@ try
             Type            = 'Basic'
         }
 
+        $script:mockedPartitionNoDriveLetterReadOnly = [pscustomobject] @{
+            DriveLetter     = ''
+            Size            = $script:mockedPartitionSize
+            PartitionNumber = 1
+            Type            = 'Basic'
+            IsReadOnly      = $true
+        }
+
         $script:mockedVolume = [pscustomobject] @{
             FileSystemLabel = 'myLabel'
             FileSystem      = 'NTFS'
@@ -842,6 +850,67 @@ try
                 }
             }
 
+            Context 'Online GPT disk with no partitions using Disk Number, partition fails to become writeable' {
+                # verifiable (should be called) mocks
+                Mock `
+                    -CommandName Get-Disk `
+                    -MockWith { $script:mockedDisk0 } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-Partition `
+                    -MockWith { $script:mockedPartitionNoDriveLetterReadOnly } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName New-Partition `
+                    -ParameterFilter {
+                    $DriveLetter -eq $script:testDriveLetter
+                } `
+                    -MockWith { $script:mockedPartitionNoDriveLetterReadOnly } `
+                    -Verifiable
+
+                # mocks that should not be called
+                Mock -CommandName Set-Disk
+                Mock -CommandName Initialize-Disk
+                Mock -CommandName Set-Volume
+                Mock -CommandName Get-Volume
+                Mock -CommandName Format-Volume
+                Mock -CommandName Set-Partition
+
+                $startTime = Get-Date
+                It 'Should throw' {
+                    {
+                        Set-TargetResource `
+                            -DiskId $script:mockedDisk0.Number `
+                            -Driveletter $script:testDriveLetter `
+                            -Verbose
+                    } | Should throw
+                }
+
+                $endTime = Get-Date
+
+                It 'Should take at least 30s' {
+                    ($endTime - $startTime).TotalSeconds | Should BeGreaterThan 29
+                }
+
+                It 'the correct mocks were called' {
+                    Assert-VerifiableMocks
+                    Assert-MockCalled -CommandName Get-Disk -Times 1
+                    Assert-MockCalled -CommandName Set-Disk -Times 0
+                    Assert-MockCalled -CommandName Initialize-Disk -Times 0
+                    Assert-MockCalled -CommandName Get-Partition -Times 1
+                    Assert-MockCalled -CommandName Get-Volume -Times 0
+                    Assert-MockCalled -CommandName New-Partition -Times 1 `
+                        -ParameterFilter {
+                        $DriveLetter -eq $script:testDriveLetter
+                    }
+                    Assert-MockCalled -CommandName Format-Volume -Times 0
+                    Assert-MockCalled -CommandName Set-Volume -Times 0
+                    Assert-MockCalled -CommandName Set-Partition -Times 0
+                }
+            }
+
             Context 'Online MBR disk using Disk Number' {
                 # verifiable (should be called) mocks
                 Mock `
@@ -1132,6 +1201,63 @@ try
                 }
             }
 
+            Context 'AllowDestructive: Online GPT disk with matching partition/volume without assigned drive letter and wrong size' {
+                # verifiable (should be called) mocks
+                Mock `
+                    -CommandName Get-Disk `
+                    -MockWith { $script:mockedDisk0 } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-Partition `
+                    -MockWith { $script:mockedPartitionNoDriveLetter } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName New-Partition `
+                    -ParameterFilter {
+                    $DriveLetter -eq $script:testDriveLetter
+                } `
+                    -MockWith { $script:mockedPartitionNoDriveLetter } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-Volume `
+                    -MockWith { $script:mockedVolumeUnformatted } `
+                    -Verifiable
+                
+                # mocks that should not be called
+                Mock -CommandName Set-Disk
+                Mock -CommandName Initialize-Disk
+                Mock -CommandName Format-Volume
+                Mock -CommandName Set-Partition
+                Mock -CommandName Resize-Partition
+                Mock -CommandName Get-PartitionSupportedSize
+                Mock -CommandName Set-Volume
+
+                It 'Should not throw' {
+                    {
+                        Set-TargetResource `
+                            -DiskId $script:mockedDisk0.Number `
+                            -Driveletter $script:testDriveLetter `
+                            -Size ($script:mockedPartitionSize + 1024) `
+                            -AllowDestructive $true `
+                            -FSLabel 'NewLabel' `
+                            -Verbose
+                    } | Should not throw
+                }
+
+                It 'the correct mocks were called' {
+                    Assert-VerifiableMocks
+                    Assert-MockCalled -CommandName Get-Disk -Times 1
+                    Assert-MockCalled -CommandName Set-Disk -Times 0
+                    Assert-MockCalled -CommandName Initialize-Disk -Times 0
+                    Assert-MockCalled -CommandName Format-Volume -Times 1
+                    Assert-MockCalled -CommandName Set-Partition -Times 1
+                    Assert-MockCalled -CommandName Set-Volume -Times 0
+                }
+            }
+
             Context 'AllowDestructive: Online GPT disk with matching partition/volume but wrong size' {
                 # verifiable (should be called) mocks
                 Mock `
@@ -1195,6 +1321,65 @@ try
                     Assert-MockCalled -CommandName Format-Volume -Times 0
                     Assert-MockCalled -CommandName Set-Partition -Times 0
                     Assert-MockCalled -CommandName Set-Volume -Times 1
+                }
+            }
+
+            Context 'AllowDestructive: Online GPT disk with matching partition/volume but wrong size and ReFS' {
+                # verifiable (should be called) mocks
+                Mock `
+                    -CommandName Get-Disk `
+                    -MockWith { $script:mockedDisk0 } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-Partition `
+                    -MockWith { $script:mockedPartition } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-Volume `
+                    -MockWith { $script:mockedVolumeReFS } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Set-Volume `
+                    -Verifiable
+               
+                # mocks that should not be called
+                Mock -CommandName Set-Disk
+                Mock -CommandName Initialize-Disk
+                Mock -CommandName New-Partition
+                Mock -CommandName Format-Volume
+                Mock -CommandName Set-Partition
+                Mock -CommandName Resize-Partition
+                 Mock  -CommandName Get-PartitionSupportedSize
+
+                It 'Should not throw' {
+                    {
+                        Set-TargetResource `
+                            -DiskId $script:mockedDisk0.Number `
+                            -Driveletter $script:testDriveLetter `
+                            -Size ($script:mockedPartitionSize + 1024) `
+                            -AllowDestructive $true `
+                            -FSLabel 'NewLabel' `
+                            -FSFormat 'ReFS' `
+                            -Verbose
+                    } | Should not throw
+                }
+
+                It 'the correct mocks were called' {
+                    Assert-VerifiableMocks
+                    Assert-MockCalled -CommandName Get-Disk -Times 1
+                    Assert-MockCalled -CommandName Set-Disk -Times 0
+                    Assert-MockCalled -CommandName Initialize-Disk -Times 0
+                    Assert-MockCalled -CommandName Get-Partition -Times 1
+                    Assert-MockCalled -CommandName Get-Volume -Times 1
+                    Assert-MockCalled -CommandName New-Partition -Times 0
+                    Assert-MockCalled -CommandName Format-Volume -Times 0
+                    Assert-MockCalled -CommandName Set-Partition -Times 0
+                    Assert-MockCalled -CommandName Set-Volume -Times 1
+                    Assert-MockCalled -CommandName Resize-Partition -Times 0
+                    Assert-MockCalled -CommandName Get-PartitionSupportedSize -Times 0
                 }
             }
 
@@ -1546,12 +1731,12 @@ try
                             -DiskId $script:mockedDisk0.Number `
                             -DriveLetter $script:testDriveLetter `
                             -AllocationUnitSize 4097 `
+                            -AllowDestructive $true `
                             -Verbose
                     } | Should not throw
                 }
 
-                # skipped due to:  https://github.com/PowerShell/xStorage/issues/22
-                It 'result should be false' -skip {
+                It 'result should be false' {
                     $script:result | Should Be $false
                 }
 
@@ -1559,7 +1744,7 @@ try
                     Assert-VerifiableMocks
                     Assert-MockCalled -CommandName Get-Disk -Times 1
                     Assert-MockCalled -CommandName Get-Partition -Times 1
-                    Assert-MockCalled -CommandName Get-Volume -Times 1
+                    Assert-MockCalled -CommandName Get-Volume -Times 0
                     Assert-MockCalled -CommandName Get-CimInstance -Times 1
                 }
             }
