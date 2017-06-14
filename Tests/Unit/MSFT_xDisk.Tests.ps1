@@ -1631,6 +1631,42 @@ try
                 -CommandName Get-CimInstance `
                 -MockWith { $script:mockedCim }
 
+            Context 'Test no disk' {
+                # verifiable (should be called) mocks
+                Mock `
+                    -CommandName Get-Disk `
+                    -Verifiable
+
+                # mocks that should not be called
+                Mock -CommandName Get-Volume
+                Mock -CommandName Get-Partition
+                Mock -CommandName Get-CimInstance
+
+                $script:result = $null
+
+                It 'calling test Should Not Throw' {
+                    {
+                        $script:result = Test-TargetResource `
+                            -DiskId $script:mockedDisk0Offline.Number `
+                            -DriveLetter $script:testDriveLetter `
+                            -AllocationUnitSize 4096 `
+                            -Verbose
+                    } | Should not throw
+                }
+
+                It 'result should be false' {
+                    $script:result | Should Be $false
+                }
+
+                It 'the correct mocks were called' {
+                    Assert-VerifiableMocks
+                    Assert-MockCalled -CommandName Get-Disk -Times 1
+                    Assert-MockCalled -CommandName Get-Partition -Times 0
+                    Assert-MockCalled -CommandName Get-Volume -Times 0
+                    Assert-MockCalled -CommandName Get-CimInstance -Times 0
+                }
+            }
+            
             Context 'Test disk not initialized using Disk Number' {
                 # verifiable (should be called) mocks
                 Mock `
@@ -1921,6 +1957,54 @@ try
                 }
             }
 
+            Context 'Test mismatching FSFormat using Disk Number and AllowDestructive' {
+                # verifiable (should be called) mocks
+                Mock `
+                    -CommandName Get-Disk `
+                    -MockWith { $script:mockedDisk0 } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-Partition `
+                    -MockWith { $script:mockedPartition } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-Volume `
+                    -MockWith { $script:mockedVolume } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-CimInstance `
+                    -MockWith { $script:mockedCim } `
+                    -Verifiable
+
+                $script:result = $null
+
+                It 'calling test Should Not Throw' {
+                    {
+                        $script:result = Test-TargetResource `
+                            -DiskId $script:mockedDisk0.Number `
+                            -DriveLetter $script:testDriveLetter `
+                            -FSFormat 'ReFS' `
+                            -AllowDestructive $true `
+                            -Verbose
+                    } | Should not throw
+                }
+
+                It 'result should be false' {
+                    $script:result | Should Be $false
+                }
+
+                It 'the correct mocks were called' {
+                    Assert-VerifiableMocks
+                    Assert-MockCalled -CommandName Get-Disk -Times 1
+                    Assert-MockCalled -CommandName Get-Partition -Times 1
+                    Assert-MockCalled -CommandName Get-Volume -Times 1
+                    Assert-MockCalled -CommandName Get-CimInstance -Times 1
+                }
+            }
+
             Context 'Test mismatching FSLabel using Disk Number' {
                 # verifiable (should be called) mocks
                 Mock `
@@ -1965,6 +2049,50 @@ try
                     Assert-MockCalled -CommandName Get-Partition -Times 1
                     Assert-MockCalled -CommandName Get-Volume -Times 1
                     Assert-MockCalled -CommandName Get-CimInstance -Times 1
+                }
+            }
+
+            Context 'Test mismatching DriveLetter using Disk Number' {
+                # verifiable (should be called) mocks
+                Mock `
+                    -CommandName Get-Disk `
+                    -MockWith { $script:mockedDisk0 } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-Partition `
+                    -MockWith { $script:mockedPartition } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-Volume `
+                    -MockWith { $script:mockedVolume }
+
+                Mock `
+                    -CommandName Get-CimInstance `
+                    -MockWith { $script:mockedCim }
+
+                $script:result = $null
+
+                It 'calling test Should Not Throw' {
+                    {
+                        $script:result = Test-TargetResource `
+                            -DiskId $script:mockedDisk0.Number `
+                            -DriveLetter 'Z' `
+                            -Verbose
+                    } | Should not throw
+                }
+
+                It 'result should be false' {
+                    $script:result | Should Be $false
+                }
+
+                It 'the correct mocks were called' {
+                    Assert-VerifiableMocks
+                    Assert-MockCalled -CommandName Get-Disk -Times 1
+                    Assert-MockCalled -CommandName Get-Partition -Times 1
+                    Assert-MockCalled -CommandName Get-Volume -Times 0
+                    Assert-MockCalled -CommandName Get-CimInstance -Times 0
                 }
             }
 
