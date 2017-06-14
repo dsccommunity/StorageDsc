@@ -2,6 +2,21 @@
 
 ## Unreleased
 
+- xDisk:
+  - Fix error message when new partition does not become writable before timeout.
+  - Removed unneeded timeout initialization code.
+- xDiskAccessPath:
+  - Fix error message when new partition does not become writable before timeout.
+  - Removed unneeded timeout initialization code.
+
+## 3.1.0.0
+
+- Added integration test to test for conflicts with other common resource kit modules.
+- Prevented ResourceHelper and Common module cmdlets from being exported to resolve
+  conflicts with other resource modules.
+
+## 3.0.0.0
+
 - Converted AppVeyor build process to use AppVeyor.psm1.
 - Added support for auto generating wiki, help files, markdown linting
   and checking examples.
