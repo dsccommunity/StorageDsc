@@ -8,6 +8,8 @@
 - xDiskAccessPath:
   - Fix error message when new partition does not become writable before timeout.
   - Removed unneeded timeout initialization code.
+- Added the VS Code PowerShell extension formatting settings that cause PowerShell
+  files to be formatted as per the DSC Resource kit style guidelines.
 
 ## 3.1.0.0
 
