@@ -10,6 +10,8 @@
   - Removed unneeded timeout initialization code.
 - Added the VS Code PowerShell extension formatting settings that cause PowerShell
   files to be formatted as per the DSC Resource kit style guidelines.
+- Force the use of Windows Server 2012 R2 for AppVeyor testing to ensure
+  compatibility testing.
 
 ## 3.1.0.0
 

@@ -2,6 +2,8 @@
 #      environment configuration  #
 #---------------------------------#
 version: 2.9.{build}.0
+# Force use Windows Server 2012 R2
+image: Visual Studio 2015
 install:
     - git clone https://github.com/PowerShell/DscResource.Tests
 
