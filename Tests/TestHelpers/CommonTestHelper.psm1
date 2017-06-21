@@ -83,57 +83,32 @@ function Get-InvalidOperationRecord
 
 <#
     .SYNOPSIS
-    Tests if Hyper-V is installed on this OS.
-
-    .OUTPUTS
-    True if Hyper-V is installed. False otherwise.
+    Creates a new VHD using DISKPART.
+    DISKPART is used because New-VHD is only available if Hyper-V is installed.
 #>
-function Test-HyperVInstalled
+function New-VDisk
 {
     [CmdletBinding()]
-    [OutputType([String])]
     param
     (
+        [Parameter(Mandatory = $True)]
+        [String]
+        $Path,
+
+        [Parameter()]
+        [Uint32]
+        $SizeInMB
     )
 
-    # Ensure that the tests can be performed on this computer
-    $ProductType = (Get-CimInstance Win32_OperatingSystem).ProductType
-    switch ($ProductType) {
-        1
-        {
-            # Desktop OS
-            $HyperVInstalled = (((Get-WindowsOptionalFeature `
-                    -FeatureName Microsoft-Hyper-V `
-                    -Online).State -eq 'Enabled') -and `
-                ((Get-WindowsOptionalFeature `
-                    -FeatureName Microsoft-Hyper-V-Management-PowerShell `
-                    -Online).State -eq 'Enabled'))
-            Break
-        }
-        3
-        {
-            # Server OS
-            $HyperVInstalled = (((Get-WindowsFeature -Name Hyper-V).Installed) -and `
-                ((Get-WindowsFeature -Name Hyper-V-PowerShell).Installed))
-            Break
-        }
-        default
-        {
-            # Unsupported OS type for testing
-            Write-Verbose -Message "Integration tests cannot be run on this operating system." -Verbose
-            Break
-        }
-    }
-
-    if ($HyperVInstalled -eq $false)
-    {
-        Write-Verbose -Message "Integration tests cannot be run because Hyper-V Components not installed." -Verbose
-        return $false
-    }
-    return $true
-} # end function Test-HyperVInstalled
+    $tempScriptPath = Join-Path -Path $ENV:Temp -ChildPath 'DiskPartVdiskScript.txt'
+    Write-Verbose -Message ('Creating DISKPART script {0}' -f $tempScriptPath)
+    Set-Content -Path $tempScriptPath -Value "create vdisk file=`"$Path`" type=expandable maximum=$SizeInMB"
+    $result = & DISKPART @('/s',$tempScriptPath)
+    Write-Verbose -Message ($Result | Out-String)
+    $null = Remove-Item -Path $tempScriptPath -Force
+} # end function New-VDisk
 
 Export-ModuleMember -Function `
-    Test-HyperVInstalled, `
+    New-VDisk, `
     Get-InvalidArgumentRecord, `
     Get-InvalidOperationRecord

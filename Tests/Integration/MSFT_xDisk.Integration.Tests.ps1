@@ -22,12 +22,6 @@ $TestEnvironment = Initialize-TestEnvironment `
 # Using try/finally to always cleanup even if something awful happens.
 try
 {
-    # Ensure that the tests can be performed on this computer
-    if (-not (Test-HyperVInstalled))
-    {
-        Return
-    }
-
     $ConfigFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:DSCResourceName).config.ps1"
     . $ConfigFile -Verbose -ErrorAction Stop
 
@@ -35,11 +29,11 @@ try
     Describe "$($script:DSCResourceName)_Integration" {
         Context 'Partition and format newly provisioned disk using Disk Number with two volumes and assign Drive Letters' {
             BeforeAll {
-                # Create a VHDx and attach it to the computer
+                # Create a VHD and attach it to the computer
                 $VHDPath = Join-Path -Path $TestDrive `
-                    -ChildPath 'TestDisk.vhdx'
-                New-VHD -Path $VHDPath -SizeBytes 1GB -Dynamic
-                Mount-DiskImage -ImagePath $VHDPath -StorageType VHDX -NoDriveLetter
+                    -ChildPath 'TestDisk.vhd'
+                $null = New-VDisk -Path $VHDPath -SizeInMB 1024
+                $null = Mount-DiskImage -ImagePath $VHDPath -StorageType VHD -NoDriveLetter
                 $disk = Get-Disk | Where-Object -FilterScript {
                     $_.Location -eq $VHDPath
                 }
@@ -144,7 +138,7 @@ try
             }
 
             AfterAll {
-                Dismount-DiskImage -ImagePath $VHDPath -StorageType VHDx
+                Dismount-DiskImage -ImagePath $VHDPath -StorageType VHD
                 Remove-Item -Path $VHDPath -Force
             }
         }
@@ -155,11 +149,11 @@ try
     Describe "$($script:DSCResourceName)_Integration" {
         Context 'Partition and format newly provisioned disk using Unique Id with two volumes and assign Drive Letters' {
             BeforeAll {
-                # Create a VHDx and attach it to the computer
+                # Create a VHD and attach it to the computer
                 $VHDPath = Join-Path -Path $TestDrive `
-                    -ChildPath 'TestDisk.vhdx'
-                New-VHD -Path $VHDPath -SizeBytes 1GB -Dynamic
-                Mount-DiskImage -ImagePath $VHDPath -StorageType VHDX -NoDriveLetter
+                    -ChildPath 'TestDisk.vhd'
+                $null = New-VDisk -Path $VHDPath -SizeInMB 1024
+                $null = Mount-DiskImage -ImagePath $VHDPath -StorageType VHD -NoDriveLetter
                 $disk = Get-Disk | Where-Object -FilterScript {
                     $_.Location -eq $VHDPath
                 }
@@ -265,8 +259,8 @@ try
             }
 
             AfterAll {
-                Dismount-DiskImage -ImagePath $VHDPath -StorageType VHDx
-                Remove-Item -Path $VHDPath -Force
+                $null = Dismount-DiskImage -ImagePath $VHDPath -StorageType VHD
+                $null = Remove-Item -Path $VHDPath -Force
             }
         }
     }

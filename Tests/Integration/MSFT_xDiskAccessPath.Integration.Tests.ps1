@@ -22,12 +22,6 @@ $TestEnvironment = Initialize-TestEnvironment `
 # Using try/finally to always cleanup even if something awful happens.
 try
 {
-    # Ensure that the tests can be performed on this computer
-    if (-not (Test-HyperVInstalled))
-    {
-        Return
-    }
-
     $ConfigFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:DSCResourceName).config.ps1"
     . $ConfigFile -Verbose -ErrorAction Stop
 
@@ -35,11 +29,11 @@ try
     Describe "$($script:DSCResourceName)_Integration" {
         Context 'Partition and format newly provisioned disk using Disk Number with two volumes and assign Access Paths' {
             BeforeAll {
-                # Create a VHDx and attach it to the computer
+                # Create a VHD and attach it to the computer
                 $VHDPath = Join-Path -Path $TestDrive `
-                    -ChildPath 'TestDisk.vhdx'
-                New-VHD -Path $VHDPath -SizeBytes 1GB -Dynamic
-                Mount-DiskImage -ImagePath $VHDPath -StorageType VHDX -NoDriveLetter
+                    -ChildPath 'TestDisk.vhd'
+                $null = New-VDisk -Path $VHDPath -SizeInMB 1024
+                $null = Mount-DiskImage -ImagePath $VHDPath -StorageType VHD -NoDriveLetter
                 $disk = Get-Disk | Where-Object -FilterScript {
                     $_.Location -eq $VHDPath
                 }
@@ -50,12 +44,13 @@ try
                 $accessPathA = Join-Path -Path $ENV:Temp -ChildPath 'xDiskAccessPath_MountA'
                 if (-not (Test-Path -Path $accessPathA))
                 {
-                    New-Item -Path $accessPathA -ItemType Directory
+                    $null = New-Item -Path $accessPathA -ItemType Directory
                 } # if
+
                 $accessPathB = Join-Path -Path $ENV:Temp -ChildPath 'xDiskAccessPath_MountB'
                 if (-not (Test-Path -Path $accessPathB))
                 {
-                    New-Item -Path $accessPathB -ItemType Directory
+                    $null = New-Item -Path $accessPathB -ItemType Directory
                 } # if
             }
 
@@ -204,10 +199,10 @@ try
                 $disk | Remove-PartitionAccessPath `
                     -PartitionNumber 3 `
                     -AccessPath $accessPathB
-                Remove-Item -Path $accessPathA -Force
-                Remove-Item -Path $accessPathB -Force
-                Dismount-DiskImage -ImagePath $VHDPath -StorageType VHDx
-                Remove-Item -Path $VHDPath -Force
+                $null = Remove-Item -Path $accessPathA -Force
+                $null = Remove-Item -Path $accessPathB -Force
+                $null = Dismount-DiskImage -ImagePath $VHDPath -StorageType VHD
+                $null = Remove-Item -Path $VHDPath -Force
             }
         }
         #endregion
@@ -215,11 +210,11 @@ try
         #region Integration Tests for Disk Unique Id
         Context 'Partition and format newly provisioned disk using Disk Unique Id with two volumes and assign Access Paths' {
             BeforeAll {
-                # Create a VHDx and attach it to the computer
+                # Create a VHD and attach it to the computer
                 $VHDPath = Join-Path -Path $TestDrive `
-                    -ChildPath 'TestDisk.vhdx'
-                New-VHD -Path $VHDPath -SizeBytes 1GB -Dynamic
-                Mount-DiskImage -ImagePath $VHDPath -StorageType VHDX -NoDriveLetter
+                    -ChildPath 'TestDisk.vhd'
+                $null = New-VDisk -Path $VHDPath -SizeInMB 1024
+                $null = Mount-DiskImage -ImagePath $VHDPath -StorageType VHD -NoDriveLetter
                 $disk = Get-Disk | Where-Object -FilterScript {
                     $_.Location -eq $VHDPath
                 }
@@ -230,12 +225,13 @@ try
                 $accessPathA = Join-Path -Path $ENV:Temp -ChildPath 'xDiskAccessPath_MountA'
                 if (-not (Test-Path -Path $accessPathA))
                 {
-                    New-Item -Path $accessPathA -ItemType Directory
+                    $null = New-Item -Path $accessPathA -ItemType Directory
                 } # if
+
                 $accessPathB = Join-Path -Path $ENV:Temp -ChildPath 'xDiskAccessPath_MountB'
                 if (-not (Test-Path -Path $accessPathB))
                 {
-                    New-Item -Path $accessPathB -ItemType Directory
+                    $null = New-Item -Path $accessPathB -ItemType Directory
                 } # if
             }
 
@@ -384,10 +380,10 @@ try
                 $disk | Remove-PartitionAccessPath `
                     -PartitionNumber 3 `
                     -AccessPath $accessPathB
-                Remove-Item -Path $accessPathA -Force
-                Remove-Item -Path $accessPathB -Force
-                Dismount-DiskImage -ImagePath $VHDPath -StorageType VHDx
-                Remove-Item -Path $VHDPath -Force
+                $null = Remove-Item -Path $accessPathA -Force
+                $null = Remove-Item -Path $accessPathB -Force
+                $null = Dismount-DiskImage -ImagePath $VHDPath -StorageType VHD
+                $null = Remove-Item -Path $VHDPath -Force
             }
         }
     }
