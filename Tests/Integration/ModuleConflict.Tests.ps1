@@ -1,4 +1,5 @@
 $script:DSCModuleName      = 'xStorage'
+return
 <#
     These integration tests ensure that exported cmdlets names do not conflict
     with any other names that are exposed by other common resource kit modules.
@@ -28,7 +29,7 @@ $TestEnvironment = Initialize-TestEnvironment `
 try
 {
     Describe "$($script:DSCModuleName)_CommonModuleConflict" {
-        
+
         foreach ($moduleToTest in $script:ModulesToTest)
         {
             It "Should be able to install DSC Resource module '$moduleToTest'" {
