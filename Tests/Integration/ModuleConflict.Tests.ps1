@@ -1,5 +1,4 @@
 $script:DSCModuleName      = 'xStorage'
-return
 <#
     These integration tests ensure that exported cmdlets names do not conflict
     with any other names that are exposed by other common resource kit modules.
