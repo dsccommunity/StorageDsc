@@ -54,7 +54,7 @@ try
             }
 
             #region DEFAULT TESTS
-            It 'should compile and apply the MOF without throwing' {
+            It 'Should compile and apply the MOF without throwing' {
                 {
                     # This is to pass to the Config
                     $configData = @{
@@ -78,7 +78,7 @@ try
                 } | Should not throw
             }
 
-            It 'should be able to call Get-DscConfiguration without throwing' {
+            It 'Should be able to call Get-DscConfiguration without throwing' {
                 { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should Not throw
             }
 
@@ -100,11 +100,12 @@ try
                 -NoNewline
 
             # This test will ensure the disk can be remounted if the access path is removed.
-            $disk | Remove-PartitionAccessPath `
+            Remove-PartitionAccessPath `
+                -DiskNumber $disk.Number `
                 -PartitionNumber 2 `
                 -AccessPath $accessPathA
 
-            It 'should compile and apply the MOF without throwing' {
+            It 'Should compile and apply the MOF without throwing' {
                 {
                     # This is to pass to the Config
                     $configData = @{
@@ -128,7 +129,7 @@ try
                 } | Should not throw
             }
 
-            It 'should be able to call Get-DscConfiguration without throwing' {
+            It 'Should be able to call Get-DscConfiguration without throwing' {
                 { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should Not throw
             }
 
@@ -147,7 +148,7 @@ try
                 Get-Content -Path $testFilePath -Raw | Should Be 'Test'
             }
 
-            It 'should compile and apply the MOF without throwing' {
+            It 'Should compile and apply the MOF without throwing' {
                 {
                     # This is to pass to the Config
                     $configData = @{
@@ -170,7 +171,7 @@ try
                 } | Should not throw
             }
 
-            It 'should be able to call Get-DscConfiguration without throwing' {
+            It 'Should be able to call Get-DscConfiguration without throwing' {
                 { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should Not throw
             }
 
@@ -185,17 +186,19 @@ try
             }
 
             # A system partition will have been added to the disk as well as the 2 test partitions
-            It 'should have 3 partitions on disk' {
+            It 'Should have 3 partitions on disk' {
                 ($disk | Get-Partition).Count | Should Be 3
             }
             #endregion
 
             AfterAll {
                 # Clean up
-                $disk | Remove-PartitionAccessPath `
+                Remove-PartitionAccessPath `
+                    -DiskNumber $disk.Number `
                     -PartitionNumber 2 `
                     -AccessPath $accessPathA
-                $disk | Remove-PartitionAccessPath `
+                Remove-PartitionAccessPath `
+                    -DiskNumber $disk.Number `
                     -PartitionNumber 3 `
                     -AccessPath $accessPathB
                 $null = Remove-Item -Path $accessPathA -Force
@@ -234,7 +237,7 @@ try
             }
 
             #region DEFAULT TESTS
-            It 'should compile and apply the MOF without throwing' {
+            It 'Should compile and apply the MOF without throwing' {
                 {
                     # This is to pass to the Config
                     $configData = @{
@@ -258,7 +261,7 @@ try
                 } | Should not throw
             }
 
-            It 'should be able to call Get-DscConfiguration without throwing' {
+            It 'Should be able to call Get-DscConfiguration without throwing' {
                 { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should Not throw
             }
 
@@ -280,11 +283,12 @@ try
                 -NoNewline
 
             # This test will ensure the disk can be remounted if the access path is removed.
-            $disk | Remove-PartitionAccessPath `
+            Remove-PartitionAccessPath `
+                -DiskNumber $disk.Number `
                 -PartitionNumber 2 `
                 -AccessPath $accessPathA
 
-            It 'should compile and apply the MOF without throwing' {
+            It 'Should compile and apply the MOF without throwing' {
                 {
                     # This is to pass to the Config
                     $configData = @{
@@ -308,7 +312,7 @@ try
                 } | Should not throw
             }
 
-            It 'should be able to call Get-DscConfiguration without throwing' {
+            It 'Should be able to call Get-DscConfiguration without throwing' {
                 { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should Not throw
             }
 
@@ -327,7 +331,7 @@ try
                 Get-Content -Path $testFilePath -Raw | Should Be 'Test'
             }
 
-            It 'should compile and apply the MOF without throwing' {
+            It 'Should compile and apply the MOF without throwing' {
                 {
                     # This is to pass to the Config
                     $configData = @{
@@ -350,7 +354,7 @@ try
                 } | Should not throw
             }
 
-            It 'should be able to call Get-DscConfiguration without throwing' {
+            It 'Should be able to call Get-DscConfiguration without throwing' {
                 { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should Not throw
             }
 
@@ -365,17 +369,19 @@ try
             }
 
             # A system partition will have been added to the disk as well as the 2 test partitions
-            It 'should have 3 partitions on disk' {
+            It 'Should have 3 partitions on disk' {
                 ($disk | Get-Partition).Count | Should Be 3
             }
             #endregion
 
             AfterAll {
                 # Clean up
-                $disk | Remove-PartitionAccessPath `
+                Remove-PartitionAccessPath `
+                    -DiskNumber $disk.Number `
                     -PartitionNumber 2 `
                     -AccessPath $accessPathA
-                $disk | Remove-PartitionAccessPath `
+                Remove-PartitionAccessPath `
+                    -DiskNumber $disk.Number `
                     -PartitionNumber 3 `
                     -AccessPath $accessPathB
                 $null = Remove-Item -Path $accessPathA -Force

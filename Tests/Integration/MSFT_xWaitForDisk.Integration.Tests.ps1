@@ -33,7 +33,7 @@ try
         Context 'Wait for a Disk using Disk Number' {
             #region DEFAULT TESTS
 
-            It 'should compile and apply the MOF without throwing' {
+            It 'Should compile and apply the MOF without throwing' {
                 {
                     # This is to pass to the Config
                     $configData = @{
@@ -55,7 +55,7 @@ try
                 } | Should not throw
             }
 
-            It 'should be able to call Get-DscConfiguration without throwing' {
+            It 'Should be able to call Get-DscConfiguration without throwing' {
                 { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should Not throw
             }
             #endregion
@@ -73,7 +73,7 @@ try
         Context 'Wait for a Disk using Disk Unique Id' {
             #region DEFAULT TESTS
 
-            It 'should compile and apply the MOF without throwing' {
+            It 'Should compile and apply the MOF without throwing' {
                 {
                     # This is to pass to the Config
                     $configData = @{
@@ -95,7 +95,7 @@ try
                 } | Should not throw
             }
 
-            It 'should be able to call Get-DscConfiguration without throwing' {
+            It 'Should be able to call Get-DscConfiguration without throwing' {
                 { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should Not throw
             }
             #endregion

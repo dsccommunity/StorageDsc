@@ -128,13 +128,18 @@ try
                 ($disk | Get-Partition).Count | Should Be 3
             }
 
-            Write-Verbose -Verbose -Message (Get-PSDrive | FL * | Out-String)
+            <#
+                Get a list of all drives mounted - this works better on Windows Server 2012 R2 than
+                trying to get the drive mounted by name.
+            #>
+            $drives = Get-PSDrive
+
             It "should have attached drive $driveLetterA" {
-                Get-PSDrive -Name $driveLetterA -ErrorAction SilentlyContinue | Should Not BeNullOrEmpty
+                $drives | Where-Object -Property Name -eq $driveLetterA | Should Not BeNullOrEmpty
             }
 
             It "should have attached drive $driveLetterB" {
-                Get-PSDrive -Name $driveLetterB -ErrorAction SilentlyContinue | Should Not BeNullOrEmpty
+                $drives | Where-Object -Property Name -eq $driveLetterB | Should Not BeNullOrEmpty
             }
 
             AfterAll {
