@@ -34,7 +34,6 @@ try
                     -ChildPath 'TestDisk.vhd'
                 $null = New-VDisk -Path $VHDPath -SizeInMB 1024 -Verbose
                 $null = Mount-DiskImage -ImagePath $VHDPath -StorageType VHD -NoDriveLetter
-
                 $diskImage = Get-DiskImage -ImagePath $VHDPath
                 $disk = Get-Disk -Number $diskImage.Number
                 $FSLabelA = 'TestDiskA'
@@ -215,9 +214,8 @@ try
                     -ChildPath 'TestDisk.vhd'
                 $null = New-VDisk -Path $VHDPath -SizeInMB 1024
                 $null = Mount-DiskImage -ImagePath $VHDPath -StorageType VHD -NoDriveLetter
-                $disk = Get-Disk | Where-Object -FilterScript {
-                    $_.Location -eq $VHDPath
-                }
+                $diskImage = Get-DiskImage -ImagePath $VHDPath
+                $disk = Get-Disk -Number $diskImage.Number
                 $FSLabelA = 'TestDiskA'
                 $FSLabelB = 'TestDiskB'
 

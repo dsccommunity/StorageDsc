@@ -32,7 +32,8 @@ try
         -ChildPath 'TestDisk.vhd'
     $null = New-VDisk -Path $VHDPath -SizeInMB 1024
     $null = Mount-DiskImage -ImagePath $VHDPath
-    $disk = Get-Disk | Where-Object -Property Location -eq -Value $VHDPath
+    $diskImage = Get-DiskImage -ImagePath $VHDPath
+    $disk = Get-Disk -Number $diskImage.Number
     $null = $disk | Initialize-Disk -PartitionStyle GPT
     $partition = $disk | New-Partition -UseMaximumSize
     $null = $partition | Get-Volume | Format-Volume -FileSystem NTFS
