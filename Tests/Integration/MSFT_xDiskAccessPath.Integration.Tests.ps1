@@ -29,6 +29,7 @@ try
     Describe "$($script:DSCResourceName)_Integration" {
         Context 'Partition and format newly provisioned disk using Disk Number with two volumes and assign Access Paths' {
             BeforeAll {
+                Write-Verbose -Verbose -Message "In BeforeAll"
                 # Create a VHD and attach it to the computer
                 $VHDPath = Join-Path -Path $TestDrive `
                     -ChildPath 'TestDisk.vhd'
@@ -54,6 +55,8 @@ try
                     $null = New-Item -Path $accessPathB -ItemType Directory
                 } # if
             }
+
+            Write-Verbose -Verbose -Message "Begin tests"
 
             #region DEFAULT TESTS
             It 'should compile and apply the MOF without throwing' {
