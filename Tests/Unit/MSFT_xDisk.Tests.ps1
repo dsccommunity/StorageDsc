@@ -319,31 +319,31 @@ try
                     -DriveLetter $script:testDriveLetter `
                     -Verbose
 
-                It "DiskId should be $($script:mockedDisk0.Number)" {
+                It "Should be DiskId $($script:mockedDisk0.Number)" {
                     $resource.DiskId | Should Be $script:mockedDisk0.Number
                 }
 
-                It "DriveLetter should be $($script:testDriveLetter)" {
+                It "Should be DriveLetter $($script:testDriveLetter)" {
                     $resource.DriveLetter | Should Be $script:testDriveLetter
                 }
 
-                It "Size should be $($script:mockedPartition.Size)" {
+                It "Should have size $($script:mockedPartition.Size)" {
                     $resource.Size | Should Be $script:mockedPartition.Size
                 }
 
-                It "FSLabel should be $($script:mockedVolume.FileSystemLabel)" {
+                It "Should be FSLabel $($script:mockedVolume.FileSystemLabel)" {
                     $resource.FSLabel | Should Be $script:mockedVolume.FileSystemLabel
                 }
 
-                It "AllocationUnitSize should be $($script:mockedCim.BlockSize)" {
+                It "Should be AllocationUnitSize $($script:mockedCim.BlockSize)" {
                     $resource.AllocationUnitSize | Should Be $script:mockedCim.BlockSize
                 }
 
-                It "FSFormat should be $($script:mockedVolume.FileSystem)" {
+                It "Should be FSFormat $($script:mockedVolume.FileSystem)" {
                     $resource.FSFormat | Should Be $script:mockedVolume.FileSystem
                 }
 
-                It 'all the get mocks should be called' {
+                It 'Should call all mocks' {
                     Assert-VerifiableMocks
                 }
             }
@@ -376,31 +376,31 @@ try
                     -DriveLetter $script:testDriveLetter `
                     -Verbose
 
-                It "DiskId should be $($script:mockedDisk0.UniqueId)" {
+                It "Should be DiskId $($script:mockedDisk0.UniqueId)" {
                     $resource.DiskId | Should Be $script:mockedDisk0.UniqueId
                 }
 
-                It "DriveLetter should be $($script:testDriveLetter)" {
+                It "Should be DriveLetter $($script:testDriveLetter)" {
                     $resource.DriveLetter | Should Be $script:testDriveLetter
                 }
 
-                It "Size should be $($script:mockedPartition.Size)" {
+                It "Should have size $($script:mockedPartition.Size)" {
                     $resource.Size | Should Be $script:mockedPartition.Size
                 }
 
-                It "FSLabel should be $($script:mockedVolume.FileSystemLabel)" {
+                It "Should be FSLabel $($script:mockedVolume.FileSystemLabel)" {
                     $resource.FSLabel | Should Be $script:mockedVolume.FileSystemLabel
                 }
 
-                It "AllocationUnitSize should be $($script:mockedCim.BlockSize)" {
+                It "Should be AllocationUnitSize $($script:mockedCim.BlockSize)" {
                     $resource.AllocationUnitSize | Should Be $script:mockedCim.BlockSize
                 }
 
-                It "FSFormat should be $($script:mockedVolume.FileSystem)" {
+                It "Should be FSFormat $($script:mockedVolume.FileSystem)" {
                     $resource.FSFormat | Should Be $script:mockedVolume.FileSystem
                 }
 
-                It 'all the get mocks should be called' {
+                It 'Should call all mocks' {
                     Assert-VerifiableMocks
                 }
             }
@@ -429,31 +429,31 @@ try
                     -DriveLetter $script:testDriveLetter `
                     -Verbose
 
-                It "DiskId should be $($script:mockedDisk0.Number)" {
+                It "Should be DiskId $($script:mockedDisk0.Number)" {
                     $resource.DiskId | Should Be $script:mockedDisk0.Number
                 }
 
-                It "DriveLetter should be null" {
+                It "Should have an empty drive letter" {
                     $resource.DriveLetter | Should Be $null
                 }
 
-                It "Size should be null" {
+                It "Should have a zero size" {
                     $resource.Size | Should Be $null
                 }
 
-                It "FSLabel should be empty" {
+                It "Should have no FSLabel" {
                     $resource.FSLabel | Should Be ''
                 }
 
-                It "AllocationUnitSize should be null" {
+                It "Should have an AllocationUnitSize of 0" {
                     $resource.AllocationUnitSize | Should Be $null
                 }
 
-                It "FSFormat should be null" {
+                It "Should have no FSFormat" {
                     $resource.FSFormat | Should Be $null
                 }
 
-                It 'all the get mocks should be called' {
+                It 'Should call all mocks' {
                     Assert-VerifiableMocks
                     Assert-MockCalled -CommandName Get-CimInstance -Exactly 1
                     Assert-MockCalled -CommandName Get-Disk -Exactly 1
@@ -514,7 +514,7 @@ try
                     } | Should not throw
                 }
 
-                It 'the correct mocks were called' {
+                It 'Should call all mocks' {
                     Assert-VerifiableMocks
                     Assert-MockCalled -CommandName Get-Disk -Times 1
                     Assert-MockCalled -CommandName Set-Disk -Times 1
@@ -579,7 +579,7 @@ try
                     } | Should not throw
                 }
 
-                It 'the correct mocks were called' {
+                It 'Should call all mocks' {
                     Assert-VerifiableMocks
                     Assert-MockCalled -CommandName Get-Disk -Times 1
                     Assert-MockCalled -CommandName Set-Disk -Times 1
@@ -643,7 +643,7 @@ try
                     } | Should not throw
                 }
 
-                It 'the correct mocks were called' {
+                It 'Should call all mocks' {
                     Assert-VerifiableMocks
                     Assert-MockCalled -CommandName Get-Disk -Times 1
                     Assert-MockCalled -CommandName Set-Disk -Times 1
@@ -708,7 +708,7 @@ try
                     } | Should not throw
                 }
 
-                It 'the correct mocks were called' {
+                It 'Should call all mocks' {
                     Assert-VerifiableMocks
                     Assert-MockCalled -CommandName Get-Disk -Times 1
                     Assert-MockCalled -CommandName Set-Disk -Times 1
@@ -773,7 +773,7 @@ try
                     } | Should not throw
                 }
 
-                It 'the correct mocks were called' {
+                It 'Should call all mocks' {
                     Assert-VerifiableMocks
                     Assert-MockCalled -CommandName Get-Disk -Times 1
                     Assert-MockCalled -CommandName Set-Disk -Times 0
@@ -840,7 +840,7 @@ try
                     } | Should not throw
                 }
 
-                It 'the correct mocks were called' {
+                It 'Should call all mocks' {
                     Assert-VerifiableMocks
                     Assert-MockCalled -CommandName Get-Disk -Times 1
                     Assert-MockCalled -CommandName Set-Disk -Times 0
@@ -901,7 +901,7 @@ try
                     } | Should not throw
                 }
 
-                It 'the correct mocks were called' {
+                It 'Should call all mocks' {
                     Assert-VerifiableMocks
                     Assert-MockCalled -CommandName Get-Disk -Times 1
                     Assert-MockCalled -CommandName Set-Disk -Times 0
@@ -961,7 +961,7 @@ try
                     ($endTime - $startTime).TotalSeconds | Should BeGreaterThan 29
                 }
 
-                It 'the correct mocks were called' {
+                It 'Should call all mocks' {
                     Assert-VerifiableMocks
                     Assert-MockCalled -CommandName Get-Disk -Times 1
                     Assert-MockCalled -CommandName Set-Disk -Times 0
@@ -1007,7 +1007,7 @@ try
                     } | Should Throw $errorRecord
                 }
 
-                It 'the correct mocks were called' {
+                It 'Should call all mocks' {
                     Assert-VerifiableMocks
                     Assert-MockCalled -CommandName Get-Disk -Times 1
                     Assert-MockCalled -CommandName Set-Disk -Times 0
@@ -1050,7 +1050,7 @@ try
                     } | Should Throw $errorRecord
                 }
 
-                It 'the correct mocks were called' {
+                It 'Should call all mocks' {
                     Assert-VerifiableMocks
                     Assert-MockCalled -CommandName Get-Disk -Times 1
                     Assert-MockCalled -CommandName Set-Disk -Times 0
@@ -1096,7 +1096,7 @@ try
                     } | Should not throw
                 }
 
-                It 'the correct mocks were called' {
+                It 'Should call all mocks' {
                     Assert-VerifiableMocks
                     Assert-MockCalled -CommandName Get-Disk -Times 1
                     Assert-MockCalled -CommandName Set-Disk -Times 0
@@ -1146,7 +1146,7 @@ try
                     } | Should not throw
                 }
 
-                It 'the correct mocks were called' {
+                It 'Should call all mocks' {
                     Assert-VerifiableMocks
                     Assert-MockCalled -CommandName Get-Disk -Times 1
                     Assert-MockCalled -CommandName Set-Disk -Times 0
@@ -1203,7 +1203,7 @@ try
                     } | Should not throw
                 }
 
-                It 'the correct mocks were called' {
+                It 'Should call all mocks' {
                     Assert-VerifiableMocks
                     Assert-MockCalled -CommandName Get-Disk -Times 1
                     Assert-MockCalled -CommandName Set-Disk -Times 0
@@ -1254,7 +1254,7 @@ try
                     } | Should not throw
                 }
 
-                It 'the correct mocks were called' {
+                It 'Should call all mocks' {
                     Assert-VerifiableMocks
                     Assert-MockCalled -CommandName Get-Disk -Times 1
                     Assert-MockCalled -CommandName Set-Disk -Times 0
@@ -1314,7 +1314,7 @@ try
                     } | Should not throw
                 }
 
-                It 'the correct mocks were called' {
+                It 'Should call all mocks' {
                     Assert-VerifiableMocks
                     Assert-MockCalled -CommandName Get-Disk -Times 1
                     Assert-MockCalled -CommandName Set-Disk -Times 0
@@ -1377,7 +1377,7 @@ try
                     } | Should not throw
                 }
 
-                It 'the correct mocks were called' {
+                It 'Should call all mocks' {
                     Assert-VerifiableMocks
                     Assert-MockCalled -CommandName Get-Disk -Times 1
                     Assert-MockCalled -CommandName Set-Disk -Times 0
@@ -1435,7 +1435,7 @@ try
                     } | Should throw
                 }
 
-                It 'the correct mocks were called' {
+                It 'Should call all mocks' {
                     Assert-VerifiableMocks
                     Assert-MockCalled -CommandName Get-Disk -Times 1
                     Assert-MockCalled -CommandName Set-Disk -Times 0
@@ -1492,7 +1492,7 @@ try
                     } | Should not throw
                 }
 
-                It 'the correct mocks were called' {
+                It 'Should call all mocks' {
                     Assert-VerifiableMocks
                     Assert-MockCalled -CommandName Get-Disk -Times 1
                     Assert-MockCalled -CommandName Set-Disk -Times 0
@@ -1552,7 +1552,7 @@ try
                     } | Should not throw
                 }
 
-                It 'the correct mocks were called' {
+                It 'Should call all mocks' {
                     Assert-VerifiableMocks
                     Assert-MockCalled -CommandName Get-Disk -Times 1
                     Assert-MockCalled -CommandName Set-Disk -Times 0
@@ -1609,7 +1609,7 @@ try
                     } | Should not throw
                 }
 
-                It 'the correct mocks were called' {
+                It 'Should call all mocks' {
                     Assert-VerifiableMocks
                     Assert-MockCalled -CommandName Get-Disk -Times 1
                     Assert-MockCalled -CommandName Set-Disk -Times 0
@@ -1644,7 +1644,7 @@ try
 
                 $script:result = $null
 
-                It 'calling test Should Not Throw' {
+                It 'Should not throw when calling Test-TargetResource' {
                     {
                         $script:result = Test-TargetResource `
                             -DiskId $script:mockedDisk0Offline.Number `
@@ -1654,11 +1654,11 @@ try
                     } | Should not throw
                 }
 
-                It 'result should be false' {
+                It 'Should return false' {
                     $script:result | Should Be $false
                 }
 
-                It 'the correct mocks were called' {
+                It 'Should call the correct mocks' {
                     Assert-VerifiableMocks
                     Assert-MockCalled -CommandName Get-Disk -Times 1
                     Assert-MockCalled -CommandName Get-Partition -Times 0
@@ -1681,7 +1681,7 @@ try
 
                 $script:result = $null
 
-                It 'calling test Should Not Throw' {
+                It 'Should Not Throw' {
                     {
                         $script:result = Test-TargetResource `
                             -DiskId $script:mockedDisk0Offline.Number `
@@ -1691,11 +1691,11 @@ try
                     } | Should not throw
                 }
 
-                It 'result should be false' {
+                It 'Should be false' {
                     $script:result | Should Be $false
                 }
 
-                It 'the correct mocks were called' {
+                It 'Should call all mocks' {
                     Assert-VerifiableMocks
                     Assert-MockCalled -CommandName Get-Disk -Times 1
                     Assert-MockCalled -CommandName Get-Partition -Times 0
@@ -1718,7 +1718,7 @@ try
 
                 $script:result = $null
 
-                It 'calling test Should Not Throw' {
+                It 'Should not throw' {
                     {
                         $script:result = Test-TargetResource `
                             -DiskId $script:mockedDisk0Offline.UniqueId `
@@ -1729,11 +1729,11 @@ try
                     } | Should not throw
                 }
 
-                It 'result should be false' {
+                It 'Should be false' {
                     $script:result | Should Be $false
                 }
 
-                It 'the correct mocks were called' {
+                It 'Should call all mocks' {
                     Assert-VerifiableMocks
                     Assert-MockCalled -CommandName Get-Disk -Times 1
                     Assert-MockCalled -CommandName Get-Partition -Times 0
@@ -1756,7 +1756,7 @@ try
 
                 $script:result = $null
 
-                It 'calling test Should Not Throw' {
+                It 'Should Not Throw' {
                     {
                         $script:result = Test-TargetResource `
                             -DiskId $script:mockedDisk0Readonly.Number `
@@ -1766,11 +1766,11 @@ try
                     } | Should not throw
                 }
 
-                It 'result should be false' {
+                It 'Should be false' {
                     $script:result | Should Be $false
                 }
 
-                It 'the correct mocks were called' {
+                It 'Should call all mocks' {
                     Assert-VerifiableMocks
                     Assert-MockCalled -CommandName Get-Disk -Times 1
                     Assert-MockCalled -CommandName Get-Partition -Times 0
@@ -1793,7 +1793,7 @@ try
 
                 $script:result = $null
 
-                It 'calling test Should Not Throw' {
+                It 'Should Not Throw' {
                     {
                         $script:result = Test-TargetResource `
                             -DiskId $script:mockedDisk0Raw.Number `
@@ -1803,11 +1803,11 @@ try
                     } | Should not throw
                 }
 
-                It 'result should be false' {
+                It 'Should be false' {
                     $script:result | Should Be $false
                 }
 
-                It 'the correct mocks were called' {
+                It 'Should call all mocks' {
                     Assert-VerifiableMocks
                     Assert-MockCalled -CommandName Get-Disk -Times 1
                     Assert-MockCalled -CommandName Get-Partition -Times 0
@@ -1840,7 +1840,7 @@ try
 
                 $script:result = $null
 
-                It 'calling test Should Not Throw' {
+                It 'Should Not Throw' {
                     {
                         $script:result = Test-TargetResource `
                             -DiskId $script:mockedDisk0.Number `
@@ -1851,11 +1851,11 @@ try
                     } | Should not throw
                 }
 
-                It 'result should be true' {
+                It 'Sshould be true' {
                     $script:result | Should Be $true
                 }
 
-                It 'the correct mocks were called' {
+                It 'Should call all mocks' {
                     Assert-VerifiableMocks
                     Assert-MockCalled -CommandName Get-Disk -Times 1
                     Assert-MockCalled -CommandName Get-Partition -Times 1
@@ -1886,7 +1886,7 @@ try
 
                 $script:result = $null
 
-                It 'calling test Should Not Throw' {
+                It 'Should Not Throw' {
                     {
                         $script:result = Test-TargetResource `
                             -DiskId $script:mockedDisk0.Number `
@@ -1897,11 +1897,11 @@ try
                     } | Should not throw
                 }
 
-                It 'result should be false' {
+                It 'Should be false' {
                     $script:result | Should Be $false
                 }
 
-                It 'the correct mocks were called' {
+                It 'Should call all mocks' {
                     Assert-VerifiableMocks
                     Assert-MockCalled -CommandName Get-Disk -Times 1
                     Assert-MockCalled -CommandName Get-Partition -Times 1
@@ -1934,7 +1934,7 @@ try
 
                 $script:result = $null
 
-                It 'calling test Should Not Throw' {
+                It 'Should Not Throw' {
                     {
                         $script:result = Test-TargetResource `
                             -DiskId $script:mockedDisk0.Number `
@@ -1944,11 +1944,11 @@ try
                     } | Should not throw
                 }
 
-                It 'result should be true' {
+                It 'Should be true' {
                     $script:result | Should Be $true
                 }
 
-                It 'the correct mocks were called' {
+                It 'Should call all mocks' {
                     Assert-VerifiableMocks
                     Assert-MockCalled -CommandName Get-Disk -Times 1
                     Assert-MockCalled -CommandName Get-Partition -Times 1
@@ -1981,7 +1981,7 @@ try
 
                 $script:result = $null
 
-                It 'calling test Should Not Throw' {
+                It 'Should Not Throw' {
                     {
                         $script:result = Test-TargetResource `
                             -DiskId $script:mockedDisk0.Number `
@@ -1992,11 +1992,11 @@ try
                     } | Should not throw
                 }
 
-                It 'result should be false' {
+                It 'Should be false' {
                     $script:result | Should Be $false
                 }
 
-                It 'the correct mocks were called' {
+                It 'Should call all mocks' {
                     Assert-VerifiableMocks
                     Assert-MockCalled -CommandName Get-Disk -Times 1
                     Assert-MockCalled -CommandName Get-Partition -Times 1
@@ -2029,7 +2029,7 @@ try
 
                 $script:result = $null
 
-                It 'calling test Should Not Throw' {
+                It 'Should Not Throw' {
                     {
                         $script:result = Test-TargetResource `
                             -DiskId $script:mockedDisk0.Number `
@@ -2039,11 +2039,11 @@ try
                     } | Should not throw
                 }
 
-                It 'result should be false' {
+                It 'Should be false' {
                     $script:result | Should Be $false
                 }
 
-                It 'the correct mocks were called' {
+                It 'Should call all mocks' {
                     Assert-VerifiableMocks
                     Assert-MockCalled -CommandName Get-Disk -Times 1
                     Assert-MockCalled -CommandName Get-Partition -Times 1
@@ -2074,7 +2074,7 @@ try
 
                 $script:result = $null
 
-                It 'calling test Should Not Throw' {
+                It 'Should Not Throw' {
                     {
                         $script:result = Test-TargetResource `
                             -DiskId $script:mockedDisk0.Number `
@@ -2083,11 +2083,11 @@ try
                     } | Should not throw
                 }
 
-                It 'result should be false' {
+                It 'Should be false' {
                     $script:result | Should Be $false
                 }
 
-                It 'the correct mocks were called' {
+                It 'Should call all mocks' {
                     Assert-VerifiableMocks
                     Assert-MockCalled -CommandName Get-Disk -Times 1
                     Assert-MockCalled -CommandName Get-Partition -Times 1
@@ -2120,7 +2120,7 @@ try
 
                 $script:result = $null
 
-                It 'calling test Should Not Throw' {
+                It 'Should Not Throw' {
                     {
                         $script:result = Test-TargetResource `
                             -DiskId $script:mockedDisk0.Number `
@@ -2133,11 +2133,11 @@ try
                     } | Should not throw
                 }
 
-                It 'result should be true' {
+                It 'Should be true' {
                     $script:result | Should Be $true
                 }
 
-                It 'the correct mocks were called' {
+                It 'Should call all mocks' {
                     Assert-VerifiableMocks
                     Assert-MockCalled -CommandName Get-Disk -Times 1
                     Assert-MockCalled -CommandName Get-Partition -Times 1

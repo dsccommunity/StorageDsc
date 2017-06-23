@@ -9,6 +9,6 @@ class MSFT_xDisk : OMI_BaseResource
     [Write, Description("Define volume label if required.")] String FSLabel;
     [Write, Description("Specifies the allocation unit size to use when formatting the volume.")] Uint32 AllocationUnitSize;
     [Write, Description("Specifies the file system format of the new volume."), ValueMap{"NTFS","ReFS"}, Values{"NTFS","ReFS"}] String FSFormat;
-    [Write, Description("Specifies if potentially destructive operations may occur")] Boolean AllowDestructive;
+    [Write, Description("Specifies if potentially destructive operations may occur.")] Boolean AllowDestructive;
     [Write, Description("Specifies if the disks partition schema should be removed entirely, even if data and oem partitions are present. Only possible with AllowDestructive enabled.")] Boolean ClearDisk;
 };
