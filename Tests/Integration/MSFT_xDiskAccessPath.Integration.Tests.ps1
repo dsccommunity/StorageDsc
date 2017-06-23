@@ -32,7 +32,7 @@ try
                 # Create a VHD and attach it to the computer
                 $VHDPath = Join-Path -Path $TestDrive `
                     -ChildPath 'TestDisk.vhd'
-                $null = New-VDisk -Path $VHDPath -SizeInMB 1024
+                $null = New-VDisk -Path $VHDPath -SizeInMB 1024 -Verbose
                 $null = Mount-DiskImage -ImagePath $VHDPath -StorageType VHD -NoDriveLetter
                 $disk = Get-Disk | Where-Object -FilterScript {
                     $_.Location -eq $VHDPath
