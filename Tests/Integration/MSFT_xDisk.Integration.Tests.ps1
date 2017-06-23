@@ -46,7 +46,7 @@ try
             }
 
             #region DEFAULT TESTS
-            It 'should compile and apply the MOF without throwing' {
+            It 'Should compile and apply the MOF without throwing' {
                 {
                     # This is to pass to the Config
                     $configData = @{
@@ -70,12 +70,12 @@ try
                 } | Should Not Throw
             }
 
-            It 'should be able to call Get-DscConfiguration without throwing' {
+            It 'Should be able to call Get-DscConfiguration without throwing' {
                 { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should Not Throw
             }
             #endregion
 
-            It 'should have set the resource and all the parameters should match' {
+            It 'Should have set the resource and all the parameters should match' {
                 $current = Get-DscConfiguration | Where-Object {
                     $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
                 }
@@ -85,7 +85,7 @@ try
                 $current.Size             | Should Be 100MB
             }
 
-            It 'should compile and apply the MOF without throwing' {
+            It 'Should compile and apply the MOF without throwing' {
                 {
                     # This is to pass to the Config
                     $configData = @{
@@ -108,12 +108,12 @@ try
                 } | Should Not Throw
             }
 
-            It 'should be able to call Get-DscConfiguration without throwing' {
+            It 'Should be able to call Get-DscConfiguration without throwing' {
                 { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should Not Throw
             }
             #endregion
 
-            It 'should have set the resource and all the parameters should match' {
+            It 'Should have set the resource and all the parameters should match' {
                 $current = Get-DscConfiguration | Where-Object {
                     $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
                 }
@@ -124,10 +124,11 @@ try
             }
 
             # A system partition will have been added to the disk as well as the 2 test partitions
-            It 'should have 3 partitions on disk' {
+            It 'Should have 3 partitions on disk' {
                 ($disk | Get-Partition).Count | Should Be 3
             }
 
+            Write-Verbose -Verbose -Message (Get-PSDrive | FL * | Out-String)
             It "should have attached drive $driveLetterA" {
                 Get-PSDrive -Name $driveLetterA -ErrorAction SilentlyContinue | Should Not BeNullOrEmpty
             }
@@ -165,7 +166,7 @@ try
             }
 
             #region DEFAULT TESTS
-            It 'should compile and apply the MOF without throwing' {
+            It 'Should compile and apply the MOF without throwing' {
                 {
                     # This is to pass to the Config
                     $configData = @{
@@ -189,12 +190,12 @@ try
                 } | Should Not Throw
             }
 
-            It 'should be able to call Get-DscConfiguration without throwing' {
+            It 'Should be able to call Get-DscConfiguration without throwing' {
                 { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should Not Throw
             }
             #endregion
 
-            It 'should have set the resource and all the parameters should match' {
+            It 'Should have set the resource and all the parameters should match' {
                 $current = Get-DscConfiguration | Where-Object {
                     $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
                 }
@@ -205,7 +206,7 @@ try
             }
 
             #region DEFAULT TESTS
-            It 'should compile and apply the MOF without throwing' {
+            It 'Should compile and apply the MOF without throwing' {
                 {
                     # This is to pass to the Config
                     $configData = @{
@@ -228,12 +229,12 @@ try
                 } | Should Not Throw
             }
 
-            It 'should be able to call Get-DscConfiguration without throwing' {
+            It 'Should be able to call Get-DscConfiguration without throwing' {
                 { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should Not Throw
             }
             #endregion
 
-            It 'should have set the resource and all the parameters should match' {
+            It 'Should have set the resource and all the parameters should match' {
                 $current = Get-DscConfiguration | Where-Object {
                     $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
                 }
@@ -244,7 +245,7 @@ try
             }
 
             # A system partition will have been added to the disk as well as the 2 test partitions
-            It 'should have 3 partitions on disk' {
+            It 'Should have 3 partitions on disk' {
                 ($disk | Get-Partition).Count | Should Be 3
             }
 
