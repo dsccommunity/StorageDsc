@@ -7,13 +7,13 @@ $modulePath = Join-Path -Path (Split-Path -Path (Split-Path -Path $PSScriptRoot 
 
 # Import the Storage Common Modules
 Import-Module -Name (Join-Path -Path $modulePath `
-                               -ChildPath (Join-Path -Path 'StorageDsc.Common' `
-                                                     -ChildPath 'StorageDsc.Common.psm1'))
+        -ChildPath (Join-Path -Path 'StorageDsc.Common' `
+            -ChildPath 'StorageDsc.Common.psm1'))
 
 # Import the Storage Resource Helper Module
 Import-Module -Name (Join-Path -Path $modulePath `
-                               -ChildPath (Join-Path -Path 'StorageDsc.ResourceHelper' `
-                                                     -ChildPath 'StorageDsc.ResourceHelper.psm1'))
+        -ChildPath (Join-Path -Path 'StorageDsc.ResourceHelper' `
+            -ChildPath 'StorageDsc.ResourceHelper.psm1'))
 
 # Import Localization Strings
 $localizedData = Get-LocalizedData `
@@ -431,142 +431,144 @@ function Set-TargetResource
 
         if ($assignedPartition.Size -ne $Size)
         {
-            if ($AllowDestructive -and $FSFormat -eq 'ReFS')
+            if ($AllowDestructive)
             {
-                Write-Verbose -Message ( @(
-                        "$($MyInvocation.MyCommand): "
-                        $($localizedData.ResizeRefsNotPossible `
-                                -f $DriveLetter, $assignedPartition.Size, $Size)
-                    ) -join '' )
-            }
-
-            if ($AllowDestructive -and $FSFormat -ne 'ReFS')
-            {
-                Write-Verbose -Message ( @(
-                        "$($MyInvocation.MyCommand): "
-                        $($localizedData.SizeMismatchCorrection `
-                                -f $DriveLetter, $assignedPartition.Size, $Size)
-                    ) -join '' )                
-                
-                $supportedSize = ($assignedPartition | Get-PartitionSupportedSize)
-            
-                if ($size -gt $supportedSize.SizeMax)
-                {
-                    New-InvalidArgumentException -Message ( @(
-                            "$($MyInvocation.MyCommand): "
-                            $($localizedData.FreeSpaceViolationError `
-                                    -f $DriveLetter, $assignedPartition.Size, $Size, $supportedSize.SizeMax)
-                        ) -join '' ) -ArgumentName 'Size' -ErrorAction Stop
-                }
-
-                $assignedPartition | Resize-Partition -Size $Size
-            }
-        }
-    }
-
-    # Get the Volume on the partition
-    $volume = $partition | Get-Volume
-
-    # Is the volume already formatted?
-    if ($volume.FileSystem -eq '')
-    {
-        # The volume is not formatted
-        $volParams = @{
-            FileSystem = $FSFormat
-            Confirm    = $false
-        }
-
-        if ($FSLabel)
-        {
-            # Set the File System label on the new volume
-            $volParams["NewFileSystemLabel"] = $FSLabel
-        } # if
-
-        if ($AllocationUnitSize)
-        {
-            # Set the Allocation Unit Size on the new volume
-            $volParams["AllocationUnitSize"] = $AllocationUnitSize
-        } # if
-
-        Write-Verbose -Message ( @(
-                "$($MyInvocation.MyCommand): "
-                $($localizedData.FormattingVolumeMessage -f $volParams.FileSystem)
-            ) -join '' )
-
-        # Format the volume
-        $volume = $partition | Format-Volume @VolParams
-    }
-    else
-    {
-        # The volume is already formatted
-        if ($PSBoundParameters.ContainsKey('FSFormat'))
-        {
-            # Check the filesystem format
-            $fileSystem = $volume.FileSystem
-            if ($fileSystem -ne $FSFormat)
-            {
-                # The file system format does not match
-                Write-Verbose -Message ( @(
-                        "$($MyInvocation.MyCommand): "
-                        $($localizedData.FileSystemFormatMismatch -f `
-                                $DriveLetter, $fileSystem, $FSFormat)
-                    ) -join '' )
-
-                if ($AllowDestructive)
+                if ($FSFormat -eq 'ReFS')
                 {
                     Write-Verbose -Message ( @(
                             "$($MyInvocation.MyCommand): "
-                            $($localizedData.VolumeFormatInProgress -f `
+                            $($localizedData.ResizeRefsNotPossible `
+                                    -f $DriveLetter, $assignedPartition.Size, $Size)
+                        ) -join '' )
+            
+                }
+                else
+                {
+                    Write-Verbose -Message ( @(
+                            "$($MyInvocation.MyCommand): "
+                            $($localizedData.SizeMismatchCorrection `
+                                    -f $DriveLetter, $assignedPartition.Size, $Size)
+                        ) -join '' )                
+                
+                    $supportedSize = ($assignedPartition | Get-PartitionSupportedSize)
+            
+                    if ($size -gt $supportedSize.SizeMax)
+                    {
+                        New-InvalidArgumentException -Message ( @(
+                                "$($MyInvocation.MyCommand): "
+                                $($localizedData.FreeSpaceViolationError `
+                                        -f $DriveLetter, $assignedPartition.Size, $Size, $supportedSize.SizeMax)
+                            ) -join '' ) -ArgumentName 'Size' -ErrorAction Stop
+                    }
+
+                    $assignedPartition | Resize-Partition -Size $Size
+                }
+            }
+        }
+
+        # Get the Volume on the partition
+        $volume = $partition | Get-Volume
+
+        # Is the volume already formatted?
+        if ($volume.FileSystem -eq '')
+        {
+            # The volume is not formatted
+            $volParams = @{
+                FileSystem = $FSFormat
+                Confirm    = $false
+            }
+
+            if ($FSLabel)
+            {
+                # Set the File System label on the new volume
+                $volParams["NewFileSystemLabel"] = $FSLabel
+            } # if
+
+            if ($AllocationUnitSize)
+            {
+                # Set the Allocation Unit Size on the new volume
+                $volParams["AllocationUnitSize"] = $AllocationUnitSize
+            } # if
+
+            Write-Verbose -Message ( @(
+                    "$($MyInvocation.MyCommand): "
+                    $($localizedData.FormattingVolumeMessage -f $volParams.FileSystem)
+                ) -join '' )
+
+            # Format the volume
+            $volume = $partition | Format-Volume @VolParams
+        }
+        else
+        {
+            # The volume is already formatted
+            if ($PSBoundParameters.ContainsKey('FSFormat'))
+            {
+                # Check the filesystem format
+                $fileSystem = $volume.FileSystem
+                if ($fileSystem -ne $FSFormat)
+                {
+                    # The file system format does not match
+                    Write-Verbose -Message ( @(
+                            "$($MyInvocation.MyCommand): "
+                            $($localizedData.FileSystemFormatMismatch -f `
                                     $DriveLetter, $fileSystem, $FSFormat)
                         ) -join '' )
 
-                    $formatParam = @{
-                        FileSystem = $FSFormat
-                        Force      = $true
-                    }
-
-                    if ($PSBoundParameters.ContainsKey('AllocationUnitSize'))
+                    if ($AllowDestructive)
                     {
-                        $formatParam.Add('AllocationUnitSize', $AllocationUnitSize)
+                        Write-Verbose -Message ( @(
+                                "$($MyInvocation.MyCommand): "
+                                $($localizedData.VolumeFormatInProgress -f `
+                                        $DriveLetter, $fileSystem, $FSFormat)
+                            ) -join '' )
+
+                        $formatParam = @{
+                            FileSystem = $FSFormat
+                            Force      = $true
+                        }
+
+                        if ($PSBoundParameters.ContainsKey('AllocationUnitSize'))
+                        {
+                            $formatParam.Add('AllocationUnitSize', $AllocationUnitSize)
+                        }
+
+                        $Volume | Format-Volume @formatParam
                     }
-
-                    $Volume | Format-Volume @formatParam
-                }
+                } # if
             } # if
-        } # if
 
-        # Check the volume label
-        if ($PSBoundParameters.ContainsKey('FSLabel'))
-        {
-            # The volume should have a label assigned
-            if ($volume.FileSystemLabel -ne $FSLabel)
+            # Check the volume label
+            if ($PSBoundParameters.ContainsKey('FSLabel'))
             {
-                # The volume lable needs to be changed because it is different.
-                Write-Verbose -Message ( @(
-                        "$($MyInvocation.MyCommand): "
-                        $($localizedData.ChangingVolumeLabelMessage `
-                                -f $DriveLetter, $FSLabel)
-                    ) -join '' )
+                # The volume should have a label assigned
+                if ($volume.FileSystemLabel -ne $FSLabel)
+                {
+                    # The volume lable needs to be changed because it is different.
+                    Write-Verbose -Message ( @(
+                            "$($MyInvocation.MyCommand): "
+                            $($localizedData.ChangingVolumeLabelMessage `
+                                    -f $DriveLetter, $FSLabel)
+                        ) -join '' )
 
-                $volume | Set-Volume -NewFileSystemLabel $FSLabel
+                    $volume | Set-Volume -NewFileSystemLabel $FSLabel
+                } # if
             } # if
         } # if
-    } # if
 
-    # Assign the Drive Letter if it isn't assigned
-    if ($assignDriveLetter -and ($partition.DriveLetter -ne $DriveLetter))
-    {
-        $null = $partition | Set-Partition -NewDriveLetter $DriveLetter
+        # Assign the Drive Letter if it isn't assigned
+        if ($assignDriveLetter -and ($partition.DriveLetter -ne $DriveLetter))
+        {
+            $null = $partition | Set-Partition -NewDriveLetter $DriveLetter
 
-        Write-Verbose -Message ( @(
-                "$($MyInvocation.MyCommand): "
-                $($localizedData.SuccessfullyInitializedMessage -f $DriveLetter)
-            ) -join '' )
-    } # if
+            Write-Verbose -Message ( @(
+                    "$($MyInvocation.MyCommand): "
+                    $($localizedData.SuccessfullyInitializedMessage -f $DriveLetter)
+                ) -join '' )
+        } # if
     
-}# Set-TargetResource
+    }# Set-TargetResource
 
-<#
+    <#
     .SYNOPSIS
     Tests if the disk is initialized, the partion exists and the drive letter is assigned.
 
@@ -597,208 +599,208 @@ function Set-TargetResource
     .PARAMETER ClearDisk
     Specifies if the disks partition schema should be removed entirely, even if data and oem partitions are present. Only possible with AllowDestructive enabled.
 #>
-function Test-TargetResource
-{
-    [CmdletBinding()]
-    [OutputType([System.Boolean])]
-    param
-    (
-        [Parameter(Mandatory = $true)]
-        [System.String]
-        $DriveLetter,
-
-        [Parameter(Mandatory = $true)]
-        [System.String]
-        $DiskId,
-
-        [Parameter()]
-        [ValidateSet('Number', 'UniqueId')]
-        [System.String]
-        $DiskIdType = 'Number',
-
-        [Parameter()]
-        [System.UInt64]
-        $Size,
-
-        [Parameter()]
-        [System.String]
-        $FSLabel,
-
-        [Parameter()]
-        [System.UInt32]
-        $AllocationUnitSize,
-
-        [Parameter()]
-        [ValidateSet('NTFS', 'ReFS')]
-        [System.String]
-        $FSFormat = 'NTFS',
-
-        [Parameter()]
-        [System.Boolean]
-        $AllowDestructive,
-
-        [Parameter()]
-        [System.Boolean]
-        $ClearDisk
-    )
-
-    Write-Verbose -Message ( @(
-            "$($MyInvocation.MyCommand): "
-            $($localizedData.TestingDiskMessage -f $DiskIdType, $DiskId, $DriveLetter)
-        ) -join '' )
-
-    # Validate the DriveLetter parameter
-    $DriveLetter = Assert-DriveLetterValid -DriveLetter $DriveLetter
-
-    $diskIdParameter = @{
-        $DiskIdType = $DiskId
-    }
-
-    Write-Verbose -Message ( @(
-            "$($MyInvocation.MyCommand): "
-            $($localizedData.CheckDiskInitializedMessage -f $DiskIdType, $DiskId)
-        ) -join '' )
-
-    $disk = Get-Disk `
-        @diskIdParameter `
-        -ErrorAction SilentlyContinue
-
-    if (-not $disk)
+    function Test-TargetResource
     {
+        [CmdletBinding()]
+        [OutputType([System.Boolean])]
+        param
+        (
+            [Parameter(Mandatory = $true)]
+            [System.String]
+            $DriveLetter,
+
+            [Parameter(Mandatory = $true)]
+            [System.String]
+            $DiskId,
+
+            [Parameter()]
+            [ValidateSet('Number', 'UniqueId')]
+            [System.String]
+            $DiskIdType = 'Number',
+
+            [Parameter()]
+            [System.UInt64]
+            $Size,
+
+            [Parameter()]
+            [System.String]
+            $FSLabel,
+
+            [Parameter()]
+            [System.UInt32]
+            $AllocationUnitSize,
+
+            [Parameter()]
+            [ValidateSet('NTFS', 'ReFS')]
+            [System.String]
+            $FSFormat = 'NTFS',
+
+            [Parameter()]
+            [System.Boolean]
+            $AllowDestructive,
+
+            [Parameter()]
+            [System.Boolean]
+            $ClearDisk
+        )
+
         Write-Verbose -Message ( @(
                 "$($MyInvocation.MyCommand): "
-                $($localizedData.DiskNotFoundMessage -f $DiskIdType, $DiskId)
+                $($localizedData.TestingDiskMessage -f $DiskIdType, $DiskId, $DriveLetter)
             ) -join '' )
 
-        return $false
-    } # if
+        # Validate the DriveLetter parameter
+        $DriveLetter = Assert-DriveLetterValid -DriveLetter $DriveLetter
 
-    if ($disk.IsOffline)
-    {
+        $diskIdParameter = @{
+            $DiskIdType = $DiskId
+        }
+
         Write-Verbose -Message ( @(
                 "$($MyInvocation.MyCommand): "
-                $($localizedData.DiskNotOnlineMessage -f $DiskIdType, $DiskId)
+                $($localizedData.CheckDiskInitializedMessage -f $DiskIdType, $DiskId)
             ) -join '' )
 
-        return $false
-    } # if
+        $disk = Get-Disk `
+            @diskIdParameter `
+            -ErrorAction SilentlyContinue
 
-    if ($disk.IsReadOnly)
-    {
-        Write-Verbose -Message ( @(
-                "$($MyInvocation.MyCommand): "
-                $($localizedData.DiskReadOnlyMessage -f $DiskIdType, $DiskId)
-            ) -join '' )
-
-        return $false
-    } # if
-
-    if ($disk.PartitionStyle -ne 'GPT')
-    {
-        Write-Verbose -Message ( @(
-                "$($MyInvocation.MyCommand): "
-                $($localizedData.DiskNotGPTMessage -f $DiskIdType, $DiskId, $Disk.PartitionStyle)
-            ) -join '' )
-
-        return $false
-    } # if
-
-    $partition = Get-Partition `
-        -DriveLetter $DriveLetter `
-        -ErrorAction SilentlyContinue
-    if ($partition.DriveLetter -ne $DriveLetter)
-    {
-        Write-Verbose -Message ( @(
-                "$($MyInvocation.MyCommand): "
-                $($localizedData.DriveLetterNotFoundMessage -f $DriveLetter)
-            ) -join '' )
-
-        return $false
-    } # if
-
-    # Drive size
-    if ($Size)
-    {
-        if ($partition.Size -ne $Size)
-        {
-            # The partition size mismatches
-            Write-Verbose -Message ( @(
-                    "$($MyInvocation.MyCommand): "
-                    $($localizedData.SizeMismatchMessage `
-                            -f $DriveLetter, $Partition.Size, $Size)
-                ) -join '' )
-
-            if ($AllowDestructive)
-            {
-                return $false
-            }
-        } # if
-    } # if
-
-    $blockSize = (Get-CimInstance `
-            -Query "SELECT BlockSize from Win32_Volume WHERE DriveLetter = '$($DriveLetter):'" `
-            -ErrorAction SilentlyContinue).BlockSize
-
-    if ($blockSize -gt 0 -and $AllocationUnitSize -ne 0)
-    {
-        if ($AllocationUnitSize -ne $blockSize)
-        {
-            # The allocation unit size mismatches
-            Write-Verbose -Message ( @(
-                    "$($MyInvocation.MyCommand): "
-                    $($localizedData.AllocationUnitSizeMismatchMessage `
-                            -f $DriveLetter, $($blockSize.BlockSize / 1KB), $($AllocationUnitSize / 1KB))
-                ) -join '' )
-
-            if ($AllowDestructive)
-            {
-                return $false
-            }
-        } # if
-    } # if
-
-    # Get the volume so the properties can be checked
-    $volume = Get-Volume `
-        -DriveLetter $DriveLetter `
-        -ErrorAction SilentlyContinue
-
-    if ($PSBoundParameters.ContainsKey('FSFormat'))
-    {
-        # Check the filesystem format
-        $fileSystem = $volume.FileSystem
-        if ($fileSystem -ne $FSFormat)
+        if (-not $disk)
         {
             Write-Verbose -Message ( @(
                     "$($MyInvocation.MyCommand): "
-                    $($localizedData.FileSystemFormatMismatch `
-                            -f $DriveLetter, $fileSystem, $FSFormat)
-                ) -join '' )
-
-            if ($AllowDestructive)
-            {
-                return $false
-            }
-        } # if
-    } # if
-
-    if ($PSBoundParameters.ContainsKey('FSLabel'))
-    {
-        # Check the volume label
-        $label = $volume.FileSystemLabel
-        if ($label -ne $FSLabel)
-        {
-            # The assigned volume label is different and needs updating
-            Write-Verbose -Message ( @(
-                    "$($MyInvocation.MyCommand): "
-                    $($localizedData.DriveLabelMismatch `
-                            -f $DriveLetter, $label, $FSLabel)
+                    $($localizedData.DiskNotFoundMessage -f $DiskIdType, $DiskId)
                 ) -join '' )
 
             return $false
         } # if
-    } # if
 
-    return $true
-} # Test-TargetResource
+        if ($disk.IsOffline)
+        {
+            Write-Verbose -Message ( @(
+                    "$($MyInvocation.MyCommand): "
+                    $($localizedData.DiskNotOnlineMessage -f $DiskIdType, $DiskId)
+                ) -join '' )
 
-Export-ModuleMember -Function *-TargetResource
+            return $false
+        } # if
+
+        if ($disk.IsReadOnly)
+        {
+            Write-Verbose -Message ( @(
+                    "$($MyInvocation.MyCommand): "
+                    $($localizedData.DiskReadOnlyMessage -f $DiskIdType, $DiskId)
+                ) -join '' )
+
+            return $false
+        } # if
+
+        if ($disk.PartitionStyle -ne 'GPT')
+        {
+            Write-Verbose -Message ( @(
+                    "$($MyInvocation.MyCommand): "
+                    $($localizedData.DiskNotGPTMessage -f $DiskIdType, $DiskId, $Disk.PartitionStyle)
+                ) -join '' )
+
+            return $false
+        } # if
+
+        $partition = Get-Partition `
+            -DriveLetter $DriveLetter `
+            -ErrorAction SilentlyContinue
+        if ($partition.DriveLetter -ne $DriveLetter)
+        {
+            Write-Verbose -Message ( @(
+                    "$($MyInvocation.MyCommand): "
+                    $($localizedData.DriveLetterNotFoundMessage -f $DriveLetter)
+                ) -join '' )
+
+            return $false
+        } # if
+
+        # Drive size
+        if ($Size)
+        {
+            if ($partition.Size -ne $Size)
+            {
+                # The partition size mismatches
+                Write-Verbose -Message ( @(
+                        "$($MyInvocation.MyCommand): "
+                        $($localizedData.SizeMismatchMessage `
+                                -f $DriveLetter, $Partition.Size, $Size)
+                    ) -join '' )
+
+                if ($AllowDestructive)
+                {
+                    return $false
+                }
+            } # if
+        } # if
+
+        $blockSize = (Get-CimInstance `
+                -Query "SELECT BlockSize from Win32_Volume WHERE DriveLetter = '$($DriveLetter):'" `
+                -ErrorAction SilentlyContinue).BlockSize
+
+        if ($blockSize -gt 0 -and $AllocationUnitSize -ne 0)
+        {
+            if ($AllocationUnitSize -ne $blockSize)
+            {
+                # The allocation unit size mismatches
+                Write-Verbose -Message ( @(
+                        "$($MyInvocation.MyCommand): "
+                        $($localizedData.AllocationUnitSizeMismatchMessage `
+                                -f $DriveLetter, $($blockSize.BlockSize / 1KB), $($AllocationUnitSize / 1KB))
+                    ) -join '' )
+
+                if ($AllowDestructive)
+                {
+                    return $false
+                }
+            } # if
+        } # if
+
+        # Get the volume so the properties can be checked
+        $volume = Get-Volume `
+            -DriveLetter $DriveLetter `
+            -ErrorAction SilentlyContinue
+
+        if ($PSBoundParameters.ContainsKey('FSFormat'))
+        {
+            # Check the filesystem format
+            $fileSystem = $volume.FileSystem
+            if ($fileSystem -ne $FSFormat)
+            {
+                Write-Verbose -Message ( @(
+                        "$($MyInvocation.MyCommand): "
+                        $($localizedData.FileSystemFormatMismatch `
+                                -f $DriveLetter, $fileSystem, $FSFormat)
+                    ) -join '' )
+
+                if ($AllowDestructive)
+                {
+                    return $false
+                }
+            } # if
+        } # if
+
+        if ($PSBoundParameters.ContainsKey('FSLabel'))
+        {
+            # Check the volume label
+            $label = $volume.FileSystemLabel
+            if ($label -ne $FSLabel)
+            {
+                # The assigned volume label is different and needs updating
+                Write-Verbose -Message ( @(
+                        "$($MyInvocation.MyCommand): "
+                        $($localizedData.DriveLabelMismatch `
+                                -f $DriveLetter, $label, $FSLabel)
+                    ) -join '' )
+
+                return $false
+            } # if
+        } # if
+
+        return $true
+    } # Test-TargetResource
+
+    Export-ModuleMember -Function *-TargetResource
