@@ -34,7 +34,7 @@ try
                     -ChildPath 'TestDisk.vhd'
                 $null = New-VDisk -Path $VHDPath -SizeInMB 1024 -Verbose
                 $null = Mount-DiskImage -ImagePath $VHDPath -StorageType VHD -NoDriveLetter
-                Write-Verbose -Verbose -Message (Get-Disk | Out-String)
+                Write-Verbose -Verbose -Message (Get-Disk | FL * | Out-String )
                 $disk = Get-Disk | Where-Object -FilterScript {
                     $_.Location -eq $VHDPath
                 }
