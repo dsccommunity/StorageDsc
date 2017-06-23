@@ -37,6 +37,7 @@ try
                 $disk = Get-Disk | Where-Object -FilterScript {
                     $_.Location -eq $VHDPath
                 }
+                Write-Verbose -Verbose -Message ($disk | Out-String)
                 $FSLabelA = 'TestDiskA'
                 $FSLabelB = 'TestDiskB'
 
