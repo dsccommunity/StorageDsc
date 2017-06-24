@@ -1027,7 +1027,7 @@ try
 
                 Mock `
                     -CommandName Get-DiskImage `
-                    -MockWith { $script:mockedDiskImageVHDX } `
+                    -MockWith { $script:mockedDiskImageAttachedVHDX } `
                     -Verifiable
 
                 Mock `
@@ -1070,7 +1070,7 @@ try
                 }
             }
 
-            Context 'ISO is specified and gets mounted to the wrong Drive Letter' {
+            Context 'VHDX is specified and gets mounted to the wrong Drive Letter' {
                 # Verifiable (should be called) mocks
                 Mock `
                     -CommandName Mount-DiskImage `
@@ -1078,7 +1078,7 @@ try
 
                 Mock `
                     -CommandName Get-DiskImage `
-                    -MockWith { $script:mockedDiskImageVHDX } `
+                    -MockWith { $script:mockedDiskImageAttachedVHDX } `
                     -Verifiable
 
                 Mock `

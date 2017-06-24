@@ -12,6 +12,8 @@
 - Added the VS Code PowerShell extension formatting settings that cause PowerShell
   files to be formatted as per the DSC Resource kit style guidelines.
 - Removed requirement on Hyper-V PowerShell module to execute integration tests.
+- xMountImage:
+  - Fix error when mounting VHD on Windows Server 2012 R2 - See [Issue 105](https://github.com/PowerShell/xStorage/issues/105)
 
 ## 3.1.0.0
 

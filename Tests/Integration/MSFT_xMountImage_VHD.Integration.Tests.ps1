@@ -36,7 +36,7 @@ try
     $disk = Get-Disk -Number $diskImage.Number
     $null = $disk | Initialize-Disk -PartitionStyle GPT
     $partition = $disk | New-Partition -UseMaximumSize
-    $null = $partition | Get-Volume | Format-Volume -FileSystem NTFS
+    $null = $partition | Get-Volume | Format-Volume -FileSystem NTFS -Confirm:$false
     $null = Dismount-Diskimage -ImagePath $VHDPath
 
     # Create a config data object to pass to the DSC Configs
