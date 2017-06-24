@@ -102,7 +102,10 @@ function New-VDisk
 
     $tempScriptPath = Join-Path -Path $ENV:Temp -ChildPath 'DiskPartVdiskScript.txt'
     Write-Verbose -Message ('Creating DISKPART script {0}' -f $tempScriptPath)
-    Set-Content -Path $tempScriptPath -Value "create vdisk file=`"$Path`" type=expandable maximum=$SizeInMB"
+    Set-Content `
+        -Path $tempScriptPath `
+        -Value "create vdisk FILE=`"$Path`" TYPE=EXPANDABLE MAXIMUM=$SizeInMB" `
+        -Encoding Ascii
     $result = & DISKPART @('/s',$tempScriptPath)
     Write-Verbose -Message ($Result | Out-String)
     $null = Remove-Item -Path $tempScriptPath -Force
