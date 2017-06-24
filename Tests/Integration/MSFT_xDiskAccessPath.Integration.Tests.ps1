@@ -22,12 +22,6 @@ $TestEnvironment = Initialize-TestEnvironment `
 # Using try/finally to always cleanup even if something awful happens.
 try
 {
-    # Ensure that the tests can be performed on this computer
-    if (-not (Test-HyperVInstalled))
-    {
-        Return
-    }
-
     $ConfigFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:DSCResourceName).config.ps1"
     . $ConfigFile -Verbose -ErrorAction Stop
 
@@ -35,14 +29,13 @@ try
     Describe "$($script:DSCResourceName)_Integration" {
         Context 'Partition and format newly provisioned disk using Disk Number with two volumes and assign Access Paths' {
             BeforeAll {
-                # Create a VHDx and attach it to the computer
+                # Create a VHD and attach it to the computer
                 $VHDPath = Join-Path -Path $TestDrive `
-                    -ChildPath 'TestDisk.vhdx'
-                New-VHD -Path $VHDPath -SizeBytes 1GB -Dynamic
-                Mount-DiskImage -ImagePath $VHDPath -StorageType VHDX -NoDriveLetter
-                $disk = Get-Disk | Where-Object -FilterScript {
-                    $_.Location -eq $VHDPath
-                }
+                    -ChildPath 'TestDisk.vhd'
+                $null = New-VDisk -Path $VHDPath -SizeInMB 1024 -Verbose
+                $null = Mount-DiskImage -ImagePath $VHDPath -StorageType VHD -NoDriveLetter
+                $diskImage = Get-DiskImage -ImagePath $VHDPath
+                $disk = Get-Disk -Number $diskImage.Number
                 $FSLabelA = 'TestDiskA'
                 $FSLabelB = 'TestDiskB'
 
@@ -50,17 +43,18 @@ try
                 $accessPathA = Join-Path -Path $ENV:Temp -ChildPath 'xDiskAccessPath_MountA'
                 if (-not (Test-Path -Path $accessPathA))
                 {
-                    New-Item -Path $accessPathA -ItemType Directory
+                    $null = New-Item -Path $accessPathA -ItemType Directory
                 } # if
+
                 $accessPathB = Join-Path -Path $ENV:Temp -ChildPath 'xDiskAccessPath_MountB'
                 if (-not (Test-Path -Path $accessPathB))
                 {
-                    New-Item -Path $accessPathB -ItemType Directory
+                    $null = New-Item -Path $accessPathB -ItemType Directory
                 } # if
             }
 
             #region DEFAULT TESTS
-            It 'should compile and apply the MOF without throwing' {
+            It 'Should compile and apply the MOF without throwing' {
                 {
                     # This is to pass to the Config
                     $configData = @{
@@ -84,7 +78,7 @@ try
                 } | Should not throw
             }
 
-            It 'should be able to call Get-DscConfiguration without throwing' {
+            It 'Should be able to call Get-DscConfiguration without throwing' {
                 { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should Not throw
             }
 
@@ -106,11 +100,12 @@ try
                 -NoNewline
 
             # This test will ensure the disk can be remounted if the access path is removed.
-            $disk | Remove-PartitionAccessPath `
+            Remove-PartitionAccessPath `
+                -DiskNumber $disk.Number `
                 -PartitionNumber 2 `
                 -AccessPath $accessPathA
 
-            It 'should compile and apply the MOF without throwing' {
+            It 'Should compile and apply the MOF without throwing' {
                 {
                     # This is to pass to the Config
                     $configData = @{
@@ -134,7 +129,7 @@ try
                 } | Should not throw
             }
 
-            It 'should be able to call Get-DscConfiguration without throwing' {
+            It 'Should be able to call Get-DscConfiguration without throwing' {
                 { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should Not throw
             }
 
@@ -153,7 +148,7 @@ try
                 Get-Content -Path $testFilePath -Raw | Should Be 'Test'
             }
 
-            It 'should compile and apply the MOF without throwing' {
+            It 'Should compile and apply the MOF without throwing' {
                 {
                     # This is to pass to the Config
                     $configData = @{
@@ -176,7 +171,7 @@ try
                 } | Should not throw
             }
 
-            It 'should be able to call Get-DscConfiguration without throwing' {
+            It 'Should be able to call Get-DscConfiguration without throwing' {
                 { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should Not throw
             }
 
@@ -191,23 +186,25 @@ try
             }
 
             # A system partition will have been added to the disk as well as the 2 test partitions
-            It 'should have 3 partitions on disk' {
+            It 'Should have 3 partitions on disk' {
                 ($disk | Get-Partition).Count | Should Be 3
             }
             #endregion
 
             AfterAll {
                 # Clean up
-                $disk | Remove-PartitionAccessPath `
+                Remove-PartitionAccessPath `
+                    -DiskNumber $disk.Number `
                     -PartitionNumber 2 `
                     -AccessPath $accessPathA
-                $disk | Remove-PartitionAccessPath `
+                Remove-PartitionAccessPath `
+                    -DiskNumber $disk.Number `
                     -PartitionNumber 3 `
                     -AccessPath $accessPathB
-                Remove-Item -Path $accessPathA -Force
-                Remove-Item -Path $accessPathB -Force
-                Dismount-DiskImage -ImagePath $VHDPath -StorageType VHDx
-                Remove-Item -Path $VHDPath -Force
+                $null = Remove-Item -Path $accessPathA -Force
+                $null = Remove-Item -Path $accessPathB -Force
+                $null = Dismount-DiskImage -ImagePath $VHDPath -StorageType VHD
+                $null = Remove-Item -Path $VHDPath -Force
             }
         }
         #endregion
@@ -215,14 +212,13 @@ try
         #region Integration Tests for Disk Unique Id
         Context 'Partition and format newly provisioned disk using Disk Unique Id with two volumes and assign Access Paths' {
             BeforeAll {
-                # Create a VHDx and attach it to the computer
+                # Create a VHD and attach it to the computer
                 $VHDPath = Join-Path -Path $TestDrive `
-                    -ChildPath 'TestDisk.vhdx'
-                New-VHD -Path $VHDPath -SizeBytes 1GB -Dynamic
-                Mount-DiskImage -ImagePath $VHDPath -StorageType VHDX -NoDriveLetter
-                $disk = Get-Disk | Where-Object -FilterScript {
-                    $_.Location -eq $VHDPath
-                }
+                    -ChildPath 'TestDisk.vhd'
+                $null = New-VDisk -Path $VHDPath -SizeInMB 1024
+                $null = Mount-DiskImage -ImagePath $VHDPath -StorageType VHD -NoDriveLetter
+                $diskImage = Get-DiskImage -ImagePath $VHDPath
+                $disk = Get-Disk -Number $diskImage.Number
                 $FSLabelA = 'TestDiskA'
                 $FSLabelB = 'TestDiskB'
 
@@ -230,17 +226,18 @@ try
                 $accessPathA = Join-Path -Path $ENV:Temp -ChildPath 'xDiskAccessPath_MountA'
                 if (-not (Test-Path -Path $accessPathA))
                 {
-                    New-Item -Path $accessPathA -ItemType Directory
+                    $null = New-Item -Path $accessPathA -ItemType Directory
                 } # if
+
                 $accessPathB = Join-Path -Path $ENV:Temp -ChildPath 'xDiskAccessPath_MountB'
                 if (-not (Test-Path -Path $accessPathB))
                 {
-                    New-Item -Path $accessPathB -ItemType Directory
+                    $null = New-Item -Path $accessPathB -ItemType Directory
                 } # if
             }
 
             #region DEFAULT TESTS
-            It 'should compile and apply the MOF without throwing' {
+            It 'Should compile and apply the MOF without throwing' {
                 {
                     # This is to pass to the Config
                     $configData = @{
@@ -264,7 +261,7 @@ try
                 } | Should not throw
             }
 
-            It 'should be able to call Get-DscConfiguration without throwing' {
+            It 'Should be able to call Get-DscConfiguration without throwing' {
                 { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should Not throw
             }
 
@@ -286,11 +283,12 @@ try
                 -NoNewline
 
             # This test will ensure the disk can be remounted if the access path is removed.
-            $disk | Remove-PartitionAccessPath `
+            Remove-PartitionAccessPath `
+                -DiskNumber $disk.Number `
                 -PartitionNumber 2 `
                 -AccessPath $accessPathA
 
-            It 'should compile and apply the MOF without throwing' {
+            It 'Should compile and apply the MOF without throwing' {
                 {
                     # This is to pass to the Config
                     $configData = @{
@@ -314,7 +312,7 @@ try
                 } | Should not throw
             }
 
-            It 'should be able to call Get-DscConfiguration without throwing' {
+            It 'Should be able to call Get-DscConfiguration without throwing' {
                 { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should Not throw
             }
 
@@ -333,7 +331,7 @@ try
                 Get-Content -Path $testFilePath -Raw | Should Be 'Test'
             }
 
-            It 'should compile and apply the MOF without throwing' {
+            It 'Should compile and apply the MOF without throwing' {
                 {
                     # This is to pass to the Config
                     $configData = @{
@@ -356,7 +354,7 @@ try
                 } | Should not throw
             }
 
-            It 'should be able to call Get-DscConfiguration without throwing' {
+            It 'Should be able to call Get-DscConfiguration without throwing' {
                 { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should Not throw
             }
 
@@ -371,23 +369,25 @@ try
             }
 
             # A system partition will have been added to the disk as well as the 2 test partitions
-            It 'should have 3 partitions on disk' {
+            It 'Should have 3 partitions on disk' {
                 ($disk | Get-Partition).Count | Should Be 3
             }
             #endregion
 
             AfterAll {
                 # Clean up
-                $disk | Remove-PartitionAccessPath `
+                Remove-PartitionAccessPath `
+                    -DiskNumber $disk.Number `
                     -PartitionNumber 2 `
                     -AccessPath $accessPathA
-                $disk | Remove-PartitionAccessPath `
+                Remove-PartitionAccessPath `
+                    -DiskNumber $disk.Number `
                     -PartitionNumber 3 `
                     -AccessPath $accessPathB
-                Remove-Item -Path $accessPathA -Force
-                Remove-Item -Path $accessPathB -Force
-                Dismount-DiskImage -ImagePath $VHDPath -StorageType VHDx
-                Remove-Item -Path $VHDPath -Force
+                $null = Remove-Item -Path $accessPathA -Force
+                $null = Remove-Item -Path $accessPathB -Force
+                $null = Dismount-DiskImage -ImagePath $VHDPath -StorageType VHD
+                $null = Remove-Item -Path $VHDPath -Force
             }
         }
     }

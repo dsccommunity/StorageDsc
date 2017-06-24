@@ -18,5 +18,5 @@ ConvertFrom-StringData @'
     DiskImageFileNotFoundError = The image file '{0}' could not be found.
 
     MountingImageMessage = The image file '{0}' is being mounted as drive '{1}'.
-    ChangingISODriveLetterMessage = ISO image file '{0}' mounted as drive '{1}' but is being changed to '{2}'.
+    ChangingImageDriveLetterMessage = The image file '{0}' mounted as drive '{1}' will be changed to '{2}'.
 '@

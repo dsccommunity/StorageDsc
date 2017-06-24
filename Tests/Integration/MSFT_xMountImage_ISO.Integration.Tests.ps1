@@ -60,7 +60,7 @@ try
     Describe "$($script:DSCResourceName)_MountISO_Integration" {
         Context 'Mount an ISO and assign a Drive Letter' {
             #region DEFAULT TESTS
-            It 'should compile and apply the MOF without throwing' {
+            It 'Should compile and apply the MOF without throwing' {
                 {
                     & "$($script:DSCResourceName)_Mount_Config" `
                         -OutputPath $TestDrive `
@@ -70,7 +70,7 @@ try
                 } | Should not throw
             }
 
-            It 'should be able to call Get-DscConfiguration without throwing' {
+            It 'Should be able to call Get-DscConfiguration without throwing' {
                 { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should Not throw
             }
             #endregion
@@ -95,7 +95,7 @@ try
     Describe "$($script:DSCResourceName)_DismountISO_Integration" {
         Context 'Dismount a previously mounted ISO' {
             #region DEFAULT TESTS
-            It 'should compile and apply the MOF without throwing' {
+            It 'Should compile and apply the MOF without throwing' {
                 {
                     & "$($script:DSCResourceName)_Dismount_Config" `
                         -OutputPath $TestDrive `
@@ -105,7 +105,7 @@ try
                 } | Should not throw
             }
 
-            It 'should be able to call Get-DscConfiguration without throwing' {
+            It 'Should be able to call Get-DscConfiguration without throwing' {
                 { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should Not throw
             }
             #endregion

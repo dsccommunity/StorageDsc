@@ -456,8 +456,14 @@ function Set-TargetResource
     # Assign the access path if it isn't assigned
     if ($assignAccessPath)
     {
-        $null = $disk | Add-PartitionAccessPath `
+        <#
+            Add the partition access path, but do not pipe $disk to
+            Add-PartitionAccessPath because it is not supported in
+            Windows Server 2012 R2
+        #>
+        $null = Add-PartitionAccessPath `
             -AccessPath $AccessPath `
+            -DiskNumber $disk.Number `
             -PartitionNumber $partition.PartitionNumber
 
         Write-Verbose -Message ( @(
