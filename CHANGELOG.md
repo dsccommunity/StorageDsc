@@ -5,15 +5,19 @@
 - xDisk:
   - Fix error message when new partition does not become writable before timeout.
   - Removed unneeded timeout initialization code.
+  - Added support for Guid Disk Id type - See [Issue 104](https://github.com/PowerShell/xStorage/issues/104)
 - xDiskAccessPath:
   - Fix error message when new partition does not become writable before timeout.
   - Removed unneeded timeout initialization code.
   - Fix error when used on Windows Server 2012 R2 - See [Issue 102](https://github.com/PowerShell/xStorage/issues/102).
+  - Added support for Guid Disk Id type - See [Issue 104](https://github.com/PowerShell/xStorage/issues/104)
 - Added the VS Code PowerShell extension formatting settings that cause PowerShell
   files to be formatted as per the DSC Resource kit style guidelines.
 - Removed requirement on Hyper-V PowerShell module to execute integration tests.
 - xMountImage:
   - Fix error when mounting VHD on Windows Server 2012 R2 - See [Issue 105](https://github.com/PowerShell/xStorage/issues/105)
+- xWaitForDisk:
+  - Added support for Guid Disk Id type - See [Issue 104](https://github.com/PowerShell/xStorage/issues/104)
 
 ## 3.1.0.0
 
