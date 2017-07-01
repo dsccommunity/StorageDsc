@@ -60,7 +60,7 @@ function Get-TargetResource
         $DiskId,
 
         [Parameter()]
-        [ValidateSet('Number','UniqueId')]
+        [ValidateSet('Number','UniqueId','Guid')]
         [System.String]
         $DiskIdType = 'Number',
 
@@ -90,13 +90,10 @@ function Get-TargetResource
     # Validate the AccessPath parameter adding a trailing slash
     $AccessPath = Assert-AccessPathValid -AccessPath $AccessPath -Slash
 
-    $diskIdParameter = @{
-        $DiskIdType = $DiskId
-    }
-
-    $disk = Get-Disk `
-        @diskIdParameter `
-        -ErrorAction SilentlyContinue
+    # Get the Disk using the identifiers supplied
+    $disk = Get-DiskByIdentifier `
+        -DiskId $DiskId `
+        -DiskIdType $DiskIdType
 
     # Get the partitions on the disk
     $partition = $disk | Get-Partition -ErrorAction SilentlyContinue
@@ -170,7 +167,7 @@ function Set-TargetResource
         $DiskId,
 
         [Parameter()]
-        [ValidateSet('Number','UniqueId')]
+        [ValidateSet('Number','UniqueId','Guid')]
         [System.String]
         $DiskIdType = 'Number',
 
@@ -200,13 +197,10 @@ function Set-TargetResource
     # Validate the AccessPath parameter adding a trailing slash
     $AccessPath = Assert-AccessPathValid -AccessPath $AccessPath -Slash
 
-    $diskIdParameter = @{
-        $DiskIdType = $DiskId
-    }
-
-    $disk = Get-Disk `
-        @diskIdParameter `
-        -ErrorAction Stop
+    # Get the Disk using the identifiers supplied
+    $disk = Get-DiskByIdentifier `
+        -DiskId $DiskId `
+        -DiskIdType $DiskIdType
 
     if ($disk.IsOffline)
     {
@@ -513,7 +507,7 @@ function Test-TargetResource
         $DiskId,
 
         [Parameter()]
-        [ValidateSet('Number','UniqueId')]
+        [ValidateSet('Number','UniqueId','Guid')]
         [System.String]
         $DiskIdType = 'Number',
 
@@ -548,13 +542,10 @@ function Test-TargetResource
             $($localizedData.CheckDiskInitializedMessage -f $DiskIdType,$DiskId)
         ) -join '' )
 
-    $diskIdParameter = @{
-        $DiskIdType = $DiskId
-    }
-
-    $disk = Get-Disk `
-        @diskIdParameter `
-        -ErrorAction SilentlyContinue
+    # Get the Disk using the identifiers supplied
+    $disk = Get-DiskByIdentifier `
+        -DiskId $DiskId `
+        -DiskIdType $DiskIdType
 
     if (-not $disk)
     {

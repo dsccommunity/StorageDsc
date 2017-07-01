@@ -6,9 +6,9 @@ Import-Module -Name (Join-Path -Path (Join-Path -Path (Split-Path $PSScriptRoot 
 # Unit Test Template Version: 1.1.0
 [string] $script:moduleRoot = Join-Path -Path $(Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $Script:MyInvocation.MyCommand.Path))) -ChildPath 'Modules\xStorage'
 if ( (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests'))) -or `
-     (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1'))) )
+    (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1'))) )
 {
-    & git @('clone','https://github.com/PowerShell/DscResource.Tests.git',(Join-Path -Path $script:moduleRoot -ChildPath '\DSCResource.Tests\'))
+    & git @('clone', 'https://github.com/PowerShell/DscResource.Tests.git', (Join-Path -Path $script:moduleRoot -ChildPath '\DSCResource.Tests\'))
 }
 
 Import-Module (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1') -Force
@@ -19,7 +19,6 @@ Import-Module (Join-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath (J
 try
 {
     #region Pester Tests
-
     $LocalizedData = InModuleScope $script:ModuleName {
         $LocalizedData
     }
@@ -34,60 +33,87 @@ try
     $accessPathGood = 'c:\Good'
     $accessPathGoodWithSlash = 'c:\Good\'
     $accessPathBad = 'c:\Bad'
+
+    $testDiskNumber = 10
+    $testDiskUniqueId = 'DiskUniqueId'
+    $testDiskGuid = [Guid]::NewGuid().ToString()
+
+    # Defining these InModuleScope makes them accessible to the Mocks
+    InModuleScope $script:ModuleName {
+        $mockedDisk = [pscustomobject] @{
+            Number   = $testDiskNumber
+            UniqueId = $testDiskUniqueId
+            Guid     = $testDiskGuid
+        }
+    }
+    #endregion
+
+    #region Functions To Mock
+    function Get-Disk {
+        [CmdletBinding()]
+        Param
+        (
+            [System.UInt32]
+            $Number,
+
+            [System.String]
+            $UniqueId
+        )
+    }
     #endregion
 
     #region Function Assert-DriveLetterValid
-    Describe "StorageDsc.Common\Assert-DriveLetterValid" {
-        Context 'drive letter is good, has no colon and colon is not required' {
-            It "should return '$driveLetterGood'" {
+    Describe 'StorageDsc.Common\Assert-DriveLetterValid' {
+        Context 'Drive letter is good, has no colon and colon is not required' {
+            It "Should return '$driveLetterGood'" {
                 Assert-DriveLetterValid -DriveLetter $driveLetterGood | Should Be $driveLetterGood
             }
         }
 
-        Context 'drive letter is good, has no colon but colon is required' {
-            It "should return '$driveLetterGoodwithColon'" {
+        Context 'Drive letter is good, has no colon but colon is required' {
+            It "Should return '$driveLetterGoodwithColon'" {
                 Assert-DriveLetterValid -DriveLetter $driveLetterGood -Colon | Should Be $driveLetterGoodwithColon
             }
         }
 
-        Context 'drive letter is good, has a colon but colon is not required' {
-            It "should return '$driveLetterGood'" {
+        Context 'Drive letter is good, has a colon but colon is not required' {
+            It "Should return '$driveLetterGood'" {
                 Assert-DriveLetterValid -DriveLetter $driveLetterGoodwithColon | Should Be $driveLetterGood
             }
         }
 
-        Context 'drive letter is good, has a colon and colon is required' {
-            It "should return '$driveLetterGoodwithColon'" {
+        Context 'Drive letter is good, has a colon and colon is required' {
+            It "Should return '$driveLetterGoodwithColon'" {
                 Assert-DriveLetterValid -DriveLetter $driveLetterGoodwithColon -Colon | Should Be $driveLetterGoodwithColon
             }
         }
 
-        Context 'drive letter is non alpha' {
+        Context 'Drive letter is non alpha' {
             $errorRecord = Get-InvalidArgumentRecord `
                 -Message $($LocalizedData.InvalidDriveLetterFormatError -f $driveLetterBad) `
                 -ArgumentName 'DriveLetter'
 
-            It 'should throw InvalidDriveLetterFormatError' {
+            It 'Should throw InvalidDriveLetterFormatError' {
                 { Assert-DriveLetterValid -DriveLetter $driveLetterBad } | Should Throw $errorRecord
             }
         }
 
-        Context 'drive letter has a bad colon location' {
+        Context 'Drive letter has a bad colon location' {
             $errorRecord = Get-InvalidArgumentRecord `
                 -Message $($LocalizedData.InvalidDriveLetterFormatError -f $driveLetterBadColon) `
                 -ArgumentName 'DriveLetter'
 
-            It 'should throw InvalidDriveLetterFormatError' {
+            It 'Should throw InvalidDriveLetterFormatError' {
                 { Assert-DriveLetterValid -DriveLetter $driveLetterBadColon } | Should Throw $errorRecord
             }
         }
 
-        Context 'drive letter is too long' {
+        Context 'Drive letter is too long' {
             $errorRecord = Get-InvalidArgumentRecord `
                 -Message $($LocalizedData.InvalidDriveLetterFormatError -f $driveLetterBadTooLong) `
                 -ArgumentName 'DriveLetter'
 
-            It 'should throw InvalidDriveLetterFormatError' {
+            It 'Should throw InvalidDriveLetterFormatError' {
                 { Assert-DriveLetterValid -DriveLetter $driveLetterBadTooLong } | Should Throw $errorRecord
             }
         }
@@ -101,26 +127,26 @@ try
             -ModuleName StorageDsc.Common `
             -MockWith { $true }
 
-        Context 'path is found, trailing slash included, not required' {
-            It "should return '$accessPathGood'" {
+        Context 'Path is found, trailing slash included, not required' {
+            It "Should return '$accessPathGood'" {
                 Assert-AccessPathValid -AccessPath $accessPathGoodWithSlash | Should Be $accessPathGood
             }
         }
 
-        Context 'path is found, trailing slash included, required' {
-            It "should return '$accessPathGoodWithSlash'" {
+        Context 'Path is found, trailing slash included, required' {
+            It "Should return '$accessPathGoodWithSlash'" {
                 Assert-AccessPathValid -AccessPath $accessPathGoodWithSlash -Slash | Should Be $accessPathGoodWithSlash
             }
         }
 
-        Context 'path is found, trailing slash not included, required' {
-            It "should return '$accessPathGoodWithSlash'" {
+        Context 'Path is found, trailing slash not included, required' {
+            It "Should return '$accessPathGoodWithSlash'" {
                 Assert-AccessPathValid -AccessPath $accessPathGood -Slash | Should Be $accessPathGoodWithSlash
             }
         }
 
-        Context 'path is found, trailing slash not included, not required' {
-            It "should return '$accessPathGood'" {
+        Context 'Path is found, trailing slash not included, not required' {
+            It "Should return '$accessPathGood'" {
                 Assert-AccessPathValid -AccessPath $accessPathGood | Should Be $accessPathGood
             }
         }
@@ -130,18 +156,154 @@ try
             -ModuleName StorageDsc.Common `
             -MockWith { $false }
 
-        Context 'drive is not found' {
+        Context 'Drive is not found' {
             $errorRecord = Get-InvalidArgumentRecord `
                 -Message $($LocalizedData.InvalidAccessPathError -f $accessPathBad) `
                 -ArgumentName 'AccessPath'
 
-            It 'should throw InvalidAccessPathError' {
+            It 'Should throw InvalidAccessPathError' {
                 { Assert-AccessPathValid `
-                    -AccessPath $accessPathBad } | Should Throw $errorRecord
+                        -AccessPath $accessPathBad } | Should Throw $errorRecord
             }
         }
     }
     #endregion
+
+    #region Function Get-DiskByIdentifier
+    Describe 'StorageDsc.Common\Get-DiskByIdentifier' {
+        Context 'Disk exists that matches the specified Disk Number' {
+            Mock `
+                -CommandName Get-Disk `
+                -MockWith { $mockedDisk } `
+                -ModuleName StorageDsc.Common `
+                -ParameterFilter { $Number -eq $mockedDisk.Number } `
+                -Verifiable
+
+            It "Should return Disk with Disk Number $($mockedDisk.Number)" {
+                (Get-DiskByIdentifier -DiskId $mockedDisk.Number).Number | Should Be $mockedDisk.Number
+            }
+
+            It 'Should call exepced mocks' {
+                Assert-VerifiableMocks
+                Assert-MockCalled `
+                    -CommandName Get-Disk `
+                    -ModuleName StorageDsc.Common `
+                    -ParameterFilter { $Number -eq $testDiskNumber } `
+                    -Exactly `
+                    -Times 1
+            }
+        }
+
+        Context 'Disk does not exist that matches the specified Disk Number' {
+            Mock `
+                -CommandName Get-Disk `
+                -ModuleName StorageDsc.Common `
+                -ParameterFilter { $Number -eq $testDiskNumber } `
+                -Verifiable
+
+            It "Should return Disk with Disk Number $testDiskNumber" {
+                Get-DiskByIdentifier -DiskId $testDiskNumber | Should BeNullOrEmpty
+            }
+
+            It 'Should call exepced mocks' {
+                Assert-VerifiableMocks
+                Assert-MockCalled `
+                    -CommandName Get-Disk `
+                    -ModuleName StorageDsc.Common `
+                    -ParameterFilter { $Number -eq $testDiskNumber } `
+                    -Exactly `
+                    -Times 1
+            }
+        }
+
+        Context 'Disk exists that matches the specified Disk Unique Id' {
+            Mock `
+                -CommandName Get-Disk `
+                -MockWith { $mockedDisk } `
+                -ModuleName StorageDsc.Common `
+                -ParameterFilter { $UniqueId -eq $mockedDisk.UniqueId } `
+                -Verifiable
+
+            It "Should return Disk with Disk Unique Id $($mockedDisk.UniqueId)" {
+                (Get-DiskByIdentifier -DiskId $mockedDisk.UniqueId -DiskIdType 'UniqueId').UniqueId | Should Be $mockedDisk.UniqueId
+            }
+
+            It 'Should call exepced mocks' {
+                Assert-VerifiableMocks
+                Assert-MockCalled `
+                    -CommandName Get-Disk `
+                    -ModuleName StorageDsc.Common `
+                    -ParameterFilter { $UniqueId -eq $testDiskUniqueId } `
+                    -Exactly `
+                    -Times 1
+            }
+        }
+
+        Context 'Disk does not exist that matches the specified Disk Unique Id' {
+            Mock `
+                -CommandName Get-Disk `
+                -ModuleName StorageDsc.Common `
+                -ParameterFilter { $UniqueId -eq $testDiskUniqueId } `
+                -Verifiable
+
+            It "Should return Disk with Disk Unique Id $testDiskUniqueId" {
+                Get-DiskByIdentifier -DiskId $testDiskUniqueId -DiskIdType 'UniqueId' | Should BeNullOrEmpty
+            }
+
+            It 'Should call exepced mocks' {
+                Assert-VerifiableMocks
+                Assert-MockCalled `
+                    -CommandName Get-Disk `
+                    -ModuleName StorageDsc.Common `
+                    -ParameterFilter { $UniqueId -eq $testDiskUniqueId } `
+                    -Exactly `
+                    -Times 1
+            }
+        }
+
+        Context 'Disk exists that matches the specified Disk Guid' {
+            Mock `
+                -CommandName Get-Disk `
+                -MockWith { $mockedDisk } `
+                -ModuleName StorageDsc.Common `
+                -Verifiable
+
+            It "Should return Disk with Disk Guid $($mockedDisk.testDiskGuid)" {
+                (Get-DiskByIdentifier -DiskId $mockedDisk.Guid -DiskIdType 'Guid').Guid | Should Be $mockedDisk.Guid
+            }
+
+            It 'Should call exepced mocks' {
+                Assert-VerifiableMocks
+                Assert-MockCalled `
+                    -CommandName Get-Disk `
+                    -ModuleName StorageDsc.Common `
+                    -Exactly `
+                    -Times 1
+            }
+        }
+
+        Context 'Disk does not exist that matches the specified Disk Guid' {
+            Mock `
+                -CommandName Get-Disk `
+                -ModuleName StorageDsc.Common `
+                -Verifiable
+
+            It "Should return Disk with Disk Guid $testDiskGuid" {
+                Get-DiskByIdentifier -DiskId $testDiskGuid -DiskIdType 'Guid' | Should BeNullOrEmpty
+            }
+
+            It 'Should call exepced mocks' {
+                Assert-VerifiableMocks
+                Assert-MockCalled `
+                    -CommandName Get-Disk `
+                    -ModuleName StorageDsc.Common `
+                    -Exactly `
+                    -Times 1
+            }
+        }
+    }
+    #endregion Function Get-DiskByIdentifier
+    #endregion Pester Tests
 }
 finally
 {
