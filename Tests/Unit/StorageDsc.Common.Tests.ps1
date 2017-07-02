@@ -34,22 +34,9 @@ try
     $accessPathGoodWithSlash = 'c:\Good\'
     $accessPathBad = 'c:\Bad'
 
-    $testDiskNumber = 10
-    $testDiskUniqueId = 'DiskUniqueId'
-    $testDiskGuid = [Guid]::NewGuid().ToString()
-
-    # Defining these InModuleScope makes them accessible to the Mocks
-    InModuleScope $script:ModuleName {
-        $mockedDisk = [pscustomobject] @{
-            Number   = $testDiskNumber
-            UniqueId = $testDiskUniqueId
-            Guid     = $testDiskGuid
-        }
-    }
-    #endregion
-
     #region Functions To Mock
-    function Get-Disk {
+    function Get-Disk
+    {
         [CmdletBinding()]
         Param
         (
@@ -170,139 +157,151 @@ try
     #endregion
 
     #region Function Get-DiskByIdentifier
-    Describe 'StorageDsc.Common\Get-DiskByIdentifier' {
-        Context 'Disk exists that matches the specified Disk Number' {
-            Mock `
-                -CommandName Get-Disk `
-                -MockWith { $mockedDisk } `
-                -ModuleName StorageDsc.Common `
-                -ParameterFilter { $Number -eq $mockedDisk.Number } `
-                -Verifiable
+    InModuleScope $script:ModuleName {
+        $testDiskNumber = 10
+        $testDiskUniqueId = 'DiskUniqueId'
+        $testDiskGuid = [Guid]::NewGuid().ToString()
 
-            It "Should return Disk with Disk Number $($mockedDisk.Number)" {
-                (Get-DiskByIdentifier -DiskId $mockedDisk.Number).Number | Should Be $mockedDisk.Number
+        $mockedDisk = [pscustomobject] @{
+            Number   = $testDiskNumber
+            UniqueId = $testDiskUniqueId
+            Guid     = $testDiskGuid
+        }
+
+        Describe 'StorageDsc.Common\Get-DiskByIdentifier' {
+            Context 'Disk exists that matches the specified Disk Number' {
+                Mock `
+                    -CommandName Get-Disk `
+                    -MockWith { $mockedDisk } `
+                    -ModuleName StorageDsc.Common `
+                    -ParameterFilter { $Number -eq $testDiskNumber } `
+                    -Verifiable
+
+                It "Should return Disk with Disk Number $testDiskNumber" {
+                    (Get-DiskByIdentifier -DiskId $testDiskNumber).Number | Should Be $testDiskNumber
+                }
+
+                It 'Should call exepced mocks' {
+                    Assert-VerifiableMocks
+                    Assert-MockCalled `
+                        -CommandName Get-Disk `
+                        -ModuleName StorageDsc.Common `
+                        -ParameterFilter { $Number -eq $testDiskNumber } `
+                        -Exactly `
+                        -Times 1
+                }
             }
 
-            It 'Should call exepced mocks' {
-                Assert-VerifiableMocks
-                Assert-MockCalled `
+            Context 'Disk does not exist that matches the specified Disk Number' {
+                Mock `
                     -CommandName Get-Disk `
                     -ModuleName StorageDsc.Common `
                     -ParameterFilter { $Number -eq $testDiskNumber } `
-                    -Exactly `
-                    -Times 1
+                    -Verifiable
+
+                It "Should return Disk with Disk Number $testDiskNumber" {
+                    Get-DiskByIdentifier -DiskId $testDiskNumber | Should BeNullOrEmpty
+                }
+
+                It 'Should call exepced mocks' {
+                    Assert-VerifiableMocks
+                    Assert-MockCalled `
+                        -CommandName Get-Disk `
+                        -ModuleName StorageDsc.Common `
+                        -ParameterFilter { $Number -eq $testDiskNumber } `
+                        -Exactly `
+                        -Times 1
+                }
             }
-        }
 
-        Context 'Disk does not exist that matches the specified Disk Number' {
-            Mock `
-                -CommandName Get-Disk `
-                -ModuleName StorageDsc.Common `
-                -ParameterFilter { $Number -eq $testDiskNumber } `
-                -Verifiable
-
-            It "Should return Disk with Disk Number $testDiskNumber" {
-                Get-DiskByIdentifier -DiskId $testDiskNumber | Should BeNullOrEmpty
-            }
-
-            It 'Should call exepced mocks' {
-                Assert-VerifiableMocks
-                Assert-MockCalled `
+            Context 'Disk exists that matches the specified Disk Unique Id' {
+                Mock `
                     -CommandName Get-Disk `
+                    -MockWith { $mockedDisk } `
                     -ModuleName StorageDsc.Common `
-                    -ParameterFilter { $Number -eq $testDiskNumber } `
-                    -Exactly `
-                    -Times 1
+                    -ParameterFilter { $UniqueId -eq $testDiskUniqueId } `
+                    -Verifiable
+
+                It "Should return Disk with Disk Unique Id $testDiskUniqueId" {
+                    (Get-DiskByIdentifier -DiskId $testDiskUniqueId -DiskIdType 'UniqueId').UniqueId | Should Be $testDiskUniqueId
+                }
+
+                It 'Should call exepced mocks' {
+                    Assert-VerifiableMocks
+                    Assert-MockCalled `
+                        -CommandName Get-Disk `
+                        -ModuleName StorageDsc.Common `
+                        -ParameterFilter { $UniqueId -eq $testDiskUniqueId } `
+                        -Exactly `
+                        -Times 1
+                }
             }
-        }
 
-        Context 'Disk exists that matches the specified Disk Unique Id' {
-            Mock `
-                -CommandName Get-Disk `
-                -MockWith { $mockedDisk } `
-                -ModuleName StorageDsc.Common `
-                -ParameterFilter { $UniqueId -eq $mockedDisk.UniqueId } `
-                -Verifiable
-
-            It "Should return Disk with Disk Unique Id $($mockedDisk.UniqueId)" {
-                (Get-DiskByIdentifier -DiskId $mockedDisk.UniqueId -DiskIdType 'UniqueId').UniqueId | Should Be $mockedDisk.UniqueId
-            }
-
-            It 'Should call exepced mocks' {
-                Assert-VerifiableMocks
-                Assert-MockCalled `
+            Context 'Disk does not exist that matches the specified Disk Unique Id' {
+                Mock `
                     -CommandName Get-Disk `
                     -ModuleName StorageDsc.Common `
                     -ParameterFilter { $UniqueId -eq $testDiskUniqueId } `
-                    -Exactly `
-                    -Times 1
+                    -Verifiable
+
+                It "Should return Disk with Disk Unique Id $testDiskUniqueId" {
+                    Get-DiskByIdentifier -DiskId $testDiskUniqueId -DiskIdType 'UniqueId' | Should BeNullOrEmpty
+                }
+
+                It 'Should call exepced mocks' {
+                    Assert-VerifiableMocks
+                    Assert-MockCalled `
+                        -CommandName Get-Disk `
+                        -ModuleName StorageDsc.Common `
+                        -ParameterFilter { $UniqueId -eq $testDiskUniqueId } `
+                        -Exactly `
+                        -Times 1
+                }
             }
-        }
 
-        Context 'Disk does not exist that matches the specified Disk Unique Id' {
-            Mock `
-                -CommandName Get-Disk `
-                -ModuleName StorageDsc.Common `
-                -ParameterFilter { $UniqueId -eq $testDiskUniqueId } `
-                -Verifiable
+            Context 'Disk exists that matches the specified Disk Guid' {
+                Mock `
+                    -CommandName Get-Disk `
+                    -MockWith { $mockedDisk } `
+                    -ModuleName StorageDsc.Common `
+                    -Verifiable
 
-            It "Should return Disk with Disk Unique Id $testDiskUniqueId" {
-                Get-DiskByIdentifier -DiskId $testDiskUniqueId -DiskIdType 'UniqueId' | Should BeNullOrEmpty
+                It "Should return Disk with Disk Guid $testDiskGuid" {
+                    (Get-DiskByIdentifier -DiskId $testDiskGuid -DiskIdType 'Guid').Guid | Should Be $testDiskGuid
+                }
+
+                It 'Should call exepced mocks' {
+                    Assert-VerifiableMocks
+                    Assert-MockCalled `
+                        -CommandName Get-Disk `
+                        -ModuleName StorageDsc.Common `
+                        -Exactly `
+                        -Times 1
+                }
             }
 
-            It 'Should call exepced mocks' {
-                Assert-VerifiableMocks
-                Assert-MockCalled `
+            Context 'Disk does not exist that matches the specified Disk Guid' {
+                Mock `
                     -CommandName Get-Disk `
                     -ModuleName StorageDsc.Common `
-                    -ParameterFilter { $UniqueId -eq $testDiskUniqueId } `
-                    -Exactly `
-                    -Times 1
+                    -Verifiable
+
+                It "Should return Disk with Disk Guid $testDiskGuid" {
+                    Get-DiskByIdentifier -DiskId $testDiskGuid -DiskIdType 'Guid' | Should BeNullOrEmpty
+                }
+
+                It 'Should call exepced mocks' {
+                    Assert-VerifiableMocks
+                    Assert-MockCalled `
+                        -CommandName Get-Disk `
+                        -ModuleName StorageDsc.Common `
+                        -Exactly `
+                        -Times 1
+                }
             }
         }
-
-        Context 'Disk exists that matches the specified Disk Guid' {
-            Mock `
-                -CommandName Get-Disk `
-                -MockWith { $mockedDisk } `
-                -ModuleName StorageDsc.Common `
-                -Verifiable
-
-            It "Should return Disk with Disk Guid $($mockedDisk.testDiskGuid)" {
-                (Get-DiskByIdentifier -DiskId $mockedDisk.Guid -DiskIdType 'Guid').Guid | Should Be $mockedDisk.Guid
-            }
-
-            It 'Should call exepced mocks' {
-                Assert-VerifiableMocks
-                Assert-MockCalled `
-                    -CommandName Get-Disk `
-                    -ModuleName StorageDsc.Common `
-                    -Exactly `
-                    -Times 1
-            }
-        }
-
-        Context 'Disk does not exist that matches the specified Disk Guid' {
-            Mock `
-                -CommandName Get-Disk `
-                -ModuleName StorageDsc.Common `
-                -Verifiable
-
-            It "Should return Disk with Disk Guid $testDiskGuid" {
-                Get-DiskByIdentifier -DiskId $testDiskGuid -DiskIdType 'Guid' | Should BeNullOrEmpty
-            }
-
-            It 'Should call exepced mocks' {
-                Assert-VerifiableMocks
-                Assert-MockCalled `
-                    -CommandName Get-Disk `
-                    -ModuleName StorageDsc.Common `
-                    -Exactly `
-                    -Times 1
-            }
-        }
+        #endregion Function Get-DiskByIdentifier
     }
-    #endregion Function Get-DiskByIdentifier
     #endregion Pester Tests
 }
 finally
