@@ -564,11 +564,12 @@ function Set-TargetResource
                     "$($MyInvocation.MyCommand): "
                     $($localizedData.SuccessfullyInitializedMessage -f $DriveLetter)
                 ) -join '' )
-        } # if
+        } # if    
     
-    }# Set-TargetResource
+    }
+} # Set-TargetResource
 
-    <#
+<#
     .SYNOPSIS
     Tests if the disk is initialized, the partion exists and the drive letter is assigned.
 
@@ -599,208 +600,208 @@ function Set-TargetResource
     .PARAMETER ClearDisk
     Specifies if the disks partition schema should be removed entirely, even if data and oem partitions are present. Only possible with AllowDestructive enabled.
 #>
-    function Test-TargetResource
+function Test-TargetResource
+{
+    [CmdletBinding()]
+    [OutputType([System.Boolean])]
+    param
+    (
+        [Parameter(Mandatory = $true)]
+        [System.String]
+        $DriveLetter,
+
+        [Parameter(Mandatory = $true)]
+        [System.String]
+        $DiskId,
+
+        [Parameter()]
+        [ValidateSet('Number', 'UniqueId')]
+        [System.String]
+        $DiskIdType = 'Number',
+
+        [Parameter()]
+        [System.UInt64]
+        $Size,
+
+        [Parameter()]
+        [System.String]
+        $FSLabel,
+
+        [Parameter()]
+        [System.UInt32]
+        $AllocationUnitSize,
+
+        [Parameter()]
+        [ValidateSet('NTFS', 'ReFS')]
+        [System.String]
+        $FSFormat = 'NTFS',
+
+        [Parameter()]
+        [System.Boolean]
+        $AllowDestructive,
+
+        [Parameter()]
+        [System.Boolean]
+        $ClearDisk
+    )
+
+    Write-Verbose -Message ( @(
+            "$($MyInvocation.MyCommand): "
+            $($localizedData.TestingDiskMessage -f $DiskIdType, $DiskId, $DriveLetter)
+        ) -join '' )
+
+    # Validate the DriveLetter parameter
+    $DriveLetter = Assert-DriveLetterValid -DriveLetter $DriveLetter
+
+    $diskIdParameter = @{
+        $DiskIdType = $DiskId
+    }
+
+    Write-Verbose -Message ( @(
+            "$($MyInvocation.MyCommand): "
+            $($localizedData.CheckDiskInitializedMessage -f $DiskIdType, $DiskId)
+        ) -join '' )
+
+    $disk = Get-Disk `
+        @diskIdParameter `
+        -ErrorAction SilentlyContinue
+
+    if (-not $disk)
     {
-        [CmdletBinding()]
-        [OutputType([System.Boolean])]
-        param
-        (
-            [Parameter(Mandatory = $true)]
-            [System.String]
-            $DriveLetter,
-
-            [Parameter(Mandatory = $true)]
-            [System.String]
-            $DiskId,
-
-            [Parameter()]
-            [ValidateSet('Number', 'UniqueId')]
-            [System.String]
-            $DiskIdType = 'Number',
-
-            [Parameter()]
-            [System.UInt64]
-            $Size,
-
-            [Parameter()]
-            [System.String]
-            $FSLabel,
-
-            [Parameter()]
-            [System.UInt32]
-            $AllocationUnitSize,
-
-            [Parameter()]
-            [ValidateSet('NTFS', 'ReFS')]
-            [System.String]
-            $FSFormat = 'NTFS',
-
-            [Parameter()]
-            [System.Boolean]
-            $AllowDestructive,
-
-            [Parameter()]
-            [System.Boolean]
-            $ClearDisk
-        )
-
         Write-Verbose -Message ( @(
                 "$($MyInvocation.MyCommand): "
-                $($localizedData.TestingDiskMessage -f $DiskIdType, $DiskId, $DriveLetter)
+                $($localizedData.DiskNotFoundMessage -f $DiskIdType, $DiskId)
             ) -join '' )
 
-        # Validate the DriveLetter parameter
-        $DriveLetter = Assert-DriveLetterValid -DriveLetter $DriveLetter
+        return $false
+    } # if
 
-        $diskIdParameter = @{
-            $DiskIdType = $DiskId
-        }
-
+    if ($disk.IsOffline)
+    {
         Write-Verbose -Message ( @(
                 "$($MyInvocation.MyCommand): "
-                $($localizedData.CheckDiskInitializedMessage -f $DiskIdType, $DiskId)
+                $($localizedData.DiskNotOnlineMessage -f $DiskIdType, $DiskId)
             ) -join '' )
 
-        $disk = Get-Disk `
-            @diskIdParameter `
-            -ErrorAction SilentlyContinue
+        return $false
+    } # if
 
-        if (-not $disk)
+    if ($disk.IsReadOnly)
+    {
+        Write-Verbose -Message ( @(
+                "$($MyInvocation.MyCommand): "
+                $($localizedData.DiskReadOnlyMessage -f $DiskIdType, $DiskId)
+            ) -join '' )
+
+        return $false
+    } # if
+
+    if ($disk.PartitionStyle -ne 'GPT')
+    {
+        Write-Verbose -Message ( @(
+                "$($MyInvocation.MyCommand): "
+                $($localizedData.DiskNotGPTMessage -f $DiskIdType, $DiskId, $Disk.PartitionStyle)
+            ) -join '' )
+
+        return $false
+    } # if
+
+    $partition = Get-Partition `
+        -DriveLetter $DriveLetter `
+        -ErrorAction SilentlyContinue
+    if ($partition.DriveLetter -ne $DriveLetter)
+    {
+        Write-Verbose -Message ( @(
+                "$($MyInvocation.MyCommand): "
+                $($localizedData.DriveLetterNotFoundMessage -f $DriveLetter)
+            ) -join '' )
+
+        return $false
+    } # if
+
+    # Drive size
+    if ($Size)
+    {
+        if ($partition.Size -ne $Size)
         {
+            # The partition size mismatches
             Write-Verbose -Message ( @(
                     "$($MyInvocation.MyCommand): "
-                    $($localizedData.DiskNotFoundMessage -f $DiskIdType, $DiskId)
+                    $($localizedData.SizeMismatchMessage `
+                            -f $DriveLetter, $Partition.Size, $Size)
                 ) -join '' )
 
-            return $false
-        } # if
-
-        if ($disk.IsOffline)
-        {
-            Write-Verbose -Message ( @(
-                    "$($MyInvocation.MyCommand): "
-                    $($localizedData.DiskNotOnlineMessage -f $DiskIdType, $DiskId)
-                ) -join '' )
-
-            return $false
-        } # if
-
-        if ($disk.IsReadOnly)
-        {
-            Write-Verbose -Message ( @(
-                    "$($MyInvocation.MyCommand): "
-                    $($localizedData.DiskReadOnlyMessage -f $DiskIdType, $DiskId)
-                ) -join '' )
-
-            return $false
-        } # if
-
-        if ($disk.PartitionStyle -ne 'GPT')
-        {
-            Write-Verbose -Message ( @(
-                    "$($MyInvocation.MyCommand): "
-                    $($localizedData.DiskNotGPTMessage -f $DiskIdType, $DiskId, $Disk.PartitionStyle)
-                ) -join '' )
-
-            return $false
-        } # if
-
-        $partition = Get-Partition `
-            -DriveLetter $DriveLetter `
-            -ErrorAction SilentlyContinue
-        if ($partition.DriveLetter -ne $DriveLetter)
-        {
-            Write-Verbose -Message ( @(
-                    "$($MyInvocation.MyCommand): "
-                    $($localizedData.DriveLetterNotFoundMessage -f $DriveLetter)
-                ) -join '' )
-
-            return $false
-        } # if
-
-        # Drive size
-        if ($Size)
-        {
-            if ($partition.Size -ne $Size)
+            if ($AllowDestructive)
             {
-                # The partition size mismatches
-                Write-Verbose -Message ( @(
-                        "$($MyInvocation.MyCommand): "
-                        $($localizedData.SizeMismatchMessage `
-                                -f $DriveLetter, $Partition.Size, $Size)
-                    ) -join '' )
-
-                if ($AllowDestructive)
-                {
-                    return $false
-                }
-            } # if
-        } # if
-
-        $blockSize = (Get-CimInstance `
-                -Query "SELECT BlockSize from Win32_Volume WHERE DriveLetter = '$($DriveLetter):'" `
-                -ErrorAction SilentlyContinue).BlockSize
-
-        if ($blockSize -gt 0 -and $AllocationUnitSize -ne 0)
-        {
-            if ($AllocationUnitSize -ne $blockSize)
-            {
-                # The allocation unit size mismatches
-                Write-Verbose -Message ( @(
-                        "$($MyInvocation.MyCommand): "
-                        $($localizedData.AllocationUnitSizeMismatchMessage `
-                                -f $DriveLetter, $($blockSize.BlockSize / 1KB), $($AllocationUnitSize / 1KB))
-                    ) -join '' )
-
-                if ($AllowDestructive)
-                {
-                    return $false
-                }
-            } # if
-        } # if
-
-        # Get the volume so the properties can be checked
-        $volume = Get-Volume `
-            -DriveLetter $DriveLetter `
-            -ErrorAction SilentlyContinue
-
-        if ($PSBoundParameters.ContainsKey('FSFormat'))
-        {
-            # Check the filesystem format
-            $fileSystem = $volume.FileSystem
-            if ($fileSystem -ne $FSFormat)
-            {
-                Write-Verbose -Message ( @(
-                        "$($MyInvocation.MyCommand): "
-                        $($localizedData.FileSystemFormatMismatch `
-                                -f $DriveLetter, $fileSystem, $FSFormat)
-                    ) -join '' )
-
-                if ($AllowDestructive)
-                {
-                    return $false
-                }
-            } # if
-        } # if
-
-        if ($PSBoundParameters.ContainsKey('FSLabel'))
-        {
-            # Check the volume label
-            $label = $volume.FileSystemLabel
-            if ($label -ne $FSLabel)
-            {
-                # The assigned volume label is different and needs updating
-                Write-Verbose -Message ( @(
-                        "$($MyInvocation.MyCommand): "
-                        $($localizedData.DriveLabelMismatch `
-                                -f $DriveLetter, $label, $FSLabel)
-                    ) -join '' )
-
                 return $false
-            } # if
+            }
         } # if
+    } # if
 
-        return $true
-    } # Test-TargetResource
+    $blockSize = (Get-CimInstance `
+            -Query "SELECT BlockSize from Win32_Volume WHERE DriveLetter = '$($DriveLetter):'" `
+            -ErrorAction SilentlyContinue).BlockSize
 
-    Export-ModuleMember -Function *-TargetResource
+    if ($blockSize -gt 0 -and $AllocationUnitSize -ne 0)
+    {
+        if ($AllocationUnitSize -ne $blockSize)
+        {
+            # The allocation unit size mismatches
+            Write-Verbose -Message ( @(
+                    "$($MyInvocation.MyCommand): "
+                    $($localizedData.AllocationUnitSizeMismatchMessage `
+                            -f $DriveLetter, $($blockSize.BlockSize / 1KB), $($AllocationUnitSize / 1KB))
+                ) -join '' )
+
+            if ($AllowDestructive)
+            {
+                return $false
+            }
+        } # if
+    } # if
+
+    # Get the volume so the properties can be checked
+    $volume = Get-Volume `
+        -DriveLetter $DriveLetter `
+        -ErrorAction SilentlyContinue
+
+    if ($PSBoundParameters.ContainsKey('FSFormat'))
+    {
+        # Check the filesystem format
+        $fileSystem = $volume.FileSystem
+        if ($fileSystem -ne $FSFormat)
+        {
+            Write-Verbose -Message ( @(
+                    "$($MyInvocation.MyCommand): "
+                    $($localizedData.FileSystemFormatMismatch `
+                            -f $DriveLetter, $fileSystem, $FSFormat)
+                ) -join '' )
+
+            if ($AllowDestructive)
+            {
+                return $false
+            }
+        } # if
+    } # if
+
+    if ($PSBoundParameters.ContainsKey('FSLabel'))
+    {
+        # Check the volume label
+        $label = $volume.FileSystemLabel
+        if ($label -ne $FSLabel)
+        {
+            # The assigned volume label is different and needs updating
+            Write-Verbose -Message ( @(
+                    "$($MyInvocation.MyCommand): "
+                    $($localizedData.DriveLabelMismatch `
+                            -f $DriveLetter, $label, $FSLabel)
+                ) -join '' )
+
+            return $false
+        } # if
+    } # if
+
+    return $true
+} # Test-TargetResource
+
+Export-ModuleMember -Function *-TargetResource
