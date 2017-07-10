@@ -465,108 +465,107 @@ function Set-TargetResource
                 }
             }
         }
+    }
 
-        # Get the Volume on the partition
-        $volume = $partition | Get-Volume
+    # Get the Volume on the partition
+    $volume = $partition | Get-Volume
 
-        # Is the volume already formatted?
-        if ($volume.FileSystem -eq '')
-        {
-            # The volume is not formatted
-            $volParams = @{
-                FileSystem = $FSFormat
-                Confirm    = $false
-            }
-
-            if ($FSLabel)
-            {
-                # Set the File System label on the new volume
-                $volParams["NewFileSystemLabel"] = $FSLabel
-            } # if
-
-            if ($AllocationUnitSize)
-            {
-                # Set the Allocation Unit Size on the new volume
-                $volParams["AllocationUnitSize"] = $AllocationUnitSize
-            } # if
-
-            Write-Verbose -Message ( @(
-                    "$($MyInvocation.MyCommand): "
-                    $($localizedData.FormattingVolumeMessage -f $volParams.FileSystem)
-                ) -join '' )
-
-            # Format the volume
-            $volume = $partition | Format-Volume @VolParams
+    # Is the volume already formatted?
+    if ($volume.FileSystem -eq '')
+    {
+        # The volume is not formatted
+        $volParams = @{
+            FileSystem = $FSFormat
+            Confirm    = $false
         }
-        else
+
+        if ($FSLabel)
         {
-            # The volume is already formatted
-            if ($PSBoundParameters.ContainsKey('FSFormat'))
+            # Set the File System label on the new volume
+            $volParams["NewFileSystemLabel"] = $FSLabel
+        } # if
+
+        if ($AllocationUnitSize)
+        {
+            # Set the Allocation Unit Size on the new volume
+            $volParams["AllocationUnitSize"] = $AllocationUnitSize
+        } # if
+
+        Write-Verbose -Message ( @(
+                "$($MyInvocation.MyCommand): "
+                $($localizedData.FormattingVolumeMessage -f $volParams.FileSystem)
+            ) -join '' )
+
+        # Format the volume
+        $volume = $partition | Format-Volume @VolParams
+    }
+    else
+    {
+        # The volume is already formatted
+        if ($PSBoundParameters.ContainsKey('FSFormat'))
+        {
+            # Check the filesystem format
+            $fileSystem = $volume.FileSystem
+            if ($fileSystem -ne $FSFormat)
             {
-                # Check the filesystem format
-                $fileSystem = $volume.FileSystem
-                if ($fileSystem -ne $FSFormat)
+                # The file system format does not match
+                Write-Verbose -Message ( @(
+                        "$($MyInvocation.MyCommand): "
+                        $($localizedData.FileSystemFormatMismatch -f `
+                                $DriveLetter, $fileSystem, $FSFormat)
+                    ) -join '' )
+
+                if ($AllowDestructive)
                 {
-                    # The file system format does not match
                     Write-Verbose -Message ( @(
                             "$($MyInvocation.MyCommand): "
-                            $($localizedData.FileSystemFormatMismatch -f `
+                            $($localizedData.VolumeFormatInProgress -f `
                                     $DriveLetter, $fileSystem, $FSFormat)
                         ) -join '' )
 
-                    if ($AllowDestructive)
-                    {
-                        Write-Verbose -Message ( @(
-                                "$($MyInvocation.MyCommand): "
-                                $($localizedData.VolumeFormatInProgress -f `
-                                        $DriveLetter, $fileSystem, $FSFormat)
-                            ) -join '' )
-
-                        $formatParam = @{
-                            FileSystem = $FSFormat
-                            Force      = $true
-                        }
-
-                        if ($PSBoundParameters.ContainsKey('AllocationUnitSize'))
-                        {
-                            $formatParam.Add('AllocationUnitSize', $AllocationUnitSize)
-                        }
-
-                        $Volume | Format-Volume @formatParam
+                    $formatParam = @{
+                        FileSystem = $FSFormat
+                        Force      = $true
                     }
-                } # if
-            } # if
 
-            # Check the volume label
-            if ($PSBoundParameters.ContainsKey('FSLabel'))
-            {
-                # The volume should have a label assigned
-                if ($volume.FileSystemLabel -ne $FSLabel)
-                {
-                    # The volume lable needs to be changed because it is different.
-                    Write-Verbose -Message ( @(
-                            "$($MyInvocation.MyCommand): "
-                            $($localizedData.ChangingVolumeLabelMessage `
-                                    -f $DriveLetter, $FSLabel)
-                        ) -join '' )
+                    if ($PSBoundParameters.ContainsKey('AllocationUnitSize'))
+                    {
+                        $formatParam.Add('AllocationUnitSize', $AllocationUnitSize)
+                    }
 
-                    $volume | Set-Volume -NewFileSystemLabel $FSLabel
-                } # if
+                    $Volume | Format-Volume @formatParam
+                }
             } # if
         } # if
 
-        # Assign the Drive Letter if it isn't assigned
-        if ($assignDriveLetter -and ($partition.DriveLetter -ne $DriveLetter))
+        # Check the volume label
+        if ($PSBoundParameters.ContainsKey('FSLabel'))
         {
-            $null = $partition | Set-Partition -NewDriveLetter $DriveLetter
+            # The volume should have a label assigned
+            if ($volume.FileSystemLabel -ne $FSLabel)
+            {
+                # The volume lable needs to be changed because it is different.
+                Write-Verbose -Message ( @(
+                        "$($MyInvocation.MyCommand): "
+                        $($localizedData.ChangingVolumeLabelMessage `
+                                -f $DriveLetter, $FSLabel)
+                    ) -join '' )
 
-            Write-Verbose -Message ( @(
-                    "$($MyInvocation.MyCommand): "
-                    $($localizedData.SuccessfullyInitializedMessage -f $DriveLetter)
-                ) -join '' )
-        } # if    
-    
-    }
+                $volume | Set-Volume -NewFileSystemLabel $FSLabel
+            } # if
+        } # if
+    } # if
+
+    # Assign the Drive Letter if it isn't assigned
+    if ($assignDriveLetter -and ($partition.DriveLetter -ne $DriveLetter))
+    {
+        $null = $partition | Set-Partition -NewDriveLetter $DriveLetter
+
+        Write-Verbose -Message ( @(
+                "$($MyInvocation.MyCommand): "
+                $($localizedData.SuccessfullyInitializedMessage -f $DriveLetter)
+            ) -join '' )
+    } # if    
 } # Set-TargetResource
 
 <#
