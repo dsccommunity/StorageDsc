@@ -210,6 +210,48 @@ try
                 $current.Size             | Should Be 100MB
             }
 
+            #region DEFAULT TESTS Resize/Reformat
+            It 'should compile and apply the MOF without throwing' {
+                {
+                    # This is to pass to the Config
+                    $configData = @{
+                        AllNodes = @(
+                            @{
+                                NodeName      = 'localhost'
+                                DriveLetter   = $driveLetterA
+                                DiskId        = $disk.UniqueId
+                                DiskIdType    = 'UniqueId'
+                                FSLabel       = $FSLabelA
+                                Size          = 900MB
+                                FSFormat      = 'ReFS'
+                            }
+                        )
+                    }
+
+                    & "$($script:DSCResourceName)_ConfigDestructive" `
+                        -OutputPath $TestDrive `
+                        -ConfigurationData $configData
+                    Start-DscConfiguration -Path $TestDrive `
+                        -ComputerName localhost -Wait -Verbose -Force
+                } | Should Not Throw
+            }
+
+            It 'should be able to call Get-DscConfiguration without throwing' {
+                { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should Not Throw
+            }
+            #endregion
+
+            It 'should have set the resource and all the parameters should match' {
+                $current = Get-DscConfiguration | Where-Object {
+                    $_.ConfigurationName -eq "$($script:DSCResourceName)_ConfigDestructive"
+                }
+                $current.DiskId           | Should Be $disk.UniqueId
+                $current.DriveLetter      | Should Be $driveLetterA
+                $current.FSLabel          | Should Be $FSLabelA
+                $current.Size             | Should Be 900MB
+                $current.FSFormat         | Should Be 'ReFS'
+            }
+
             #region DEFAULT TESTS
             It 'Should compile and apply the MOF without throwing' {
                 {
@@ -246,7 +288,7 @@ try
                 $current.DiskId           | Should Be $disk.UniqueId
                 $current.DriveLetter      | Should Be $driveLetterB
                 $current.FSLabel          | Should Be $FSLabelB
-                $current.Size             | Should Be 935198720
+                $current.Size             | Should Be 96337920
             }
 
             # A system partition will have been added to the disk as well as the 2 test partitions

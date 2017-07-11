@@ -45,6 +45,8 @@
   - Fixed style violations in xDisk.
   - Fixed issue when creating multiple partitions on a single disk with no size
     specified - See [Issue 86](https://github.com/PowerShell/xStorage/issues/86).
+  - Added parameter AllowDestructive - See [Issue 11](https://github.com/PowerShell/xStorage/issues/11).
+  - Added parameter ClearDisk - See [Issue 50](https://github.com/PowerShell/xStorage/issues/50).
 - xDiskAccessPath:
   - BREAKING CHANGE: Renamed parameter DiskNumber to DiskId to
     enable it to contain either DiskNumber or UniqueId - See [Issue 81](https://github.com/PowerShell/xStorage/issues/81).
