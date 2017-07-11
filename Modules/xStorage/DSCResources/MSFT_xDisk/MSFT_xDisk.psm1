@@ -262,7 +262,11 @@ function Set-TargetResource
             ) -join '' )
 
         $disk | Clear-Disk -RemoveData -RemoveOEM -Confirm:$true
-        $disk = $disk | Get-Disk
+
+        # Requery the disk
+        $disk = Get-DiskByIdentifier `
+            -DiskId $DiskId `
+            -DiskIdType $DiskIdType
     }
 
     switch ($disk.PartitionStyle)
