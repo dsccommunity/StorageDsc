@@ -6,6 +6,8 @@
   - Fix error message when new partition does not become writable before timeout.
   - Removed unneeded timeout initialization code.
   - Added support for Guid Disk Id type - See [Issue 104](https://github.com/PowerShell/xStorage/issues/104)
+  - Added parameter AllowDestructive - See [Issue 11](https://github.com/PowerShell/xStorage/issues/11).
+  - Added parameter ClearDisk - See [Issue 50](https://github.com/PowerShell/xStorage/issues/50).
 - xDiskAccessPath:
   - Fix error message when new partition does not become writable before timeout.
   - Removed unneeded timeout initialization code.
@@ -18,6 +20,7 @@
   - Fix error when mounting VHD on Windows Server 2012 R2 - See [Issue 105](https://github.com/PowerShell/xStorage/issues/105)
 - xWaitForDisk:
   - Added support for Guid Disk Id type - See [Issue 104](https://github.com/PowerShell/xStorage/issues/104)
+- Added .markdownlint.json file to configure markdown rules to validate.
 
 ## 3.1.0.0
 
@@ -49,8 +52,6 @@
   - Fixed style violations in xDisk.
   - Fixed issue when creating multiple partitions on a single disk with no size
     specified - See [Issue 86](https://github.com/PowerShell/xStorage/issues/86).
-  - Added parameter AllowDestructive - See [Issue 11](https://github.com/PowerShell/xStorage/issues/11).
-  - Added parameter ClearDisk - See [Issue 50](https://github.com/PowerShell/xStorage/issues/50).
 - xDiskAccessPath:
   - BREAKING CHANGE: Renamed parameter DiskNumber to DiskId to
     enable it to contain either DiskNumber or UniqueId - See [Issue 81](https://github.com/PowerShell/xStorage/issues/81).
