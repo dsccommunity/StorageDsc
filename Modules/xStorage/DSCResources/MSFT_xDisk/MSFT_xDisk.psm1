@@ -34,7 +34,7 @@ $localizedData = Get-LocalizedData `
     Specifies the identifier type the DiskId contains. Defaults to Number.
 
     .PARAMETER Size
-    Specifies the size of new volume. Leave empty to use the remaining free space.
+    Specifies the size of new volume (use all available space on disk if not provided).
 
     .PARAMETER FSLabel
     Specifies the volume label to assign to the volume.
