@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 3.2.0.0
+
 - xDisk:
   - Fix error message when new partition does not become writable before timeout.
   - Removed unneeded timeout initialization code.

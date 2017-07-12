@@ -10,7 +10,7 @@
 # RootModule = ''
 
 # Version number of this module.
-ModuleVersion = '3.1.0.0'
+ModuleVersion = '3.2.0.0'
 
 # ID used to uniquely identify this module
 GUID = '00d73ca1-58b5-46b7-ac1a-5bfcf5814faf'
@@ -102,9 +102,18 @@ PrivateData = @{
         # IconUri = ''
 
         # ReleaseNotes of this module
-        ReleaseNotes = '- Added integration test to test for conflicts with other common resource kit modules.
-- Prevented ResourceHelper and Common module cmdlets from being exported to resolve
-  conflicts with other resource modules.
+        ReleaseNotes = '- xDisk:
+  - Fix error message when new partition does not become writable before timeout.
+  - Removed unneeded timeout initialization code.
+- xDiskAccessPath:
+  - Fix error message when new partition does not become writable before timeout.
+  - Removed unneeded timeout initialization code.
+  - Fix error when used on Windows Server 2012 R2 - See [Issue 102](https://github.com/PowerShell/xStorage/issues/102).
+- Added the VS Code PowerShell extension formatting settings that cause PowerShell
+  files to be formatted as per the DSC Resource kit style guidelines.
+- Removed requirement on Hyper-V PowerShell module to execute integration tests.
+- xMountImage:
+  - Fix error when mounting VHD on Windows Server 2012 R2 - See [Issue 105](https://github.com/PowerShell/xStorage/issues/105)
 
 '
 
@@ -119,6 +128,7 @@ PrivateData = @{
 # DefaultCommandPrefix = ''
 
 }
+
 
 
 
