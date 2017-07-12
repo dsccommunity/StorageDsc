@@ -217,12 +217,11 @@ try
         function Add-PartitionAccessPath {
             Param
             (
-                [CmdletBinding()]
-                [Parameter(ValueFromPipeline = $true)]
-                $Disk,
-
                 [String]
                 $AccessPath,
+
+                [Uint32]
+                $DiskNumber,
 
                 [Uint32]
                 $PartitionNumber

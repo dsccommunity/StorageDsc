@@ -25,10 +25,14 @@
     FileSystemFormatMismatch = Volume assigned to drive {0} filesystem format '{1}' does not match expected format '{2}'.
     DriveLabelMismatch = Volume assigned to drive {0} label '{1}' does not match expected label '{2}'.
     PartitionAlreadyAssignedMessage = Partition '{1}' is already assigned as drive {0}.
-    MatchingPartitionNotFoundMessage = Disk with {0} '{1}' already contains paritions, but none match required size.
-    MatchingPartitionFoundMessage = Disk with {0} '{1}' already contains paritions, and partition '{2}' matches required size.
+    MatchingPartitionNotFoundMessage = Disk with {0} '{1}' already contains partitions, but none match required size.
+    MatchingPartitionFoundMessage = Disk with {0} '{1}' already contains partitions, and partition '{2}' matches required size.
     DriveNotFoundOnPartitionMessage = Disk with {0} '{1}' does not contain a partition assigned to drive letter '{2}'.
-
+    ClearingDisk = Clearing disk with {0} '{1}' of all existing partitions and volumes.
     DiskAlreadyInitializedError = Disk with {0} '{1}' is already initialized with {2}.
     NewParitionIsReadOnlyError = New partition '{2}' on disk with {0} '{1}' did not become writable in the expected time.
+    VolumeFormatInProgress = Switch AllowDestructive is specified. Attempting to format volume on {0} with '{2}', was '{1}'
+    SizeMismatchCorrection = Switch AllowDestructive is specified. Attempting to resize partition {0} from {1} to {2}
+    FreeSpaceViolationError = Attempted to resize partition {0} from {1} to {2} while maximum allowed size was {3}
+    ResizeRefsNotPossible = Skipping resize of {0} from {1} to {2}. Resizing ReFS partitions is currently not possible.
 '@

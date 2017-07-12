@@ -47,6 +47,7 @@ function Get-TargetResource
         ) -join '' )
 
     $diskImage = Get-DiskImage -ImagePath $ImagePath
+
     if ($diskImage.Attached)
     {
         $returnValue = @{
@@ -68,16 +69,21 @@ function Get-TargetResource
         else
         {
             # Look up the disk and find out if it is readwrite.
-            $disk = Get-Disk | Where-Object -Property Location -eq -Value $ImagePath
+            $disk = Get-Disk -Number $diskImage.Number
             if (-not $disk.IsReadOnly)
             {
                 $returnValue.Access = 'ReadWrite'
             } # if
 
-            # Lookup the volume and get the first mounted Drive Letter.
-            $volumes = $disk | Get-Partition | Get-Volume
-            $firstVolume = $volumes | Select-Object -First 1
-            $returnValue.Driveletter = $firstVolume.DriveLetter
+            # Find the first 'Basic' partition
+            $partitions = $disk | Get-Partition
+            $partition = $partitions | Where-Object -Property Type -EQ 'Basic'
+
+            # Find the first volume in the partition and get the mounted Drive Letter
+            $volumes = $partition | Get-Volume
+            $volume = $volumes | Select-Object -First 1
+
+            $returnValue.Driveletter = $volume.DriveLetter
         } # if
     }
     else
@@ -525,7 +531,7 @@ function Mount-DiskImageToLetter
     {
         $mountParams += @{ Access = $Access }
     }  # if
-    Mount-DiskImage @mountParams
+    $null = Mount-DiskImage @mountParams
 
     # Get the DiskImage object
     $diskImage = Get-DiskImage -ImagePath $ImagePath
@@ -545,20 +551,26 @@ function Mount-DiskImageToLetter
     else
     {
         # This is a VHD/VHDx/VHDSet diskimage
-        $disk = Get-Disk | Where-Object -Property Location -eq -Value $ImagePath
+        $disk = Get-Disk -Number $diskImage.Number
 
-        # Lookup the volume and get the first mounted Drive Letter.
-        $volumes = $disk | Get-Partition | Get-Volume
+        # Find the first 'Basic' partition to mount
+        $partitions = $disk | Get-Partition
+        $partition = $partitions | Where-Object -Property Type -EQ 'Basic'
+
+        # Find the first volume in the partition and get the mounted Drive Letter
+        $volumes = $partition | Get-Volume
         $volume = $volumes | Select-Object -First 1
     } # if
 
+    $currentDriveLetter = $volume.DriveLetter
+
     # Verify that the drive letter assigned to the drive is the one needed.
-    if ($volume.DriveLetter -ne $normalizedDriveLetter)
+    if ($currentDriveLetter -ne $normalizedDriveLetter)
     {
         Write-Verbose -Message ( @(
                 "$($MyInvocation.MyCommand): "
-                $($localizedData.ChangingISODriveLetterMessage `
-                    -f $ImagePath,$volume.DriveLetter,$normalizedDriveLetter)
+                $($localizedData.ChangingImageDriveLetterMessage `
+                    -f $ImagePath,$currentDriveLetter,$normalizedDriveLetter)
             ) -join '' )
 
         <#

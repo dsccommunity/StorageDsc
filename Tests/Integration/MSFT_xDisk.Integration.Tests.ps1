@@ -22,12 +22,6 @@ $TestEnvironment = Initialize-TestEnvironment `
 # Using try/finally to always cleanup even if something awful happens.
 try
 {
-    # Ensure that the tests can be performed on this computer
-    if (-not (Test-HyperVInstalled))
-    {
-        Return
-    }
-
     $ConfigFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:DSCResourceName).config.ps1"
     . $ConfigFile -Verbose -ErrorAction Stop
 
@@ -35,14 +29,13 @@ try
     Describe "$($script:DSCResourceName)_Integration" {
         Context 'Partition and format newly provisioned disk using Disk Number with two volumes and assign Drive Letters' {
             BeforeAll {
-                # Create a VHDx and attach it to the computer
+                # Create a VHD and attach it to the computer
                 $VHDPath = Join-Path -Path $TestDrive `
-                    -ChildPath 'TestDisk.vhdx'
-                New-VHD -Path $VHDPath -SizeBytes 1GB -Dynamic
-                Mount-DiskImage -ImagePath $VHDPath -StorageType VHDX -NoDriveLetter
-                $disk = Get-Disk | Where-Object -FilterScript {
-                    $_.Location -eq $VHDPath
-                }
+                    -ChildPath 'TestDisk.vhd'
+                $null = New-VDisk -Path $VHDPath -SizeInMB 1024
+                $null = Mount-DiskImage -ImagePath $VHDPath -StorageType VHD -NoDriveLetter
+                $diskImage = Get-DiskImage -ImagePath $VHDPath
+                $disk = Get-Disk -Number $diskImage.Number
                 $FSLabelA = 'TestDiskA'
                 $FSLabelB = 'TestDiskB'
 
@@ -53,7 +46,7 @@ try
             }
 
             #region DEFAULT TESTS
-            It 'should compile and apply the MOF without throwing' {
+            It 'Should compile and apply the MOF without throwing' {
                 {
                     # This is to pass to the Config
                     $configData = @{
@@ -77,12 +70,12 @@ try
                 } | Should Not Throw
             }
 
-            It 'should be able to call Get-DscConfiguration without throwing' {
+            It 'Should be able to call Get-DscConfiguration without throwing' {
                 { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should Not Throw
             }
             #endregion
 
-            It 'should have set the resource and all the parameters should match' {
+            It 'Should have set the resource and all the parameters should match' {
                 $current = Get-DscConfiguration | Where-Object {
                     $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
                 }
@@ -92,7 +85,7 @@ try
                 $current.Size             | Should Be 100MB
             }
 
-            It 'should compile and apply the MOF without throwing' {
+            It 'Should compile and apply the MOF without throwing' {
                 {
                     # This is to pass to the Config
                     $configData = @{
@@ -115,12 +108,12 @@ try
                 } | Should Not Throw
             }
 
-            It 'should be able to call Get-DscConfiguration without throwing' {
+            It 'Should be able to call Get-DscConfiguration without throwing' {
                 { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should Not Throw
             }
             #endregion
 
-            It 'should have set the resource and all the parameters should match' {
+            It 'Should have set the resource and all the parameters should match' {
                 $current = Get-DscConfiguration | Where-Object {
                     $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
                 }
@@ -131,20 +124,26 @@ try
             }
 
             # A system partition will have been added to the disk as well as the 2 test partitions
-            It 'should have 3 partitions on disk' {
+            It 'Should have 3 partitions on disk' {
                 ($disk | Get-Partition).Count | Should Be 3
             }
 
+            <#
+                Get a list of all drives mounted - this works better on Windows Server 2012 R2 than
+                trying to get the drive mounted by name.
+            #>
+            $drives = Get-PSDrive
+
             It "should have attached drive $driveLetterA" {
-                Get-PSDrive -Name $driveLetterA -ErrorAction SilentlyContinue | Should Not BeNullOrEmpty
+                $drives | Where-Object -Property Name -eq $driveLetterA | Should Not BeNullOrEmpty
             }
 
             It "should have attached drive $driveLetterB" {
-                Get-PSDrive -Name $driveLetterB -ErrorAction SilentlyContinue | Should Not BeNullOrEmpty
+                $drives | Where-Object -Property Name -eq $driveLetterB | Should Not BeNullOrEmpty
             }
 
             AfterAll {
-                Dismount-DiskImage -ImagePath $VHDPath -StorageType VHDx
+                Dismount-DiskImage -ImagePath $VHDPath -StorageType VHD
                 Remove-Item -Path $VHDPath -Force
             }
         }
@@ -155,14 +154,13 @@ try
     Describe "$($script:DSCResourceName)_Integration" {
         Context 'Partition and format newly provisioned disk using Unique Id with two volumes and assign Drive Letters' {
             BeforeAll {
-                # Create a VHDx and attach it to the computer
+                # Create a VHD and attach it to the computer
                 $VHDPath = Join-Path -Path $TestDrive `
-                    -ChildPath 'TestDisk.vhdx'
-                New-VHD -Path $VHDPath -SizeBytes 1GB -Dynamic
-                Mount-DiskImage -ImagePath $VHDPath -StorageType VHDX -NoDriveLetter
-                $disk = Get-Disk | Where-Object -FilterScript {
-                    $_.Location -eq $VHDPath
-                }
+                    -ChildPath 'TestDisk.vhd'
+                $null = New-VDisk -Path $VHDPath -SizeInMB 1024
+                $null = Mount-DiskImage -ImagePath $VHDPath -StorageType VHD -NoDriveLetter
+                $diskImage = Get-DiskImage -ImagePath $VHDPath
+                $disk = Get-Disk -Number $diskImage.Number
                 $FSLabelA = 'TestDiskA'
                 $FSLabelB = 'TestDiskB'
 
@@ -173,7 +171,7 @@ try
             }
 
             #region DEFAULT TESTS
-            It 'should compile and apply the MOF without throwing' {
+            It 'Should compile and apply the MOF without throwing' {
                 {
                     # This is to pass to the Config
                     $configData = @{
@@ -197,12 +195,12 @@ try
                 } | Should Not Throw
             }
 
-            It 'should be able to call Get-DscConfiguration without throwing' {
+            It 'Should be able to call Get-DscConfiguration without throwing' {
                 { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should Not Throw
             }
             #endregion
 
-            It 'should have set the resource and all the parameters should match' {
+            It 'Should have set the resource and all the parameters should match' {
                 $current = Get-DscConfiguration | Where-Object {
                     $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
                 }
@@ -212,8 +210,50 @@ try
                 $current.Size             | Should Be 100MB
             }
 
-            #region DEFAULT TESTS
+            #region DEFAULT TESTS Resize/Reformat
             It 'should compile and apply the MOF without throwing' {
+                {
+                    # This is to pass to the Config
+                    $configData = @{
+                        AllNodes = @(
+                            @{
+                                NodeName      = 'localhost'
+                                DriveLetter   = $driveLetterA
+                                DiskId        = $disk.UniqueId
+                                DiskIdType    = 'UniqueId'
+                                FSLabel       = $FSLabelA
+                                Size          = 900MB
+                                FSFormat      = 'ReFS'
+                            }
+                        )
+                    }
+
+                    & "$($script:DSCResourceName)_ConfigDestructive" `
+                        -OutputPath $TestDrive `
+                        -ConfigurationData $configData
+                    Start-DscConfiguration -Path $TestDrive `
+                        -ComputerName localhost -Wait -Verbose -Force
+                } | Should Not Throw
+            }
+
+            It 'should be able to call Get-DscConfiguration without throwing' {
+                { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should Not Throw
+            }
+            #endregion
+
+            It 'should have set the resource and all the parameters should match' {
+                $current = Get-DscConfiguration | Where-Object {
+                    $_.ConfigurationName -eq "$($script:DSCResourceName)_ConfigDestructive"
+                }
+                $current.DiskId           | Should Be $disk.UniqueId
+                $current.DriveLetter      | Should Be $driveLetterA
+                $current.FSLabel          | Should Be $FSLabelA
+                $current.Size             | Should Be 900MB
+                $current.FSFormat         | Should Be 'ReFS'
+            }
+
+            #region DEFAULT TESTS
+            It 'Should compile and apply the MOF without throwing' {
                 {
                     # This is to pass to the Config
                     $configData = @{
@@ -236,23 +276,23 @@ try
                 } | Should Not Throw
             }
 
-            It 'should be able to call Get-DscConfiguration without throwing' {
+            It 'Should be able to call Get-DscConfiguration without throwing' {
                 { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should Not Throw
             }
             #endregion
 
-            It 'should have set the resource and all the parameters should match' {
+            It 'Should have set the resource and all the parameters should match' {
                 $current = Get-DscConfiguration | Where-Object {
                     $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
                 }
                 $current.DiskId           | Should Be $disk.UniqueId
                 $current.DriveLetter      | Should Be $driveLetterB
                 $current.FSLabel          | Should Be $FSLabelB
-                $current.Size             | Should Be 935198720
+                $current.Size             | Should Be 96337920
             }
 
             # A system partition will have been added to the disk as well as the 2 test partitions
-            It 'should have 3 partitions on disk' {
+            It 'Should have 3 partitions on disk' {
                 ($disk | Get-Partition).Count | Should Be 3
             }
 
@@ -265,8 +305,8 @@ try
             }
 
             AfterAll {
-                Dismount-DiskImage -ImagePath $VHDPath -StorageType VHDx
-                Remove-Item -Path $VHDPath -Force
+                $null = Dismount-DiskImage -ImagePath $VHDPath -StorageType VHD
+                $null = Remove-Item -Path $VHDPath -Force
             }
         }
     }
