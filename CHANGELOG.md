@@ -12,6 +12,7 @@
   - Added support for Guid Disk Id type - See [Issue 104](https://github.com/PowerShell/xStorage/issues/104)
 - Added .markdownlint.json file to configure markdown rules to validate.
 - Clean up Badge area in README.MD - See [Issue 110](https://github.com/PowerShell/xStorage/issues/110)
+- Disabled MD013 rule checking to enable badge table.
 
 ## 3.2.0.0
 
