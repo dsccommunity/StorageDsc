@@ -1,7 +1,9 @@
 # xStorage
 
-[![Build status](https://ci.appveyor.com/api/projects/status/1j95juvceu39ekm7/branch/master?svg=true)](https://ci.appveyor.com/project/PowerShell/xstorage/branch/master)
-[![codecov](https://codecov.io/gh/PowerShell/xStorage/branch/master/graph/badge.svg)](https://codecov.io/gh/PowerShell/xStorage)
+| Branch | Build Status | Code Coverage |
+| --- | --- | --- |
+| master | [![Build status](https://ci.appveyor.com/api/projects/status/1j95juvceu39ekm7/branch/master?svg=true)](https://ci.appveyor.com/project/PowerShell/xstorage/branch/master) | [![codecov](https://codecov.io/gh/PowerShell/xStorage/branch/master/graph/badge.svg)](https://codecov.io/gh/PowerShell/xStorage/branch/master) |
+| dev | [![Build status](https://ci.appveyor.com/api/projects/status/1j95juvceu39ekm7/branch/dev?svg=true)](https://ci.appveyor.com/project/PowerShell/xstorage/branch/dev) | [![codecov](https://codecov.io/gh/PowerShell/xStorage/branch/dev/graph/badge.svg)](https://codecov.io/gh/PowerShell/xStorage/branch/dev) |
 
 The **xStorage** module contains the following resources:
 
