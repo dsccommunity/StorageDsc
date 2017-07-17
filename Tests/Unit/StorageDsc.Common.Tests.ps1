@@ -181,7 +181,7 @@ try
                     (Get-DiskByIdentifier -DiskId $testDiskNumber).Number | Should Be $testDiskNumber
                 }
 
-                It 'Should call exepced mocks' {
+                It 'Should call expected mocks' {
                     Assert-VerifiableMocks
                     Assert-MockCalled `
                         -CommandName Get-Disk `
@@ -203,7 +203,7 @@ try
                     Get-DiskByIdentifier -DiskId $testDiskNumber | Should BeNullOrEmpty
                 }
 
-                It 'Should call exepced mocks' {
+                It 'Should call expected mocks' {
                     Assert-VerifiableMocks
                     Assert-MockCalled `
                         -CommandName Get-Disk `
@@ -226,7 +226,7 @@ try
                     (Get-DiskByIdentifier -DiskId $testDiskUniqueId -DiskIdType 'UniqueId').UniqueId | Should Be $testDiskUniqueId
                 }
 
-                It 'Should call exepced mocks' {
+                It 'Should call expected mocks' {
                     Assert-VerifiableMocks
                     Assert-MockCalled `
                         -CommandName Get-Disk `
@@ -248,7 +248,7 @@ try
                     Get-DiskByIdentifier -DiskId $testDiskUniqueId -DiskIdType 'UniqueId' | Should BeNullOrEmpty
                 }
 
-                It 'Should call exepced mocks' {
+                It 'Should call expected mocks' {
                     Assert-VerifiableMocks
                     Assert-MockCalled `
                         -CommandName Get-Disk `
@@ -270,7 +270,7 @@ try
                     (Get-DiskByIdentifier -DiskId $testDiskGuid -DiskIdType 'Guid').Guid | Should Be $testDiskGuid
                 }
 
-                It 'Should call exepced mocks' {
+                It 'Should call expected mocks' {
                     Assert-VerifiableMocks
                     Assert-MockCalled `
                         -CommandName Get-Disk `
@@ -290,7 +290,7 @@ try
                     Get-DiskByIdentifier -DiskId $testDiskGuid -DiskIdType 'Guid' | Should BeNullOrEmpty
                 }
 
-                It 'Should call exepced mocks' {
+                It 'Should call expected mocks' {
                     Assert-VerifiableMocks
                     Assert-MockCalled `
                         -CommandName Get-Disk `

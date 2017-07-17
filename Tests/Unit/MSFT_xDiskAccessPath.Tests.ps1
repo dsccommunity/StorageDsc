@@ -282,27 +282,27 @@ try
                     -AccessPath $script:testAccessPath `
                     -Verbose
 
-                It "DiskId should be $($script:mockedDisk0.Number)" {
+                It "Should return DiskId $($script:mockedDisk0.Number)" {
                     $resource.DiskId | Should Be $script:mockedDisk0.Number
                 }
 
-                It "AccessPath should be $($script:testAccessPath)" {
+                It "Should return AccessPath $($script:testAccessPath)" {
                     $resource.AccessPath | Should Be $script:testAccessPath
                 }
 
-                It "Size should be $($script:mockedPartition.Size)" {
+                It "Should return Size $($script:mockedPartition.Size)" {
                     $resource.Size | Should Be $script:mockedPartition.Size
                 }
 
-                It "FSLabel should be $($script:mockedVolume.FileSystemLabel)" {
+                It "Should return FSLabel $($script:mockedVolume.FileSystemLabel)" {
                     $resource.FSLabel | Should Be $script:mockedVolume.FileSystemLabel
                 }
 
-                It "AllocationUnitSize should be $($script:mockedCim.BlockSize)" {
+                It "Should return AllocationUnitSize $($script:mockedCim.BlockSize)" {
                     $resource.AllocationUnitSize | Should Be $script:mockedCim.BlockSize
                 }
 
-                It "FSFormat should be $($script:mockedVolume.FileSystem)" {
+                It "Should return FSFormat $($script:mockedVolume.FileSystem)" {
                     $resource.FSFormat | Should Be $script:mockedVolume.FileSystem
                 }
 
@@ -350,27 +350,27 @@ try
                     -AccessPath $script:testAccessPath `
                     -Verbose
 
-                It "DiskId should be $($script:mockedDisk0.UniqueId)" {
+                It "Should return DiskId $($script:mockedDisk0.UniqueId)" {
                     $resource.DiskId | Should Be $script:mockedDisk0.UniqueId
                 }
 
-                It "AccessPath should be $($script:testAccessPath)" {
+                It "Should return AccessPath $($script:testAccessPath)" {
                     $resource.AccessPath | Should Be $script:testAccessPath
                 }
 
-                It "Size should be $($script:mockedPartition.Size)" {
+                It "Should return Size $($script:mockedPartition.Size)" {
                     $resource.Size | Should Be $script:mockedPartition.Size
                 }
 
-                It "FSLabel should be $($script:mockedVolume.FileSystemLabel)" {
+                It "Should return FSLabel $($script:mockedVolume.FileSystemLabel)" {
                     $resource.FSLabel | Should Be $script:mockedVolume.FileSystemLabel
                 }
 
-                It "AllocationUnitSize should be $($script:mockedCim.BlockSize)" {
+                It "Should return AllocationUnitSize $($script:mockedCim.BlockSize)" {
                     $resource.AllocationUnitSize | Should Be $script:mockedCim.BlockSize
                 }
 
-                It "FSFormat should be $($script:mockedVolume.FileSystem)" {
+                It "Should return FSFormat $($script:mockedVolume.FileSystem)" {
                     $resource.FSFormat | Should Be $script:mockedVolume.FileSystem
                 }
 
@@ -418,27 +418,27 @@ try
                     -AccessPath $script:testAccessPath `
                     -Verbose
 
-                It "DiskId should be $($script:mockedDisk0.Guid)" {
+                It "Should return DiskId $($script:mockedDisk0.Guid)" {
                     $resource.DiskId | Should Be $script:mockedDisk0.Guid
                 }
 
-                It "AccessPath should be $($script:testAccessPath)" {
+                It "Should return AccessPath $($script:testAccessPath)" {
                     $resource.AccessPath | Should Be $script:testAccessPath
                 }
 
-                It "Size should be $($script:mockedPartition.Size)" {
+                It "Should return Size $($script:mockedPartition.Size)" {
                     $resource.Size | Should Be $script:mockedPartition.Size
                 }
 
-                It "FSLabel should be $($script:mockedVolume.FileSystemLabel)" {
+                It "Should return FSLabel $($script:mockedVolume.FileSystemLabel)" {
                     $resource.FSLabel | Should Be $script:mockedVolume.FileSystemLabel
                 }
 
-                It "AllocationUnitSize should be $($script:mockedCim.BlockSize)" {
+                It "Should return AllocationUnitSize $($script:mockedCim.BlockSize)" {
                     $resource.AllocationUnitSize | Should Be $script:mockedCim.BlockSize
                 }
 
-                It "FSFormat should be $($script:mockedVolume.FileSystem)" {
+                It "Should return FSFormat $($script:mockedVolume.FileSystem)" {
                     $resource.FSFormat | Should Be $script:mockedVolume.FileSystem
                 }
 
@@ -481,27 +481,27 @@ try
                     -AccessPath $script:testAccessPath `
                     -Verbose
 
-                It "DiskId should be $($script:mockedDisk0.Number)" {
+                It "Should return DiskId $($script:mockedDisk0.Number)" {
                     $resource.DiskId | Should Be $script:mockedDisk0.Number
                 }
 
-                It "AccessPath should be $($script:testAccessPath)" {
+                It "Should return AccessPath $($script:testAccessPath)" {
                     $resource.AccessPath | Should Be $script:testAccessPath
                 }
 
-                It "Size should be null" {
+                It "Should return Size null" {
                     $resource.Size | Should Be $null
                 }
 
-                It "FSLabel should be empty" {
+                It "Should return FSLabel empty" {
                     $resource.FSLabel | Should Be ''
                 }
 
-                It "AllocationUnitSize should be null" {
+                It "Should return AllocationUnitSize null" {
                     $resource.AllocationUnitSize | Should Be $null
                 }
 
-                It "FSFormat should be null" {
+                It "Should return FSFormat null" {
                     $resource.FSFormat | Should Be $null
                 }
 
@@ -561,13 +561,13 @@ try
                 # mocks that should not be called
                 Mock -CommandName Initialize-Disk
 
-                It 'Should not throw' {
+                It 'Should not throw an exception' {
                     {
                         Set-targetResource `
                             -DiskId $script:mockedDisk0Offline.Number `
                             -AccessPath $script:testAccessPath `
                             -Verbose
-                    } | Should not throw
+                    } | Should Not Throw
                 }
 
                 It 'Should call the correct mocks' {
@@ -627,14 +627,14 @@ try
                 # mocks that should not be called
                 Mock -CommandName Initialize-Disk
 
-                It 'Should not throw' {
+                It 'Should not throw an exception' {
                     {
                         Set-targetResource `
                             -DiskId $script:mockedDisk0Offline.UniqueId `
                             -DiskIdType 'UniqueId' `
                             -AccessPath $script:testAccessPath `
                             -Verbose
-                    } | Should not throw
+                    } | Should Not Throw
                 }
 
                 It 'Should call the correct mocks' {
@@ -694,14 +694,14 @@ try
                 # mocks that should not be called
                 Mock -CommandName Initialize-Disk
 
-                It 'Should not throw' {
+                It 'Should not throw an exception' {
                     {
                         Set-targetResource `
                             -DiskId $script:mockedDisk0Offline.Guid `
                             -DiskIdType 'Guid' `
                             -AccessPath $script:testAccessPath `
                             -Verbose
-                    } | Should not throw
+                    } | Should Not Throw
                 }
 
                 It 'Should call the correct mocks' {
@@ -761,13 +761,13 @@ try
                 # mocks that should not be called
                 Mock -CommandName Initialize-Disk
 
-                It 'Should not throw' {
+                It 'Should not throw an exception' {
                     {
                         Set-targetResource `
                             -DiskId $script:mockedDisk0Readonly.Number `
                             -AccessPath $script:testAccessPath `
                             -Verbose
-                    } | Should not throw
+                    } | Should Not Throw
                 }
 
                 It 'Should call the correct mocks' {
@@ -830,13 +830,13 @@ try
 
                 # mocks that should not be called
 
-                It 'Should not throw' {
+                It 'Should not throw an exception' {
                     {
                         Set-targetResource `
                             -DiskId $script:mockedDisk0OfflineRaw.Number `
                             -AccessPath $script:testAccessPath `
                             -Verbose
-                    } | Should not throw
+                    } | Should Not Throw
                 }
 
                 It 'Should call the correct mocks' {
@@ -896,13 +896,13 @@ try
                 # mocks that should not be called
                 Mock -CommandName Set-Disk
 
-                It 'Should not throw' {
+                It 'Should not throw an exception' {
                     {
                         Set-targetResource `
                             -DiskId $script:mockedDisk0Raw.Number `
                             -AccessPath $script:testAccessPath `
                             -Verbose
-                    } | Should not throw
+                    } | Should Not Throw
                 }
 
                 It 'Should call the correct mocks' {
@@ -959,13 +959,13 @@ try
                 Mock -CommandName Set-Disk
                 Mock -CommandName Initialize-Disk
 
-                It 'Should not throw' {
+                It 'Should not throw an exception' {
                     {
                         Set-targetResource `
                             -DiskId $script:mockedDisk0.Number `
                             -AccessPath $script:testAccessPath `
                             -Verbose
-                    } | Should not throw
+                    } | Should Not Throw
                 }
 
                 It 'Should call the correct mocks' {
@@ -1165,13 +1165,13 @@ try
                 Mock -CommandName Format-Volume
                 Mock -CommandName Add-PartitionAccessPath
 
-                It 'Should not throw' {
+                It 'Should not throw an exception' {
                     {
                         Set-targetResource `
                             -DiskId $script:mockedDisk0.Number `
                             -AccessPath $script:testAccessPath `
                             -Verbose
-                    } | Should not throw
+                    } | Should Not Throw
                 }
 
                 It 'Should call the correct mocks' {
@@ -1222,14 +1222,14 @@ try
                 Mock -CommandName New-Partition
                 Mock -CommandName Format-Volume
 
-                It 'Should not throw' {
+                It 'Should not throw an exception' {
                     {
                         Set-targetResource `
                             -DiskId $script:mockedDisk0.Number `
                             -AccessPath $script:testAccessPath `
                             -Size $script:mockedPartitionSize `
                             -Verbose
-                    } | Should not throw
+                    } | Should Not Throw
                 }
 
                 It 'Should call the correct mocks' {
@@ -1281,14 +1281,14 @@ try
                 Mock -CommandName Format-Volume
                 Mock -CommandName Add-PartitionAccessPath
 
-                It 'Should not throw' {
+                It 'Should not throw an exception' {
                     {
                         Set-targetResource `
                             -DiskId $script:mockedDisk0.Number `
                             -AccessPath $script:testAccessPath `
                             -FSLabel 'NewLabel' `
                             -Verbose
-                    } | Should not throw
+                    } | Should Not Throw
                 }
 
                 It 'Should call the correct mocks' {
@@ -1335,17 +1335,17 @@ try
 
                 $script:result = $null
 
-                It 'calling test Should Not Throw' {
+                It 'Should not throw an exception' {
                     {
                         $script:result = Test-TargetResource `
                             -DiskId $script:mockedDisk0Offline.Number `
                             -AccessPath $script:testAccessPath `
                             -AllocationUnitSize 4096 `
                             -Verbose
-                    } | Should not throw
+                    } | Should Not Throw
                 }
 
-                It 'result should be false' {
+                It 'Should return false' {
                     $script:result | Should Be $false
                 }
 
@@ -1380,7 +1380,7 @@ try
 
                 $script:result = $null
 
-                It 'calling test Should Not Throw' {
+                It 'Should not throw an exception' {
                     {
                         $script:result = Test-TargetResource `
                             -DiskId $script:mockedDisk0Offline.UniqueId `
@@ -1388,10 +1388,10 @@ try
                             -AccessPath $script:testAccessPath `
                             -AllocationUnitSize 4096 `
                             -Verbose
-                    } | Should not throw
+                    } | Should Not Throw
                 }
 
-                It 'result should be false' {
+                It 'Should return false' {
                     $script:result | Should Be $false
                 }
 
@@ -1426,7 +1426,7 @@ try
 
                 $script:result = $null
 
-                It 'calling test Should Not Throw' {
+                It 'Should not throw an exception' {
                     {
                         $script:result = Test-TargetResource `
                             -DiskId $script:mockedDisk0Offline.Guid `
@@ -1434,10 +1434,10 @@ try
                             -AccessPath $script:testAccessPath `
                             -AllocationUnitSize 4096 `
                             -Verbose
-                    } | Should not throw
+                    } | Should Not Throw
                 }
 
-                It 'result should be false' {
+                It 'Should return false' {
                     $script:result | Should Be $false
                 }
 
@@ -1472,17 +1472,17 @@ try
 
                 $script:result = $null
 
-                It 'calling test Should Not Throw' {
+                It 'Should not throw an exception' {
                     {
                         $script:result = Test-TargetResource `
                             -DiskId $script:mockedDisk0Readonly.Number `
                             -AccessPath $script:testAccessPath `
                             -AllocationUnitSize 4096 `
                             -Verbose
-                    } | Should not throw
+                    } | Should Not Throw
                 }
 
-                It 'result should be false' {
+                It 'Should return false' {
                     $script:result | Should Be $false
                 }
 
@@ -1517,17 +1517,17 @@ try
 
                 $script:result = $null
 
-                It 'calling test Should Not Throw' {
+                It 'Should not throw an exception' {
                     {
                         $script:result = Test-TargetResource `
                             -DiskId $script:mockedDisk0Raw.Number `
                             -AccessPath $script:testAccessPath `
                             -AllocationUnitSize 4096 `
                             -Verbose
-                    } | Should not throw
+                    } | Should Not Throw
                 }
 
-                It 'result should be false' {
+                It 'Should return false' {
                     $script:result | Should Be $false
                 }
 
@@ -1572,7 +1572,7 @@ try
 
                 $script:result = $null
 
-                It 'calling test Should Not Throw' {
+                It 'Should not throw an exception' {
                     {
                         $script:result = Test-TargetResource `
                             -DiskId $script:mockedDisk0.Number `
@@ -1580,10 +1580,10 @@ try
                             -AllocationUnitSize 4096 `
                             -Size 124 `
                             -Verbose
-                    } | Should not throw
+                    } | Should Not Throw
                 }
 
-                It 'result should be true' {
+                It 'Should return true' {
                     $script:result | Should Be $true
                 }
 
@@ -1626,18 +1626,18 @@ try
 
                 $script:result = $null
 
-                It 'calling test Should Not Throw' {
+                It 'Should not throw an exception' {
                     {
                         $script:result = Test-TargetResource `
                             -DiskId $script:mockedDisk0.Number `
                             -AccessPath $script:testAccessPath `
                             -AllocationUnitSize 4097 `
                             -Verbose
-                    } | Should not throw
+                    } | Should Not Throw
                 }
 
                 # skipped due to:  https://github.com/PowerShell/xStorage/issues/22
-                It 'result should be false' -skip {
+                It 'Should return false' -skip {
                     $script:result | Should Be $false
                 }
 
@@ -1682,17 +1682,17 @@ try
 
                 $script:result = $null
 
-                It 'calling test Should Not Throw' {
+                It 'Should not throw an exception' {
                     {
                         $script:result = Test-TargetResource `
                             -DiskId $script:mockedDisk0.Number `
                             -AccessPath $script:testAccessPath `
                             -FSFormat 'ReFS' `
                             -Verbose
-                    } | Should not throw
+                    } | Should Not Throw
                 }
 
-                It 'result should be true' {
+                It 'Should return true' {
                     $script:result | Should Be $true
                 }
 
@@ -1737,17 +1737,17 @@ try
 
                 $script:result = $null
 
-                It 'calling test Should Not Throw' {
+                It 'Should not throw an exception' {
                     {
                         $script:result = Test-TargetResource `
                             -DiskId $script:mockedDisk0.Number `
                             -AccessPath $script:testAccessPath `
                             -FSLabel 'NewLabel' `
                             -Verbose
-                    } | Should not throw
+                    } | Should Not Throw
                 }
 
-                It 'result should be false' {
+                It 'Should return false' {
                     $script:result | Should Be $false
                 }
 
@@ -1792,7 +1792,7 @@ try
 
                 $script:result = $null
 
-                It 'calling test Should Not Throw' {
+                It 'Should not throw an exception' {
                     {
                         $script:result = Test-TargetResource `
                             -DiskId $script:mockedDisk0.Number `
@@ -1801,10 +1801,10 @@ try
                             -Size $script:mockedPartition.Size `
                             -FSFormat $script:mockedVolume.FileSystem `
                             -Verbose
-                    } | Should not throw
+                    } | Should Not Throw
                 }
 
-                It 'result should be true' {
+                It 'Should return true' {
                     $script:result | Should Be $true
                 }
 

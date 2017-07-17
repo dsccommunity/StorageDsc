@@ -52,7 +52,7 @@ try
                         -OutputPath $TestDrive `
                         -ConfigurationData $configData
                     Start-DscConfiguration -Path $TestDrive -ComputerName localhost -Wait -Verbose -Force
-                } | Should not throw
+                } | Should Not Throw
             }
 
             It 'Should be able to call Get-DscConfiguration without throwing' {
@@ -92,7 +92,7 @@ try
                         -OutputPath $TestDrive `
                         -ConfigurationData $configData
                     Start-DscConfiguration -Path $TestDrive -ComputerName localhost -Wait -Verbose -Force
-                } | Should not throw
+                } | Should Not Throw
             }
 
             It 'Should be able to call Get-DscConfiguration without throwing' {
@@ -132,7 +132,7 @@ try
                         -OutputPath $TestDrive `
                         -ConfigurationData $configData
                     Start-DscConfiguration -Path $TestDrive -ComputerName localhost -Wait -Verbose -Force
-                } | Should not throw
+                } | Should Not Throw
             }
 
             It 'Should be able to call Get-DscConfiguration without throwing' {

@@ -438,7 +438,7 @@ try
                 Mock -CommandName Mount-DiskImageToLetter
                 Mock -CommandName Dismount-DiskImage
 
-                It 'Should not throw exception' {
+                It 'Should not throw an exception' {
                     {
                         Set-TargetResource `
                             -ImagePath $script:DiskImageISOPath `
@@ -472,7 +472,7 @@ try
                     -CommandName Dismount-DiskImage `
                     -Verifiable
 
-                It 'Should not throw exception' {
+                It 'Should not throw an exception' {
                     {
                         Set-TargetResource `
                             -ImagePath $script:DiskImageISOPath `
@@ -505,7 +505,7 @@ try
                 # Mocks that should not be called
                 Mock -CommandName Dismount-DiskImage
 
-                It 'Should not throw exception' {
+                It 'Should not throw an exception' {
                     {
                         Set-TargetResource `
                             -ImagePath $script:DiskImageISOPath `
@@ -538,7 +538,7 @@ try
                 # Mocks that should not be called
                 Mock -CommandName Mount-DiskImageToLetter
 
-                It 'Should not throw exception' {
+                It 'Should not throw an exception' {
                     {
                         Set-TargetResource `
                             -ImagePath $script:DiskImageISOPath `
@@ -567,7 +567,7 @@ try
                 Mock -CommandName Dismount-DiskImage
                 Mock -CommandName Mount-DiskImageToLetter
 
-                It 'Should not throw exception' {
+                It 'Should not throw an exception' {
                     {
                         Set-TargetResource `
                             -ImagePath $script:DiskImageISOPath `
@@ -600,7 +600,7 @@ try
                     -CommandName Dismount-DiskImage `
                     -Verifiable
 
-                It 'Should not throw exception' {
+                It 'Should not throw an exception' {
                     {
                         Set-TargetResource `
                             -ImagePath $script:DiskImageVHDXPath `
@@ -813,7 +813,7 @@ try
             }
 
             Context 'Ensure is Absent, nothing else passed' {
-                It 'Should not throw exception' {
+                It 'Should not throw an exception' {
                     {
                         Test-ParameterValid `
                             -ImagePath $script:DiskImageISOPath `
@@ -862,7 +862,7 @@ try
             }
 
             Context 'ImagePath passed and found, ensure is Present, DriveLetter set' {
-                It 'Should not throw exception' {
+                It 'Should not throw an exception' {
                     Mock `
                         -CommandName Test-Path `
                         -MockWith { $true }
@@ -948,7 +948,7 @@ try
                 Mock -CommandName Get-CimInstance
                 Mock -CommandName Set-CimInstance
 
-                It 'Should not throw exception' {
+                It 'Should not throw an exception' {
                     {
                         Mount-DiskImageToLetter `
                             -ImagePath $script:DiskImageISOPath `
@@ -998,7 +998,7 @@ try
                 Mock -CommandName Get-Disk
                 Mock -CommandName Get-Partition
 
-                It 'Should not throw exception' {
+                It 'Should not throw an exception' {
                     {
                         Mount-DiskImageToLetter `
                             -ImagePath $script:DiskImageISOPath `
@@ -1049,7 +1049,7 @@ try
                 Mock -CommandName Get-CimInstance
                 Mock -CommandName Set-CimInstance
 
-                It 'Should not throw exception' {
+                It 'Should not throw an exception' {
                     {
                         Mount-DiskImageToLetter `
                             -ImagePath $script:DiskImageVHDxPath `
@@ -1105,7 +1105,7 @@ try
                     -CommandName Set-CimInstance `
                     -Verifiable
 
-                It 'Should not throw exception' {
+                It 'Should not throw an exception' {
                     {
                         Mount-DiskImageToLetter `
                             -ImagePath $script:DiskImageVHDXPath `

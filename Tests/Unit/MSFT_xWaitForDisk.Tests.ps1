@@ -66,7 +66,7 @@ try
             Context 'Disk is specified by Number' {
                 $script:result = $null
 
-                It 'Should Not Throw' {
+                It 'Should not throw an exception' {
                     {
                         $script:result = Get-TargetResource @disk0ParametersByNumber -Verbose
                     } | Should Not Throw
@@ -92,7 +92,7 @@ try
             Context 'Disk is specified by Unique Id' {
                 $script:result = $null
 
-                It 'Should Not Throw' {
+                It 'Should not throw an exception' {
                     {
                         $script:result = Get-TargetResource @disk0ParametersByUniqueId -Verbose
                     } | Should Not Throw
@@ -118,7 +118,7 @@ try
             Context 'Disk is specified by Guid' {
                 $script:result = $null
 
-                It 'Should Not Throw' {
+                It 'Should not throw an exception' {
                     {
                         $script:result = Get-TargetResource @disk0ParametersByGptGuid -Verbose
                     } | Should Not Throw
@@ -155,7 +155,7 @@ try
                     -MockWith { return $mockedDisk0 } `
                     -Verifiable
 
-                It 'Should Not Throw' {
+                It 'Should not throw an exception' {
                     { Set-targetResource @disk0ParametersByNumber -Verbose } | Should Not throw
                 }
 
@@ -175,7 +175,7 @@ try
                     -MockWith { return $mockedDisk0 } `
                     -Verifiable
 
-                It 'Should Not Throw' {
+                It 'Should not throw an exception' {
                     { Set-targetResource @disk0ParametersByUniqueId -Verbose } | Should Not throw
                 }
 
@@ -195,7 +195,7 @@ try
                     -MockWith { return $mockedDisk0 } `
                     -Verifiable
 
-                It 'Should Not Throw' {
+                It 'Should not throw an exception' {
                     { Set-targetResource @disk0ParametersByGptGuid -Verbose } | Should Not throw
                 }
 
@@ -293,7 +293,7 @@ try
 
                 $script:result = $null
 
-                It 'Should Not Throw' {
+                It 'Should not throw an exception' {
                     {
                         $script:result = Test-TargetResource @disk0ParametersByNumber -Verbose
                     } | Should Not Throw
@@ -320,7 +320,7 @@ try
 
                 $script:result = $null
 
-                It 'Should Not Throw' {
+                It 'Should not throw an exception' {
                     {
                         $script:result = Test-TargetResource @disk0ParametersByUniqueId -Verbose
                     } | Should Not Throw
@@ -347,7 +347,7 @@ try
 
                 $script:result = $null
 
-                It 'Should Not Throw' {
+                It 'Should not throw an exception' {
                     {
                         $script:result = Test-TargetResource @disk0ParametersByGptGuid -Verbose
                     } | Should Not Throw
@@ -374,7 +374,7 @@ try
 
                 $script:result = $null
 
-                It 'Should Not Throw' {
+                It 'Should not throw an exception' {
                     {
                         $script:result = Test-TargetResource @disk0ParametersByNumber -Verbose
                     } | Should Not Throw
@@ -401,7 +401,7 @@ try
 
                 $script:result = $null
 
-                It 'Should Not Throw' {
+                It 'Should not throw an exception' {
                     {
                         $script:result = Test-TargetResource @disk0ParametersByUniqueId -Verbose
                     } | Should Not Throw
@@ -428,7 +428,7 @@ try
 
                 $script:result = $null
 
-                It 'Should Not Throw' {
+                It 'Should not throw an exception' {
                     {
                         $script:result = Test-TargetResource @disk0ParametersByGptGuid -Verbose
                     } | Should Not Throw

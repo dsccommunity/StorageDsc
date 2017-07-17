@@ -122,7 +122,6 @@ function New-VDisk
     {
         # The disk will be initialized with GPT
         $diskPartScript += @"
-
 SELECT VDISK FILE=`"$Path`"
 ATTACH VDISK
 CONVERT GPT
