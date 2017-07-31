@@ -13,6 +13,10 @@
 - Added .markdownlint.json file to configure markdown rules to validate.
 - Clean up Badge area in README.MD - See [Issue 110](https://github.com/PowerShell/xStorage/issues/110).
 - Disabled MD013 rule checking to enable badge table.
+- Added .github support files:
+  - CONTRIBUTING.md
+  - ISSUE_TEMPLATE.md
+  - PULL_REQUEST_TEMPLATE.md
 
 ## 3.2.0.0
 
