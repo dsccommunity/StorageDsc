@@ -17,6 +17,10 @@
   - CONTRIBUTING.md
   - ISSUE_TEMPLATE.md
   - PULL_REQUEST_TEMPLATE.md
+- Changed license year to 2017 and set company name to Microsoft
+  Corporation in LICENSE.MD and module manifest - See [Issue 111](https://github.com/PowerShell/xStorage/issues/111).
+- Set Visual Studio Code setting "powershell.codeFormatting.preset" to
+  "custom" - See [Issue 108](https://github.com/PowerShell/xStorage/issues/108)
 
 ## 3.2.0.0
 
