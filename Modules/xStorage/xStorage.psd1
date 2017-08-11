@@ -22,7 +22,7 @@ Author = 'PowerShell DSC'
 CompanyName = 'Microsoft Corporation'
 
 # Copyright statement for this module
-Copyright = '2015'
+Copyright = '2017'
 
 # Description of the functionality provided by this module
 Description = 'This module contains all resources related to the PowerShell Storage module, or pertaining to disk management.'
