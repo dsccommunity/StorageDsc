@@ -23,6 +23,8 @@
   "custom" - See [Issue 108](https://github.com/PowerShell/xStorage/issues/108)
 - Added `Documentation and Examples` section to Readme.md file - see
   [issue #116](https://github.com/PowerShell/xStorage/issues/116).
+- Prevent unit tests from DSCResource.Tests from running during test
+  execution - fixes [Issue #118](https://github.com/PowerShell/xStorage/issues/118).
 
 ## 3.2.0.0
 
