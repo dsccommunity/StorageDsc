@@ -529,6 +529,27 @@ function Test-TargetResource
         $FSFormat = 'NTFS'
     )
 
+  Try 
+    {
+          $AccessPathDisk = $AccessPath.split(":")[0]
+            Write-Verbose -Message ( @(
+            "$($MyInvocation.MyCommand): "
+            $($localizedData.TestingPSDriveMessage -f $AccessPathDisk,$AccessPath)
+        ) -join '' )
+         $TestDrive = Get-PSDrive $AccessPathDisk -ErrorAction Stop
+    }
+    Catch
+    {
+        
+              Write-Verbose -Message ( @(
+            "$($MyInvocation.MyCommand): "
+            $($localizedData.UnavailablePSDriveMessage -f $AccessPathDisk,$AccessPath)
+        ) -join '' )
+
+   
+        Get-PSDrive | out-null
+    }
+    
     Write-Verbose -Message ( @(
             "$($MyInvocation.MyCommand): "
             $($localizedData.TestingDiskMessage -f $DiskIdType,$DiskId,$AccessPath)
