@@ -52,11 +52,11 @@ try
                         -OutputPath $TestDrive `
                         -ConfigurationData $configData
                     Start-DscConfiguration -Path $TestDrive -ComputerName localhost -Wait -Verbose -Force
-                } | Should Not Throw
+                } | Should -Not -Throw
             }
 
             It 'Should be able to call Get-DscConfiguration without throwing' {
-                { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should Not throw
+                { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -throw
             }
             #endregion
 
@@ -64,9 +64,9 @@ try
                 $current = Get-DscConfiguration | Where-Object {
                     $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
                 }
-                $current.DiskId           | Should Be $Disk.Number
-                $current.RetryIntervalSec | Should Be 1
-                $current.RetryCount       | Should Be 5
+                $current.DiskId           | Should -Be $Disk.Number
+                $current.RetryIntervalSec | Should -Be 1
+                $current.RetryCount       | Should -Be 5
             }
         }
 
@@ -92,11 +92,11 @@ try
                         -OutputPath $TestDrive `
                         -ConfigurationData $configData
                     Start-DscConfiguration -Path $TestDrive -ComputerName localhost -Wait -Verbose -Force
-                } | Should Not Throw
+                } | Should -Not -Throw
             }
 
             It 'Should be able to call Get-DscConfiguration without throwing' {
-                { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should Not throw
+                { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -throw
             }
             #endregion
 
@@ -104,9 +104,9 @@ try
                 $current = Get-DscConfiguration | Where-Object {
                     $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
                 }
-                $current.DiskId           | Should Be $Disk.UniqueId
-                $current.RetryIntervalSec | Should Be 1
-                $current.RetryCount       | Should Be 5
+                $current.DiskId           | Should -Be $Disk.UniqueId
+                $current.RetryIntervalSec | Should -Be 1
+                $current.RetryCount       | Should -Be 5
             }
         }
 
@@ -132,11 +132,11 @@ try
                         -OutputPath $TestDrive `
                         -ConfigurationData $configData
                     Start-DscConfiguration -Path $TestDrive -ComputerName localhost -Wait -Verbose -Force
-                } | Should Not Throw
+                } | Should -Not -Throw
             }
 
             It 'Should be able to call Get-DscConfiguration without throwing' {
-                { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should Not throw
+                { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -throw
             }
             #endregion
 
@@ -144,9 +144,9 @@ try
                 $current = Get-DscConfiguration | Where-Object {
                     $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
                 }
-                $current.DiskId           | Should Be $Disk.Guid
-                $current.RetryIntervalSec | Should Be 1
-                $current.RetryCount       | Should Be 5
+                $current.DiskId           | Should -Be $Disk.Guid
+                $current.RetryIntervalSec | Should -Be 1
+                $current.RetryCount       | Should -Be 5
             }
         }
     }

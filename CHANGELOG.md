@@ -26,6 +26,7 @@
   [issue #116](https://github.com/PowerShell/xStorage/issues/116).
 - Prevent unit tests from DSCResource.Tests from running during test
   execution - fixes [Issue #118](https://github.com/PowerShell/xStorage/issues/118).
+- Updated tests to meet Pester V4 guidelines - fixes [Issue #120](https://github.com/PowerShell/xStorage/issues/120).
 
 ## 3.2.0.0
 

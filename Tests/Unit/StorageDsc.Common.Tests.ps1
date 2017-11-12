@@ -53,25 +53,25 @@ try
     Describe 'StorageDsc.Common\Assert-DriveLetterValid' {
         Context 'Drive letter is good, has no colon and colon is not required' {
             It "Should return '$driveLetterGood'" {
-                Assert-DriveLetterValid -DriveLetter $driveLetterGood | Should Be $driveLetterGood
+                Assert-DriveLetterValid -DriveLetter $driveLetterGood | Should -Be $driveLetterGood
             }
         }
 
         Context 'Drive letter is good, has no colon but colon is required' {
             It "Should return '$driveLetterGoodwithColon'" {
-                Assert-DriveLetterValid -DriveLetter $driveLetterGood -Colon | Should Be $driveLetterGoodwithColon
+                Assert-DriveLetterValid -DriveLetter $driveLetterGood -Colon | Should -Be $driveLetterGoodwithColon
             }
         }
 
         Context 'Drive letter is good, has a colon but colon is not required' {
             It "Should return '$driveLetterGood'" {
-                Assert-DriveLetterValid -DriveLetter $driveLetterGoodwithColon | Should Be $driveLetterGood
+                Assert-DriveLetterValid -DriveLetter $driveLetterGoodwithColon | Should -Be $driveLetterGood
             }
         }
 
         Context 'Drive letter is good, has a colon and colon is required' {
             It "Should return '$driveLetterGoodwithColon'" {
-                Assert-DriveLetterValid -DriveLetter $driveLetterGoodwithColon -Colon | Should Be $driveLetterGoodwithColon
+                Assert-DriveLetterValid -DriveLetter $driveLetterGoodwithColon -Colon | Should -Be $driveLetterGoodwithColon
             }
         }
 
@@ -81,7 +81,7 @@ try
                 -ArgumentName 'DriveLetter'
 
             It 'Should throw InvalidDriveLetterFormatError' {
-                { Assert-DriveLetterValid -DriveLetter $driveLetterBad } | Should Throw $errorRecord
+                { Assert-DriveLetterValid -DriveLetter $driveLetterBad } | Should -Throw $errorRecord
             }
         }
 
@@ -91,7 +91,7 @@ try
                 -ArgumentName 'DriveLetter'
 
             It 'Should throw InvalidDriveLetterFormatError' {
-                { Assert-DriveLetterValid -DriveLetter $driveLetterBadColon } | Should Throw $errorRecord
+                { Assert-DriveLetterValid -DriveLetter $driveLetterBadColon } | Should -Throw $errorRecord
             }
         }
 
@@ -101,7 +101,7 @@ try
                 -ArgumentName 'DriveLetter'
 
             It 'Should throw InvalidDriveLetterFormatError' {
-                { Assert-DriveLetterValid -DriveLetter $driveLetterBadTooLong } | Should Throw $errorRecord
+                { Assert-DriveLetterValid -DriveLetter $driveLetterBadTooLong } | Should -Throw $errorRecord
             }
         }
     }
@@ -116,25 +116,25 @@ try
 
         Context 'Path is found, trailing slash included, not required' {
             It "Should return '$accessPathGood'" {
-                Assert-AccessPathValid -AccessPath $accessPathGoodWithSlash | Should Be $accessPathGood
+                Assert-AccessPathValid -AccessPath $accessPathGoodWithSlash | Should -Be $accessPathGood
             }
         }
 
         Context 'Path is found, trailing slash included, required' {
             It "Should return '$accessPathGoodWithSlash'" {
-                Assert-AccessPathValid -AccessPath $accessPathGoodWithSlash -Slash | Should Be $accessPathGoodWithSlash
+                Assert-AccessPathValid -AccessPath $accessPathGoodWithSlash -Slash | Should -Be $accessPathGoodWithSlash
             }
         }
 
         Context 'Path is found, trailing slash not included, required' {
             It "Should return '$accessPathGoodWithSlash'" {
-                Assert-AccessPathValid -AccessPath $accessPathGood -Slash | Should Be $accessPathGoodWithSlash
+                Assert-AccessPathValid -AccessPath $accessPathGood -Slash | Should -Be $accessPathGoodWithSlash
             }
         }
 
         Context 'Path is found, trailing slash not included, not required' {
             It "Should return '$accessPathGood'" {
-                Assert-AccessPathValid -AccessPath $accessPathGood | Should Be $accessPathGood
+                Assert-AccessPathValid -AccessPath $accessPathGood | Should -Be $accessPathGood
             }
         }
 
@@ -150,7 +150,7 @@ try
 
             It 'Should throw InvalidAccessPathError' {
                 { Assert-AccessPathValid `
-                        -AccessPath $accessPathBad } | Should Throw $errorRecord
+                        -AccessPath $accessPathBad } | Should -Throw $errorRecord
             }
         }
     }
@@ -178,7 +178,7 @@ try
                     -Verifiable
 
                 It "Should return Disk with Disk Number $testDiskNumber" {
-                    (Get-DiskByIdentifier -DiskId $testDiskNumber).Number | Should Be $testDiskNumber
+                    (Get-DiskByIdentifier -DiskId $testDiskNumber).Number | Should -Be $testDiskNumber
                 }
 
                 It 'Should call expected mocks' {
@@ -200,7 +200,7 @@ try
                     -Verifiable
 
                 It "Should return Disk with Disk Number $testDiskNumber" {
-                    Get-DiskByIdentifier -DiskId $testDiskNumber | Should BeNullOrEmpty
+                    Get-DiskByIdentifier -DiskId $testDiskNumber | Should -BeNullOrEmpty
                 }
 
                 It 'Should call expected mocks' {
@@ -223,7 +223,7 @@ try
                     -Verifiable
 
                 It "Should return Disk with Disk Unique Id $testDiskUniqueId" {
-                    (Get-DiskByIdentifier -DiskId $testDiskUniqueId -DiskIdType 'UniqueId').UniqueId | Should Be $testDiskUniqueId
+                    (Get-DiskByIdentifier -DiskId $testDiskUniqueId -DiskIdType 'UniqueId').UniqueId | Should -Be $testDiskUniqueId
                 }
 
                 It 'Should call expected mocks' {
@@ -245,7 +245,7 @@ try
                     -Verifiable
 
                 It "Should return Disk with Disk Unique Id $testDiskUniqueId" {
-                    Get-DiskByIdentifier -DiskId $testDiskUniqueId -DiskIdType 'UniqueId' | Should BeNullOrEmpty
+                    Get-DiskByIdentifier -DiskId $testDiskUniqueId -DiskIdType 'UniqueId' | Should -BeNullOrEmpty
                 }
 
                 It 'Should call expected mocks' {
@@ -267,7 +267,7 @@ try
                     -Verifiable
 
                 It "Should return Disk with Disk Guid $testDiskGuid" {
-                    (Get-DiskByIdentifier -DiskId $testDiskGuid -DiskIdType 'Guid').Guid | Should Be $testDiskGuid
+                    (Get-DiskByIdentifier -DiskId $testDiskGuid -DiskIdType 'Guid').Guid | Should -Be $testDiskGuid
                 }
 
                 It 'Should call expected mocks' {
@@ -287,7 +287,7 @@ try
                     -Verifiable
 
                 It "Should return Disk with Disk Guid $testDiskGuid" {
-                    Get-DiskByIdentifier -DiskId $testDiskGuid -DiskIdType 'Guid' | Should BeNullOrEmpty
+                    Get-DiskByIdentifier -DiskId $testDiskGuid -DiskIdType 'Guid' | Should -BeNullOrEmpty
                 }
 
                 It 'Should call expected mocks' {

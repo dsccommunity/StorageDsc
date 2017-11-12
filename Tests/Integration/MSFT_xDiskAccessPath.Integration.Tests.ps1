@@ -75,21 +75,21 @@ try
                         -ConfigurationData $configData
                     Start-DscConfiguration -Path $TestDrive `
                         -ComputerName localhost -Wait -Verbose -Force
-                } | Should Not Throw
+                } | Should -Not -Throw
             }
 
             It 'Should be able to call Get-DscConfiguration without throwing' {
-                { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should Not throw
+                { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -throw
             }
 
             It 'Should have set the resource and all the parameters should match' {
                 $current = Get-DscConfiguration | Where-Object {
                     $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
                 }
-                $current.DiskId           | Should Be $disk.Number
-                $current.AccessPath       | Should Be "$($accessPathA)\"
-                $current.FSLabel          | Should Be $FSLabelA
-                $current.Size             | Should Be 100MB
+                $current.DiskId           | Should -Be $disk.Number
+                $current.AccessPath       | Should -Be "$($accessPathA)\"
+                $current.FSLabel          | Should -Be $FSLabelA
+                $current.Size             | Should -Be 100MB
             }
 
             # Create a file on the new disk to ensure it still exists after reattach
@@ -126,26 +126,26 @@ try
                         -ConfigurationData $configData
                     Start-DscConfiguration -Path $TestDrive `
                         -ComputerName localhost -Wait -Verbose -Force
-                } | Should Not Throw
+                } | Should -Not -Throw
             }
 
             It 'Should be able to call Get-DscConfiguration without throwing' {
-                { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should Not throw
+                { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -throw
             }
 
             It 'Should have set the resource and all the parameters should match' {
                 $current = Get-DscConfiguration | Where-Object {
                     $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
                 }
-                $current.DiskId           | Should Be $disk.Number
-                $current.AccessPath       | Should Be "$($accessPathA)\"
-                $current.FSLabel          | Should Be $FSLabelA
-                $current.Size             | Should Be 100MB
+                $current.DiskId           | Should -Be $disk.Number
+                $current.AccessPath       | Should -Be "$($accessPathA)\"
+                $current.FSLabel          | Should -Be $FSLabelA
+                $current.Size             | Should -Be 100MB
             }
 
             It 'Should contain the test file' {
-                Test-Path -Path $testFilePath        | Should Be $true
-                Get-Content -Path $testFilePath -Raw | Should Be 'Test'
+                Test-Path -Path $testFilePath        | Should -Be $true
+                Get-Content -Path $testFilePath -Raw | Should -Be 'Test'
             }
 
             It 'Should compile and apply the MOF without throwing' {
@@ -168,26 +168,26 @@ try
                         -ConfigurationData $configData
                     Start-DscConfiguration -Path $TestDrive `
                         -ComputerName localhost -Wait -Verbose -Force
-                } | Should Not Throw
+                } | Should -Not -Throw
             }
 
             It 'Should be able to call Get-DscConfiguration without throwing' {
-                { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should Not throw
+                { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -throw
             }
 
             It 'Should have set the resource and all the parameters should match' {
                 $current = Get-DscConfiguration | Where-Object {
                     $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
                 }
-                $current.DiskId           | Should Be $disk.Number
-                $current.AccessPath       | Should Be "$($accessPathB)\"
-                $current.FSLabel          | Should Be $FSLabelB
-                $current.Size             | Should Be 935198720
+                $current.DiskId           | Should -Be $disk.Number
+                $current.AccessPath       | Should -Be "$($accessPathB)\"
+                $current.FSLabel          | Should -Be $FSLabelB
+                $current.Size             | Should -Be 935198720
             }
 
             # A system partition will have been added to the disk as well as the 2 test partitions
             It 'Should have 3 partitions on disk' {
-                ($disk | Get-Partition).Count | Should Be 3
+                ($disk | Get-Partition).Count | Should -Be 3
             }
             #endregion
 
@@ -258,21 +258,21 @@ try
                         -ConfigurationData $configData
                     Start-DscConfiguration -Path $TestDrive `
                         -ComputerName localhost -Wait -Verbose -Force
-                } | Should Not Throw
+                } | Should -Not -Throw
             }
 
             It 'Should be able to call Get-DscConfiguration without throwing' {
-                { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should Not throw
+                { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -throw
             }
 
             It 'Should have set the resource and all the parameters should match' {
                 $current = Get-DscConfiguration | Where-Object {
                     $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
                 }
-                $current.DiskId           | Should Be $disk.UniqueId
-                $current.AccessPath       | Should Be "$($accessPathA)\"
-                $current.FSLabel          | Should Be $FSLabelA
-                $current.Size             | Should Be 100MB
+                $current.DiskId           | Should -Be $disk.UniqueId
+                $current.AccessPath       | Should -Be "$($accessPathA)\"
+                $current.FSLabel          | Should -Be $FSLabelA
+                $current.Size             | Should -Be 100MB
             }
 
             # Create a file on the new disk to ensure it still exists after reattach
@@ -309,26 +309,26 @@ try
                         -ConfigurationData $configData
                     Start-DscConfiguration -Path $TestDrive `
                         -ComputerName localhost -Wait -Verbose -Force
-                } | Should Not Throw
+                } | Should -Not -Throw
             }
 
             It 'Should be able to call Get-DscConfiguration without throwing' {
-                { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should Not throw
+                { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -throw
             }
 
             It 'Should have set the resource and all the parameters should match' {
                 $current = Get-DscConfiguration | Where-Object {
                     $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
                 }
-                $current.DiskId           | Should Be $disk.UniqueId
-                $current.AccessPath       | Should Be "$($accessPathA)\"
-                $current.FSLabel          | Should Be $FSLabelA
-                $current.Size             | Should Be 100MB
+                $current.DiskId           | Should -Be $disk.UniqueId
+                $current.AccessPath       | Should -Be "$($accessPathA)\"
+                $current.FSLabel          | Should -Be $FSLabelA
+                $current.Size             | Should -Be 100MB
             }
 
             It 'Should contain the test file' {
-                Test-Path -Path $testFilePath        | Should Be $true
-                Get-Content -Path $testFilePath -Raw | Should Be 'Test'
+                Test-Path -Path $testFilePath        | Should -Be $true
+                Get-Content -Path $testFilePath -Raw | Should -Be 'Test'
             }
 
             It 'Should compile and apply the MOF without throwing' {
@@ -351,26 +351,26 @@ try
                         -ConfigurationData $configData
                     Start-DscConfiguration -Path $TestDrive `
                         -ComputerName localhost -Wait -Verbose -Force
-                } | Should Not Throw
+                } | Should -Not -Throw
             }
 
             It 'Should be able to call Get-DscConfiguration without throwing' {
-                { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should Not throw
+                { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -throw
             }
 
             It 'Should have set the resource and all the parameters should match' {
                 $current = Get-DscConfiguration | Where-Object {
                     $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
                 }
-                $current.DiskId           | Should Be $disk.UniqueId
-                $current.AccessPath       | Should Be "$($accessPathB)\"
-                $current.FSLabel          | Should Be $FSLabelB
-                $current.Size             | Should Be 935198720
+                $current.DiskId           | Should -Be $disk.UniqueId
+                $current.AccessPath       | Should -Be "$($accessPathB)\"
+                $current.FSLabel          | Should -Be $FSLabelB
+                $current.Size             | Should -Be 935198720
             }
 
             # A system partition will have been added to the disk as well as the 2 test partitions
             It 'Should have 3 partitions on disk' {
-                ($disk | Get-Partition).Count | Should Be 3
+                ($disk | Get-Partition).Count | Should -Be 3
             }
             #endregion
 
@@ -441,21 +441,21 @@ try
                         -ConfigurationData $configData
                     Start-DscConfiguration -Path $TestDrive `
                         -ComputerName localhost -Wait -Verbose -Force
-                } | Should Not Throw
+                } | Should -Not -Throw
             }
 
             It 'Should be able to call Get-DscConfiguration without throwing' {
-                { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should Not throw
+                { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -throw
             }
 
             It 'Should have set the resource and all the parameters should match' {
                 $current = Get-DscConfiguration | Where-Object {
                     $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
                 }
-                $current.DiskId           | Should Be $disk.Guid
-                $current.AccessPath       | Should Be "$($accessPathA)\"
-                $current.FSLabel          | Should Be $FSLabelA
-                $current.Size             | Should Be 100MB
+                $current.DiskId           | Should -Be $disk.Guid
+                $current.AccessPath       | Should -Be "$($accessPathA)\"
+                $current.FSLabel          | Should -Be $FSLabelA
+                $current.Size             | Should -Be 100MB
             }
 
             # Create a file on the new disk to ensure it still exists after reattach
@@ -492,26 +492,26 @@ try
                         -ConfigurationData $configData
                     Start-DscConfiguration -Path $TestDrive `
                         -ComputerName localhost -Wait -Verbose -Force
-                } | Should Not Throw
+                } | Should -Not -Throw
             }
 
             It 'Should be able to call Get-DscConfiguration without throwing' {
-                { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should Not throw
+                { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -throw
             }
 
             It 'Should have set the resource and all the parameters should match' {
                 $current = Get-DscConfiguration | Where-Object {
                     $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
                 }
-                $current.DiskId           | Should Be $disk.Guid
-                $current.AccessPath       | Should Be "$($accessPathA)\"
-                $current.FSLabel          | Should Be $FSLabelA
-                $current.Size             | Should Be 100MB
+                $current.DiskId           | Should -Be $disk.Guid
+                $current.AccessPath       | Should -Be "$($accessPathA)\"
+                $current.FSLabel          | Should -Be $FSLabelA
+                $current.Size             | Should -Be 100MB
             }
 
             It 'Should contain the test file' {
-                Test-Path -Path $testFilePath        | Should Be $true
-                Get-Content -Path $testFilePath -Raw | Should Be 'Test'
+                Test-Path -Path $testFilePath        | Should -Be $true
+                Get-Content -Path $testFilePath -Raw | Should -Be 'Test'
             }
 
             It 'Should compile and apply the MOF without throwing' {
@@ -534,26 +534,26 @@ try
                         -ConfigurationData $configData
                     Start-DscConfiguration -Path $TestDrive `
                         -ComputerName localhost -Wait -Verbose -Force
-                } | Should Not Throw
+                } | Should -Not -Throw
             }
 
             It 'Should be able to call Get-DscConfiguration without throwing' {
-                { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should Not throw
+                { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -throw
             }
 
             It 'Should have set the resource and all the parameters should match' {
                 $current = Get-DscConfiguration | Where-Object {
                     $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
                 }
-                $current.DiskId           | Should Be $disk.Guid
-                $current.AccessPath       | Should Be "$($accessPathB)\"
-                $current.FSLabel          | Should Be $FSLabelB
-                $current.Size             | Should Be 935198720
+                $current.DiskId           | Should -Be $disk.Guid
+                $current.AccessPath       | Should -Be "$($accessPathB)\"
+                $current.FSLabel          | Should -Be $FSLabelB
+                $current.Size             | Should -Be 935198720
             }
 
             # A system partition will have been added to the disk as well as the 2 test partitions
             It 'Should have 3 partitions on disk' {
-                ($disk | Get-Partition).Count | Should Be 3
+                ($disk | Get-Partition).Count | Should -Be 3
             }
             #endregion
 

@@ -283,27 +283,27 @@ try
                     -Verbose
 
                 It "Should return DiskId $($script:mockedDisk0.Number)" {
-                    $resource.DiskId | Should Be $script:mockedDisk0.Number
+                    $resource.DiskId | Should -Be $script:mockedDisk0.Number
                 }
 
                 It "Should return AccessPath $($script:testAccessPath)" {
-                    $resource.AccessPath | Should Be $script:testAccessPath
+                    $resource.AccessPath | Should -Be $script:testAccessPath
                 }
 
                 It "Should return Size $($script:mockedPartition.Size)" {
-                    $resource.Size | Should Be $script:mockedPartition.Size
+                    $resource.Size | Should -Be $script:mockedPartition.Size
                 }
 
                 It "Should return FSLabel $($script:mockedVolume.FileSystemLabel)" {
-                    $resource.FSLabel | Should Be $script:mockedVolume.FileSystemLabel
+                    $resource.FSLabel | Should -Be $script:mockedVolume.FileSystemLabel
                 }
 
                 It "Should return AllocationUnitSize $($script:mockedCim.BlockSize)" {
-                    $resource.AllocationUnitSize | Should Be $script:mockedCim.BlockSize
+                    $resource.AllocationUnitSize | Should -Be $script:mockedCim.BlockSize
                 }
 
                 It "Should return FSFormat $($script:mockedVolume.FileSystem)" {
-                    $resource.FSFormat | Should Be $script:mockedVolume.FileSystem
+                    $resource.FSFormat | Should -Be $script:mockedVolume.FileSystem
                 }
 
                 It 'Should call the correct mocks' {
@@ -351,27 +351,27 @@ try
                     -Verbose
 
                 It "Should return DiskId $($script:mockedDisk0.UniqueId)" {
-                    $resource.DiskId | Should Be $script:mockedDisk0.UniqueId
+                    $resource.DiskId | Should -Be $script:mockedDisk0.UniqueId
                 }
 
                 It "Should return AccessPath $($script:testAccessPath)" {
-                    $resource.AccessPath | Should Be $script:testAccessPath
+                    $resource.AccessPath | Should -Be $script:testAccessPath
                 }
 
                 It "Should return Size $($script:mockedPartition.Size)" {
-                    $resource.Size | Should Be $script:mockedPartition.Size
+                    $resource.Size | Should -Be $script:mockedPartition.Size
                 }
 
                 It "Should return FSLabel $($script:mockedVolume.FileSystemLabel)" {
-                    $resource.FSLabel | Should Be $script:mockedVolume.FileSystemLabel
+                    $resource.FSLabel | Should -Be $script:mockedVolume.FileSystemLabel
                 }
 
                 It "Should return AllocationUnitSize $($script:mockedCim.BlockSize)" {
-                    $resource.AllocationUnitSize | Should Be $script:mockedCim.BlockSize
+                    $resource.AllocationUnitSize | Should -Be $script:mockedCim.BlockSize
                 }
 
                 It "Should return FSFormat $($script:mockedVolume.FileSystem)" {
-                    $resource.FSFormat | Should Be $script:mockedVolume.FileSystem
+                    $resource.FSFormat | Should -Be $script:mockedVolume.FileSystem
                 }
 
                 It 'Should call the correct mocks' {
@@ -419,27 +419,27 @@ try
                     -Verbose
 
                 It "Should return DiskId $($script:mockedDisk0.Guid)" {
-                    $resource.DiskId | Should Be $script:mockedDisk0.Guid
+                    $resource.DiskId | Should -Be $script:mockedDisk0.Guid
                 }
 
                 It "Should return AccessPath $($script:testAccessPath)" {
-                    $resource.AccessPath | Should Be $script:testAccessPath
+                    $resource.AccessPath | Should -Be $script:testAccessPath
                 }
 
                 It "Should return Size $($script:mockedPartition.Size)" {
-                    $resource.Size | Should Be $script:mockedPartition.Size
+                    $resource.Size | Should -Be $script:mockedPartition.Size
                 }
 
                 It "Should return FSLabel $($script:mockedVolume.FileSystemLabel)" {
-                    $resource.FSLabel | Should Be $script:mockedVolume.FileSystemLabel
+                    $resource.FSLabel | Should -Be $script:mockedVolume.FileSystemLabel
                 }
 
                 It "Should return AllocationUnitSize $($script:mockedCim.BlockSize)" {
-                    $resource.AllocationUnitSize | Should Be $script:mockedCim.BlockSize
+                    $resource.AllocationUnitSize | Should -Be $script:mockedCim.BlockSize
                 }
 
                 It "Should return FSFormat $($script:mockedVolume.FileSystem)" {
-                    $resource.FSFormat | Should Be $script:mockedVolume.FileSystem
+                    $resource.FSFormat | Should -Be $script:mockedVolume.FileSystem
                 }
 
                 It 'Should call the correct mocks' {
@@ -482,27 +482,27 @@ try
                     -Verbose
 
                 It "Should return DiskId $($script:mockedDisk0.Number)" {
-                    $resource.DiskId | Should Be $script:mockedDisk0.Number
+                    $resource.DiskId | Should -Be $script:mockedDisk0.Number
                 }
 
                 It "Should return AccessPath $($script:testAccessPath)" {
-                    $resource.AccessPath | Should Be $script:testAccessPath
+                    $resource.AccessPath | Should -Be $script:testAccessPath
                 }
 
                 It "Should return Size null" {
-                    $resource.Size | Should Be $null
+                    $resource.Size | Should -Be $null
                 }
 
                 It "Should return FSLabel empty" {
-                    $resource.FSLabel | Should Be ''
+                    $resource.FSLabel | Should -Be ''
                 }
 
                 It "Should return AllocationUnitSize null" {
-                    $resource.AllocationUnitSize | Should Be $null
+                    $resource.AllocationUnitSize | Should -Be $null
                 }
 
                 It "Should return FSFormat null" {
-                    $resource.FSFormat | Should Be $null
+                    $resource.FSFormat | Should -Be $null
                 }
 
                 It 'Should call the correct mocks' {
@@ -567,7 +567,7 @@ try
                             -DiskId $script:mockedDisk0Offline.Number `
                             -AccessPath $script:testAccessPath `
                             -Verbose
-                    } | Should Not Throw
+                    } | Should -Not -Throw
                 }
 
                 It 'Should call the correct mocks' {
@@ -634,7 +634,7 @@ try
                             -DiskIdType 'UniqueId' `
                             -AccessPath $script:testAccessPath `
                             -Verbose
-                    } | Should Not Throw
+                    } | Should -Not -Throw
                 }
 
                 It 'Should call the correct mocks' {
@@ -701,7 +701,7 @@ try
                             -DiskIdType 'Guid' `
                             -AccessPath $script:testAccessPath `
                             -Verbose
-                    } | Should Not Throw
+                    } | Should -Not -Throw
                 }
 
                 It 'Should call the correct mocks' {
@@ -767,7 +767,7 @@ try
                             -DiskId $script:mockedDisk0Readonly.Number `
                             -AccessPath $script:testAccessPath `
                             -Verbose
-                    } | Should Not Throw
+                    } | Should -Not -Throw
                 }
 
                 It 'Should call the correct mocks' {
@@ -836,7 +836,7 @@ try
                             -DiskId $script:mockedDisk0OfflineRaw.Number `
                             -AccessPath $script:testAccessPath `
                             -Verbose
-                    } | Should Not Throw
+                    } | Should -Not -Throw
                 }
 
                 It 'Should call the correct mocks' {
@@ -902,7 +902,7 @@ try
                             -DiskId $script:mockedDisk0Raw.Number `
                             -AccessPath $script:testAccessPath `
                             -Verbose
-                    } | Should Not Throw
+                    } | Should -Not -Throw
                 }
 
                 It 'Should call the correct mocks' {
@@ -965,7 +965,7 @@ try
                             -DiskId $script:mockedDisk0.Number `
                             -AccessPath $script:testAccessPath `
                             -Verbose
-                    } | Should Not Throw
+                    } | Should -Not -Throw
                 }
 
                 It 'Should call the correct mocks' {
@@ -1015,7 +1015,7 @@ try
                             -DiskId $script:mockedDisk0Mbr.Number `
                             -AccessPath $script:testAccessPath `
                             -Verbose
-                    } | Should Throw $errorRecord
+                    } | Should -Throw $errorRecord
                 }
 
                 It 'Should call the correct mocks' {
@@ -1066,7 +1066,7 @@ try
                             -DiskIdType 'UniqueId' `
                             -AccessPath $script:testAccessPath `
                             -Verbose
-                    } | Should Throw $errorRecord
+                    } | Should -Throw $errorRecord
                 }
 
                 It 'Should call the correct mocks' {
@@ -1117,7 +1117,7 @@ try
                             -DiskIdType 'Guid' `
                             -AccessPath $script:testAccessPath `
                             -Verbose
-                    } | Should Throw $errorRecord
+                    } | Should -Throw $errorRecord
                 }
 
                 It 'Should call the correct mocks' {
@@ -1171,7 +1171,7 @@ try
                             -DiskId $script:mockedDisk0.Number `
                             -AccessPath $script:testAccessPath `
                             -Verbose
-                    } | Should Not Throw
+                    } | Should -Not -Throw
                 }
 
                 It 'Should call the correct mocks' {
@@ -1229,7 +1229,7 @@ try
                             -AccessPath $script:testAccessPath `
                             -Size $script:mockedPartitionSize `
                             -Verbose
-                    } | Should Not Throw
+                    } | Should -Not -Throw
                 }
 
                 It 'Should call the correct mocks' {
@@ -1288,7 +1288,7 @@ try
                             -AccessPath $script:testAccessPath `
                             -FSLabel 'NewLabel' `
                             -Verbose
-                    } | Should Not Throw
+                    } | Should -Not -Throw
                 }
 
                 It 'Should call the correct mocks' {
@@ -1342,11 +1342,11 @@ try
                             -AccessPath $script:testAccessPath `
                             -AllocationUnitSize 4096 `
                             -Verbose
-                    } | Should Not Throw
+                    } | Should -Not -Throw
                 }
 
                 It 'Should return false' {
-                    $script:result | Should Be $false
+                    $script:result | Should -Be $false
                 }
 
                 It 'Should call the correct mocks' {
@@ -1388,11 +1388,11 @@ try
                             -AccessPath $script:testAccessPath `
                             -AllocationUnitSize 4096 `
                             -Verbose
-                    } | Should Not Throw
+                    } | Should -Not -Throw
                 }
 
                 It 'Should return false' {
-                    $script:result | Should Be $false
+                    $script:result | Should -Be $false
                 }
 
                 It 'Should call the correct mocks' {
@@ -1434,11 +1434,11 @@ try
                             -AccessPath $script:testAccessPath `
                             -AllocationUnitSize 4096 `
                             -Verbose
-                    } | Should Not Throw
+                    } | Should -Not -Throw
                 }
 
                 It 'Should return false' {
-                    $script:result | Should Be $false
+                    $script:result | Should -Be $false
                 }
 
                 It 'Should call the correct mocks' {
@@ -1479,11 +1479,11 @@ try
                             -AccessPath $script:testAccessPath `
                             -AllocationUnitSize 4096 `
                             -Verbose
-                    } | Should Not Throw
+                    } | Should -Not -Throw
                 }
 
                 It 'Should return false' {
-                    $script:result | Should Be $false
+                    $script:result | Should -Be $false
                 }
 
                 It 'Should call the correct mocks' {
@@ -1524,11 +1524,11 @@ try
                             -AccessPath $script:testAccessPath `
                             -AllocationUnitSize 4096 `
                             -Verbose
-                    } | Should Not Throw
+                    } | Should -Not -Throw
                 }
 
                 It 'Should return false' {
-                    $script:result | Should Be $false
+                    $script:result | Should -Be $false
                 }
 
                 It 'Should call the correct mocks' {
@@ -1580,11 +1580,11 @@ try
                             -AllocationUnitSize 4096 `
                             -Size 124 `
                             -Verbose
-                    } | Should Not Throw
+                    } | Should -Not -Throw
                 }
 
                 It 'Should return true' {
-                    $script:result | Should Be $true
+                    $script:result | Should -Be $true
                 }
 
                 It 'Should call the correct mocks' {
@@ -1633,12 +1633,12 @@ try
                             -AccessPath $script:testAccessPath `
                             -AllocationUnitSize 4097 `
                             -Verbose
-                    } | Should Not Throw
+                    } | Should -Not -Throw
                 }
 
                 # skipped due to:  https://github.com/PowerShell/xStorage/issues/22
                 It 'Should return false' -skip {
-                    $script:result | Should Be $false
+                    $script:result | Should -Be $false
                 }
 
                 It 'Should call the correct mocks' {
@@ -1689,11 +1689,11 @@ try
                             -AccessPath $script:testAccessPath `
                             -FSFormat 'ReFS' `
                             -Verbose
-                    } | Should Not Throw
+                    } | Should -Not -Throw
                 }
 
                 It 'Should return true' {
-                    $script:result | Should Be $true
+                    $script:result | Should -Be $true
                 }
 
                 It 'Should call the correct mocks' {
@@ -1744,11 +1744,11 @@ try
                             -AccessPath $script:testAccessPath `
                             -FSLabel 'NewLabel' `
                             -Verbose
-                    } | Should Not Throw
+                    } | Should -Not -Throw
                 }
 
                 It 'Should return false' {
-                    $script:result | Should Be $false
+                    $script:result | Should -Be $false
                 }
 
                 It 'Should call the correct mocks' {
@@ -1801,11 +1801,11 @@ try
                             -Size $script:mockedPartition.Size `
                             -FSFormat $script:mockedVolume.FileSystem `
                             -Verbose
-                    } | Should Not Throw
+                    } | Should -Not -Throw
                 }
 
                 It 'Should return true' {
-                    $script:result | Should Be $true
+                    $script:result | Should -Be $true
                 }
 
                 It 'Should call the correct mocks' {

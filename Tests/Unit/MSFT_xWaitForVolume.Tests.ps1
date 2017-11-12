@@ -42,15 +42,15 @@ try
         Describe "MSFT_xWaitForVolume\Get-TargetResource" {
             $resource = Get-TargetResource @driveCParameters -Verbose
             It "DriveLetter Should Be $($driveCParameters.DriveLetter)" {
-                $resource.DriveLetter | Should Be $driveCParameters.DriveLetter
+                $resource.DriveLetter | Should -Be $driveCParameters.DriveLetter
             }
 
             It "RetryIntervalSec Should Be $($driveCParameters.RetryIntervalSec)" {
-                $resource.RetryIntervalSec | Should Be $driveCParameters.RetryIntervalSec
+                $resource.RetryIntervalSec | Should -Be $driveCParameters.RetryIntervalSec
             }
 
             It "RetryIntervalSec Should Be $($driveCParameters.RetryCount)" {
-                $resource.RetryCount | Should Be $driveCParameters.RetryCount
+                $resource.RetryCount | Should -Be $driveCParameters.RetryCount
             }
 
             It 'the correct mocks were called' {
@@ -69,7 +69,7 @@ try
                 Mock Get-Volume -MockWith { return $mockedDriveC } -Verifiable
 
                 It 'Should not throw an exception' {
-                    { Set-targetResource @driveCParameters -Verbose } | Should Not throw
+                    { Set-targetResource @driveCParameters -Verbose } | Should -Not -throw
                 }
 
                 It 'the correct mocks were called' {
@@ -88,7 +88,7 @@ try
                         -f $driveCParameters.DriveLetter,$driveCParameters.RetryCount)
 
                 It 'should throw VolumeNotFoundAfterError' {
-                    { Set-targetResource @driveCParameters -Verbose } | Should Throw $errorRecord
+                    { Set-targetResource @driveCParameters -Verbose } | Should -Throw $errorRecord
                 }
 
                 It 'the correct mocks were called' {
@@ -114,11 +114,11 @@ try
                 It 'calling test Should Not Throw' {
                     {
                         $script:result = Test-TargetResource @driveCParameters -Verbose
-                    } | Should Not Throw
+                    } | Should -Not -Throw
                 }
 
                 It "result Should Be true" {
-                    $script:result | Should Be $true
+                    $script:result | Should -Be $true
                 }
 
                 It "the correct mocks were called" {
@@ -136,11 +136,11 @@ try
                 It 'calling test Should Not Throw' {
                     {
                         $script:result = Test-TargetResource @driveCParameters -Verbose
-                    } | Should Not Throw
+                    } | Should -Not -Throw
                 }
 
                 It 'result Should Be false' {
-                    $script:result | Should Be $false
+                    $script:result | Should -Be $false
                 }
 
                 It 'the correct mocks were called' {

@@ -252,8 +252,8 @@ try
                     -Verbose
 
                 It 'Should return expected values' {
-                    $resource.ImagePath   | Should Be $script:DiskImageISOPath
-                    $resource.Ensure      | Should Be 'Absent'
+                    $resource.ImagePath   | Should -Be $script:DiskImageISOPath
+                    $resource.Ensure      | Should -Be 'Absent'
                 }
 
                 It 'all the get mocks should be called' {
@@ -286,11 +286,11 @@ try
                     -Verbose
 
                 It 'Should return expected values' {
-                    $resource.ImagePath   | Should Be $script:DiskImageISOPath
-                    $resource.DriveLetter | Should Be $script:mockedVolumeISO.DriveLetter
-                    $resource.StorageType | Should Be 'ISO'
-                    $resource.Access      | Should Be 'ReadOnly'
-                    $resource.Ensure      | Should Be 'Present'
+                    $resource.ImagePath   | Should -Be $script:DiskImageISOPath
+                    $resource.DriveLetter | Should -Be $script:mockedVolumeISO.DriveLetter
+                    $resource.StorageType | Should -Be 'ISO'
+                    $resource.Access      | Should -Be 'ReadOnly'
+                    $resource.Ensure      | Should -Be 'Present'
                 }
 
                 It 'all the get mocks should be called' {
@@ -319,8 +319,8 @@ try
                     -Verbose
 
                 It 'Should return expected values' {
-                    $resource.ImagePath   | Should Be $script:DiskImageVHDXPath
-                    $resource.Ensure      | Should Be 'Absent'
+                    $resource.ImagePath   | Should -Be $script:DiskImageVHDXPath
+                    $resource.Ensure      | Should -Be 'Absent'
                 }
 
                 It 'all the get mocks should be called' {
@@ -359,11 +359,11 @@ try
                     -Verbose
 
                 It 'Should return expected values' {
-                    $resource.ImagePath   | Should Be $script:DiskImageVHDXPath
-                    $resource.DriveLetter | Should Be $script:mockedVolumeVHDX.DriveLetter
-                    $resource.StorageType | Should Be 'VHDX'
-                    $resource.Access      | Should Be 'ReadWrite'
-                    $resource.Ensure      | Should Be 'Present'
+                    $resource.ImagePath   | Should -Be $script:DiskImageVHDXPath
+                    $resource.DriveLetter | Should -Be $script:mockedVolumeVHDX.DriveLetter
+                    $resource.StorageType | Should -Be 'VHDX'
+                    $resource.Access      | Should -Be 'ReadWrite'
+                    $resource.Ensure      | Should -Be 'Present'
                 }
 
                 It 'all the get mocks should be called' {
@@ -402,11 +402,11 @@ try
                     -Verbose
 
                 It 'Should return expected values' {
-                    $resource.ImagePath   | Should Be $script:DiskImageVHDXPath
-                    $resource.DriveLetter | Should Be $script:mockedVolumeVHDX.DriveLetter
-                    $resource.StorageType | Should Be 'VHDX'
-                    $resource.Access      | Should Be 'ReadOnly'
-                    $resource.Ensure      | Should Be 'Present'
+                    $resource.ImagePath   | Should -Be $script:DiskImageVHDXPath
+                    $resource.DriveLetter | Should -Be $script:mockedVolumeVHDX.DriveLetter
+                    $resource.StorageType | Should -Be 'VHDX'
+                    $resource.Access      | Should -Be 'ReadOnly'
+                    $resource.Ensure      | Should -Be 'Present'
                 }
 
                 It 'all the get mocks should be called' {
@@ -445,7 +445,7 @@ try
                             -DriveLetter $script:DriveLetter `
                             -Ensure 'Present' `
                             -Verbose
-                    } | Should Not Throw
+                    } | Should -Not -Throw
                 }
 
                 It 'all the get mocks should be called' {
@@ -479,7 +479,7 @@ try
                             -DriveLetter 'Y' `
                             -Ensure 'Present' `
                             -Verbose
-                    } | Should Not Throw
+                    } | Should -Not -Throw
                 }
 
                 It 'all the get mocks should be called' {
@@ -512,7 +512,7 @@ try
                             -DriveLetter $script:DriveLetter `
                             -Ensure 'Present' `
                             -Verbose
-                    } | Should Not Throw
+                    } | Should -Not -Throw
                 }
 
                 It 'all the get mocks should be called' {
@@ -544,7 +544,7 @@ try
                             -ImagePath $script:DiskImageISOPath `
                             -Ensure 'Absent' `
                             -Verbose
-                    } | Should Not Throw
+                    } | Should -Not -Throw
                 }
 
                 It 'all the get mocks should be called' {
@@ -573,7 +573,7 @@ try
                             -ImagePath $script:DiskImageISOPath `
                             -Ensure 'Absent' `
                             -Verbose
-                    } | Should Not Throw
+                    } | Should -Not -Throw
                 }
 
                 It 'all the get mocks should be called' {
@@ -608,7 +608,7 @@ try
                             -Access 'ReadWrite' `
                             -Ensure 'Present' `
                             -Verbose
-                    } | Should Not Throw
+                    } | Should -Not -Throw
                 }
 
                 It 'all the get mocks should be called' {
@@ -641,7 +641,7 @@ try
                         -ImagePath $script:DiskImageISOPath `
                         -DriveLetter $script:DriveLetter `
                         -Ensure 'Present' `
-                        -Verbose | Should Be $true
+                        -Verbose | Should -Be $true
                 }
 
                 It 'all the get mocks should be called' {
@@ -663,7 +663,7 @@ try
                         -ImagePath $script:DiskImageISOPath `
                         -DriveLetter 'Y' `
                         -Ensure 'Present' `
-                        -Verbose | Should Be $false
+                        -Verbose | Should -Be $false
                 }
 
                 It 'all the get mocks should be called' {
@@ -685,7 +685,7 @@ try
                         -ImagePath $script:DiskImageISOPath `
                         -DriveLetter $script:DriveLetter `
                         -Ensure 'Present' `
-                        -Verbose | Should Be $false
+                        -Verbose | Should -Be $false
                 }
 
                 It 'all the get mocks should be called' {
@@ -706,7 +706,7 @@ try
                     Test-TargetResource `
                         -ImagePath $script:DiskImageISOPath `
                         -Ensure 'Absent' `
-                        -Verbose | Should Be $false
+                        -Verbose | Should -Be $false
                 }
 
                 It 'all the get mocks should be called' {
@@ -727,7 +727,7 @@ try
                     Test-TargetResource `
                         -ImagePath $script:DiskImageISOPath `
                         -Ensure 'Absent' `
-                        -Verbose | Should Be $true
+                        -Verbose | Should -Be $true
                 }
 
                 It 'all the get mocks should be called' {
@@ -750,7 +750,7 @@ try
                         -DriveLetter $script:DriveLetter `
                         -Access 'ReadWrite' `
                         -Ensure 'Present' `
-                        -Verbose | Should Be $false
+                        -Verbose | Should -Be $false
                 }
 
                 It 'all the get mocks should be called' {
@@ -776,7 +776,7 @@ try
                             -DriveLetter $script:DriveLetter `
                             -Ensure 'Absent' `
                             -Verbose
-                    } | Should Throw $errorRecord
+                    } | Should -Throw $errorRecord
                 }
             }
 
@@ -792,7 +792,7 @@ try
                             -StorageType 'VHD' `
                             -Ensure 'Absent' `
                             -Verbose
-                    } | Should Throw $errorRecord
+                    } | Should -Throw $errorRecord
                 }
             }
 
@@ -808,7 +808,7 @@ try
                             -Access 'ReadOnly' `
                             -Ensure 'Absent' `
                             -Verbose
-                    } | Should Throw $errorRecord
+                    } | Should -Throw $errorRecord
                 }
             }
 
@@ -819,7 +819,7 @@ try
                             -ImagePath $script:DiskImageISOPath `
                             -Ensure 'Absent' `
                             -Verbose
-                    } | Should Not Throw
+                    } | Should -Not -Throw
                 }
             }
 
@@ -838,7 +838,7 @@ try
                             -ImagePath $script:DiskImageISOPath `
                             -Ensure 'Present' `
                             -Verbose
-                    } | Should Throw $errorRecord
+                    } | Should -Throw $errorRecord
                 }
             }
 
@@ -857,7 +857,7 @@ try
                             -ImagePath $script:DiskImageISOPath `
                             -Ensure 'Present' `
                             -Verbose
-                    } | Should Throw $errorRecord
+                    } | Should -Throw $errorRecord
                 }
             }
 
@@ -872,7 +872,7 @@ try
                             -DriveLetter $script:DriveLetter `
                             -Ensure 'Present' `
                             -Verbose
-                    } | Should Not Throw
+                    } | Should -Not -Throw
                 }
             }
 
@@ -954,7 +954,7 @@ try
                             -ImagePath $script:DiskImageISOPath `
                             -DriveLetter $script:DriveLetter `
                             -Verbose
-                    } | Should Not Throw
+                    } | Should -Not -Throw
                 }
 
                 It 'all the get mocks should be called' {
@@ -1004,7 +1004,7 @@ try
                             -ImagePath $script:DiskImageISOPath `
                             -DriveLetter 'Y' `
                             -Verbose
-                    } | Should Not Throw
+                    } | Should -Not -Throw
                 }
 
                 It 'all the get mocks should be called' {
@@ -1055,7 +1055,7 @@ try
                             -ImagePath $script:DiskImageVHDxPath `
                             -DriveLetter $script:DriveLetter `
                             -Verbose
-                    } | Should Not Throw
+                    } | Should -Not -Throw
                 }
 
                 It 'all the get mocks should be called' {
@@ -1111,7 +1111,7 @@ try
                             -ImagePath $script:DiskImageVHDXPath `
                             -DriveLetter 'Y' `
                             -Verbose
-                    } | Should Not Throw
+                    } | Should -Not -Throw
                 }
 
                 It 'all the get mocks should be called' {

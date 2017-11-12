@@ -330,27 +330,27 @@ try
                     -Verbose
 
                 It "Should return DiskId $($script:mockedDisk0.Number)" {
-                    $resource.DiskId | Should Be $script:mockedDisk0.Number
+                    $resource.DiskId | Should -Be $script:mockedDisk0.Number
                 }
 
                 It "Should return DriveLetter $($script:testDriveLetter)" {
-                    $resource.DriveLetter | Should Be $script:testDriveLetter
+                    $resource.DriveLetter | Should -Be $script:testDriveLetter
                 }
 
                 It "Should return size $($script:mockedPartition.Size)" {
-                    $resource.Size | Should Be $script:mockedPartition.Size
+                    $resource.Size | Should -Be $script:mockedPartition.Size
                 }
 
                 It "Should return FSLabel $($script:mockedVolume.FileSystemLabel)" {
-                    $resource.FSLabel | Should Be $script:mockedVolume.FileSystemLabel
+                    $resource.FSLabel | Should -Be $script:mockedVolume.FileSystemLabel
                 }
 
                 It "Should return AllocationUnitSize $($script:mockedCim.BlockSize)" {
-                    $resource.AllocationUnitSize | Should Be $script:mockedCim.BlockSize
+                    $resource.AllocationUnitSize | Should -Be $script:mockedCim.BlockSize
                 }
 
                 It "Should return FSFormat $($script:mockedVolume.FileSystem)" {
-                    $resource.FSFormat | Should Be $script:mockedVolume.FileSystem
+                    $resource.FSFormat | Should -Be $script:mockedVolume.FileSystem
                 }
 
                 It 'Should call the correct mocks' {
@@ -393,27 +393,27 @@ try
                     -Verbose
 
                 It "Should return DiskId $($script:mockedDisk0.UniqueId)" {
-                    $resource.DiskId | Should Be $script:mockedDisk0.UniqueId
+                    $resource.DiskId | Should -Be $script:mockedDisk0.UniqueId
                 }
 
                 It "Should return DriveLetter $($script:testDriveLetter)" {
-                    $resource.DriveLetter | Should Be $script:testDriveLetter
+                    $resource.DriveLetter | Should -Be $script:testDriveLetter
                 }
 
                 It "Should return size $($script:mockedPartition.Size)" {
-                    $resource.Size | Should Be $script:mockedPartition.Size
+                    $resource.Size | Should -Be $script:mockedPartition.Size
                 }
 
                 It "Should return FSLabel $($script:mockedVolume.FileSystemLabel)" {
-                    $resource.FSLabel | Should Be $script:mockedVolume.FileSystemLabel
+                    $resource.FSLabel | Should -Be $script:mockedVolume.FileSystemLabel
                 }
 
                 It "Should return AllocationUnitSize $($script:mockedCim.BlockSize)" {
-                    $resource.AllocationUnitSize | Should Be $script:mockedCim.BlockSize
+                    $resource.AllocationUnitSize | Should -Be $script:mockedCim.BlockSize
                 }
 
                 It "Should return FSFormat $($script:mockedVolume.FileSystem)" {
-                    $resource.FSFormat | Should Be $script:mockedVolume.FileSystem
+                    $resource.FSFormat | Should -Be $script:mockedVolume.FileSystem
                 }
 
                 It 'Should call the correct mocks' {
@@ -456,27 +456,27 @@ try
                     -Verbose
 
                 It "Should return DiskId $($script:mockedDisk0.Guid)" {
-                    $resource.DiskId | Should Be $script:mockedDisk0.Guid
+                    $resource.DiskId | Should -Be $script:mockedDisk0.Guid
                 }
 
                 It "Should return DriveLetter $($script:testDriveLetter)" {
-                    $resource.DriveLetter | Should Be $script:testDriveLetter
+                    $resource.DriveLetter | Should -Be $script:testDriveLetter
                 }
 
                 It "Should return Size $($script:mockedPartition.Size)" {
-                    $resource.Size | Should Be $script:mockedPartition.Size
+                    $resource.Size | Should -Be $script:mockedPartition.Size
                 }
 
                 It "Should return FSLabel $($script:mockedVolume.FileSystemLabel)" {
-                    $resource.FSLabel | Should Be $script:mockedVolume.FileSystemLabel
+                    $resource.FSLabel | Should -Be $script:mockedVolume.FileSystemLabel
                 }
 
                 It "Should return AllocationUnitSize $($script:mockedCim.BlockSize)" {
-                    $resource.AllocationUnitSize | Should Be $script:mockedCim.BlockSize
+                    $resource.AllocationUnitSize | Should -Be $script:mockedCim.BlockSize
                 }
 
                 It "Should return FSFormat $($script:mockedVolume.FileSystem)" {
-                    $resource.FSFormat | Should Be $script:mockedVolume.FileSystem
+                    $resource.FSFormat | Should -Be $script:mockedVolume.FileSystem
                 }
 
                 It 'Should call the correct mocks' {
@@ -519,27 +519,27 @@ try
                     -Verbose
 
                 It "Should return DiskId $($script:mockedDisk0.Guid)" {
-                    $resource.DiskId | Should Be $script:mockedDisk0.Guid
+                    $resource.DiskId | Should -Be $script:mockedDisk0.Guid
                 }
 
                 It "Should return DriveLetter $($script:testDriveLetter)" {
-                    $resource.DriveLetter | Should Be $script:testDriveLetter
+                    $resource.DriveLetter | Should -Be $script:testDriveLetter
                 }
 
                 It "Should return Size $($script:mockedPartition.Size)" {
-                    $resource.Size | Should Be $script:mockedPartition.Size
+                    $resource.Size | Should -Be $script:mockedPartition.Size
                 }
 
                 It "Should return FSLabel $($script:mockedVolume.FileSystemLabel)" {
-                    $resource.FSLabel | Should Be $script:mockedVolume.FileSystemLabel
+                    $resource.FSLabel | Should -Be $script:mockedVolume.FileSystemLabel
                 }
 
                 It "Should return AllocationUnitSize $($script:mockedCim.BlockSize)" {
-                    $resource.AllocationUnitSize | Should Be $script:mockedCim.BlockSize
+                    $resource.AllocationUnitSize | Should -Be $script:mockedCim.BlockSize
                 }
 
                 It "Should return FSFormat $($script:mockedVolume.FileSystem)" {
-                    $resource.FSFormat | Should Be $script:mockedVolume.FileSystem
+                    $resource.FSFormat | Should -Be $script:mockedVolume.FileSystem
                 }
 
                 It 'Should call the correct mocks' {
@@ -578,27 +578,27 @@ try
                     -Verbose
 
                 It "Should return DiskId $($script:mockedDisk0.Number)" {
-                    $resource.DiskId | Should Be $script:mockedDisk0.Number
+                    $resource.DiskId | Should -Be $script:mockedDisk0.Number
                 }
 
                 It "Should return an empty drive letter" {
-                    $resource.DriveLetter | Should Be $null
+                    $resource.DriveLetter | Should -Be $null
                 }
 
                 It "Should return a zero size" {
-                    $resource.Size | Should Be $null
+                    $resource.Size | Should -Be $null
                 }
 
                 It "Should return no FSLabel" {
-                    $resource.FSLabel | Should Be ''
+                    $resource.FSLabel | Should -Be ''
                 }
 
                 It "Should return an AllocationUnitSize of 0" {
-                    $resource.AllocationUnitSize | Should Be $null
+                    $resource.AllocationUnitSize | Should -Be $null
                 }
 
                 It "Should return no FSFormat" {
-                    $resource.FSFormat | Should Be $null
+                    $resource.FSFormat | Should -Be $null
                 }
 
                 It 'Should call the correct mocks' {
@@ -659,7 +659,7 @@ try
                             -DiskId $script:mockedDisk0Offline.Number `
                             -Driveletter $script:testDriveLetter `
                             -Verbose
-                    } | Should Not Throw
+                    } | Should -Not -Throw
                 }
 
                 It 'Should call the correct mocks' {
@@ -724,7 +724,7 @@ try
                             -DiskIdType 'UniqueId' `
                             -Driveletter $script:testDriveLetter `
                             -Verbose
-                    } | Should Not Throw
+                    } | Should -Not -Throw
                 }
 
                 It 'Should call the correct mocks' {
@@ -791,7 +791,7 @@ try
                             -DiskIdType 'Guid' `
                             -Driveletter $script:testDriveLetter `
                             -Verbose
-                    } | Should Not Throw
+                    } | Should -Not -Throw
                 }
 
                 It 'Should call the correct mocks' {
@@ -857,7 +857,7 @@ try
                             -DiskId $script:mockedDisk0Readonly.Number `
                             -Driveletter $script:testDriveLetter `
                             -Verbose
-                    } | Should Not Throw
+                    } | Should -Not -Throw
                 }
 
                 It 'Should call the correct mocks' {
@@ -924,7 +924,7 @@ try
                             -DiskId $script:mockedDisk0OfflineRaw.Number `
                             -Driveletter $script:testDriveLetter `
                             -Verbose
-                    } | Should Not Throw
+                    } | Should -Not -Throw
                 }
 
                 It 'Should call the correct mocks' {
@@ -993,7 +993,7 @@ try
                             -AllocationUnitSize 64 `
                             -FSLabel 'MyDisk' `
                             -Verbose
-                    } | Should Not Throw
+                    } | Should -Not -Throw
                 }
 
                 It 'Should call the correct mocks' {
@@ -1056,7 +1056,7 @@ try
                             -DiskId $script:mockedDisk0.Number `
                             -Driveletter $script:testDriveLetter `
                             -Verbose
-                    } | Should Not Throw
+                    } | Should -Not -Throw
                 }
 
                 It 'Should call the correct mocks' {
@@ -1113,13 +1113,13 @@ try
                             -DiskId $script:mockedDisk0.Number `
                             -Driveletter $script:testDriveLetter `
                             -Verbose
-                    } | Should throw
+                    } | Should -throw
                 }
 
                 $endTime = Get-Date
 
                 It 'Should take at least 30s' {
-                    ($endTime - $startTime).TotalSeconds | Should BeGreaterThan 29
+                    ($endTime - $startTime).TotalSeconds | Should -BeGreaterThan 29
                 }
 
                 It 'Should call the correct mocks' {
@@ -1167,7 +1167,7 @@ try
                             -DiskId $script:mockedDisk0Mbr.Number `
                             -Driveletter $script:testDriveLetter `
                             -Verbose
-                    } | Should Throw $errorRecord
+                    } | Should -Throw $errorRecord
                 }
 
                 It 'Should call the correct mocks' {
@@ -1211,7 +1211,7 @@ try
                             -DiskIdType 'UniqueId' `
                             -Driveletter $script:testDriveLetter `
                             -Verbose
-                    } | Should Throw $errorRecord
+                    } | Should -Throw $errorRecord
                 }
 
                 It 'Should call the correct mocks' {
@@ -1254,7 +1254,7 @@ try
                             -DiskIdType 'Guid' `
                             -Driveletter $script:testDriveLetter `
                             -Verbose
-                    } | Should Throw $errorRecord
+                    } | Should -Throw $errorRecord
                 }
 
                 It 'Should call the correct mocks' {
@@ -1301,7 +1301,7 @@ try
                             -DiskId $script:mockedDisk0.Number `
                             -DriveLetter $script:testDriveLetter `
                             -Verbose
-                    } | Should Not Throw
+                    } | Should -Not -Throw
                 }
 
                 It 'Should call the correct mocks' {
@@ -1353,7 +1353,7 @@ try
                             -DriveLetter $script:testDriveLetter `
                             -Size $script:mockedPartitionSize `
                             -Verbose
-                    } | Should Not Throw
+                    } | Should -Not -Throw
                 }
 
                 It 'Should call the correct mocks' {
@@ -1412,7 +1412,7 @@ try
                             -DiskId $script:mockedDisk0.Number `
                             -Driveletter 'H' `
                             -Verbose
-                    } | Should Not Throw
+                    } | Should -Not -Throw
                 }
 
                 It 'Should call the correct mocks' {
@@ -1465,7 +1465,7 @@ try
                             -Driveletter $script:testDriveLetter `
                             -FSLabel 'NewLabel' `
                             -Verbose
-                    } | Should Not Throw
+                    } | Should -Not -Throw
                 }
 
                 It 'Should call the correct mocks' {
@@ -1527,7 +1527,7 @@ try
                             -AllowDestructive $true `
                             -FSLabel 'NewLabel' `
                             -Verbose
-                    } | Should Not Throw
+                    } | Should -Not -Throw
                 }
 
                 It 'Should call the correct mocks' {
@@ -1587,7 +1587,7 @@ try
                             -AllowDestructive $true `
                             -FSLabel 'NewLabel' `
                             -Verbose
-                    } | Should throw
+                    } | Should -throw
                 }
 
                 It 'Should call the correct mocks' {
@@ -1646,7 +1646,7 @@ try
                             -FSLabel 'NewLabel' `
                             -FSFormat 'ReFS' `
                             -Verbose
-                    } | Should Not Throw
+                    } | Should -Not -Throw
                 }
 
                 It 'Should call the correct mocks' {
@@ -1708,7 +1708,7 @@ try
                             -FSLabel 'NewLabel' `
                             -AllowDestructive $true `
                             -Verbose
-                    } | Should Not Throw
+                    } | Should -Not -Throw
                 }
 
                 It 'Should call the correct mocks' {
@@ -1767,7 +1767,7 @@ try
                             -AllowDestructive $true `
                             -ClearDisk $true `
                             -Verbose
-                    } | Should Not Throw
+                    } | Should -Not -Throw
                 }
 
                 It 'Should call the correct mocks' {
@@ -1815,11 +1815,11 @@ try
                             -DriveLetter $script:testDriveLetter `
                             -AllocationUnitSize 4096 `
                             -Verbose
-                    } | Should Not Throw
+                    } | Should -Not -Throw
                 }
 
                 It 'Should return false' {
-                    $script:result | Should Be $false
+                    $script:result | Should -Be $false
                 }
 
                 It 'Should call the correct mocks' {
@@ -1854,11 +1854,11 @@ try
                             -DriveLetter $script:testDriveLetter `
                             -AllocationUnitSize 4096 `
                             -Verbose
-                    } | Should Not Throw
+                    } | Should -Not -Throw
                 }
 
                 It 'Should be false' {
-                    $script:result | Should Be $false
+                    $script:result | Should -Be $false
                 }
 
                 It 'Should call the correct mocks' {
@@ -1894,11 +1894,11 @@ try
                             -DriveLetter $script:testDriveLetter `
                             -AllocationUnitSize 4096 `
                             -Verbose
-                    } | Should Not Throw
+                    } | Should -Not -Throw
                 }
 
                 It 'Should be false' {
-                    $script:result | Should Be $false
+                    $script:result | Should -Be $false
                 }
 
                 It 'Should call the correct mocks' {
@@ -1934,11 +1934,11 @@ try
                             -DriveLetter $script:testDriveLetter `
                             -AllocationUnitSize 4096 `
                             -Verbose
-                    } | Should Not Throw
+                    } | Should -Not -Throw
                 }
 
                 It 'Should return false' {
-                    $script:result | Should Be $false
+                    $script:result | Should -Be $false
                 }
 
                 It 'Should call the correct mocks' {
@@ -1973,11 +1973,11 @@ try
                             -DriveLetter $script:testDriveLetter `
                             -AllocationUnitSize 4096 `
                             -Verbose
-                    } | Should Not Throw
+                    } | Should -Not -Throw
                 }
 
                 It 'Should be false' {
-                    $script:result | Should Be $false
+                    $script:result | Should -Be $false
                 }
 
                 It 'Should call the correct mocks' {
@@ -2012,11 +2012,11 @@ try
                             -DriveLetter $script:testDriveLetter `
                             -AllocationUnitSize 4096 `
                             -Verbose
-                    } | Should Not Throw
+                    } | Should -Not -Throw
                 }
 
                 It 'Should be false' {
-                    $script:result | Should Be $false
+                    $script:result | Should -Be $false
                 }
 
                 It 'Should call the correct mocks' {
@@ -2062,11 +2062,11 @@ try
                             -AllocationUnitSize 4096 `
                             -Size ($script:mockedPartitionSize + 1MB) `
                             -Verbose
-                    } | Should Not Throw
+                    } | Should -Not -Throw
                 }
 
                 It 'Should be true' {
-                    $script:result | Should Be $true
+                    $script:result | Should -Be $true
                 }
 
                 It 'Should call the correct mocks' {
@@ -2109,11 +2109,11 @@ try
                             -AllocationUnitSize 4097 `
                             -AllowDestructive $true `
                             -Verbose
-                    } | Should Not Throw
+                    } | Should -Not -Throw
                 }
 
                 It 'Should be false' {
-                    $script:result | Should Be $false
+                    $script:result | Should -Be $false
                 }
 
                 It 'Should call the correct mocks' {
@@ -2157,11 +2157,11 @@ try
                             -DriveLetter $script:testDriveLetter `
                             -FSFormat 'ReFS' `
                             -Verbose
-                    } | Should Not Throw
+                    } | Should -Not -Throw
                 }
 
                 It 'Should be true' {
-                    $script:result | Should Be $true
+                    $script:result | Should -Be $true
                 }
 
                 It 'Should call the correct mocks' {
@@ -2207,11 +2207,11 @@ try
                             -FSFormat 'ReFS' `
                             -AllowDestructive $true `
                             -Verbose
-                    } | Should Not Throw
+                    } | Should -Not -Throw
                 }
 
                 It 'Should be false' {
-                    $script:result | Should Be $false
+                    $script:result | Should -Be $false
                 }
 
                 It 'Should call the correct mocks' {
@@ -2256,11 +2256,11 @@ try
                             -DriveLetter $script:testDriveLetter `
                             -FSLabel 'NewLabel' `
                             -Verbose
-                    } | Should Not Throw
+                    } | Should -Not -Throw
                 }
 
                 It 'Should be false' {
-                    $script:result | Should Be $false
+                    $script:result | Should -Be $false
                 }
 
                 It 'Should call the correct mocks' {
@@ -2302,11 +2302,11 @@ try
                             -DiskId $script:mockedDisk0.Number `
                             -DriveLetter 'Z' `
                             -Verbose
-                    } | Should Not Throw
+                    } | Should -Not -Throw
                 }
 
                 It 'Should be false' {
-                    $script:result | Should Be $false
+                    $script:result | Should -Be $false
                 }
 
                 It 'Should call the correct mocks' {
@@ -2354,11 +2354,11 @@ try
                             -FSLabel $script:mockedVolume.FileSystemLabel `
                             -FSFormat $script:mockedVolume.FileSystem `
                             -Verbose
-                    } | Should Not Throw
+                    } | Should -Not -Throw
                 }
 
                 It 'Should be true' {
-                    $script:result | Should Be $true
+                    $script:result | Should -Be $true
                 }
 
                 It 'Should call the correct mocks' {
