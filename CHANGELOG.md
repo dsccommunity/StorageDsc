@@ -8,7 +8,7 @@
   - Added parameter ClearDisk - See [Issue 50](https://github.com/PowerShell/xStorage/issues/50).
 - xDiskAccessPath:
   - Added support for Guid Disk Id type - See [Issue 104](https://github.com/PowerShell/xStorage/issues/104).
-  - Added check for PSDrive existance  to solve bug - See [Issue (https://github.com/PowerShell/xStorage/issues/121).
+  - Added check for PSDrive existance  to solve bug - See [Issue 121](https://github.com/PowerShell/xStorage/issues/121).
 - xWaitForDisk:
   - Added support for Guid Disk Id type - See [Issue 104](https://github.com/PowerShell/xStorage/issues/104).
 - Added .markdownlint.json file to configure markdown rules to validate.
