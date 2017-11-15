@@ -68,7 +68,7 @@ try
                 # verifiable (Should Be called) mocks
                 Mock Get-Volume -MockWith { return $mockedDriveC } -Verifiable
 
-                It 'Should Not Throw' {
+                It 'Should not throw an exception' {
                     { Set-targetResource @driveCParameters -Verbose } | Should Not throw
                 }
 

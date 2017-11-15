@@ -1,5 +1,5 @@
-$script:DSCModuleName      = 'xStorage'
-$script:DSCResourceName    = 'MSFT_xDiskAccessPath'
+$script:DSCModuleName = 'xStorage'
+$script:DSCResourceName = 'MSFT_xDiskAccessPath'
 
 Import-Module -Name (Join-Path -Path (Join-Path -Path (Split-Path $PSScriptRoot -Parent) -ChildPath 'TestHelpers') -ChildPath 'CommonTestHelper.psm1') -Global
 
@@ -7,9 +7,9 @@ Import-Module -Name (Join-Path -Path (Join-Path -Path (Split-Path $PSScriptRoot 
 # Unit Test Template Version: 1.1.0
 [string] $script:moduleRoot = Join-Path -Path $(Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $Script:MyInvocation.MyCommand.Path))) -ChildPath 'Modules\xStorage'
 if ( (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests'))) -or `
-     (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1'))) )
+    (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1'))) )
 {
-    & git @('clone','https://github.com/PowerShell/DscResource.Tests.git',(Join-Path -Path $script:moduleRoot -ChildPath '\DSCResource.Tests\'))
+    & git @('clone', 'https://github.com/PowerShell/DscResource.Tests.git', (Join-Path -Path $script:moduleRoot -ChildPath '\DSCResource.Tests\'))
 }
 
 Import-Module (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1') -Force
@@ -29,102 +29,112 @@ try
     InModuleScope $script:DSCResourceName {
         #region Pester Test Initialization
         $script:testAccessPath = 'c:\TestAccessPath'
+        $script:testDiskNumber = 1
         $script:testDiskUniqueId = 'TESTDISKUNIQUEID'
+        $script:testDiskGptGuid = [guid]::NewGuid()
+        $script:testDiskMbrGuid = '123456'
 
         $script:mockedDisk0 = [pscustomobject] @{
-                Number = 0
-                UniqueId = $script:testDiskUniqueId
-                IsOffline = $false
-                IsReadOnly = $false
-                PartitionStyle = 'GPT'
-            }
+            Number         = $script:testDiskNumber
+            UniqueId       = $script:testDiskUniqueId
+            Guid           = $script:testDiskGptGuid
+            IsOffline      = $false
+            IsReadOnly     = $false
+            PartitionStyle = 'GPT'
+        }
 
         $script:mockedDisk0Mbr = [pscustomobject] @{
-                Number = 0
-                UniqueId = $script:testDiskUniqueId
-                IsOffline = $false
-                IsReadOnly = $false
-                PartitionStyle = 'MBR'
-            }
+            Number         = $script:testDiskNumber
+            UniqueId       = $script:testDiskUniqueId
+            Guid           = $script:testDiskMbrGuid
+            IsOffline      = $false
+            IsReadOnly     = $false
+            PartitionStyle = 'MBR'
+        }
 
         $script:mockedDisk0Offline = [pscustomobject] @{
-                Number = 0
-                UniqueId = $script:testDiskUniqueId
-                IsOffline = $true
-                IsReadOnly = $false
-                PartitionStyle = 'GPT'
-            }
+            Number         = $script:testDiskNumber
+            UniqueId       = $script:testDiskUniqueId
+            Guid           = $script:testDiskGptGuid
+            IsOffline      = $true
+            IsReadOnly     = $false
+            PartitionStyle = 'GPT'
+        }
 
         $script:mockedDisk0OfflineRaw = [pscustomobject] @{
-                Number = 0
-                UniqueId = $script:testDiskUniqueId
-                IsOffline = $true
-                IsReadOnly = $false
-                PartitionStyle = 'Raw'
-            }
+            Number         = $script:testDiskNumber
+            UniqueId       = $script:testDiskUniqueId
+            Guid           = ''
+            IsOffline      = $true
+            IsReadOnly     = $false
+            PartitionStyle = 'Raw'
+        }
 
         $script:mockedDisk0Readonly = [pscustomobject] @{
-                Number = 0
-                UniqueId = $script:testDiskUniqueId
-                IsOffline = $false
-                IsReadOnly = $true
-                PartitionStyle = 'GPT'
-            }
+            Number         = $script:testDiskNumber
+            UniqueId       = $script:testDiskUniqueId
+            Guid           = $script:testDiskGptGuid
+            IsOffline      = $false
+            IsReadOnly     = $true
+            PartitionStyle = 'GPT'
+        }
 
         $script:mockedDisk0Raw = [pscustomobject] @{
-                Number = 0
-                UniqueId = $script:testDiskUniqueId
-                IsOffline = $false
-                IsReadOnly = $false
-                PartitionStyle = 'Raw'
-            }
+            Number         = $script:testDiskNumber
+            UniqueId       = $script:testDiskUniqueId
+            Guid           = ''
+            IsOffline      = $false
+            IsReadOnly     = $false
+            PartitionStyle = 'Raw'
+        }
 
-        $script:mockedCim = [pscustomobject] @{BlockSize=4096}
+        $script:mockedCim = [pscustomobject] @{BlockSize = 4096}
 
         $script:mockedPartitionSize = 1GB
 
         $script:mockedPartition = [pscustomobject] @{
-                AccessPaths = @(
-                    '\\?\Volume{2d313fdd-e4a4-4f31-9784-dad758e0030f}\'
-                    $script:testAccessPath
-                )
-                Size = $script:mockedPartitionSize
-                PartitionNumber = 1
-                Type = 'Basic'
-            }
+            AccessPaths     = @(
+                '\\?\Volume{2d313fdd-e4a4-4f31-9784-dad758e0030f}\'
+                $script:testAccessPath
+            )
+            Size            = $script:mockedPartitionSize
+            PartitionNumber = 1
+            Type            = 'Basic'
+        }
 
         $script:mockedPartitionNoAccess = [pscustomobject] @{
-                AccessPaths = @(
-                    '\\?\Volume{2d313fdd-e4a4-4f31-9784-dad758e0030f}\'
-                )
-                Size = $script:mockedPartitionSize
-                PartitionNumber = 1
-                Type = 'Basic'
-            }
+            AccessPaths     = @(
+                '\\?\Volume{2d313fdd-e4a4-4f31-9784-dad758e0030f}\'
+            )
+            Size            = $script:mockedPartitionSize
+            PartitionNumber = 1
+            Type            = 'Basic'
+        }
 
         $script:mockedVolume = [pscustomobject] @{
-                FileSystemLabel = 'myLabel'
-                FileSystem = 'NTFS'
-            }
+            FileSystemLabel = 'myLabel'
+            FileSystem      = 'NTFS'
+        }
 
         $script:mockedVolumeUnformatted = [pscustomobject] @{
-                FileSystemLabel = ''
-                FileSystem = ''
-            }
+            FileSystemLabel = ''
+            FileSystem      = ''
+        }
 
         $script:mockedVolumeReFS = [pscustomobject] @{
-                FileSystemLabel = 'myLabel'
-                FileSystem = 'ReFS'
-            }
+            FileSystemLabel = 'myLabel'
+            FileSystem      = 'ReFS'
+        }
         #endregion
 
         #region functions for mocking pipeline
         # These functions are required to be able to mock functions where
         # values are passed in via the pipeline.
-        function Set-Disk {
+        function Set-Disk
+        {
+            [CmdletBinding()]
             Param
             (
-                [CmdletBinding()]
                 [Parameter(ValueFromPipeline = $true)]
                 $InputObject,
 
@@ -136,10 +146,11 @@ try
             )
         }
 
-        function Initialize-Disk {
+        function Initialize-Disk
+        {
+            [CmdletBinding()]
             Param
             (
-                [CmdletBinding()]
                 [Parameter(ValueFromPipeline = $true)]
                 $InputObject,
 
@@ -148,10 +159,11 @@ try
             )
         }
 
-        function Get-Partition {
+        function Get-Partition
+        {
+            [CmdletBinding()]
             Param
             (
-                [CmdletBinding()]
                 [Parameter(ValueFromPipeline = $true)]
                 $Disk,
 
@@ -160,10 +172,11 @@ try
             )
         }
 
-        function New-Partition {
+        function New-Partition
+        {
+            [CmdletBinding()]
             Param
             (
-                [CmdletBinding()]
                 [Parameter(ValueFromPipeline)]
                 $Disk,
 
@@ -175,19 +188,21 @@ try
             )
         }
 
-        function Get-Volume {
+        function Get-Volume
+        {
+            [CmdletBinding()]
             Param
             (
-                [CmdletBinding()]
                 [Parameter(ValueFromPipeline = $true)]
                 $Partition
             )
         }
 
-        function Set-Volume {
+        function Set-Volume
+        {
+            [CmdletBinding()]
             Param
             (
-                [CmdletBinding()]
                 [Parameter(ValueFromPipeline = $true)]
                 $InputObject,
 
@@ -196,10 +211,11 @@ try
             )
         }
 
-        function Format-Volume {
+        function Format-Volume
+        {
+            [CmdletBinding()]
             Param
             (
-                [CmdletBinding()]
                 [Parameter(ValueFromPipeline = $true)]
                 $Partition,
 
@@ -214,7 +230,9 @@ try
             )
         }
 
-        function Add-PartitionAccessPath {
+        function Add-PartitionAccessPath
+        {
+            [CmdletBinding()]
             Param
             (
                 [String]
@@ -244,7 +262,8 @@ try
                     -Verifiable
 
                 Mock `
-                    -CommandName Get-Disk `
+                    -CommandName Get-DiskByIdentifier `
+                    -ParameterFilter { $DiskId -eq $script:mockedDisk0.Number -and $DiskIdType -eq 'Number' } `
                     -MockWith { $script:mockedDisk0 } `
                     -Verifiable
 
@@ -263,34 +282,35 @@ try
                     -AccessPath $script:testAccessPath `
                     -Verbose
 
-                It "DiskId should be $($script:mockedDisk0.Number)" {
+                It "Should return DiskId $($script:mockedDisk0.Number)" {
                     $resource.DiskId | Should Be $script:mockedDisk0.Number
                 }
 
-                It "AccessPath should be $($script:testAccessPath)" {
+                It "Should return AccessPath $($script:testAccessPath)" {
                     $resource.AccessPath | Should Be $script:testAccessPath
                 }
 
-                It "Size should be $($script:mockedPartition.Size)" {
+                It "Should return Size $($script:mockedPartition.Size)" {
                     $resource.Size | Should Be $script:mockedPartition.Size
                 }
 
-                It "FSLabel should be $($script:mockedVolume.FileSystemLabel)" {
+                It "Should return FSLabel $($script:mockedVolume.FileSystemLabel)" {
                     $resource.FSLabel | Should Be $script:mockedVolume.FileSystemLabel
                 }
 
-                It "AllocationUnitSize should be $($script:mockedCim.BlockSize)" {
+                It "Should return AllocationUnitSize $($script:mockedCim.BlockSize)" {
                     $resource.AllocationUnitSize | Should Be $script:mockedCim.BlockSize
                 }
 
-                It "FSFormat should be $($script:mockedVolume.FileSystem)" {
+                It "Should return FSFormat $($script:mockedVolume.FileSystem)" {
                     $resource.FSFormat | Should Be $script:mockedVolume.FileSystem
                 }
 
-                It 'all the get mocks should be called' {
+                It 'Should call the correct mocks' {
                     Assert-VerifiableMocks
                     Assert-MockCalled -CommandName Get-CimInstance -Exactly 1
-                    Assert-MockCalled -CommandName Get-Disk -Exactly 1
+                    Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly 1 `
+                        -ParameterFilter { $DiskId -eq $script:mockedDisk0.Number -and $DiskIdType -eq 'Number' }
                     Assert-MockCalled -CommandName Get-Partition -Exactly 1
                     Assert-MockCalled -CommandName Get-Volume -Exactly 1
                 }
@@ -309,7 +329,8 @@ try
                     -Verifiable
 
                 Mock `
-                    -CommandName Get-Disk `
+                    -CommandName Get-DiskByIdentifier `
+                    -ParameterFilter { $DiskId -eq $script:mockedDisk0.UniqueId -and $DiskIdType -eq 'UniqueId' } `
                     -MockWith { $script:mockedDisk0 } `
                     -Verifiable
 
@@ -329,34 +350,103 @@ try
                     -AccessPath $script:testAccessPath `
                     -Verbose
 
-                It "DiskId should be $($script:mockedDisk0.UniqueId)" {
+                It "Should return DiskId $($script:mockedDisk0.UniqueId)" {
                     $resource.DiskId | Should Be $script:mockedDisk0.UniqueId
                 }
 
-                It "AccessPath should be $($script:testAccessPath)" {
+                It "Should return AccessPath $($script:testAccessPath)" {
                     $resource.AccessPath | Should Be $script:testAccessPath
                 }
 
-                It "Size should be $($script:mockedPartition.Size)" {
+                It "Should return Size $($script:mockedPartition.Size)" {
                     $resource.Size | Should Be $script:mockedPartition.Size
                 }
 
-                It "FSLabel should be $($script:mockedVolume.FileSystemLabel)" {
+                It "Should return FSLabel $($script:mockedVolume.FileSystemLabel)" {
                     $resource.FSLabel | Should Be $script:mockedVolume.FileSystemLabel
                 }
 
-                It "AllocationUnitSize should be $($script:mockedCim.BlockSize)" {
+                It "Should return AllocationUnitSize $($script:mockedCim.BlockSize)" {
                     $resource.AllocationUnitSize | Should Be $script:mockedCim.BlockSize
                 }
 
-                It "FSFormat should be $($script:mockedVolume.FileSystem)" {
+                It "Should return FSFormat $($script:mockedVolume.FileSystem)" {
                     $resource.FSFormat | Should Be $script:mockedVolume.FileSystem
                 }
 
-                It 'all the get mocks should be called' {
+                It 'Should call the correct mocks' {
                     Assert-VerifiableMocks
                     Assert-MockCalled -CommandName Get-CimInstance -Exactly 1
-                    Assert-MockCalled -CommandName Get-Disk -Exactly 1
+                    Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly 1 `
+                        -ParameterFilter { $DiskId -eq $script:mockedDisk0.UniqueId -and $DiskIdType -eq 'UniqueId' }
+                    Assert-MockCalled -CommandName Get-Partition -Exactly 1
+                    Assert-MockCalled -CommandName Get-Volume -Exactly 1
+                }
+            }
+
+            Context 'Online GPT disk with a partition/volume and correct Access Path assigned using Disk Guid' {
+                # verifiable (should be called) mocks
+                Mock `
+                    -CommandName Assert-AccessPathValid `
+                    -MockWith { $script:testAccessPath } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-CimInstance `
+                    -MockWith { $script:mockedCim } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-DiskByIdentifier `
+                    -ParameterFilter { $DiskId -eq $script:mockedDisk0.Guid -and $DiskIdType -eq 'Guid' } `
+                    -MockWith { $script:mockedDisk0 } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-Partition `
+                    -MockWith { $script:mockedPartition } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-Volume `
+                    -MockWith { $script:mockedVolume } `
+                    -Verifiable
+
+                $resource = Get-TargetResource `
+                    -DiskId $script:mockedDisk0.Guid `
+                    -DiskIdType 'Guid' `
+                    -AccessPath $script:testAccessPath `
+                    -Verbose
+
+                It "Should return DiskId $($script:mockedDisk0.Guid)" {
+                    $resource.DiskId | Should Be $script:mockedDisk0.Guid
+                }
+
+                It "Should return AccessPath $($script:testAccessPath)" {
+                    $resource.AccessPath | Should Be $script:testAccessPath
+                }
+
+                It "Should return Size $($script:mockedPartition.Size)" {
+                    $resource.Size | Should Be $script:mockedPartition.Size
+                }
+
+                It "Should return FSLabel $($script:mockedVolume.FileSystemLabel)" {
+                    $resource.FSLabel | Should Be $script:mockedVolume.FileSystemLabel
+                }
+
+                It "Should return AllocationUnitSize $($script:mockedCim.BlockSize)" {
+                    $resource.AllocationUnitSize | Should Be $script:mockedCim.BlockSize
+                }
+
+                It "Should return FSFormat $($script:mockedVolume.FileSystem)" {
+                    $resource.FSFormat | Should Be $script:mockedVolume.FileSystem
+                }
+
+                It 'Should call the correct mocks' {
+                    Assert-VerifiableMocks
+                    Assert-MockCalled -CommandName Get-CimInstance -Exactly 1
+                    Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly 1 `
+                        -ParameterFilter { $DiskId -eq $script:mockedDisk0.Guid -and $DiskIdType -eq 'Guid' }
                     Assert-MockCalled -CommandName Get-Partition -Exactly 1
                     Assert-MockCalled -CommandName Get-Volume -Exactly 1
                 }
@@ -374,7 +464,8 @@ try
                     -Verifiable
 
                 Mock `
-                    -CommandName Get-Disk `
+                    -CommandName Get-DiskByIdentifier `
+                    -ParameterFilter { $DiskId -eq $script:mockedDisk0.Number -and $DiskIdType -eq 'Number' } `
                     -MockWith { $script:mockedDisk0 } `
                     -Verifiable
 
@@ -390,34 +481,35 @@ try
                     -AccessPath $script:testAccessPath `
                     -Verbose
 
-                It "DiskId should be $($script:mockedDisk0.Number)" {
+                It "Should return DiskId $($script:mockedDisk0.Number)" {
                     $resource.DiskId | Should Be $script:mockedDisk0.Number
                 }
 
-                It "AccessPath should be $($script:testAccessPath)" {
+                It "Should return AccessPath $($script:testAccessPath)" {
                     $resource.AccessPath | Should Be $script:testAccessPath
                 }
 
-                It "Size should be null" {
+                It "Should return Size null" {
                     $resource.Size | Should Be $null
                 }
 
-                It "FSLabel should be empty" {
+                It "Should return FSLabel empty" {
                     $resource.FSLabel | Should Be ''
                 }
 
-                It "AllocationUnitSize should be null" {
+                It "Should return AllocationUnitSize null" {
                     $resource.AllocationUnitSize | Should Be $null
                 }
 
-                It "FSFormat should be null" {
+                It "Should return FSFormat null" {
                     $resource.FSFormat | Should Be $null
                 }
 
-                It 'all the get mocks should be called' {
+                It 'Should call the correct mocks' {
                     Assert-VerifiableMocks
                     Assert-MockCalled -CommandName Get-CimInstance -Exactly 1
-                    Assert-MockCalled -CommandName Get-Disk -Exactly 1
+                    Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly 1 `
+                        -ParameterFilter { $DiskId -eq $script:mockedDisk0.Number -and $DiskIdType -eq 'Number' }
                     Assert-MockCalled -CommandName Get-Partition -Exactly 1
                     Assert-MockCalled -CommandName Get-Volume -Exactly 0
                 }
@@ -435,7 +527,8 @@ try
                     -Verifiable
 
                 Mock `
-                    -CommandName Get-Disk `
+                    -CommandName Get-DiskByIdentifier `
+                    -ParameterFilter { $DiskId -eq $script:mockedDisk0Offline.Number -and $DiskIdType -eq 'Number' } `
                     -MockWith { $script:mockedDisk0Offline } `
                     -Verifiable
 
@@ -468,19 +561,20 @@ try
                 # mocks that should not be called
                 Mock -CommandName Initialize-Disk
 
-                It 'Should not throw' {
+                It 'Should not throw an exception' {
                     {
                         Set-targetResource `
                             -DiskId $script:mockedDisk0Offline.Number `
                             -AccessPath $script:testAccessPath `
                             -Verbose
-                    } | Should not throw
+                    } | Should Not Throw
                 }
 
-                It 'the correct mocks were called' {
+                It 'Should call the correct mocks' {
                     Assert-VerifiableMocks
                     Assert-MockCalled -CommandName Assert-AccessPathValid -Times 1
-                    Assert-MockCalled -CommandName Get-Disk -Times 1
+                    Assert-MockCalled -CommandName Get-DiskByIdentifier -Times 1 `
+                        -ParameterFilter { $DiskId -eq $script:mockedDisk0Offline.Number -and $DiskIdType -eq 'Number' }
                     Assert-MockCalled -CommandName Set-Disk -Times 1
                     Assert-MockCalled -CommandName Initialize-Disk -Times 0
                     Assert-MockCalled -CommandName Get-Partition -Times 1
@@ -499,7 +593,8 @@ try
                     -Verifiable
 
                 Mock `
-                    -CommandName Get-Disk `
+                    -CommandName Get-DiskByIdentifier `
+                    -ParameterFilter { $DiskId -eq $script:mockedDisk0Offline.UniqueId -and $DiskIdType -eq 'UniqueId' } `
                     -MockWith { $script:mockedDisk0Offline } `
                     -Verifiable
 
@@ -532,20 +627,88 @@ try
                 # mocks that should not be called
                 Mock -CommandName Initialize-Disk
 
-                It 'Should not throw' {
+                It 'Should not throw an exception' {
                     {
                         Set-targetResource `
                             -DiskId $script:mockedDisk0Offline.UniqueId `
                             -DiskIdType 'UniqueId' `
                             -AccessPath $script:testAccessPath `
                             -Verbose
-                    } | Should not throw
+                    } | Should Not Throw
                 }
 
-                It 'the correct mocks were called' {
+                It 'Should call the correct mocks' {
                     Assert-VerifiableMocks
                     Assert-MockCalled -CommandName Assert-AccessPathValid -Times 1
-                    Assert-MockCalled -CommandName Get-Disk -Times 1
+                    Assert-MockCalled -CommandName Get-DiskByIdentifier -Times 1 `
+                        -ParameterFilter { $DiskId -eq $script:mockedDisk0Offline.UniqueId -and $DiskIdType -eq 'UniqueId' }
+                    Assert-MockCalled -CommandName Set-Disk -Times 1
+                    Assert-MockCalled -CommandName Initialize-Disk -Times 0
+                    Assert-MockCalled -CommandName Get-Partition -Times 1
+                    Assert-MockCalled -CommandName Get-Volume -Times 1
+                    Assert-MockCalled -CommandName New-Partition -Times 1
+                    Assert-MockCalled -CommandName Format-Volume -Times 1
+                    Assert-MockCalled -CommandName Add-PartitionAccessPath -Times 1
+                }
+            }
+
+            Context 'Offline GPT disk using Disk Guid' {
+                # verifiable (should be called) mocks
+                Mock `
+                    -CommandName Assert-AccessPathValid `
+                    -MockWith { $script:testAccessPath } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-DiskByIdentifier `
+                    -ParameterFilter { $DiskId -eq $script:mockedDisk0Offline.Guid -and $DiskIdType -eq 'Guid' } `
+                    -MockWith { $script:mockedDisk0Offline } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Set-Disk `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-Partition `
+                    -Verifiable
+
+                Mock `
+                    -CommandName New-Partition `
+                    -MockWith { $script:mockedPartitionNoAccess } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-Volume `
+                    -MockWith { $script:mockedVolumeUnformatted } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Format-Volume `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Add-PartitionAccessPath `
+                    -Verifiable
+
+                # mocks that should not be called
+                Mock -CommandName Initialize-Disk
+
+                It 'Should not throw an exception' {
+                    {
+                        Set-targetResource `
+                            -DiskId $script:mockedDisk0Offline.Guid `
+                            -DiskIdType 'Guid' `
+                            -AccessPath $script:testAccessPath `
+                            -Verbose
+                    } | Should Not Throw
+                }
+
+                It 'Should call the correct mocks' {
+                    Assert-VerifiableMocks
+                    Assert-MockCalled -CommandName Assert-AccessPathValid -Times 1
+                    Assert-MockCalled -CommandName Get-DiskByIdentifier -Times 1 `
+                        -ParameterFilter { $DiskId -eq $script:mockedDisk0Offline.Guid -and $DiskIdType -eq 'Guid' }
                     Assert-MockCalled -CommandName Set-Disk -Times 1
                     Assert-MockCalled -CommandName Initialize-Disk -Times 0
                     Assert-MockCalled -CommandName Get-Partition -Times 1
@@ -564,7 +727,8 @@ try
                     -Verifiable
 
                 Mock `
-                    -CommandName Get-Disk `
+                    -CommandName Get-DiskByIdentifier `
+                    -ParameterFilter { $DiskId -eq $script:mockedDisk0Readonly.Number -and $DiskIdType -eq 'Number' } `
                     -MockWith { $script:mockedDisk0Readonly } `
                     -Verifiable
 
@@ -597,19 +761,20 @@ try
                 # mocks that should not be called
                 Mock -CommandName Initialize-Disk
 
-                It 'Should not throw' {
+                It 'Should not throw an exception' {
                     {
                         Set-targetResource `
                             -DiskId $script:mockedDisk0Readonly.Number `
                             -AccessPath $script:testAccessPath `
                             -Verbose
-                    } | Should not throw
+                    } | Should Not Throw
                 }
 
-                It 'the correct mocks were called' {
+                It 'Should call the correct mocks' {
                     Assert-VerifiableMocks
                     Assert-MockCalled -CommandName Assert-AccessPathValid -Times 1
-                    Assert-MockCalled -CommandName Get-Disk -Times 1
+                    Assert-MockCalled -CommandName Get-DiskByIdentifier -Times 1 `
+                        -ParameterFilter { $DiskId -eq $script:mockedDisk0Readonly.Number -and $DiskIdType -eq 'Number' }
                     Assert-MockCalled -CommandName Set-Disk -Times 1
                     Assert-MockCalled -CommandName Initialize-Disk -Times 0
                     Assert-MockCalled -CommandName Get-Partition -Times 1
@@ -628,7 +793,8 @@ try
                     -Verifiable
 
                 Mock `
-                    -CommandName Get-Disk `
+                    -CommandName Get-DiskByIdentifier `
+                    -ParameterFilter { $DiskId -eq $script:mockedDisk0OfflineRaw.Number -and $DiskIdType -eq 'Number' } `
                     -MockWith { $script:mockedDisk0OfflineRaw } `
                     -Verifiable
 
@@ -664,19 +830,20 @@ try
 
                 # mocks that should not be called
 
-                It 'Should not throw' {
+                It 'Should not throw an exception' {
                     {
                         Set-targetResource `
                             -DiskId $script:mockedDisk0OfflineRaw.Number `
                             -AccessPath $script:testAccessPath `
                             -Verbose
-                    } | Should not throw
+                    } | Should Not Throw
                 }
 
-                It 'the correct mocks were called' {
+                It 'Should call the correct mocks' {
                     Assert-VerifiableMocks
                     Assert-MockCalled -CommandName Assert-AccessPathValid -Times 1
-                    Assert-MockCalled -CommandName Get-Disk -Times 1
+                    Assert-MockCalled -CommandName Get-DiskByIdentifier -Times 1 `
+                        -ParameterFilter { $DiskId -eq $script:mockedDisk0OfflineRaw.Number -and $DiskIdType -eq 'Number' }
                     Assert-MockCalled -CommandName Set-Disk -Times 1
                     Assert-MockCalled -CommandName Initialize-Disk -Times 1
                     Assert-MockCalled -CommandName Get-Partition -Times 1
@@ -695,7 +862,8 @@ try
                     -Verifiable
 
                 Mock `
-                    -CommandName Get-Disk `
+                    -CommandName Get-DiskByIdentifier `
+                    -ParameterFilter { $DiskId -eq $script:mockedDisk0Raw.Number -and $DiskIdType -eq 'Number' } `
                     -MockWith { $script:mockedDisk0Raw } `
                     -Verifiable
 
@@ -728,19 +896,20 @@ try
                 # mocks that should not be called
                 Mock -CommandName Set-Disk
 
-                It 'Should not throw' {
+                It 'Should not throw an exception' {
                     {
                         Set-targetResource `
                             -DiskId $script:mockedDisk0Raw.Number `
                             -AccessPath $script:testAccessPath `
                             -Verbose
-                    } | Should not throw
+                    } | Should Not Throw
                 }
 
-                It 'the correct mocks were called' {
+                It 'Should call the correct mocks' {
                     Assert-VerifiableMocks
                     Assert-MockCalled -CommandName Assert-AccessPathValid -Times 1
-                    Assert-MockCalled -CommandName Get-Disk -Times 1
+                    Assert-MockCalled -CommandName Get-DiskByIdentifier -Times 1 `
+                        -ParameterFilter { $DiskId -eq $script:mockedDisk0Raw.Number -and $DiskIdType -eq 'Number' }
                     Assert-MockCalled -CommandName Set-Disk -Times 0
                     Assert-MockCalled -CommandName Initialize-Disk -Times 1
                     Assert-MockCalled -CommandName Get-Partition -Times 1
@@ -759,7 +928,8 @@ try
                     -Verifiable
 
                 Mock `
-                    -CommandName Get-Disk `
+                    -CommandName Get-DiskByIdentifier `
+                    -ParameterFilter { $DiskId -eq $script:mockedDisk0.Number -and $DiskIdType -eq 'Number' } `
                     -MockWith { $script:mockedDisk0 } `
                     -Verifiable
 
@@ -789,19 +959,20 @@ try
                 Mock -CommandName Set-Disk
                 Mock -CommandName Initialize-Disk
 
-                It 'Should not throw' {
+                It 'Should not throw an exception' {
                     {
                         Set-targetResource `
                             -DiskId $script:mockedDisk0.Number `
                             -AccessPath $script:testAccessPath `
                             -Verbose
-                    } | Should not throw
+                    } | Should Not Throw
                 }
 
-                It 'the correct mocks were called' {
+                It 'Should call the correct mocks' {
                     Assert-VerifiableMocks
                     Assert-MockCalled -CommandName Assert-AccessPathValid -Times 1
-                    Assert-MockCalled -CommandName Get-Disk -Times 1
+                    Assert-MockCalled -CommandName Get-DiskByIdentifier -Times 1 `
+                        -ParameterFilter { $DiskId -eq $script:mockedDisk0.Number -and $DiskIdType -eq 'Number' }
                     Assert-MockCalled -CommandName Set-Disk -Times 0
                     Assert-MockCalled -CommandName Initialize-Disk -Times 0
                     Assert-MockCalled -CommandName Get-Partition -Times 1
@@ -820,7 +991,8 @@ try
                     -Verifiable
 
                 Mock `
-                    -CommandName Get-Disk `
+                    -CommandName Get-DiskByIdentifier `
+                    -ParameterFilter { $DiskId -eq $script:mockedDisk0Mbr.Number -and $DiskIdType -eq 'Number' } `
                     -MockWith { $script:mockedDisk0Mbr } `
                     -Verifiable
 
@@ -835,7 +1007,7 @@ try
 
                 $errorRecord = Get-InvalidOperationRecord `
                     -Message ($LocalizedData.DiskAlreadyInitializedError -f `
-                        'Number',$script:mockedDisk0Mbr.Number,$script:mockedDisk0Mbr.PartitionStyle)
+                        'Number', $script:mockedDisk0Mbr.Number, $script:mockedDisk0Mbr.PartitionStyle)
 
                 It 'Should throw DiskAlreadyInitializedError' {
                     {
@@ -846,10 +1018,11 @@ try
                     } | Should Throw $errorRecord
                 }
 
-                It 'the correct mocks were called' {
+                It 'Should call the correct mocks' {
                     Assert-VerifiableMocks
                     Assert-MockCalled -CommandName Assert-AccessPathValid -Times 1
-                    Assert-MockCalled -CommandName Get-Disk -Times 1
+                    Assert-MockCalled -CommandName Get-DiskByIdentifier -Times 1 `
+                        -ParameterFilter { $DiskId -eq $script:mockedDisk0Mbr.Number -and $DiskIdType -eq 'Number' }
                     Assert-MockCalled -CommandName Set-Disk -Times 0
                     Assert-MockCalled -CommandName Initialize-Disk -Times 0
                     Assert-MockCalled -CommandName Get-Partition -Times 0
@@ -868,7 +1041,8 @@ try
                     -Verifiable
 
                 Mock `
-                    -CommandName Get-Disk `
+                    -CommandName Get-DiskByIdentifier `
+                    -ParameterFilter { $DiskId -eq $script:mockedDisk0Mbr.UniqueId -and $DiskIdType -eq 'UniqueId' } `
                     -MockWith { $script:mockedDisk0Mbr } `
                     -Verifiable
 
@@ -883,7 +1057,7 @@ try
 
                 $errorRecord = Get-InvalidOperationRecord `
                     -Message ($LocalizedData.DiskAlreadyInitializedError -f `
-                        'UniqueId',$script:mockedDisk0Mbr.UniqueId,$script:mockedDisk0Mbr.PartitionStyle)
+                        'UniqueId', $script:mockedDisk0Mbr.UniqueId, $script:mockedDisk0Mbr.PartitionStyle)
 
                 It 'Should throw DiskAlreadyInitializedError' {
                     {
@@ -895,10 +1069,62 @@ try
                     } | Should Throw $errorRecord
                 }
 
-                It 'the correct mocks were called' {
+                It 'Should call the correct mocks' {
                     Assert-VerifiableMocks
                     Assert-MockCalled -CommandName Assert-AccessPathValid -Times 1
-                    Assert-MockCalled -CommandName Get-Disk -Times 1
+                    Assert-MockCalled -CommandName Get-DiskByIdentifier -Times 1 `
+                        -ParameterFilter { $DiskId -eq $script:mockedDisk0Mbr.UniqueId -and $DiskIdType -eq 'UniqueId' }
+                    Assert-MockCalled -CommandName Set-Disk -Times 0
+                    Assert-MockCalled -CommandName Initialize-Disk -Times 0
+                    Assert-MockCalled -CommandName Get-Partition -Times 0
+                    Assert-MockCalled -CommandName Get-Volume -Times 0
+                    Assert-MockCalled -CommandName New-Partition -Times 0
+                    Assert-MockCalled -CommandName Format-Volume -Times 0
+                    Assert-MockCalled -CommandName Add-PartitionAccessPath -Times 0
+                }
+            }
+
+            Context 'Online MBR disk using Disk Guid' {
+                # verifiable (should be called) mocks
+                Mock `
+                    -CommandName Assert-AccessPathValid `
+                    -MockWith { $script:testAccessPath } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-DiskByIdentifier `
+                    -ParameterFilter { $DiskId -eq $script:mockedDisk0Mbr.Guid -and $DiskIdType -eq 'Guid' } `
+                    -MockWith { $script:mockedDisk0Mbr } `
+                    -Verifiable
+
+                # mocks that should not be called
+                Mock -CommandName Set-Disk
+                Mock -CommandName Initialize-Disk
+                Mock -CommandName Get-Partition
+                Mock -CommandName New-Partition
+                Mock -CommandName Format-Volume
+                Mock -CommandName Get-Volume
+                Mock -CommandName Add-PartitionAccessPath
+
+                $errorRecord = Get-InvalidOperationRecord `
+                    -Message ($LocalizedData.DiskAlreadyInitializedError -f `
+                        'Guid', $script:mockedDisk0Mbr.Guid, $script:mockedDisk0Mbr.PartitionStyle)
+
+                It 'Should throw DiskAlreadyInitializedError' {
+                    {
+                        Set-targetResource `
+                            -DiskId $script:mockedDisk0Mbr.Guid `
+                            -DiskIdType 'Guid' `
+                            -AccessPath $script:testAccessPath `
+                            -Verbose
+                    } | Should Throw $errorRecord
+                }
+
+                It 'Should call the correct mocks' {
+                    Assert-VerifiableMocks
+                    Assert-MockCalled -CommandName Assert-AccessPathValid -Times 1
+                    Assert-MockCalled -CommandName Get-DiskByIdentifier -Times 1 `
+                        -ParameterFilter { $DiskId -eq $script:mockedDisk0Mbr.Guid -and $DiskIdType -eq 'Guid' }
                     Assert-MockCalled -CommandName Set-Disk -Times 0
                     Assert-MockCalled -CommandName Initialize-Disk -Times 0
                     Assert-MockCalled -CommandName Get-Partition -Times 0
@@ -917,7 +1143,8 @@ try
                     -Verifiable
 
                 Mock `
-                    -CommandName Get-Disk `
+                    -CommandName Get-DiskByIdentifier `
+                    -ParameterFilter { $DiskId -eq $script:mockedDisk0.Number -and $DiskIdType -eq 'Number' } `
                     -MockWith { $script:mockedDisk0 } `
                     -Verifiable
 
@@ -938,19 +1165,20 @@ try
                 Mock -CommandName Format-Volume
                 Mock -CommandName Add-PartitionAccessPath
 
-                It 'Should not throw' {
+                It 'Should not throw an exception' {
                     {
                         Set-targetResource `
                             -DiskId $script:mockedDisk0.Number `
                             -AccessPath $script:testAccessPath `
                             -Verbose
-                    } | Should not throw
+                    } | Should Not Throw
                 }
 
-                It 'the correct mocks were called' {
+                It 'Should call the correct mocks' {
                     Assert-VerifiableMocks
                     Assert-MockCalled -CommandName Assert-AccessPathValid -Times 1
-                    Assert-MockCalled -CommandName Get-Disk -Times 1
+                    Assert-MockCalled -CommandName Get-DiskByIdentifier -Times 1 `
+                        -ParameterFilter { $DiskId -eq $script:mockedDisk0.Number -and $DiskIdType -eq 'Number' }
                     Assert-MockCalled -CommandName Set-Disk -Times 0
                     Assert-MockCalled -CommandName Initialize-Disk -Times 0
                     Assert-MockCalled -CommandName Get-Partition -Times 1
@@ -969,7 +1197,8 @@ try
                     -Verifiable
 
                 Mock `
-                    -CommandName Get-Disk `
+                    -CommandName Get-DiskByIdentifier `
+                    -ParameterFilter { $DiskId -eq $script:mockedDisk0.Number -and $DiskIdType -eq 'Number' } `
                     -MockWith { $script:mockedDisk0 } `
                     -Verifiable
 
@@ -993,20 +1222,21 @@ try
                 Mock -CommandName New-Partition
                 Mock -CommandName Format-Volume
 
-                It 'Should not throw' {
+                It 'Should not throw an exception' {
                     {
                         Set-targetResource `
                             -DiskId $script:mockedDisk0.Number `
                             -AccessPath $script:testAccessPath `
                             -Size $script:mockedPartitionSize `
                             -Verbose
-                    } | Should not throw
+                    } | Should Not Throw
                 }
 
-                It 'the correct mocks were called' {
+                It 'Should call the correct mocks' {
                     Assert-VerifiableMocks
                     Assert-MockCalled -CommandName Assert-AccessPathValid -Times 1
-                    Assert-MockCalled -CommandName Get-Disk -Times 1
+                    Assert-MockCalled -CommandName Get-DiskByIdentifier -Times 1 `
+                        -ParameterFilter { $DiskId -eq $script:mockedDisk0.Number -and $DiskIdType -eq 'Number' }
                     Assert-MockCalled -CommandName Set-Disk -Times 0
                     Assert-MockCalled -CommandName Initialize-Disk -Times 0
                     Assert-MockCalled -CommandName Get-Partition -Times 1
@@ -1025,7 +1255,8 @@ try
                     -Verifiable
 
                 Mock `
-                    -CommandName Get-Disk `
+                    -CommandName Get-DiskByIdentifier `
+                    -ParameterFilter { $DiskId -eq $script:mockedDisk0.Number -and $DiskIdType -eq 'Number' } `
                     -MockWith { $script:mockedDisk0 } `
                     -Verifiable
 
@@ -1050,20 +1281,21 @@ try
                 Mock -CommandName Format-Volume
                 Mock -CommandName Add-PartitionAccessPath
 
-                It 'Should not throw' {
+                It 'Should not throw an exception' {
                     {
                         Set-targetResource `
                             -DiskId $script:mockedDisk0.Number `
                             -AccessPath $script:testAccessPath `
                             -FSLabel 'NewLabel' `
                             -Verbose
-                    } | Should not throw
+                    } | Should Not Throw
                 }
 
-                It 'the correct mocks were called' {
+                It 'Should call the correct mocks' {
                     Assert-VerifiableMocks
                     Assert-MockCalled -CommandName Assert-AccessPathValid -Times 1
-                    Assert-MockCalled -CommandName Get-Disk -Times 1
+                    Assert-MockCalled -CommandName Get-DiskByIdentifier -Times 1 `
+                        -ParameterFilter { $DiskId -eq $script:mockedDisk0.Number -and $DiskIdType -eq 'Number' }
                     Assert-MockCalled -CommandName Set-Disk -Times 0
                     Assert-MockCalled -CommandName Initialize-Disk -Times 0
                     Assert-MockCalled -CommandName Get-Partition -Times 1
@@ -1091,7 +1323,8 @@ try
                     -Verifiable
 
                 Mock `
-                    -CommandName Get-Disk `
+                    -CommandName Get-DiskByIdentifier `
+                    -ParameterFilter { $DiskId -eq $script:mockedDisk0Offline.Number -and $DiskIdType -eq 'Number' } `
                     -MockWith { $script:mockedDisk0Offline } `
                     -Verifiable
 
@@ -1102,24 +1335,25 @@ try
 
                 $script:result = $null
 
-                It 'calling test Should Not Throw' {
+                It 'Should not throw an exception' {
                     {
                         $script:result = Test-TargetResource `
                             -DiskId $script:mockedDisk0Offline.Number `
                             -AccessPath $script:testAccessPath `
                             -AllocationUnitSize 4096 `
                             -Verbose
-                    } | Should not throw
+                    } | Should Not Throw
                 }
 
-                It 'result should be false' {
+                It 'Should return false' {
                     $script:result | Should Be $false
                 }
 
-                It 'the correct mocks were called' {
+                It 'Should call the correct mocks' {
                     Assert-VerifiableMocks
                     Assert-MockCalled -CommandName Assert-AccessPathValid -Times 1
-                    Assert-MockCalled -CommandName Get-Disk -Times 1
+                    Assert-MockCalled -CommandName Get-DiskByIdentifier -Times 1 `
+                        -ParameterFilter { $DiskId -eq $script:mockedDisk0Offline.Number -and $DiskIdType -eq 'Number' }
                     Assert-MockCalled -CommandName Get-Partition -Times 0
                     Assert-MockCalled -CommandName Get-Volume -Times 0
                     Assert-MockCalled -CommandName Get-CimInstance -Times 0
@@ -1134,7 +1368,8 @@ try
                     -Verifiable
 
                 Mock `
-                    -CommandName Get-Disk `
+                    -CommandName Get-DiskByIdentifier `
+                    -ParameterFilter { $DiskId -eq $script:mockedDisk0Offline.UniqueId -and $DiskIdType -eq 'UniqueId' } `
                     -MockWith { $script:mockedDisk0Offline } `
                     -Verifiable
 
@@ -1145,7 +1380,7 @@ try
 
                 $script:result = $null
 
-                It 'calling test Should Not Throw' {
+                It 'Should not throw an exception' {
                     {
                         $script:result = Test-TargetResource `
                             -DiskId $script:mockedDisk0Offline.UniqueId `
@@ -1153,17 +1388,64 @@ try
                             -AccessPath $script:testAccessPath `
                             -AllocationUnitSize 4096 `
                             -Verbose
-                    } | Should not throw
+                    } | Should Not Throw
                 }
 
-                It 'result should be false' {
+                It 'Should return false' {
                     $script:result | Should Be $false
                 }
 
-                It 'the correct mocks were called' {
+                It 'Should call the correct mocks' {
                     Assert-VerifiableMocks
                     Assert-MockCalled -CommandName Assert-AccessPathValid -Times 1
-                    Assert-MockCalled -CommandName Get-Disk -Times 1
+                    Assert-MockCalled -CommandName Get-DiskByIdentifier -Times 1 `
+                        -ParameterFilter { $DiskId -eq $script:mockedDisk0Offline.UniqueId -and $DiskIdType -eq 'UniqueId' }
+                    Assert-MockCalled -CommandName Get-Partition -Times 0
+                    Assert-MockCalled -CommandName Get-Volume -Times 0
+                    Assert-MockCalled -CommandName Get-CimInstance -Times 0
+                }
+            }
+
+            Context 'Test disk not initialized using Disk Guid' {
+                # verifiable (should be called) mocks
+                Mock `
+                    -CommandName Assert-AccessPathValid `
+                    -MockWith { $script:testAccessPath } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-DiskByIdentifier `
+                    -ParameterFilter { $DiskId -eq $script:mockedDisk0Offline.Guid -and $DiskIdType -eq 'Guid' } `
+                    -MockWith { $script:mockedDisk0Offline } `
+                    -Verifiable
+
+                # mocks that should not be called
+                Mock -CommandName Get-Volume
+                Mock -CommandName Get-Partition
+                Mock -CommandName Get-CimInstance
+
+                $script:result = $null
+
+                It 'Should not throw an exception' {
+                    {
+                        $script:result = Test-TargetResource `
+                            -DiskId $script:mockedDisk0Offline.Guid `
+                            -DiskIdType 'Guid' `
+                            -AccessPath $script:testAccessPath `
+                            -AllocationUnitSize 4096 `
+                            -Verbose
+                    } | Should Not Throw
+                }
+
+                It 'Should return false' {
+                    $script:result | Should Be $false
+                }
+
+                It 'Should call the correct mocks' {
+                    Assert-VerifiableMocks
+                    Assert-MockCalled -CommandName Assert-AccessPathValid -Times 1
+                    Assert-MockCalled -CommandName Get-DiskByIdentifier -Times 1 `
+                        -ParameterFilter { $DiskId -eq $script:mockedDisk0Offline.Guid -and $DiskIdType -eq 'Guid' }
                     Assert-MockCalled -CommandName Get-Partition -Times 0
                     Assert-MockCalled -CommandName Get-Volume -Times 0
                     Assert-MockCalled -CommandName Get-CimInstance -Times 0
@@ -1178,7 +1460,8 @@ try
                     -Verifiable
 
                 Mock `
-                    -CommandName Get-Disk `
+                    -CommandName Get-DiskByIdentifier `
+                    -ParameterFilter { $DiskId -eq $script:mockedDisk0Readonly.Number -and $DiskIdType -eq 'Number' } `
                     -MockWith { $script:mockedDisk0Readonly } `
                     -Verifiable
 
@@ -1189,24 +1472,25 @@ try
 
                 $script:result = $null
 
-                It 'calling test Should Not Throw' {
+                It 'Should not throw an exception' {
                     {
                         $script:result = Test-TargetResource `
                             -DiskId $script:mockedDisk0Readonly.Number `
                             -AccessPath $script:testAccessPath `
                             -AllocationUnitSize 4096 `
                             -Verbose
-                    } | Should not throw
+                    } | Should Not Throw
                 }
 
-                It 'result should be false' {
+                It 'Should return false' {
                     $script:result | Should Be $false
                 }
 
-                It 'the correct mocks were called' {
+                It 'Should call the correct mocks' {
                     Assert-VerifiableMocks
                     Assert-MockCalled -CommandName Assert-AccessPathValid -Times 1
-                    Assert-MockCalled -CommandName Get-Disk -Times 1
+                    Assert-MockCalled -CommandName Get-DiskByIdentifier -Times 1 `
+                        -ParameterFilter { $DiskId -eq $script:mockedDisk0Readonly.Number -and $DiskIdType -eq 'Number' }
                     Assert-MockCalled -CommandName Get-Partition -Times 0
                     Assert-MockCalled -CommandName Get-Volume -Times 0
                     Assert-MockCalled -CommandName Get-CimInstance -Times 0
@@ -1221,7 +1505,8 @@ try
                     -Verifiable
 
                 Mock `
-                    -CommandName Get-Disk `
+                    -CommandName Get-DiskByIdentifier `
+                    -ParameterFilter { $DiskId -eq $script:mockedDisk0Raw.Number -and $DiskIdType -eq 'Number' } `
                     -MockWith { $script:mockedDisk0Raw } `
                     -Verifiable
 
@@ -1232,24 +1517,25 @@ try
 
                 $script:result = $null
 
-                It 'calling test Should Not Throw' {
+                It 'Should not throw an exception' {
                     {
                         $script:result = Test-TargetResource `
                             -DiskId $script:mockedDisk0Raw.Number `
                             -AccessPath $script:testAccessPath `
                             -AllocationUnitSize 4096 `
                             -Verbose
-                    } | Should not throw
+                    } | Should Not Throw
                 }
 
-                It 'result should be false' {
+                It 'Should return false' {
                     $script:result | Should Be $false
                 }
 
-                It 'the correct mocks were called' {
+                It 'Should call the correct mocks' {
                     Assert-VerifiableMocks
                     Assert-MockCalled -CommandName Assert-AccessPathValid -Times 1
-                    Assert-MockCalled -CommandName Get-Disk -Times 1
+                    Assert-MockCalled -CommandName Get-DiskByIdentifier -Times 1 `
+                        -ParameterFilter { $DiskId -eq $script:mockedDisk0Raw.Number -and $DiskIdType -eq 'Number' }
                     Assert-MockCalled -CommandName Get-Partition -Times 0
                     Assert-MockCalled -CommandName Get-Volume -Times 0
                     Assert-MockCalled -CommandName Get-CimInstance -Times 0
@@ -1264,7 +1550,8 @@ try
                     -Verifiable
 
                 Mock `
-                    -CommandName Get-Disk `
+                    -CommandName Get-DiskByIdentifier `
+                    -ParameterFilter { $DiskId -eq $script:mockedDisk0.Number -and $DiskIdType -eq 'Number' } `
                     -MockWith { $script:mockedDisk0 } `
                     -Verifiable
 
@@ -1285,7 +1572,7 @@ try
 
                 $script:result = $null
 
-                It 'calling test Should Not Throw' {
+                It 'Should not throw an exception' {
                     {
                         $script:result = Test-TargetResource `
                             -DiskId $script:mockedDisk0.Number `
@@ -1293,17 +1580,18 @@ try
                             -AllocationUnitSize 4096 `
                             -Size 124 `
                             -Verbose
-                    } | Should not throw
+                    } | Should Not Throw
                 }
 
-                It 'result should be true' {
+                It 'Should return true' {
                     $script:result | Should Be $true
                 }
 
-                It 'the correct mocks were called' {
+                It 'Should call the correct mocks' {
                     Assert-VerifiableMocks
                     Assert-MockCalled -CommandName Assert-AccessPathValid -Times 1
-                    Assert-MockCalled -CommandName Get-Disk -Times 1
+                    Assert-MockCalled -CommandName Get-DiskByIdentifier -Times 1 `
+                        -ParameterFilter { $DiskId -eq $script:mockedDisk0.Number -and $DiskIdType -eq 'Number' }
                     Assert-MockCalled -CommandName Get-Partition -Times 1
                     Assert-MockCalled -CommandName Get-Volume -Times 1
                     Assert-MockCalled -CommandName Get-CimInstance -Times 1
@@ -1318,7 +1606,8 @@ try
                     -Verifiable
 
                 Mock `
-                    -CommandName Get-Disk `
+                    -CommandName Get-DiskByIdentifier `
+                    -ParameterFilter { $DiskId -eq $script:mockedDisk0.Number -and $DiskIdType -eq 'Number' } `
                     -MockWith { $script:mockedDisk0 } `
                     -Verifiable
 
@@ -1337,25 +1626,26 @@ try
 
                 $script:result = $null
 
-                It 'calling test Should Not Throw' {
+                It 'Should not throw an exception' {
                     {
                         $script:result = Test-TargetResource `
                             -DiskId $script:mockedDisk0.Number `
                             -AccessPath $script:testAccessPath `
                             -AllocationUnitSize 4097 `
                             -Verbose
-                    } | Should not throw
+                    } | Should Not Throw
                 }
 
                 # skipped due to:  https://github.com/PowerShell/xStorage/issues/22
-                It 'result should be false' -skip {
+                It 'Should return false' -skip {
                     $script:result | Should Be $false
                 }
 
-                It 'the correct mocks were called' {
+                It 'Should call the correct mocks' {
                     Assert-VerifiableMocks
                     Assert-MockCalled -CommandName Assert-AccessPathValid -Times 1
-                    Assert-MockCalled -CommandName Get-Disk -Times 1
+                    Assert-MockCalled -CommandName Get-DiskByIdentifier -Times 1 `
+                        -ParameterFilter { $DiskId -eq $script:mockedDisk0.Number -and $DiskIdType -eq 'Number' }
                     Assert-MockCalled -CommandName Get-Partition -Times 1
                     Assert-MockCalled -CommandName Get-Volume -Times 1
                     Assert-MockCalled -CommandName Get-CimInstance -Times 1
@@ -1370,7 +1660,8 @@ try
                     -Verifiable
 
                 Mock `
-                    -CommandName Get-Disk `
+                    -CommandName Get-DiskByIdentifier `
+                    -ParameterFilter { $DiskId -eq $script:mockedDisk0.Number -and $DiskIdType -eq 'Number' } `
                     -MockWith { $script:mockedDisk0 } `
                     -Verifiable
 
@@ -1391,24 +1682,25 @@ try
 
                 $script:result = $null
 
-                It 'calling test Should Not Throw' {
+                It 'Should not throw an exception' {
                     {
                         $script:result = Test-TargetResource `
                             -DiskId $script:mockedDisk0.Number `
                             -AccessPath $script:testAccessPath `
                             -FSFormat 'ReFS' `
                             -Verbose
-                    } | Should not throw
+                    } | Should Not Throw
                 }
 
-                It 'result should be true' {
+                It 'Should return true' {
                     $script:result | Should Be $true
                 }
 
-                It 'the correct mocks were called' {
+                It 'Should call the correct mocks' {
                     Assert-VerifiableMocks
                     Assert-MockCalled -CommandName Assert-AccessPathValid -Times 1
-                    Assert-MockCalled -CommandName Get-Disk -Times 1
+                    Assert-MockCalled -CommandName Get-DiskByIdentifier -Times 1 `
+                        -ParameterFilter { $DiskId -eq $script:mockedDisk0.Number -and $DiskIdType -eq 'Number' }
                     Assert-MockCalled -CommandName Get-Partition -Times 1
                     Assert-MockCalled -CommandName Get-Volume -Times 1
                     Assert-MockCalled -CommandName Get-CimInstance -Times 1
@@ -1423,7 +1715,8 @@ try
                     -Verifiable
 
                 Mock `
-                    -CommandName Get-Disk `
+                    -CommandName Get-DiskByIdentifier `
+                    -ParameterFilter { $DiskId -eq $script:mockedDisk0.Number -and $DiskIdType -eq 'Number' } `
                     -MockWith { $script:mockedDisk0 } `
                     -Verifiable
 
@@ -1444,24 +1737,25 @@ try
 
                 $script:result = $null
 
-                It 'calling test Should Not Throw' {
+                It 'Should not throw an exception' {
                     {
                         $script:result = Test-TargetResource `
                             -DiskId $script:mockedDisk0.Number `
                             -AccessPath $script:testAccessPath `
                             -FSLabel 'NewLabel' `
                             -Verbose
-                    } | Should not throw
+                    } | Should Not Throw
                 }
 
-                It 'result should be false' {
+                It 'Should return false' {
                     $script:result | Should Be $false
                 }
 
-                It 'the correct mocks were called' {
+                It 'Should call the correct mocks' {
                     Assert-VerifiableMocks
                     Assert-MockCalled -CommandName Assert-AccessPathValid -Times 1
-                    Assert-MockCalled -CommandName Get-Disk -Times 1
+                    Assert-MockCalled -CommandName Get-DiskByIdentifier -Times 1 `
+                        -ParameterFilter { $DiskId -eq $script:mockedDisk0.Number -and $DiskIdType -eq 'Number' }
                     Assert-MockCalled -CommandName Get-Partition -Times 1
                     Assert-MockCalled -CommandName Get-Volume -Times 1
                     Assert-MockCalled -CommandName Get-CimInstance -Times 1
@@ -1476,7 +1770,8 @@ try
                     -Verifiable
 
                 Mock `
-                    -CommandName Get-Disk `
+                    -CommandName Get-DiskByIdentifier `
+                    -ParameterFilter { $DiskId -eq $script:mockedDisk0.Number -and $DiskIdType -eq 'Number' } `
                     -MockWith { $script:mockedDisk0 } `
                     -Verifiable
 
@@ -1497,7 +1792,7 @@ try
 
                 $script:result = $null
 
-                It 'calling test Should Not Throw' {
+                It 'Should not throw an exception' {
                     {
                         $script:result = Test-TargetResource `
                             -DiskId $script:mockedDisk0.Number `
@@ -1506,17 +1801,18 @@ try
                             -Size $script:mockedPartition.Size `
                             -FSFormat $script:mockedVolume.FileSystem `
                             -Verbose
-                    } | Should not throw
+                    } | Should Not Throw
                 }
 
-                It 'result should be true' {
+                It 'Should return true' {
                     $script:result | Should Be $true
                 }
 
-                It 'the correct mocks were called' {
+                It 'Should call the correct mocks' {
                     Assert-VerifiableMocks
                     Assert-MockCalled -CommandName Assert-AccessPathValid -Times 1
-                    Assert-MockCalled -CommandName Get-Disk -Times 1
+                    Assert-MockCalled -CommandName Get-DiskByIdentifier -Times 1 `
+                        -ParameterFilter { $DiskId -eq $script:mockedDisk0.Number -and $DiskIdType -eq 'Number' }
                     Assert-MockCalled -CommandName Get-Partition -Times 1
                     Assert-MockCalled -CommandName Get-Volume -Times 1
                     Assert-MockCalled -CommandName Get-CimInstance -Times 1

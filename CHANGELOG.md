@@ -2,6 +2,33 @@
 
 ## Unreleased
 
+## 3.3.0.0
+
+- Opted into common tests for Module and Script files - See [Issue 115](https://github.com/PowerShell/xStorage/issues/115).
+- xDisk:
+  - Added support for Guid Disk Id type - See [Issue 104](https://github.com/PowerShell/xStorage/issues/104).
+  - Added parameter AllowDestructive - See [Issue 11](https://github.com/PowerShell/xStorage/issues/11).
+  - Added parameter ClearDisk - See [Issue 50](https://github.com/PowerShell/xStorage/issues/50).
+- xDiskAccessPath:
+  - Added support for Guid Disk Id type - See [Issue 104](https://github.com/PowerShell/xStorage/issues/104).
+- xWaitForDisk:
+  - Added support for Guid Disk Id type - See [Issue 104](https://github.com/PowerShell/xStorage/issues/104).
+- Added .markdownlint.json file to configure markdown rules to validate.
+- Clean up Badge area in README.MD - See [Issue 110](https://github.com/PowerShell/xStorage/issues/110).
+- Disabled MD013 rule checking to enable badge table.
+- Added .github support files:
+  - CONTRIBUTING.md
+  - ISSUE_TEMPLATE.md
+  - PULL_REQUEST_TEMPLATE.md
+- Changed license year to 2017 and set company name to Microsoft
+  Corporation in LICENSE.MD and module manifest - See [Issue 111](https://github.com/PowerShell/xStorage/issues/111).
+- Set Visual Studio Code setting "powershell.codeFormatting.preset" to
+  "custom" - See [Issue 108](https://github.com/PowerShell/xStorage/issues/108)
+- Added `Documentation and Examples` section to Readme.md file - see
+  [issue #116](https://github.com/PowerShell/xStorage/issues/116).
+- Prevent unit tests from DSCResource.Tests from running during test
+  execution - fixes [Issue #118](https://github.com/PowerShell/xStorage/issues/118).
+
 ## 3.2.0.0
 
 - xDisk:
@@ -47,8 +74,6 @@
   - Fixed style violations in xDisk.
   - Fixed issue when creating multiple partitions on a single disk with no size
     specified - See [Issue 86](https://github.com/PowerShell/xStorage/issues/86).
-  - Added parameter AllowDestructive - See [Issue 11](https://github.com/PowerShell/xStorage/issues/11).
-  - Added parameter ClearDisk - See [Issue 50](https://github.com/PowerShell/xStorage/issues/50).
 - xDiskAccessPath:
   - BREAKING CHANGE: Renamed parameter DiskNumber to DiskId to
     enable it to contain either DiskNumber or UniqueId - See [Issue 81](https://github.com/PowerShell/xStorage/issues/81).

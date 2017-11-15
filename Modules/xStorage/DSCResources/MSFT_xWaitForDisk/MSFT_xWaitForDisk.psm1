@@ -47,7 +47,7 @@ function Get-TargetResource
         $DiskId,
 
         [Parameter()]
-        [ValidateSet('Number','UniqueId')]
+        [ValidateSet('Number','UniqueId','Guid')]
         [System.String]
         $DiskIdType = 'Number',
 
@@ -100,7 +100,7 @@ function Set-TargetResource
         $DiskId,
 
         [Parameter()]
-        [ValidateSet('Number','UniqueId')]
+        [ValidateSet('Number','UniqueId','Guid')]
         [System.String]
         $DiskIdType = 'Number',
 
@@ -120,15 +120,14 @@ function Set-TargetResource
 
     $diskFound = $false
 
-    $diskIdParameter = @{
-        $DiskIdType = $DiskId
-    }
 
     for ($count = 0; $count -lt $RetryCount; $count++)
     {
-        $disk = Get-Disk `
-            @diskIdParameter `
-            -ErrorAction SilentlyContinue
+        # Get the Disk using the identifiers supplied
+        $disk = Get-DiskByIdentifier `
+            -DiskId $DiskId `
+            -DiskIdType $DiskIdType
+
         if ($disk)
         {
             Write-Verbose -Message ( @(
@@ -184,7 +183,7 @@ function Test-TargetResource
         $DiskId,
 
         [Parameter()]
-        [ValidateSet('Number','UniqueId')]
+        [ValidateSet('Number','UniqueId','Guid')]
         [System.String]
         $DiskIdType = 'Number',
 
@@ -202,13 +201,10 @@ function Test-TargetResource
             $($localizedData.CheckingForDiskStatusMessage -f $DiskIdType,$DiskId)
         ) -join '' )
 
-    $diskIdParameter = @{
-        $DiskIdType = $DiskId
-    }
-
-    $disk = Get-Disk `
-        @diskIdParameter `
-        -ErrorAction SilentlyContinue
+    # Get the Disk using the identifiers supplied
+    $disk = Get-DiskByIdentifier `
+        -DiskId $DiskId `
+        -DiskIdType $DiskIdType
 
     if ($disk)
     {

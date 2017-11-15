@@ -1,4 +1,4 @@
-﻿# Import the Networking Resource Helper Module
+# Import the Networking Resource Helper Module
 Import-Module -Name (Join-Path -Path (Split-Path -Path $PSScriptRoot -Parent) `
                                -ChildPath (Join-Path -Path 'StorageDsc.ResourceHelper' `
                                                      -ChildPath 'StorageDsc.ResourceHelper.psm1'))
@@ -104,4 +104,56 @@ function Assert-AccessPathValid
     return $AccessPath
 } # end function Assert-AccessPathValid
 
-Export-ModuleMember -Function @( 'Assert-DriveLetterValid', 'Assert-AccessPathValid' )
+
+<#
+    .SYNOPSIS
+    Retrieves a Disk object matching the disk Id and Id type
+    provided.
+
+    .PARAMETER DiskId
+    Specifies the disk identifier for the disk to retrieve.
+
+    .PARAMETER DiskIdType
+    Specifies the identifier type the DiskId contains. Defaults to Number.
+#>
+function Get-DiskByIdentifier
+{
+    [CmdletBinding()]
+    [OutputType([Microsoft.Management.Infrastructure.CimInstance])]
+    param
+    (
+        [Parameter(Mandatory = $true)]
+        [System.String]
+        $DiskId,
+
+        [Parameter()]
+        [ValidateSet('Number','UniqueId','Guid')]
+        [System.String]
+        $DiskIdType = 'Number'
+    )
+
+    if ($DiskIdType -eq 'Guid')
+    {
+        # The Disk Id requested uses a Guid so have to get all disks and filter
+        $disk = Get-Disk `
+            -ErrorAction SilentlyContinue |
+            Where-Object -Property Guid -EQ $DiskId
+    }
+    else
+    {
+        $diskIdParameter = @{
+            $DiskIdType = $DiskId
+        }
+
+        $disk = Get-Disk `
+            @diskIdParameter `
+            -ErrorAction SilentlyContinue
+    }
+
+    return $disk
+} # end function Get-DiskByIdentifier
+
+Export-ModuleMember -Function `
+    Assert-DriveLetterValid, `
+    Assert-AccessPathValid, `
+    Get-DiskByIdentifier
