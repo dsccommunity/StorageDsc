@@ -67,11 +67,11 @@ try
                         -ConfigurationData $ConfigData
                     Start-DscConfiguration -Path $TestDrive `
                         -ComputerName localhost -Wait -Verbose -Force
-                } | Should Not Throw
+                } | Should -Not -Throw
             }
 
             It 'Should be able to call Get-DscConfiguration without throwing' {
-                { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should Not throw
+                { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
             }
             #endregion
 
@@ -79,11 +79,11 @@ try
                 $current = Get-DscConfiguration | Where-Object {
                     $_.ConfigurationName -eq "$($script:DSCResourceName)_Mount_Config"
                 }
-                $current.Imagepath        | Should Be $ISOPath
-                $current.DriveLetter      | Should Be $DriveLetter
-                $current.StorageType      | Should Be 'ISO'
-                $current.Access           | Should Be 'ReadOnly'
-                $current.Ensure           | Should Be 'Present'
+                $current.Imagepath        | Should -Be $ISOPath
+                $current.DriveLetter      | Should -Be $DriveLetter
+                $current.StorageType      | Should -Be 'ISO'
+                $current.Access           | Should -Be 'ReadOnly'
+                $current.Ensure           | Should -Be 'Present'
             }
         }
     }
@@ -102,11 +102,11 @@ try
                         -ConfigurationData $ConfigData
                     Start-DscConfiguration -Path $TestDrive `
                         -ComputerName localhost -Wait -Verbose -Force
-                } | Should Not Throw
+                } | Should -Not -Throw
             }
 
             It 'Should be able to call Get-DscConfiguration without throwing' {
-                { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should Not throw
+                { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
             }
             #endregion
 
@@ -114,8 +114,8 @@ try
                 $current = Get-DscConfiguration | Where-Object {
                     $_.ConfigurationName -eq "$($script:DSCResourceName)_Dismount_Config"
                 }
-                $current.Imagepath        | Should Be $ISOPath
-                $current.Ensure           | Should Be 'Absent'
+                $current.Imagepath        | Should -Be $ISOPath
+                $current.Ensure           | Should -Be 'Absent'
             }
         }
     }

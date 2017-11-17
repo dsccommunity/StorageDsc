@@ -69,23 +69,23 @@ try
                 It 'Should not throw an exception' {
                     {
                         $script:result = Get-TargetResource @disk0ParametersByNumber -Verbose
-                    } | Should Not Throw
+                    } | Should -Not -Throw
                 }
 
                 It "Should return a DiskId of $($disk0ParametersByNumber.DiskId)" {
-                    $script:result.DiskId | Should Be $disk0ParametersByNumber.DiskId
+                    $script:result.DiskId | Should -Be $disk0ParametersByNumber.DiskId
                 }
 
                 It 'Should return a DiskIdType of Number' {
-                    $script:result.DiskIdType | Should Be 'Number'
+                    $script:result.DiskIdType | Should -Be 'Number'
                 }
 
                 It "Should return a RetryIntervalSec of $($disk0ParametersByNumber.RetryIntervalSec)" {
-                    $script:result.RetryIntervalSec | Should Be $disk0ParametersByNumber.RetryIntervalSec
+                    $script:result.RetryIntervalSec | Should -Be $disk0ParametersByNumber.RetryIntervalSec
                 }
 
                 It "Should return a RetryIntervalSec of $($disk0ParametersByNumber.RetryCount)" {
-                    $script:result.RetryCount | Should Be $disk0ParametersByNumber.RetryCount
+                    $script:result.RetryCount | Should -Be $disk0ParametersByNumber.RetryCount
                 }
             }
 
@@ -95,23 +95,23 @@ try
                 It 'Should not throw an exception' {
                     {
                         $script:result = Get-TargetResource @disk0ParametersByUniqueId -Verbose
-                    } | Should Not Throw
+                    } | Should -Not -Throw
                 }
 
                 It "Should return a DiskId of $($disk0ParametersByUniqueId.DiskId)" {
-                    $script:result.DiskId | Should Be $disk0ParametersByUniqueId.DiskId
+                    $script:result.DiskId | Should -Be $disk0ParametersByUniqueId.DiskId
                 }
 
                 It "Should return a DiskIdType of UniqueId" {
-                    $script:result.DiskIdType | Should Be 'UniqueId'
+                    $script:result.DiskIdType | Should -Be 'UniqueId'
                 }
 
                 It "Should return a RetryIntervalSec of $($disk0ParametersByUniqueId.RetryIntervalSec)" {
-                    $script:result.RetryIntervalSec | Should Be $disk0ParametersByUniqueId.RetryIntervalSec
+                    $script:result.RetryIntervalSec | Should -Be $disk0ParametersByUniqueId.RetryIntervalSec
                 }
 
                 It "Should return a RetryIntervalSec of $($disk0ParametersByUniqueId.RetryCount)" {
-                    $script:result.RetryCount | Should Be $disk0ParametersByUniqueId.RetryCount
+                    $script:result.RetryCount | Should -Be $disk0ParametersByUniqueId.RetryCount
                 }
             }
 
@@ -121,23 +121,23 @@ try
                 It 'Should not throw an exception' {
                     {
                         $script:result = Get-TargetResource @disk0ParametersByGptGuid -Verbose
-                    } | Should Not Throw
+                    } | Should -Not -Throw
                 }
 
                 It "Should return a DiskId of $($disk0ParametersByGptGuid.DiskId)" {
-                    $script:result.DiskId | Should Be $disk0ParametersByGptGuid.DiskId
+                    $script:result.DiskId | Should -Be $disk0ParametersByGptGuid.DiskId
                 }
 
                 It "Should return a DiskIdType of Guid" {
-                    $script:result.DiskIdType | Should Be 'Guid'
+                    $script:result.DiskIdType | Should -Be 'Guid'
                 }
 
                 It "Should return a RetryIntervalSec of $($disk0ParametersByGptGuid.RetryIntervalSec)" {
-                    $script:result.RetryIntervalSec | Should Be $disk0ParametersByGptGuid.RetryIntervalSec
+                    $script:result.RetryIntervalSec | Should -Be $disk0ParametersByGptGuid.RetryIntervalSec
                 }
 
                 It "Should return a RetryIntervalSec of $($disk0ParametersByGptGuid.RetryCount)" {
-                    $script:result.RetryCount | Should Be $disk0ParametersByGptGuid.RetryCount
+                    $script:result.RetryCount | Should -Be $disk0ParametersByGptGuid.RetryCount
                 }
             }
         }
@@ -156,11 +156,11 @@ try
                     -Verifiable
 
                 It 'Should not throw an exception' {
-                    { Set-targetResource @disk0ParametersByNumber -Verbose } | Should Not throw
+                    { Set-targetResource @disk0ParametersByNumber -Verbose } | Should -Not -Throw
                 }
 
                 It 'Should call the correct mocks' {
-                    Assert-VerifiableMocks
+                    Assert-VerifiableMock
                     Assert-MockCalled -CommandName Start-Sleep -Exactly -Times 0
                     Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 1 `
                         -ParameterFilter { $DiskId -eq $disk0ParametersByNumber.DiskId -and $DiskIdType -eq 'Number' }
@@ -176,11 +176,11 @@ try
                     -Verifiable
 
                 It 'Should not throw an exception' {
-                    { Set-targetResource @disk0ParametersByUniqueId -Verbose } | Should Not throw
+                    { Set-targetResource @disk0ParametersByUniqueId -Verbose } | Should -Not -Throw
                 }
 
                 It 'Should call the correct mocks' {
-                    Assert-VerifiableMocks
+                    Assert-VerifiableMock
                     Assert-MockCalled -CommandName Start-Sleep -Exactly -Times 0
                     Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 1 `
                         -ParameterFilter { $DiskId -eq $disk0ParametersByUniqueId.DiskId -and $DiskIdType -eq 'UniqueId' }
@@ -196,11 +196,11 @@ try
                     -Verifiable
 
                 It 'Should not throw an exception' {
-                    { Set-targetResource @disk0ParametersByGptGuid -Verbose } | Should Not throw
+                    { Set-targetResource @disk0ParametersByGptGuid -Verbose } | Should -Not -Throw
                 }
 
                 It 'Should call the correct mocks' {
-                    Assert-VerifiableMocks
+                    Assert-VerifiableMock
                     Assert-MockCalled -CommandName Start-Sleep -Exactly -Times 0
                     Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 1 `
                         -ParameterFilter { $DiskId -eq $disk0ParametersByGptGuid.DiskId -and $DiskIdType -eq 'Guid' }
@@ -220,11 +220,11 @@ try
                         -f 'Number', $disk0ParametersByNumber.DiskId, $disk0ParametersByNumber.RetryCount)
 
                 It 'Should throw DiskNotFoundAfterError' {
-                    { Set-targetResource @disk0ParametersByNumber -Verbose } | Should Throw $errorRecord
+                    { Set-targetResource @disk0ParametersByNumber -Verbose } | Should -Throw $errorRecord
                 }
 
                 It 'Should call the correct mocks' {
-                    Assert-VerifiableMocks
+                    Assert-VerifiableMock
                     Assert-MockCalled -CommandName Start-Sleep -Exactly -Times $disk0ParametersByNumber.RetryCount
                     Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times $disk0ParametersByNumber.RetryCount `
                         -ParameterFilter { $DiskId -eq $disk0ParametersByNumber.DiskId -and $DiskIdType -eq 'Number' } `
@@ -244,11 +244,11 @@ try
                         -f 'UniqueId', $disk0ParametersByUniqueId.DiskId, $disk0ParametersByUniqueId.RetryCount)
 
                 It 'Should throw DiskNotFoundAfterError' {
-                    { Set-targetResource @disk0ParametersByUniqueId -Verbose } | Should Throw $errorRecord
+                    { Set-targetResource @disk0ParametersByUniqueId -Verbose } | Should -Throw $errorRecord
                 }
 
                 It 'Should call the correct mocks' {
-                    Assert-VerifiableMocks
+                    Assert-VerifiableMock
                     Assert-MockCalled -CommandName Start-Sleep -Exactly -Times $disk0ParametersByUniqueId.RetryCount
                     Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times $disk0ParametersByNumber.RetryCount `
                         -ParameterFilter { $DiskId -eq $disk0ParametersByUniqueId.DiskId -and $DiskIdType -eq 'UniqueId' } `
@@ -268,11 +268,11 @@ try
                         -f 'Guid', $disk0ParametersByGptGuid.DiskId, $disk0ParametersByGptGuid.RetryCount)
 
                 It 'Should throw DiskNotFoundAfterError' {
-                    { Set-targetResource @disk0ParametersByGptGuid -Verbose } | Should Throw $errorRecord
+                    { Set-targetResource @disk0ParametersByGptGuid -Verbose } | Should -Throw $errorRecord
                 }
 
                 It 'Should call the correct mocks' {
-                    Assert-VerifiableMocks
+                    Assert-VerifiableMock
                     Assert-MockCalled -CommandName Start-Sleep -Exactly -Times $disk0ParametersByGptGuid.RetryCount
                     Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times $disk0ParametersByGptGuid.RetryCount `
                         -ParameterFilter { $DiskId -eq $disk0ParametersByGptGuid.DiskId -and $DiskIdType -eq 'Guid' }
@@ -296,15 +296,15 @@ try
                 It 'Should not throw an exception' {
                     {
                         $script:result = Test-TargetResource @disk0ParametersByNumber -Verbose
-                    } | Should Not Throw
+                    } | Should -Not -Throw
                 }
 
                 It 'Should return a result of true' {
-                    $script:result | Should Be $true
+                    $script:result | Should -Be $true
                 }
 
                 It 'Should call the correct mocks' {
-                    Assert-VerifiableMocks
+                    Assert-VerifiableMock
                     Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 1 `
                         -ParameterFilter { $DiskId -eq $disk0ParametersByNumber.DiskId -and $DiskIdType -eq 'Number' }
                 }
@@ -323,15 +323,15 @@ try
                 It 'Should not throw an exception' {
                     {
                         $script:result = Test-TargetResource @disk0ParametersByUniqueId -Verbose
-                    } | Should Not Throw
+                    } | Should -Not -Throw
                 }
 
                 It 'Should return a result of true' {
-                    $script:result | Should Be $true
+                    $script:result | Should -Be $true
                 }
 
                 It 'Should call the correct mocks' {
-                    Assert-VerifiableMocks
+                    Assert-VerifiableMock
                     Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 1 `
                         -ParameterFilter { $DiskId -eq $disk0ParametersByUniqueId.DiskId -and $DiskIdType -eq 'UniqueId' }
                 }
@@ -350,15 +350,15 @@ try
                 It 'Should not throw an exception' {
                     {
                         $script:result = Test-TargetResource @disk0ParametersByGptGuid -Verbose
-                    } | Should Not Throw
+                    } | Should -Not -Throw
                 }
 
                 It 'Should return a result of true' {
-                    $script:result | Should Be $true
+                    $script:result | Should -Be $true
                 }
 
                 It 'Should call the correct mocks' {
-                    Assert-VerifiableMocks
+                    Assert-VerifiableMock
                     Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 1 `
                         -ParameterFilter { $DiskId -eq $disk0ParametersByGptGuid.DiskId -and $DiskIdType -eq 'Guid' }
                 }
@@ -377,15 +377,15 @@ try
                 It 'Should not throw an exception' {
                     {
                         $script:result = Test-TargetResource @disk0ParametersByNumber -Verbose
-                    } | Should Not Throw
+                    } | Should -Not -Throw
                 }
 
                 It 'Result Should Be false' {
-                    $script:result | Should Be $false
+                    $script:result | Should -Be $false
                 }
 
                 It 'Should call the correct mocks' {
-                    Assert-VerifiableMocks
+                    Assert-VerifiableMock
                     Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 1 `
                         -ParameterFilter { $DiskId -eq $disk0ParametersByNumber.DiskId -and $DiskIdType -eq 'Number' }
                 }
@@ -404,15 +404,15 @@ try
                 It 'Should not throw an exception' {
                     {
                         $script:result = Test-TargetResource @disk0ParametersByUniqueId -Verbose
-                    } | Should Not Throw
+                    } | Should -Not -Throw
                 }
 
                 It 'Should return false' {
-                    $script:result | Should Be $false
+                    $script:result | Should -Be $false
                 }
 
                 It 'Should call the correct mocks' {
-                    Assert-VerifiableMocks
+                    Assert-VerifiableMock
                     Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 1 `
                         -ParameterFilter { $DiskId -eq $disk0ParametersByUniqueId.DiskId -and $DiskIdType -eq 'UniqueId' }
                 }
@@ -431,15 +431,15 @@ try
                 It 'Should not throw an exception' {
                     {
                         $script:result = Test-TargetResource @disk0ParametersByGptGuid -Verbose
-                    } | Should Not Throw
+                    } | Should -Not -Throw
                 }
 
                 It 'Should return false' {
-                    $script:result | Should Be $false
+                    $script:result | Should -Be $false
                 }
 
                 It 'Should call the correct mocks' {
-                    Assert-VerifiableMocks
+                    Assert-VerifiableMock
                     Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 1 `
                         -ParameterFilter { $DiskId -eq $disk0ParametersByGptGuid.DiskId -and $DiskIdType -eq 'Guid' }
                 }
