@@ -160,7 +160,7 @@ try
                 }
 
                 It 'Should call the correct mocks' {
-                    Assert-VerifiableMocks
+                    Assert-VerifiableMock
                     Assert-MockCalled -CommandName Start-Sleep -Exactly -Times 0
                     Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 1 `
                         -ParameterFilter { $DiskId -eq $disk0ParametersByNumber.DiskId -and $DiskIdType -eq 'Number' }
@@ -180,7 +180,7 @@ try
                 }
 
                 It 'Should call the correct mocks' {
-                    Assert-VerifiableMocks
+                    Assert-VerifiableMock
                     Assert-MockCalled -CommandName Start-Sleep -Exactly -Times 0
                     Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 1 `
                         -ParameterFilter { $DiskId -eq $disk0ParametersByUniqueId.DiskId -and $DiskIdType -eq 'UniqueId' }
@@ -200,7 +200,7 @@ try
                 }
 
                 It 'Should call the correct mocks' {
-                    Assert-VerifiableMocks
+                    Assert-VerifiableMock
                     Assert-MockCalled -CommandName Start-Sleep -Exactly -Times 0
                     Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 1 `
                         -ParameterFilter { $DiskId -eq $disk0ParametersByGptGuid.DiskId -and $DiskIdType -eq 'Guid' }
@@ -224,7 +224,7 @@ try
                 }
 
                 It 'Should call the correct mocks' {
-                    Assert-VerifiableMocks
+                    Assert-VerifiableMock
                     Assert-MockCalled -CommandName Start-Sleep -Exactly -Times $disk0ParametersByNumber.RetryCount
                     Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times $disk0ParametersByNumber.RetryCount `
                         -ParameterFilter { $DiskId -eq $disk0ParametersByNumber.DiskId -and $DiskIdType -eq 'Number' } `
@@ -248,7 +248,7 @@ try
                 }
 
                 It 'Should call the correct mocks' {
-                    Assert-VerifiableMocks
+                    Assert-VerifiableMock
                     Assert-MockCalled -CommandName Start-Sleep -Exactly -Times $disk0ParametersByUniqueId.RetryCount
                     Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times $disk0ParametersByNumber.RetryCount `
                         -ParameterFilter { $DiskId -eq $disk0ParametersByUniqueId.DiskId -and $DiskIdType -eq 'UniqueId' } `
@@ -272,7 +272,7 @@ try
                 }
 
                 It 'Should call the correct mocks' {
-                    Assert-VerifiableMocks
+                    Assert-VerifiableMock
                     Assert-MockCalled -CommandName Start-Sleep -Exactly -Times $disk0ParametersByGptGuid.RetryCount
                     Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times $disk0ParametersByGptGuid.RetryCount `
                         -ParameterFilter { $DiskId -eq $disk0ParametersByGptGuid.DiskId -and $DiskIdType -eq 'Guid' }
@@ -304,7 +304,7 @@ try
                 }
 
                 It 'Should call the correct mocks' {
-                    Assert-VerifiableMocks
+                    Assert-VerifiableMock
                     Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 1 `
                         -ParameterFilter { $DiskId -eq $disk0ParametersByNumber.DiskId -and $DiskIdType -eq 'Number' }
                 }
@@ -331,7 +331,7 @@ try
                 }
 
                 It 'Should call the correct mocks' {
-                    Assert-VerifiableMocks
+                    Assert-VerifiableMock
                     Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 1 `
                         -ParameterFilter { $DiskId -eq $disk0ParametersByUniqueId.DiskId -and $DiskIdType -eq 'UniqueId' }
                 }
@@ -358,7 +358,7 @@ try
                 }
 
                 It 'Should call the correct mocks' {
-                    Assert-VerifiableMocks
+                    Assert-VerifiableMock
                     Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 1 `
                         -ParameterFilter { $DiskId -eq $disk0ParametersByGptGuid.DiskId -and $DiskIdType -eq 'Guid' }
                 }
@@ -385,7 +385,7 @@ try
                 }
 
                 It 'Should call the correct mocks' {
-                    Assert-VerifiableMocks
+                    Assert-VerifiableMock
                     Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 1 `
                         -ParameterFilter { $DiskId -eq $disk0ParametersByNumber.DiskId -and $DiskIdType -eq 'Number' }
                 }
@@ -412,7 +412,7 @@ try
                 }
 
                 It 'Should call the correct mocks' {
-                    Assert-VerifiableMocks
+                    Assert-VerifiableMock
                     Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 1 `
                         -ParameterFilter { $DiskId -eq $disk0ParametersByUniqueId.DiskId -and $DiskIdType -eq 'UniqueId' }
                 }
@@ -439,7 +439,7 @@ try
                 }
 
                 It 'Should call the correct mocks' {
-                    Assert-VerifiableMocks
+                    Assert-VerifiableMock
                     Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 1 `
                         -ParameterFilter { $DiskId -eq $disk0ParametersByGptGuid.DiskId -and $DiskIdType -eq 'Guid' }
                 }

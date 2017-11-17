@@ -257,7 +257,7 @@ try
                 }
 
                 It 'all the get mocks should be called' {
-                    Assert-VerifiableMocks
+                    Assert-VerifiableMock
                     Assert-MockCalled -CommandName Get-DiskImage -Exactly 1
                     Assert-MockCalled -CommandName Get-Disk -Exactly 0
                     Assert-MockCalled -CommandName Get-Partition -Exactly 0
@@ -294,7 +294,7 @@ try
                 }
 
                 It 'all the get mocks should be called' {
-                    Assert-VerifiableMocks
+                    Assert-VerifiableMock
                     Assert-MockCalled -CommandName Get-DiskImage -Exactly 1
                     Assert-MockCalled -CommandName Get-Disk -Exactly 0
                     Assert-MockCalled -CommandName Get-Partition -Exactly 0
@@ -324,7 +324,7 @@ try
                 }
 
                 It 'all the get mocks should be called' {
-                    Assert-VerifiableMocks
+                    Assert-VerifiableMock
                     Assert-MockCalled -CommandName Get-DiskImage -Exactly 1
                     Assert-MockCalled -CommandName Get-Disk -Exactly 0
                     Assert-MockCalled -CommandName Get-Partition -Exactly 0
@@ -367,7 +367,7 @@ try
                 }
 
                 It 'all the get mocks should be called' {
-                    Assert-VerifiableMocks
+                    Assert-VerifiableMock
                     Assert-MockCalled -CommandName Get-DiskImage -Exactly 1
                     Assert-MockCalled -CommandName Get-Disk -Exactly 1
                     Assert-MockCalled -CommandName Get-Partition -Exactly 1
@@ -410,7 +410,7 @@ try
                 }
 
                 It 'all the get mocks should be called' {
-                    Assert-VerifiableMocks
+                    Assert-VerifiableMock
                     Assert-MockCalled -CommandName Get-DiskImage -Exactly 1
                     Assert-MockCalled -CommandName Get-Disk -Exactly 1
                     Assert-MockCalled -CommandName Get-Partition -Exactly 1
@@ -449,7 +449,7 @@ try
                 }
 
                 It 'all the get mocks should be called' {
-                    Assert-VerifiableMocks
+                    Assert-VerifiableMock
                     Assert-MockCalled -CommandName Test-ParameterValid -Exactly 1
                     Assert-MockCalled -CommandName Get-TargetResource -Exactly 1
                     Assert-MockCalled -CommandName Mount-DiskImageToLetter -Exactly 0
@@ -483,7 +483,7 @@ try
                 }
 
                 It 'all the get mocks should be called' {
-                    Assert-VerifiableMocks
+                    Assert-VerifiableMock
                     Assert-MockCalled -CommandName Test-ParameterValid -Exactly 1
                     Assert-MockCalled -CommandName Get-TargetResource -Exactly 1
                     Assert-MockCalled -CommandName Mount-DiskImageToLetter -Exactly 1
@@ -516,7 +516,7 @@ try
                 }
 
                 It 'all the get mocks should be called' {
-                    Assert-VerifiableMocks
+                    Assert-VerifiableMock
                     Assert-MockCalled -CommandName Test-ParameterValid -Exactly 1
                     Assert-MockCalled -CommandName Get-TargetResource -Exactly 1
                     Assert-MockCalled -CommandName Mount-DiskImageToLetter -Exactly 1
@@ -548,7 +548,7 @@ try
                 }
 
                 It 'all the get mocks should be called' {
-                    Assert-VerifiableMocks
+                    Assert-VerifiableMock
                     Assert-MockCalled -CommandName Test-ParameterValid -Exactly 1
                     Assert-MockCalled -CommandName Get-TargetResource -Exactly 1
                     Assert-MockCalled -CommandName Mount-DiskImageToLetter -Exactly 0
@@ -577,7 +577,7 @@ try
                 }
 
                 It 'all the get mocks should be called' {
-                    Assert-VerifiableMocks
+                    Assert-VerifiableMock
                     Assert-MockCalled -CommandName Test-ParameterValid -Exactly 1
                     Assert-MockCalled -CommandName Get-TargetResource -Exactly 1
                     Assert-MockCalled -CommandName Mount-DiskImageToLetter -Exactly 0
@@ -612,7 +612,7 @@ try
                 }
 
                 It 'all the get mocks should be called' {
-                    Assert-VerifiableMocks
+                    Assert-VerifiableMock
                     Assert-MockCalled -CommandName Test-ParameterValid -Exactly 1
                     Assert-MockCalled -CommandName Get-TargetResource -Exactly 1
                     Assert-MockCalled -CommandName Mount-DiskImageToLetter -Exactly 1
@@ -645,7 +645,7 @@ try
                 }
 
                 It 'all the get mocks should be called' {
-                    Assert-VerifiableMocks
+                    Assert-VerifiableMock
                     Assert-MockCalled -CommandName Test-ParameterValid -Exactly 1
                     Assert-MockCalled -CommandName Get-TargetResource -Exactly 1
                 }
@@ -667,7 +667,7 @@ try
                 }
 
                 It 'all the get mocks should be called' {
-                    Assert-VerifiableMocks
+                    Assert-VerifiableMock
                     Assert-MockCalled -CommandName Test-ParameterValid -Exactly 1
                     Assert-MockCalled -CommandName Get-TargetResource -Exactly 1
                 }
@@ -689,7 +689,7 @@ try
                 }
 
                 It 'all the get mocks should be called' {
-                    Assert-VerifiableMocks
+                    Assert-VerifiableMock
                     Assert-MockCalled -CommandName Test-ParameterValid -Exactly 1
                     Assert-MockCalled -CommandName Get-TargetResource -Exactly 1
                 }
@@ -710,7 +710,7 @@ try
                 }
 
                 It 'all the get mocks should be called' {
-                    Assert-VerifiableMocks
+                    Assert-VerifiableMock
                     Assert-MockCalled -CommandName Test-ParameterValid -Exactly 1
                     Assert-MockCalled -CommandName Get-TargetResource -Exactly 1
                 }
@@ -731,7 +731,7 @@ try
                 }
 
                 It 'all the get mocks should be called' {
-                    Assert-VerifiableMocks
+                    Assert-VerifiableMock
                     Assert-MockCalled -CommandName Test-ParameterValid -Exactly 1
                     Assert-MockCalled -CommandName Get-TargetResource -Exactly 1
                 }
@@ -754,7 +754,7 @@ try
                 }
 
                 It 'all the get mocks should be called' {
-                    Assert-VerifiableMocks
+                    Assert-VerifiableMock
                     Assert-MockCalled -CommandName Test-ParameterValid -Exactly 1
                     Assert-MockCalled -CommandName Get-TargetResource -Exactly 1
                 }
@@ -958,7 +958,7 @@ try
                 }
 
                 It 'all the get mocks should be called' {
-                    Assert-VerifiableMocks
+                    Assert-VerifiableMock
                     Assert-MockCalled -CommandName Mount-DiskImage -Exactly 1
                     Assert-MockCalled -CommandName Get-DiskImage -Exactly 1
                     Assert-MockCalled -CommandName Get-Volume -Exactly 1
@@ -1008,7 +1008,7 @@ try
                 }
 
                 It 'all the get mocks should be called' {
-                    Assert-VerifiableMocks
+                    Assert-VerifiableMock
                     Assert-MockCalled -CommandName Mount-DiskImage -Exactly 1
                     Assert-MockCalled -CommandName Get-DiskImage -Exactly 1
                     Assert-MockCalled -CommandName Get-Volume -Exactly 1
@@ -1059,7 +1059,7 @@ try
                 }
 
                 It 'all the get mocks should be called' {
-                    Assert-VerifiableMocks
+                    Assert-VerifiableMock
                     Assert-MockCalled -CommandName Mount-DiskImage -Exactly 1
                     Assert-MockCalled -CommandName Get-DiskImage -Exactly 1
                     Assert-MockCalled -CommandName Get-Volume -Exactly 1
@@ -1115,7 +1115,7 @@ try
                 }
 
                 It 'all the get mocks should be called' {
-                    Assert-VerifiableMocks
+                    Assert-VerifiableMock
                     Assert-MockCalled -CommandName Mount-DiskImage -Exactly 1
                     Assert-MockCalled -CommandName Get-DiskImage -Exactly 1
                     Assert-MockCalled -CommandName Get-Volume -Exactly 1

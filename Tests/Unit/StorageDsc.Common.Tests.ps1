@@ -182,7 +182,7 @@ try
                 }
 
                 It 'Should call expected mocks' {
-                    Assert-VerifiableMocks
+                    Assert-VerifiableMock
                     Assert-MockCalled `
                         -CommandName Get-Disk `
                         -ModuleName StorageDsc.Common `
@@ -204,7 +204,7 @@ try
                 }
 
                 It 'Should call expected mocks' {
-                    Assert-VerifiableMocks
+                    Assert-VerifiableMock
                     Assert-MockCalled `
                         -CommandName Get-Disk `
                         -ModuleName StorageDsc.Common `
@@ -227,7 +227,7 @@ try
                 }
 
                 It 'Should call expected mocks' {
-                    Assert-VerifiableMocks
+                    Assert-VerifiableMock
                     Assert-MockCalled `
                         -CommandName Get-Disk `
                         -ModuleName StorageDsc.Common `
@@ -249,7 +249,7 @@ try
                 }
 
                 It 'Should call expected mocks' {
-                    Assert-VerifiableMocks
+                    Assert-VerifiableMock
                     Assert-MockCalled `
                         -CommandName Get-Disk `
                         -ModuleName StorageDsc.Common `
@@ -271,7 +271,7 @@ try
                 }
 
                 It 'Should call expected mocks' {
-                    Assert-VerifiableMocks
+                    Assert-VerifiableMock
                     Assert-MockCalled `
                         -CommandName Get-Disk `
                         -ModuleName StorageDsc.Common `
@@ -291,7 +291,7 @@ try
                 }
 
                 It 'Should call expected mocks' {
-                    Assert-VerifiableMocks
+                    Assert-VerifiableMock
                     Assert-MockCalled `
                         -CommandName Get-Disk `
                         -ModuleName StorageDsc.Common `

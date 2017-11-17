@@ -354,7 +354,7 @@ try
                 }
 
                 It 'Should call the correct mocks' {
-                    Assert-VerifiableMocks
+                    Assert-VerifiableMock
                     Assert-MockCalled -CommandName Get-CimInstance -Exactly 1
                     Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly 1 `
                         -ParameterFilter { $DiskId -eq $script:mockedDisk0.Number -and $DiskIdType -eq 'Number' }
@@ -417,7 +417,7 @@ try
                 }
 
                 It 'Should call the correct mocks' {
-                    Assert-VerifiableMocks
+                    Assert-VerifiableMock
                     Assert-MockCalled -CommandName Get-CimInstance -Exactly 1
                     Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly 1 `
                         -ParameterFilter { $DiskId -eq $script:mockedDisk0.UniqueId -and $DiskIdType -eq 'UniqueId' }
@@ -480,7 +480,7 @@ try
                 }
 
                 It 'Should call the correct mocks' {
-                    Assert-VerifiableMocks
+                    Assert-VerifiableMock
                     Assert-MockCalled -CommandName Get-CimInstance -Exactly 1
                     Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly 1 `
                         -ParameterFilter { $DiskId -eq $script:mockedDisk0.Guid -and $DiskIdType -eq 'Guid' }
@@ -543,7 +543,7 @@ try
                 }
 
                 It 'Should call the correct mocks' {
-                    Assert-VerifiableMocks
+                    Assert-VerifiableMock
                     Assert-MockCalled -CommandName Get-CimInstance -Exactly 1
                     Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly 1 `
                         -ParameterFilter { $DiskId -eq $script:mockedDisk0.Guid -and $DiskIdType -eq 'Guid' }
@@ -602,7 +602,7 @@ try
                 }
 
                 It 'Should call the correct mocks' {
-                    Assert-VerifiableMocks
+                    Assert-VerifiableMock
                     Assert-MockCalled -CommandName Get-CimInstance -Exactly 1
                     Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly 1 `
                         -ParameterFilter { $DiskId -eq $script:mockedDisk0.Number -and $DiskIdType -eq 'Number' }
@@ -663,7 +663,7 @@ try
                 }
 
                 It 'Should call the correct mocks' {
-                    Assert-VerifiableMocks
+                    Assert-VerifiableMock
                     Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 1 `
                         -ParameterFilter { $DiskId -eq $script:mockedDisk0Offline.Number -and $DiskIdType -eq 'Number' }
                     Assert-MockCalled -CommandName Set-Disk -Exactly -Times 1
@@ -728,7 +728,7 @@ try
                 }
 
                 It 'Should call the correct mocks' {
-                    Assert-VerifiableMocks
+                    Assert-VerifiableMock
                     Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 1 `
                         -ParameterFilter { $DiskId -eq $script:mockedDisk0Offline.UniqueId -and $DiskIdType -eq 'UniqueId' }
                     Assert-MockCalled -CommandName Set-Disk -Exactly -Times 1
@@ -795,7 +795,7 @@ try
                 }
 
                 It 'Should call the correct mocks' {
-                    Assert-VerifiableMocks
+                    Assert-VerifiableMock
                     Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 1 `
                         -ParameterFilter { $DiskId -eq $script:mockedDisk0Offline.Guid -and $DiskIdType -eq 'Guid' }
                     Assert-MockCalled -CommandName Set-Disk -Exactly -Times 1
@@ -861,7 +861,7 @@ try
                 }
 
                 It 'Should call the correct mocks' {
-                    Assert-VerifiableMocks
+                    Assert-VerifiableMock
                     Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 1 `
                         -ParameterFilter { $DiskId -eq $script:mockedDisk0.Number -and $DiskIdType -eq 'Number' }
                     Assert-MockCalled -CommandName Set-Disk -Exactly -Times 1
@@ -928,7 +928,7 @@ try
                 }
 
                 It 'Should call the correct mocks' {
-                    Assert-VerifiableMocks
+                    Assert-VerifiableMock
                     Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 1 `
                         -ParameterFilter { $DiskId -eq $script:mockedDisk0.Number -and $DiskIdType -eq 'Number' }
                     Assert-MockCalled -CommandName Set-Disk -Exactly -Times 1
@@ -997,7 +997,7 @@ try
                 }
 
                 It 'Should call the correct mocks' {
-                    Assert-VerifiableMocks
+                    Assert-VerifiableMock
                     Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 1 `
                         -ParameterFilter { $DiskId -eq $script:mockedDisk0.Number -and $DiskIdType -eq 'Number' }
                     Assert-MockCalled -CommandName Set-Disk -Exactly -Times 0
@@ -1060,7 +1060,7 @@ try
                 }
 
                 It 'Should call the correct mocks' {
-                    Assert-VerifiableMocks
+                    Assert-VerifiableMock
                     Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 1 `
                         -ParameterFilter { $DiskId -eq $script:mockedDisk0.Number -and $DiskIdType -eq 'Number' }
                     Assert-MockCalled -CommandName Set-Disk -Exactly -Times 0
@@ -1123,7 +1123,7 @@ try
                 }
 
                 It 'Should call the correct mocks' {
-                    Assert-VerifiableMocks
+                    Assert-VerifiableMock
                     Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 1 `
                         -ParameterFilter { $DiskId -eq $script:mockedDisk0.Number -and $DiskIdType -eq 'Number' }
                     Assert-MockCalled -CommandName Set-Disk -Exactly -Times 0
@@ -1171,7 +1171,7 @@ try
                 }
 
                 It 'Should call the correct mocks' {
-                    Assert-VerifiableMocks
+                    Assert-VerifiableMock
                     Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 1 `
                         -ParameterFilter { $DiskId -eq $script:mockedDisk0.Number -and $DiskIdType -eq 'Number' }
                     Assert-MockCalled -CommandName Set-Disk -Exactly -Times 0
@@ -1215,7 +1215,7 @@ try
                 }
 
                 It 'Should call the correct mocks' {
-                    Assert-VerifiableMocks
+                    Assert-VerifiableMock
                     Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 1
                     Assert-MockCalled -CommandName Set-Disk -Exactly -Times 0
                     Assert-MockCalled -CommandName Initialize-Disk -Exactly -Times 0
@@ -1258,7 +1258,7 @@ try
                 }
 
                 It 'Should call the correct mocks' {
-                    Assert-VerifiableMocks
+                    Assert-VerifiableMock
                     Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 1
                     Assert-MockCalled -CommandName Set-Disk -Exactly -Times 0
                     Assert-MockCalled -CommandName Initialize-Disk -Exactly -Times 0
@@ -1305,7 +1305,7 @@ try
                 }
 
                 It 'Should call the correct mocks' {
-                    Assert-VerifiableMocks
+                    Assert-VerifiableMock
                     Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 1 `
                         -ParameterFilter { $DiskId -eq $script:mockedDisk0.Number -and $DiskIdType -eq 'Number' }
                     Assert-MockCalled -CommandName Set-Disk -Exactly -Times 0
@@ -1357,7 +1357,7 @@ try
                 }
 
                 It 'Should call the correct mocks' {
-                    Assert-VerifiableMocks
+                    Assert-VerifiableMock
                     Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 1 `
                         -ParameterFilter { $DiskId -eq $script:mockedDisk0.Number -and $DiskIdType -eq 'Number' }
                     Assert-MockCalled -CommandName Set-Disk -Exactly -Times 0
@@ -1416,7 +1416,7 @@ try
                 }
 
                 It 'Should call the correct mocks' {
-                    Assert-VerifiableMocks
+                    Assert-VerifiableMock
                     Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 1 `
                         -ParameterFilter { $DiskId -eq $script:mockedDisk0.Number -and $DiskIdType -eq 'Number' }
                     Assert-MockCalled -CommandName Set-Disk -Exactly -Times 0
@@ -1469,7 +1469,7 @@ try
                 }
 
                 It 'Should call the correct mocks' {
-                    Assert-VerifiableMocks
+                    Assert-VerifiableMock
                     Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 1 `
                         -ParameterFilter { $DiskId -eq $script:mockedDisk0.Number -and $DiskIdType -eq 'Number' }
                     Assert-MockCalled -CommandName Set-Disk -Exactly -Times 0
@@ -1531,7 +1531,7 @@ try
                 }
 
                 It 'Should call the correct mocks' {
-                    Assert-VerifiableMocks
+                    Assert-VerifiableMock
                     Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 1 `
                         -ParameterFilter { $DiskId -eq $script:mockedDisk0.Number -and $DiskIdType -eq 'Number' }
                     Assert-MockCalled -CommandName Get-Partition -Exactly -Times 1
@@ -1591,7 +1591,7 @@ try
                 }
 
                 It 'Should call the correct mocks' {
-                    Assert-VerifiableMocks
+                    Assert-VerifiableMock
                     Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 1 `
                         -ParameterFilter { $DiskId -eq $script:mockedDisk0.Number -and $DiskIdType -eq 'Number' }
                     Assert-MockCalled -CommandName Set-Disk -Exactly -Times 0
@@ -1650,7 +1650,7 @@ try
                 }
 
                 It 'Should call the correct mocks' {
-                    Assert-VerifiableMocks
+                    Assert-VerifiableMock
                     Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 1 `
                         -ParameterFilter { $DiskId -eq $script:mockedDisk0.Number -and $DiskIdType -eq 'Number' }
                     Assert-MockCalled -CommandName Set-Disk -Exactly -Times 0
@@ -1712,7 +1712,7 @@ try
                 }
 
                 It 'Should call the correct mocks' {
-                    Assert-VerifiableMocks
+                    Assert-VerifiableMock
                     Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 1 `
                         -ParameterFilter { $DiskId -eq $script:mockedDisk0.Number -and $DiskIdType -eq 'Number' }
                     Assert-MockCalled -CommandName Set-Disk -Exactly -Times 0
@@ -1771,7 +1771,7 @@ try
                 }
 
                 It 'Should call the correct mocks' {
-                    Assert-VerifiableMocks
+                    Assert-VerifiableMock
                     Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 2 `
                         -ParameterFilter { $DiskId -eq $script:mockedDisk0.Number -and $DiskIdType -eq 'Number' }
                     Assert-MockCalled -CommandName Set-Disk -Exactly -Times 0
@@ -1823,7 +1823,7 @@ try
                 }
 
                 It 'Should call the correct mocks' {
-                    Assert-VerifiableMocks
+                    Assert-VerifiableMock
                     Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 1 `
                         -ParameterFilter { $DiskId -eq $script:mockedDisk0.Number -and $DiskIdType -eq 'Number' }
                     Assert-MockCalled -CommandName Get-Partition -Exactly -Times 0
@@ -1862,7 +1862,7 @@ try
                 }
 
                 It 'Should call the correct mocks' {
-                    Assert-VerifiableMocks
+                    Assert-VerifiableMock
                     Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 1 `
                         -ParameterFilter { $DiskId -eq $script:mockedDisk0Offline.Number -and $DiskIdType -eq 'Number' }
                     Assert-MockCalled -CommandName Get-Partition -Exactly -Times 0
@@ -1902,7 +1902,7 @@ try
                 }
 
                 It 'Should call the correct mocks' {
-                    Assert-VerifiableMocks
+                    Assert-VerifiableMock
                     Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 1 `
                         -ParameterFilter { $DiskId -eq $script:mockedDisk0Offline.UniqueId -and $DiskIdType -eq 'UniqueId' }
                     Assert-MockCalled -CommandName Get-Partition -Exactly -Times 0
@@ -1942,7 +1942,7 @@ try
                 }
 
                 It 'Should call the correct mocks' {
-                    Assert-VerifiableMocks
+                    Assert-VerifiableMock
                     Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 1 `
                         -ParameterFilter { $DiskId -eq $script:mockedDisk0Offline.Guid -and $DiskIdType -eq 'Guid' }
                     Assert-MockCalled -CommandName Get-Partition -Exactly -Times 0
@@ -1981,7 +1981,7 @@ try
                 }
 
                 It 'Should call the correct mocks' {
-                    Assert-VerifiableMocks
+                    Assert-VerifiableMock
                     Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 1 `
                         -ParameterFilter { $DiskId -eq $script:mockedDisk0Readonly.Number -and $DiskIdType -eq 'Number' }
                     Assert-MockCalled -CommandName Get-Partition -Exactly -Times 0
@@ -2020,7 +2020,7 @@ try
                 }
 
                 It 'Should call the correct mocks' {
-                    Assert-VerifiableMocks
+                    Assert-VerifiableMock
                     Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 1 `
                         -ParameterFilter { $DiskId -eq $script:mockedDisk0.Number -and $DiskIdType -eq 'Number' }
                     Assert-MockCalled -CommandName Get-Partition -Exactly -Times 0
@@ -2070,7 +2070,7 @@ try
                 }
 
                 It 'Should call the correct mocks' {
-                    Assert-VerifiableMocks
+                    Assert-VerifiableMock
                     Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 1 `
                         -ParameterFilter { $DiskId -eq $script:mockedDisk0.Number -and $DiskIdType -eq 'Number' }
                     Assert-MockCalled -CommandName Get-Partition -Exactly -Times 1
@@ -2117,7 +2117,7 @@ try
                 }
 
                 It 'Should call the correct mocks' {
-                    Assert-VerifiableMocks
+                    Assert-VerifiableMock
                     Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 1
                     Assert-MockCalled -CommandName Get-Partition -Exactly -Times 1
                     Assert-MockCalled -CommandName Get-Volume -Exactly -Times 0
@@ -2165,7 +2165,7 @@ try
                 }
 
                 It 'Should call the correct mocks' {
-                    Assert-VerifiableMocks
+                    Assert-VerifiableMock
                     Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 1 `
                         -ParameterFilter { $DiskId -eq $script:mockedDisk0.Number -and $DiskIdType -eq 'Number' }
                     Assert-MockCalled -CommandName Get-Partition -Exactly -Times 1
@@ -2215,7 +2215,7 @@ try
                 }
 
                 It 'Should call the correct mocks' {
-                    Assert-VerifiableMocks
+                    Assert-VerifiableMock
                     Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 1 `
                         -ParameterFilter { $DiskId -eq $script:mockedDisk0.Number -and $DiskIdType -eq 'Number' }
                     Assert-MockCalled -CommandName Get-Partition -Exactly -Times 1
@@ -2264,7 +2264,7 @@ try
                 }
 
                 It 'Should call the correct mocks' {
-                    Assert-VerifiableMocks
+                    Assert-VerifiableMock
                     Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 1 `
                         -ParameterFilter { $DiskId -eq $script:mockedDisk0.Number -and $DiskIdType -eq 'Number' }
                     Assert-MockCalled -CommandName Get-Partition -Exactly -Times 1
@@ -2310,7 +2310,7 @@ try
                 }
 
                 It 'Should call the correct mocks' {
-                    Assert-VerifiableMocks
+                    Assert-VerifiableMock
                     Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 1 `
                         -ParameterFilter { $DiskId -eq $script:mockedDisk0.Number -and $DiskIdType -eq 'Number' }
                     Assert-MockCalled -CommandName Get-Partition -Exactly -Times 1
@@ -2362,7 +2362,7 @@ try
                 }
 
                 It 'Should call the correct mocks' {
-                    Assert-VerifiableMocks
+                    Assert-VerifiableMock
                     Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 1 `
                         -ParameterFilter { $DiskId -eq $script:mockedDisk0.Number -and $DiskIdType -eq 'Number' }
                     Assert-MockCalled -CommandName Get-Partition -Exactly -Times 1

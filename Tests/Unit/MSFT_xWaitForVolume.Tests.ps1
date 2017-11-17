@@ -54,7 +54,7 @@ try
             }
 
             It 'the correct mocks were called' {
-                Assert-VerifiableMocks
+                Assert-VerifiableMock
             }
         }
         #endregion
@@ -73,7 +73,7 @@ try
                 }
 
                 It 'the correct mocks were called' {
-                    Assert-VerifiableMocks
+                    Assert-VerifiableMock
                     Assert-MockCalled -CommandName Start-Sleep -Times 0
                     Assert-MockCalled -CommandName Get-PSDrive -Times 0
                     Assert-MockCalled -CommandName Get-Volume -Times 1
@@ -92,7 +92,7 @@ try
                 }
 
                 It 'the correct mocks were called' {
-                    Assert-VerifiableMocks
+                    Assert-VerifiableMock
                     Assert-MockCalled -CommandName Start-Sleep -Times $driveCParameters.RetryCount
                     Assert-MockCalled -CommandName Get-PSDrive -Times $driveCParameters.RetryCount
                     Assert-MockCalled -CommandName Get-Volume -Times $driveCParameters.RetryCount
@@ -122,7 +122,7 @@ try
                 }
 
                 It "the correct mocks were called" {
-                    Assert-VerifiableMocks
+                    Assert-VerifiableMock
                     Assert-MockCalled -CommandName Get-PSDrive -Times 1
                     Assert-MockCalled -CommandName Get-Volume -Times 1
                 }
@@ -144,7 +144,7 @@ try
                 }
 
                 It 'the correct mocks were called' {
-                    Assert-VerifiableMocks
+                    Assert-VerifiableMock
                     Assert-MockCalled -CommandName Get-PSDrive -Times 1
                     Assert-MockCalled -CommandName Get-Volume -Times 1
                 }
