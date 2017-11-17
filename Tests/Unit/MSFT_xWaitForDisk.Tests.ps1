@@ -156,7 +156,7 @@ try
                     -Verifiable
 
                 It 'Should not throw an exception' {
-                    { Set-targetResource @disk0ParametersByNumber -Verbose } | Should -Not -throw
+                    { Set-targetResource @disk0ParametersByNumber -Verbose } | Should -Not -Throw
                 }
 
                 It 'Should call the correct mocks' {
@@ -176,7 +176,7 @@ try
                     -Verifiable
 
                 It 'Should not throw an exception' {
-                    { Set-targetResource @disk0ParametersByUniqueId -Verbose } | Should -Not -throw
+                    { Set-targetResource @disk0ParametersByUniqueId -Verbose } | Should -Not -Throw
                 }
 
                 It 'Should call the correct mocks' {
@@ -196,7 +196,7 @@ try
                     -Verifiable
 
                 It 'Should not throw an exception' {
-                    { Set-targetResource @disk0ParametersByGptGuid -Verbose } | Should -Not -throw
+                    { Set-targetResource @disk0ParametersByGptGuid -Verbose } | Should -Not -Throw
                 }
 
                 It 'Should call the correct mocks' {

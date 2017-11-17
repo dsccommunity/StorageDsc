@@ -1113,7 +1113,7 @@ try
                             -DiskId $script:mockedDisk0.Number `
                             -Driveletter $script:testDriveLetter `
                             -Verbose
-                    } | Should -throw
+                    } | Should -Throw
                 }
 
                 $endTime = Get-Date
@@ -1587,7 +1587,7 @@ try
                             -AllowDestructive $true `
                             -FSLabel 'NewLabel' `
                             -Verbose
-                    } | Should -throw
+                    } | Should -Throw
                 }
 
                 It 'Should call the correct mocks' {

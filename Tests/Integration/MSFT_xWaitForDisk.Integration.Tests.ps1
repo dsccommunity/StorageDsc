@@ -56,7 +56,7 @@ try
             }
 
             It 'Should be able to call Get-DscConfiguration without throwing' {
-                { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -throw
+                { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
             }
             #endregion
 
@@ -96,7 +96,7 @@ try
             }
 
             It 'Should be able to call Get-DscConfiguration without throwing' {
-                { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -throw
+                { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
             }
             #endregion
 
@@ -136,7 +136,7 @@ try
             }
 
             It 'Should be able to call Get-DscConfiguration without throwing' {
-                { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -throw
+                { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
             }
             #endregion
 

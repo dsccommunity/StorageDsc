@@ -69,7 +69,7 @@ try
                 Mock Get-Volume -MockWith { return $mockedDriveC } -Verifiable
 
                 It 'Should not throw an exception' {
-                    { Set-targetResource @driveCParameters -Verbose } | Should -Not -throw
+                    { Set-targetResource @driveCParameters -Verbose } | Should -Not -Throw
                 }
 
                 It 'the correct mocks were called' {
