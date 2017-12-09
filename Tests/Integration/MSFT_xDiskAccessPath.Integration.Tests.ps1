@@ -53,45 +53,45 @@ try
                 } # if
             }
 
-            #region DEFAULT TESTS
-            It 'Should compile and apply the MOF without throwing' {
-                {
-                    # This is to pass to the Config
-                    $configData = @{
-                        AllNodes = @(
-                            @{
-                                NodeName   = 'localhost'
-                                AccessPath = $accessPathA
-                                DiskId     = $disk.Number
-                                DiskIdType = 'Number'
-                                FSLabel    = $FSLabelA
-                                Size       = 100MB
-                            }
-                        )
-                    }
+            Context "Create first volume on Disk Number $($disk.Number)" {
+                It 'Should compile and apply the MOF without throwing' {
+                    {
+                        # This is to pass to the Config
+                        $configData = @{
+                            AllNodes = @(
+                                @{
+                                    NodeName   = 'localhost'
+                                    AccessPath = $accessPathA
+                                    DiskId     = $disk.Number
+                                    DiskIdType = 'Number'
+                                    FSLabel    = $FSLabelA
+                                    Size       = 100MB
+                                }
+                            )
+                        }
 
-                    & "$($script:DSCResourceName)_Config" `
-                        -OutputPath $TestDrive `
-                        -ConfigurationData $configData
-                    Start-DscConfiguration -Path $TestDrive `
-                        -ComputerName localhost -Wait -Verbose -Force
-                } | Should -Not -Throw
-            }
-
-            It 'Should be able to call Get-DscConfiguration without throwing' {
-                { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
-            }
-
-            It 'Should have set the resource and all the parameters should match' {
-                $current = Get-DscConfiguration | Where-Object {
-                    $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
+                        & "$($script:DSCResourceName)_Config" `
+                            -OutputPath $TestDrive `
+                            -ConfigurationData $configData
+                        Start-DscConfiguration -Path $TestDrive `
+                            -ComputerName localhost -Wait -Verbose -Force
+                    } | Should -Not -Throw
                 }
-                $current.DiskId           | Should -Be $disk.Number
-                $current.AccessPath       | Should -Be "$($accessPathA)\"
-                $current.FSLabel          | Should -Be $FSLabelA
-                $current.Size             | Should -Be 100MB
-            }
 
+                It 'Should be able to call Get-DscConfiguration without throwing' {
+                    { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
+                }
+
+                It 'Should have set the resource and all the parameters should match' {
+                    $current = Get-DscConfiguration | Where-Object {
+                        $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
+                    }
+                    $current.DiskId           | Should -Be $disk.Number
+                    $current.AccessPath       | Should -Be "$($accessPathA)\"
+                    $current.FSLabel          | Should -Be $FSLabelA
+                    $current.Size             | Should -Be 100MB
+                }
+            }
             # Create a file on the new disk to ensure it still exists after reattach
             $testFilePath = Join-Path -Path $accessPathA -ChildPath 'IntTestFile.txt'
             Set-Content `
@@ -105,91 +105,92 @@ try
                 -PartitionNumber 2 `
                 -AccessPath $accessPathA
 
-            It 'Should compile and apply the MOF without throwing' {
-                {
-                    # This is to pass to the Config
-                    $configData = @{
-                        AllNodes = @(
-                            @{
-                                NodeName   = 'localhost'
-                                AccessPath = $accessPathA
-                                DiskId     = $disk.Number
-                                DiskIdType = 'Number'
-                                FSLabel    = $FSLabelA
-                                Size       = 100MB
-                            }
-                        )
-                    }
+            Context "Remount first volume on Disk Number $($disk.Number)" {
+                It 'Should compile and apply the MOF without throwing' {
+                    {
+                        # This is to pass to the Config
+                        $configData = @{
+                            AllNodes = @(
+                                @{
+                                    NodeName   = 'localhost'
+                                    AccessPath = $accessPathA
+                                    DiskId     = $disk.Number
+                                    DiskIdType = 'Number'
+                                    FSLabel    = $FSLabelA
+                                    Size       = 100MB
+                                }
+                            )
+                        }
 
-                    & "$($script:DSCResourceName)_Config" `
-                        -OutputPath $TestDrive `
-                        -ConfigurationData $configData
-                    Start-DscConfiguration -Path $TestDrive `
-                        -ComputerName localhost -Wait -Verbose -Force
-                } | Should -Not -Throw
-            }
-
-            It 'Should be able to call Get-DscConfiguration without throwing' {
-                { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
-            }
-
-            It 'Should have set the resource and all the parameters should match' {
-                $current = Get-DscConfiguration | Where-Object {
-                    $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
+                        & "$($script:DSCResourceName)_Config" `
+                            -OutputPath $TestDrive `
+                            -ConfigurationData $configData
+                        Start-DscConfiguration -Path $TestDrive `
+                            -ComputerName localhost -Wait -Verbose -Force
+                    } | Should -Not -Throw
                 }
-                $current.DiskId           | Should -Be $disk.Number
-                $current.AccessPath       | Should -Be "$($accessPathA)\"
-                $current.FSLabel          | Should -Be $FSLabelA
-                $current.Size             | Should -Be 100MB
-            }
 
-            It 'Should contain the test file' {
-                Test-Path -Path $testFilePath        | Should -Be $true
-                Get-Content -Path $testFilePath -Raw | Should -Be 'Test'
-            }
-
-            It 'Should compile and apply the MOF without throwing' {
-                {
-                    # This is to pass to the Config
-                    $configData = @{
-                        AllNodes = @(
-                            @{
-                                NodeName   = 'localhost'
-                                AccessPath = $accessPathB
-                                DiskId     = $disk.Number
-                                DiskIdType = 'Number'
-                                FSLabel    = $FSLabelB
-                            }
-                        )
-                    }
-
-                    & "$($script:DSCResourceName)_Config" `
-                        -OutputPath $TestDrive `
-                        -ConfigurationData $configData
-                    Start-DscConfiguration -Path $TestDrive `
-                        -ComputerName localhost -Wait -Verbose -Force
-                } | Should -Not -Throw
-            }
-
-            It 'Should be able to call Get-DscConfiguration without throwing' {
-                { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
-            }
-
-            It 'Should have set the resource and all the parameters should match' {
-                $current = Get-DscConfiguration | Where-Object {
-                    $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
+                It 'Should be able to call Get-DscConfiguration without throwing' {
+                    { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
                 }
-                $current.DiskId           | Should -Be $disk.Number
-                $current.AccessPath       | Should -Be "$($accessPathB)\"
-                $current.FSLabel          | Should -Be $FSLabelB
-                $current.Size             | Should -Be 935198720
+
+                It 'Should have set the resource and all the parameters should match' {
+                    $current = Get-DscConfiguration | Where-Object {
+                        $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
+                    }
+                    $current.DiskId           | Should -Be $disk.Number
+                    $current.AccessPath       | Should -Be "$($accessPathA)\"
+                    $current.FSLabel          | Should -Be $FSLabelA
+                    $current.Size             | Should -Be 100MB
+                }
+
+                It 'Should contain the test file' {
+                    Test-Path -Path $testFilePath        | Should -Be $true
+                    Get-Content -Path $testFilePath -Raw | Should -Be 'Test'
+                }
+
+                It 'Should compile and apply the MOF without throwing' {
+                    {
+                        # This is to pass to the Config
+                        $configData = @{
+                            AllNodes = @(
+                                @{
+                                    NodeName   = 'localhost'
+                                    AccessPath = $accessPathB
+                                    DiskId     = $disk.Number
+                                    DiskIdType = 'Number'
+                                    FSLabel    = $FSLabelB
+                                }
+                            )
+                        }
+
+                        & "$($script:DSCResourceName)_Config" `
+                            -OutputPath $TestDrive `
+                            -ConfigurationData $configData
+                        Start-DscConfiguration -Path $TestDrive `
+                            -ComputerName localhost -Wait -Verbose -Force
+                    } | Should -Not -Throw
+                }
+
+                It 'Should be able to call Get-DscConfiguration without throwing' {
+                    { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
+                }
+
+                It 'Should have set the resource and all the parameters should match' {
+                    $current = Get-DscConfiguration | Where-Object {
+                        $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
+                    }
+                    $current.DiskId           | Should -Be $disk.Number
+                    $current.AccessPath       | Should -Be "$($accessPathB)\"
+                    $current.FSLabel          | Should -Be $FSLabelB
+                    $current.Size             | Should -Be 935198720
+                }
             }
 
             # A system partition will have been added to the disk as well as the 2 test partitions
             It 'Should have 3 partitions on disk' {
                 ($disk | Get-Partition).Count | Should -Be 3
             }
-            #endregion
 
             AfterAll {
                 # Clean up
@@ -236,43 +237,44 @@ try
                 } # if
             }
 
-            #region DEFAULT TESTS
-            It 'Should compile and apply the MOF without throwing' {
-                {
-                    # This is to pass to the Config
-                    $configData = @{
-                        AllNodes = @(
-                            @{
-                                NodeName   = 'localhost'
-                                AccessPath = $accessPathA
-                                DiskId     = $disk.UniqueId
-                                DiskIdType = 'UniqueId'
-                                FSLabel    = $FSLabelA
-                                Size       = 100MB
-                            }
-                        )
-                    }
+            Context "Create first volume on Disk Unique Id $($disk.UniqueId)" {
+                It 'Should compile and apply the MOF without throwing' {
+                    {
+                        # This is to pass to the Config
+                        $configData = @{
+                            AllNodes = @(
+                                @{
+                                    NodeName   = 'localhost'
+                                    AccessPath = $accessPathA
+                                    DiskId     = $disk.UniqueId
+                                    DiskIdType = 'UniqueId'
+                                    FSLabel    = $FSLabelA
+                                    Size       = 100MB
+                                }
+                            )
+                        }
 
-                    & "$($script:DSCResourceName)_Config" `
-                        -OutputPath $TestDrive `
-                        -ConfigurationData $configData
-                    Start-DscConfiguration -Path $TestDrive `
-                        -ComputerName localhost -Wait -Verbose -Force
-                } | Should -Not -Throw
-            }
-
-            It 'Should be able to call Get-DscConfiguration without throwing' {
-                { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
-            }
-
-            It 'Should have set the resource and all the parameters should match' {
-                $current = Get-DscConfiguration | Where-Object {
-                    $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
+                        & "$($script:DSCResourceName)_Config" `
+                            -OutputPath $TestDrive `
+                            -ConfigurationData $configData
+                        Start-DscConfiguration -Path $TestDrive `
+                            -ComputerName localhost -Wait -Verbose -Force
+                    } | Should -Not -Throw
                 }
-                $current.DiskId           | Should -Be $disk.UniqueId
-                $current.AccessPath       | Should -Be "$($accessPathA)\"
-                $current.FSLabel          | Should -Be $FSLabelA
-                $current.Size             | Should -Be 100MB
+
+                It 'Should be able to call Get-DscConfiguration without throwing' {
+                    { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
+                }
+
+                It 'Should have set the resource and all the parameters should match' {
+                    $current = Get-DscConfiguration | Where-Object {
+                        $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
+                    }
+                    $current.DiskId           | Should -Be $disk.UniqueId
+                    $current.AccessPath       | Should -Be "$($accessPathA)\"
+                    $current.FSLabel          | Should -Be $FSLabelA
+                    $current.Size             | Should -Be 100MB
+                }
             }
 
             # Create a file on the new disk to ensure it still exists after reattach
@@ -288,91 +290,92 @@ try
                 -PartitionNumber 2 `
                 -AccessPath $accessPathA
 
-            It 'Should compile and apply the MOF without throwing' {
-                {
-                    # This is to pass to the Config
-                    $configData = @{
-                        AllNodes = @(
-                            @{
-                                NodeName   = 'localhost'
-                                AccessPath = $accessPathA
-                                DiskId     = $disk.UniqueId
-                                DiskIdType = 'UniqueId'
-                                FSLabel    = $FSLabelA
-                                Size       = 100MB
-                            }
-                        )
-                    }
+            Context "Remount first volume on Disk Unique Id $($disk.UniqueId)" {
+                It 'Should compile and apply the MOF without throwing' {
+                    {
+                        # This is to pass to the Config
+                        $configData = @{
+                            AllNodes = @(
+                                @{
+                                    NodeName   = 'localhost'
+                                    AccessPath = $accessPathA
+                                    DiskId     = $disk.UniqueId
+                                    DiskIdType = 'UniqueId'
+                                    FSLabel    = $FSLabelA
+                                    Size       = 100MB
+                                }
+                            )
+                        }
 
-                    & "$($script:DSCResourceName)_Config" `
-                        -OutputPath $TestDrive `
-                        -ConfigurationData $configData
-                    Start-DscConfiguration -Path $TestDrive `
-                        -ComputerName localhost -Wait -Verbose -Force
-                } | Should -Not -Throw
-            }
-
-            It 'Should be able to call Get-DscConfiguration without throwing' {
-                { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
-            }
-
-            It 'Should have set the resource and all the parameters should match' {
-                $current = Get-DscConfiguration | Where-Object {
-                    $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
+                        & "$($script:DSCResourceName)_Config" `
+                            -OutputPath $TestDrive `
+                            -ConfigurationData $configData
+                        Start-DscConfiguration -Path $TestDrive `
+                            -ComputerName localhost -Wait -Verbose -Force
+                    } | Should -Not -Throw
                 }
-                $current.DiskId           | Should -Be $disk.UniqueId
-                $current.AccessPath       | Should -Be "$($accessPathA)\"
-                $current.FSLabel          | Should -Be $FSLabelA
-                $current.Size             | Should -Be 100MB
-            }
 
-            It 'Should contain the test file' {
-                Test-Path -Path $testFilePath        | Should -Be $true
-                Get-Content -Path $testFilePath -Raw | Should -Be 'Test'
-            }
-
-            It 'Should compile and apply the MOF without throwing' {
-                {
-                    # This is to pass to the Config
-                    $configData = @{
-                        AllNodes = @(
-                            @{
-                                NodeName   = 'localhost'
-                                AccessPath = $accessPathB
-                                DiskId     = $disk.UniqueId
-                                DiskIdType = 'UniqueId'
-                                FSLabel    = $FSLabelB
-                            }
-                        )
-                    }
-
-                    & "$($script:DSCResourceName)_Config" `
-                        -OutputPath $TestDrive `
-                        -ConfigurationData $configData
-                    Start-DscConfiguration -Path $TestDrive `
-                        -ComputerName localhost -Wait -Verbose -Force
-                } | Should -Not -Throw
-            }
-
-            It 'Should be able to call Get-DscConfiguration without throwing' {
-                { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
-            }
-
-            It 'Should have set the resource and all the parameters should match' {
-                $current = Get-DscConfiguration | Where-Object {
-                    $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
+                It 'Should be able to call Get-DscConfiguration without throwing' {
+                    { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
                 }
-                $current.DiskId           | Should -Be $disk.UniqueId
-                $current.AccessPath       | Should -Be "$($accessPathB)\"
-                $current.FSLabel          | Should -Be $FSLabelB
-                $current.Size             | Should -Be 935198720
+
+                It 'Should have set the resource and all the parameters should match' {
+                    $current = Get-DscConfiguration | Where-Object {
+                        $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
+                    }
+                    $current.DiskId           | Should -Be $disk.UniqueId
+                    $current.AccessPath       | Should -Be "$($accessPathA)\"
+                    $current.FSLabel          | Should -Be $FSLabelA
+                    $current.Size             | Should -Be 100MB
+                }
+
+                It 'Should contain the test file' {
+                    Test-Path -Path $testFilePath        | Should -Be $true
+                    Get-Content -Path $testFilePath -Raw | Should -Be 'Test'
+                }
+
+                It 'Should compile and apply the MOF without throwing' {
+                    {
+                        # This is to pass to the Config
+                        $configData = @{
+                            AllNodes = @(
+                                @{
+                                    NodeName   = 'localhost'
+                                    AccessPath = $accessPathB
+                                    DiskId     = $disk.UniqueId
+                                    DiskIdType = 'UniqueId'
+                                    FSLabel    = $FSLabelB
+                                }
+                            )
+                        }
+
+                        & "$($script:DSCResourceName)_Config" `
+                            -OutputPath $TestDrive `
+                            -ConfigurationData $configData
+                        Start-DscConfiguration -Path $TestDrive `
+                            -ComputerName localhost -Wait -Verbose -Force
+                    } | Should -Not -Throw
+                }
+
+                It 'Should be able to call Get-DscConfiguration without throwing' {
+                    { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
+                }
+
+                It 'Should have set the resource and all the parameters should match' {
+                    $current = Get-DscConfiguration | Where-Object {
+                        $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
+                    }
+                    $current.DiskId           | Should -Be $disk.UniqueId
+                    $current.AccessPath       | Should -Be "$($accessPathB)\"
+                    $current.FSLabel          | Should -Be $FSLabelB
+                    $current.Size             | Should -Be 935198720
+                }
             }
 
             # A system partition will have been added to the disk as well as the 2 test partitions
             It 'Should have 3 partitions on disk' {
                 ($disk | Get-Partition).Count | Should -Be 3
             }
-            #endregion
 
             AfterAll {
                 # Clean up
@@ -419,43 +422,44 @@ try
                 } # if
             }
 
-            #region DEFAULT TESTS
-            It 'Should compile and apply the MOF without throwing' {
-                {
-                    # This is to pass to the Config
-                    $configData = @{
-                        AllNodes = @(
-                            @{
-                                NodeName   = 'localhost'
-                                AccessPath = $accessPathA
-                                DiskId     = $disk.Guid
-                                DiskIdType = 'Guid'
-                                FSLabel    = $FSLabelA
-                                Size       = 100MB
-                            }
-                        )
-                    }
+            Context "Create first volume on Disk Guid $($disk.Guid)" {
+                It 'Should compile and apply the MOF without throwing' {
+                    {
+                        # This is to pass to the Config
+                        $configData = @{
+                            AllNodes = @(
+                                @{
+                                    NodeName   = 'localhost'
+                                    AccessPath = $accessPathA
+                                    DiskId     = $disk.Guid
+                                    DiskIdType = 'Guid'
+                                    FSLabel    = $FSLabelA
+                                    Size       = 100MB
+                                }
+                            )
+                        }
 
-                    & "$($script:DSCResourceName)_Config" `
-                        -OutputPath $TestDrive `
-                        -ConfigurationData $configData
-                    Start-DscConfiguration -Path $TestDrive `
-                        -ComputerName localhost -Wait -Verbose -Force
-                } | Should -Not -Throw
-            }
-
-            It 'Should be able to call Get-DscConfiguration without throwing' {
-                { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
-            }
-
-            It 'Should have set the resource and all the parameters should match' {
-                $current = Get-DscConfiguration | Where-Object {
-                    $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
+                        & "$($script:DSCResourceName)_Config" `
+                            -OutputPath $TestDrive `
+                            -ConfigurationData $configData
+                        Start-DscConfiguration -Path $TestDrive `
+                            -ComputerName localhost -Wait -Verbose -Force
+                    } | Should -Not -Throw
                 }
-                $current.DiskId           | Should -Be $disk.Guid
-                $current.AccessPath       | Should -Be "$($accessPathA)\"
-                $current.FSLabel          | Should -Be $FSLabelA
-                $current.Size             | Should -Be 100MB
+
+                It 'Should be able to call Get-DscConfiguration without throwing' {
+                    { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
+                }
+
+                It 'Should have set the resource and all the parameters should match' {
+                    $current = Get-DscConfiguration | Where-Object {
+                        $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
+                    }
+                    $current.DiskId           | Should -Be $disk.Guid
+                    $current.AccessPath       | Should -Be "$($accessPathA)\"
+                    $current.FSLabel          | Should -Be $FSLabelA
+                    $current.Size             | Should -Be 100MB
+                }
             }
 
             # Create a file on the new disk to ensure it still exists after reattach
@@ -471,91 +475,92 @@ try
                 -PartitionNumber 2 `
                 -AccessPath $accessPathA
 
-            It 'Should compile and apply the MOF without throwing' {
-                {
-                    # This is to pass to the Config
-                    $configData = @{
-                        AllNodes = @(
-                            @{
-                                NodeName   = 'localhost'
-                                AccessPath = $accessPathA
-                                DiskId     = $disk.Guid
-                                DiskIdType = 'Guid'
-                                FSLabel    = $FSLabelA
-                                Size       = 100MB
-                            }
-                        )
-                    }
+            Context "Remount first volume on Disk Guid $($disk.Guid)" {
+                It 'Should compile and apply the MOF without throwing' {
+                    {
+                        # This is to pass to the Config
+                        $configData = @{
+                            AllNodes = @(
+                                @{
+                                    NodeName   = 'localhost'
+                                    AccessPath = $accessPathA
+                                    DiskId     = $disk.Guid
+                                    DiskIdType = 'Guid'
+                                    FSLabel    = $FSLabelA
+                                    Size       = 100MB
+                                }
+                            )
+                        }
 
-                    & "$($script:DSCResourceName)_Config" `
-                        -OutputPath $TestDrive `
-                        -ConfigurationData $configData
-                    Start-DscConfiguration -Path $TestDrive `
-                        -ComputerName localhost -Wait -Verbose -Force
-                } | Should -Not -Throw
-            }
-
-            It 'Should be able to call Get-DscConfiguration without throwing' {
-                { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
-            }
-
-            It 'Should have set the resource and all the parameters should match' {
-                $current = Get-DscConfiguration | Where-Object {
-                    $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
+                        & "$($script:DSCResourceName)_Config" `
+                            -OutputPath $TestDrive `
+                            -ConfigurationData $configData
+                        Start-DscConfiguration -Path $TestDrive `
+                            -ComputerName localhost -Wait -Verbose -Force
+                    } | Should -Not -Throw
                 }
-                $current.DiskId           | Should -Be $disk.Guid
-                $current.AccessPath       | Should -Be "$($accessPathA)\"
-                $current.FSLabel          | Should -Be $FSLabelA
-                $current.Size             | Should -Be 100MB
-            }
 
-            It 'Should contain the test file' {
-                Test-Path -Path $testFilePath        | Should -Be $true
-                Get-Content -Path $testFilePath -Raw | Should -Be 'Test'
-            }
-
-            It 'Should compile and apply the MOF without throwing' {
-                {
-                    # This is to pass to the Config
-                    $configData = @{
-                        AllNodes = @(
-                            @{
-                                NodeName   = 'localhost'
-                                AccessPath = $accessPathB
-                                DiskId     = $disk.Guid
-                                DiskIdType = 'Guid'
-                                FSLabel    = $FSLabelB
-                            }
-                        )
-                    }
-
-                    & "$($script:DSCResourceName)_Config" `
-                        -OutputPath $TestDrive `
-                        -ConfigurationData $configData
-                    Start-DscConfiguration -Path $TestDrive `
-                        -ComputerName localhost -Wait -Verbose -Force
-                } | Should -Not -Throw
-            }
-
-            It 'Should be able to call Get-DscConfiguration without throwing' {
-                { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
-            }
-
-            It 'Should have set the resource and all the parameters should match' {
-                $current = Get-DscConfiguration | Where-Object {
-                    $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
+                It 'Should be able to call Get-DscConfiguration without throwing' {
+                    { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
                 }
-                $current.DiskId           | Should -Be $disk.Guid
-                $current.AccessPath       | Should -Be "$($accessPathB)\"
-                $current.FSLabel          | Should -Be $FSLabelB
-                $current.Size             | Should -Be 935198720
+
+                It 'Should have set the resource and all the parameters should match' {
+                    $current = Get-DscConfiguration | Where-Object {
+                        $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
+                    }
+                    $current.DiskId           | Should -Be $disk.Guid
+                    $current.AccessPath       | Should -Be "$($accessPathA)\"
+                    $current.FSLabel          | Should -Be $FSLabelA
+                    $current.Size             | Should -Be 100MB
+                }
+
+                It 'Should contain the test file' {
+                    Test-Path -Path $testFilePath        | Should -Be $true
+                    Get-Content -Path $testFilePath -Raw | Should -Be 'Test'
+                }
+
+                It 'Should compile and apply the MOF without throwing' {
+                    {
+                        # This is to pass to the Config
+                        $configData = @{
+                            AllNodes = @(
+                                @{
+                                    NodeName   = 'localhost'
+                                    AccessPath = $accessPathB
+                                    DiskId     = $disk.Guid
+                                    DiskIdType = 'Guid'
+                                    FSLabel    = $FSLabelB
+                                }
+                            )
+                        }
+
+                        & "$($script:DSCResourceName)_Config" `
+                            -OutputPath $TestDrive `
+                            -ConfigurationData $configData
+                        Start-DscConfiguration -Path $TestDrive `
+                            -ComputerName localhost -Wait -Verbose -Force
+                    } | Should -Not -Throw
+                }
+
+                It 'Should be able to call Get-DscConfiguration without throwing' {
+                    { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
+                }
+
+                It 'Should have set the resource and all the parameters should match' {
+                    $current = Get-DscConfiguration | Where-Object {
+                        $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
+                    }
+                    $current.DiskId           | Should -Be $disk.Guid
+                    $current.AccessPath       | Should -Be "$($accessPathB)\"
+                    $current.FSLabel          | Should -Be $FSLabelB
+                    $current.Size             | Should -Be 935198720
+                }
             }
 
             # A system partition will have been added to the disk as well as the 2 test partitions
             It 'Should have 3 partitions on disk' {
                 ($disk | Get-Partition).Count | Should -Be 3
             }
-            #endregion
 
             AfterAll {
                 # Clean up
@@ -575,7 +580,6 @@ try
         }
         #endregion
     }
-    #endregion
 }
 finally
 {

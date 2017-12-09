@@ -4,6 +4,11 @@
 
 - xDisk:
   - Removed duplicate integration tests for Guid Disk Id type.
+  - Added new contexts to integration tests improve clarity.
+  - Fix bug when size not specified and disk partitioned and
+    formatted but not mounted - See [Issue 103](https://github.com/PowerShell/xStorage/issues/103).
+- xDiskAccessPath:
+  - Added new contexts to integration tests improve clarity.
 
 ## 3.3.0.0
 

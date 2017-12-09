@@ -117,6 +117,7 @@ try
         $script:mockedVolume = [pscustomobject] @{
             FileSystemLabel = 'myLabel'
             FileSystem      = 'NTFS'
+            DriveLetter     = $script:testDriveLetter
         }
 
         $script:mockedVolumeUnformatted = [pscustomobject] @{
@@ -127,11 +128,13 @@ try
         $script:mockedVolumeNoDriveLetter = [pscustomobject] @{
             FileSystemLabel = 'myLabel'
             FileSystem      = 'NTFS'
+            DriveLetter     = ''
         }
 
         $script:mockedVolumeReFS = [pscustomobject] @{
             FileSystemLabel = 'myLabel'
             FileSystem      = 'ReFS'
+            DriveLetter     = $script:testDriveLetter
         }
         #endregion
 
@@ -1129,7 +1132,7 @@ try
                     Assert-MockCalled -CommandName Set-Disk -Exactly -Times 0
                     Assert-MockCalled -CommandName Initialize-Disk -Exactly -Times 0
                     Assert-MockCalled -CommandName Get-Partition -Exactly -Times 31
-                    Assert-MockCalled -CommandName Get-Volume -Exactly -Times 0
+                    Assert-MockCalled -CommandName Get-Volume -Exactly -Times 1
                     Assert-MockCalled -CommandName New-Partition -Exactly -Times 1 `
                         -ParameterFilter {
                         $DriveLetter -eq $script:testDriveLetter
@@ -1422,7 +1425,7 @@ try
                     Assert-MockCalled -CommandName Set-Disk -Exactly -Times 0
                     Assert-MockCalled -CommandName Initialize-Disk -Exactly -Times 0
                     Assert-MockCalled -CommandName Get-Partition -Exactly -Times 1
-                    Assert-MockCalled -CommandName Get-Volume -Exactly -Times 1
+                    Assert-MockCalled -CommandName Get-Volume -Exactly -Times 2
                     Assert-MockCalled -CommandName New-Partition -Exactly -Times 1
                     Assert-MockCalled -CommandName Format-Volume -Exactly -Times 0
                     Assert-MockCalled -CommandName Set-Partition -Exactly -Times 1
@@ -1634,7 +1637,7 @@ try
                 Mock -CommandName Format-Volume
                 Mock -CommandName Set-Partition
                 Mock -CommandName Resize-Partition
-                 Mock  -CommandName Get-PartitionSupportedSize
+                Mock  -CommandName Get-PartitionSupportedSize
 
                 It 'Should not throw an exception' {
                     {
