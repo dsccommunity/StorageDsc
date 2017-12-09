@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- xDisk:
+  - Removed duplicate integration tests for Guid Disk Id type.
+
 ## 3.3.0.0
 
 - Opted into common tests for Module and Script files - See [Issue 115](https://github.com/PowerShell/xStorage/issues/115).
