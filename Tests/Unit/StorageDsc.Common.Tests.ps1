@@ -330,7 +330,6 @@ try
                         -AccessPath @('\\?\Volume{905551f3-33a5-421d-ac24-c993fbfb3184}\','\\?\Volume{99cf0194-ac45-4a23-b36e-3e458158a63e}\') | Should -Be $false
                 }
             }
-
         }
         #endregion
     }
