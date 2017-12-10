@@ -66,7 +66,7 @@ function Get-TargetResource
         $DiskId,
 
         [Parameter()]
-        [ValidateSet('Number','UniqueId','Guid')]
+        [ValidateSet('Number', 'UniqueId', 'Guid')]
         [System.String]
         $DiskIdType = 'Number',
 
@@ -184,7 +184,7 @@ function Set-TargetResource
         $DiskId,
 
         [Parameter()]
-        [ValidateSet('Number','UniqueId','Guid')]
+        [ValidateSet('Number', 'UniqueId', 'Guid')]
         [System.String]
         $DiskIdType = 'Number',
 
@@ -352,7 +352,7 @@ function Set-TargetResource
                     matching the file system type that is not assigned to a drive letter.
                 #>
                 Write-Verbose -Message ($localizedData.MatchingPartitionNoSizeMessage -f `
-                    $DiskIdType, $DiskId)
+                        $DiskIdType, $DiskId)
 
                 $searchPartitions = $partition | Where-Object -FilterScript {
                     $_.Type -eq 'Basic' -and -not [System.Char]::IsLetter($_.DriveLetter)
@@ -364,7 +364,7 @@ function Set-TargetResource
                 {
                     # Look for the volume in the partition.
                     Write-Verbose -Message ($localizedData.SearchForVolumeMessage -f `
-                        $DiskIdType, $DiskId, $searchPartition.PartitionNumber, $FSFormat)
+                            $DiskIdType, $DiskId, $searchPartition.PartitionNumber, $FSFormat)
 
                     $searchVolumes = $searchPartition | Get-Volume
 
@@ -381,7 +381,7 @@ function Set-TargetResource
                         $partition = $searchPartition
 
                         Write-Verbose -Message ($localizedData.VolumeFoundMessage -f `
-                            $DiskIdType, $DiskId, $searchPartition.PartitionNumber, $FSFormat)
+                                $DiskIdType, $DiskId, $searchPartition.PartitionNumber, $FSFormat)
 
                         break
                     } # if
@@ -649,7 +649,7 @@ function Test-TargetResource
         $DiskId,
 
         [Parameter()]
-        [ValidateSet('Number','UniqueId','Guid')]
+        [ValidateSet('Number', 'UniqueId', 'Guid')]
         [System.String]
         $DiskIdType = 'Number',
 

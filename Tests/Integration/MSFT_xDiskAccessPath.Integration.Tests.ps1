@@ -162,47 +162,49 @@ try
                     Get-Content -Path $testFilePath -Raw | Should -Be 'Test'
                 }
 
-                It 'Should compile and apply the MOF without throwing' {
-                    {
-                        # This is to pass to the Config
-                        $configData = @{
-                            AllNodes = @(
-                                @{
-                                    NodeName   = 'localhost'
-                                    AccessPath = $accessPathB
-                                    DiskId     = $disk.Number
-                                    DiskIdType = 'Number'
-                                    FSLabel    = $FSLabelB
-                                }
-                            )
-                        }
+                Context "Create second volume on Disk Number $($disk.Number)" {
+                    It 'Should compile and apply the MOF without throwing' {
+                        {
+                            # This is to pass to the Config
+                            $configData = @{
+                                AllNodes = @(
+                                    @{
+                                        NodeName   = 'localhost'
+                                        AccessPath = $accessPathB
+                                        DiskId     = $disk.Number
+                                        DiskIdType = 'Number'
+                                        FSLabel    = $FSLabelB
+                                    }
+                                )
+                            }
 
-                        & "$($script:DSCResourceName)_Config" `
-                            -OutputPath $TestDrive `
-                            -ConfigurationData $configData
+                            & "$($script:DSCResourceName)_Config" `
+                                -OutputPath $TestDrive `
+                                -ConfigurationData $configData
 
-                        Start-DscConfiguration `
-                            -Path $TestDrive `
-                            -ComputerName localhost `
-                            -Wait `
-                            -Verbose `
-                            -Force `
-                            -ErrorAction Stop
-                    } | Should -Not -Throw
-                }
-
-                It 'Should be able to call Get-DscConfiguration without throwing' {
-                    { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
-                }
-
-                It 'Should have set the resource and all the parameters should match' {
-                    $current = Get-DscConfiguration | Where-Object {
-                        $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
+                            Start-DscConfiguration `
+                                -Path $TestDrive `
+                                -ComputerName localhost `
+                                -Wait `
+                                -Verbose `
+                                -Force `
+                                -ErrorAction Stop
+                        } | Should -Not -Throw
                     }
-                    $current.DiskId           | Should -Be $disk.Number
-                    $current.AccessPath       | Should -Be "$($accessPathB)\"
-                    $current.FSLabel          | Should -Be $FSLabelB
-                    $current.Size             | Should -Be 935198720
+
+                    It 'Should be able to call Get-DscConfiguration without throwing' {
+                        { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
+                    }
+
+                    It 'Should have set the resource and all the parameters should match' {
+                        $current = Get-DscConfiguration | Where-Object {
+                            $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
+                        }
+                        $current.DiskId           | Should -Be $disk.Number
+                        $current.AccessPath       | Should -Be "$($accessPathB)\"
+                        $current.FSLabel          | Should -Be $FSLabelB
+                        $current.Size             | Should -Be 935198720
+                    }
                 }
             }
 
@@ -367,47 +369,49 @@ try
                     Get-Content -Path $testFilePath -Raw | Should -Be 'Test'
                 }
 
-                It 'Should compile and apply the MOF without throwing' {
-                    {
-                        # This is to pass to the Config
-                        $configData = @{
-                            AllNodes = @(
-                                @{
-                                    NodeName   = 'localhost'
-                                    AccessPath = $accessPathB
-                                    DiskId     = $disk.UniqueId
-                                    DiskIdType = 'UniqueId'
-                                    FSLabel    = $FSLabelB
-                                }
-                            )
-                        }
+                Context "Create second volume on Disk Unique Id $($disk.UniqueId)" {
+                    It 'Should compile and apply the MOF without throwing' {
+                        {
+                            # This is to pass to the Config
+                            $configData = @{
+                                AllNodes = @(
+                                    @{
+                                        NodeName   = 'localhost'
+                                        AccessPath = $accessPathB
+                                        DiskId     = $disk.UniqueId
+                                        DiskIdType = 'UniqueId'
+                                        FSLabel    = $FSLabelB
+                                    }
+                                )
+                            }
 
-                        & "$($script:DSCResourceName)_Config" `
-                            -OutputPath $TestDrive `
-                            -ConfigurationData $configData
+                            & "$($script:DSCResourceName)_Config" `
+                                -OutputPath $TestDrive `
+                                -ConfigurationData $configData
 
-                        Start-DscConfiguration `
-                            -Path $TestDrive `
-                            -ComputerName localhost `
-                            -Wait `
-                            -Verbose `
-                            -Force `
-                            -ErrorAction Stop
-                    } | Should -Not -Throw
-                }
-
-                It 'Should be able to call Get-DscConfiguration without throwing' {
-                    { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
-                }
-
-                It 'Should have set the resource and all the parameters should match' {
-                    $current = Get-DscConfiguration | Where-Object {
-                        $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
+                            Start-DscConfiguration `
+                                -Path $TestDrive `
+                                -ComputerName localhost `
+                                -Wait `
+                                -Verbose `
+                                -Force `
+                                -ErrorAction Stop
+                        } | Should -Not -Throw
                     }
-                    $current.DiskId           | Should -Be $disk.UniqueId
-                    $current.AccessPath       | Should -Be "$($accessPathB)\"
-                    $current.FSLabel          | Should -Be $FSLabelB
-                    $current.Size             | Should -Be 935198720
+
+                    It 'Should be able to call Get-DscConfiguration without throwing' {
+                        { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
+                    }
+
+                    It 'Should have set the resource and all the parameters should match' {
+                        $current = Get-DscConfiguration | Where-Object {
+                            $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
+                        }
+                        $current.DiskId           | Should -Be $disk.UniqueId
+                        $current.AccessPath       | Should -Be "$($accessPathB)\"
+                        $current.FSLabel          | Should -Be $FSLabelB
+                        $current.Size             | Should -Be 935198720
+                    }
                 }
             }
 
@@ -573,47 +577,49 @@ try
                     Get-Content -Path $testFilePath -Raw | Should -Be 'Test'
                 }
 
-                It 'Should compile and apply the MOF without throwing' {
-                    {
-                        # This is to pass to the Config
-                        $configData = @{
-                            AllNodes = @(
-                                @{
-                                    NodeName   = 'localhost'
-                                    AccessPath = $accessPathB
-                                    DiskId     = $disk.Guid
-                                    DiskIdType = 'Guid'
-                                    FSLabel    = $FSLabelB
-                                }
-                            )
-                        }
+                Context "Create second volume on Disk Guid $($disk.Guid)" {
+                    It 'Should compile and apply the MOF without throwing' {
+                        {
+                            # This is to pass to the Config
+                            $configData = @{
+                                AllNodes = @(
+                                    @{
+                                        NodeName   = 'localhost'
+                                        AccessPath = $accessPathB
+                                        DiskId     = $disk.Guid
+                                        DiskIdType = 'Guid'
+                                        FSLabel    = $FSLabelB
+                                    }
+                                )
+                            }
 
-                        & "$($script:DSCResourceName)_Config" `
-                            -OutputPath $TestDrive `
-                            -ConfigurationData $configData
+                            & "$($script:DSCResourceName)_Config" `
+                                -OutputPath $TestDrive `
+                                -ConfigurationData $configData
 
-                        Start-DscConfiguration `
-                            -Path $TestDrive `
-                            -ComputerName localhost `
-                            -Wait `
-                            -Verbose `
-                            -Force `
-                            -ErrorAction Stop
-                    } | Should -Not -Throw
-                }
-
-                It 'Should be able to call Get-DscConfiguration without throwing' {
-                    { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
-                }
-
-                It 'Should have set the resource and all the parameters should match' {
-                    $current = Get-DscConfiguration | Where-Object {
-                        $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
+                            Start-DscConfiguration `
+                                -Path $TestDrive `
+                                -ComputerName localhost `
+                                -Wait `
+                                -Verbose `
+                                -Force `
+                                -ErrorAction Stop
+                        } | Should -Not -Throw
                     }
-                    $current.DiskId           | Should -Be $disk.Guid
-                    $current.AccessPath       | Should -Be "$($accessPathB)\"
-                    $current.FSLabel          | Should -Be $FSLabelB
-                    $current.Size             | Should -Be 935198720
+
+                    It 'Should be able to call Get-DscConfiguration without throwing' {
+                        { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
+                    }
+
+                    It 'Should have set the resource and all the parameters should match' {
+                        $current = Get-DscConfiguration | Where-Object {
+                            $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
+                        }
+                        $current.DiskId           | Should -Be $disk.Guid
+                        $current.AccessPath       | Should -Be "$($accessPathB)\"
+                        $current.FSLabel          | Should -Be $FSLabelB
+                        $current.Size             | Should -Be 935198720
+                    }
                 }
             }
 
