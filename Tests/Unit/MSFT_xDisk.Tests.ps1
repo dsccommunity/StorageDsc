@@ -93,21 +93,21 @@ try
         $script:mockedPartitionSize = 1GB
 
         $script:mockedPartition = [pscustomobject] @{
-            DriveLetter     = $script:testDriveLetter
+            DriveLetter     = [System.Char] $script:testDriveLetter
             Size            = $script:mockedPartitionSize
             PartitionNumber = 1
             Type            = 'Basic'
         }
 
         $script:mockedPartitionNoDriveLetter = [pscustomobject] @{
-            DriveLetter     = ''
+            DriveLetter     = [System.Char] $null
             Size            = $script:mockedPartitionSize
             PartitionNumber = 1
             Type            = 'Basic'
         }
 
         $script:mockedPartitionNoDriveLetterReadOnly = [pscustomobject] @{
-            DriveLetter     = ''
+            DriveLetter     = [System.Char] $null
             Size            = $script:mockedPartitionSize
             PartitionNumber = 1
             Type            = 'Basic'
@@ -123,6 +123,7 @@ try
         $script:mockedVolumeUnformatted = [pscustomobject] @{
             FileSystemLabel = ''
             FileSystem      = ''
+            DriveLetter     = ''
         }
 
         $script:mockedVolumeNoDriveLetter = [pscustomobject] @{
@@ -1425,8 +1426,59 @@ try
                     Assert-MockCalled -CommandName Set-Disk -Exactly -Times 0
                     Assert-MockCalled -CommandName Initialize-Disk -Exactly -Times 0
                     Assert-MockCalled -CommandName Get-Partition -Exactly -Times 1
-                    Assert-MockCalled -CommandName Get-Volume -Exactly -Times 2
+                    Assert-MockCalled -CommandName Get-Volume -Exactly -Times 1
                     Assert-MockCalled -CommandName New-Partition -Exactly -Times 1
+                    Assert-MockCalled -CommandName Format-Volume -Exactly -Times 0
+                    Assert-MockCalled -CommandName Set-Partition -Exactly -Times 1
+                }
+            }
+
+            Context 'Online GPT disk with a partition/volume and no Drive Letter assigned using Disk Number' {
+                # verifiable (should be called) mocks
+                Mock `
+                    -CommandName Get-DiskByIdentifier `
+                    -ParameterFilter { $DiskId -eq $script:mockedDisk0.Number -and $DiskIdType -eq 'Number' } `
+                    -MockWith { $script:mockedDisk0 } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-Partition `
+                    -MockWith { $script:mockedPartitionNoDriveLetter } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-Volume `
+                    -MockWith { $script:mockedVolume } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Set-Partition `
+                    -Verifiable
+
+                # mocks that should not be called
+                Mock -CommandName Set-Disk
+                Mock -CommandName Initialize-Disk
+                Mock -CommandName New-Partition
+                Mock -CommandName Format-Volume
+
+                It 'Should not throw an exception' {
+                    {
+                        Set-TargetResource `
+                            -DiskId $script:mockedDisk0.Number `
+                            -Driveletter 'H' `
+                            -Verbose
+                    } | Should -Not -Throw
+                }
+
+                It 'Should call the correct mocks' {
+                    Assert-VerifiableMock
+                    Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 1 `
+                        -ParameterFilter { $DiskId -eq $script:mockedDisk0.Number -and $DiskIdType -eq 'Number' }
+                    Assert-MockCalled -CommandName Set-Disk -Exactly -Times 0
+                    Assert-MockCalled -CommandName Initialize-Disk -Exactly -Times 0
+                    Assert-MockCalled -CommandName Get-Partition -Exactly -Times 1
+                    Assert-MockCalled -CommandName Get-Volume -Exactly -Times 2
+                    Assert-MockCalled -CommandName New-Partition -Exactly -Times 0
                     Assert-MockCalled -CommandName Format-Volume -Exactly -Times 0
                     Assert-MockCalled -CommandName Set-Partition -Exactly -Times 1
                 }

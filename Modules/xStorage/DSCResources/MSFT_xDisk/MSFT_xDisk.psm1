@@ -329,7 +329,7 @@ function Set-TargetResource
             {
                 # Find the first basic partition matching the size
                 $partition = $partition |
-                    Where-Object -Filter { $_.Type -eq 'Basic' -and $_.Size -eq $Size } |
+                    Where-Object -FilterScript { $_.Type -eq 'Basic' -and $_.Size -eq $Size } |
                     Select-Object -First 1
 
                 if ($partition)
@@ -354,7 +354,10 @@ function Set-TargetResource
                 Write-Verbose -Message ($localizedData.MatchingPartitionNoSizeMessage -f `
                     $DiskIdType, $DiskId)
 
-                $searchPartitions = $partition | Where-Object -Filter { $_.Type -eq 'Basic' }
+                $searchPartitions = $partition | Where-Object -FilterScript {
+                    $_.Type -eq 'Basic' -and -not [System.Char]::IsLetter($_.DriveLetter)
+                }
+
                 $partition = $null
 
                 foreach ($searchPartition in $searchPartitions)
@@ -366,8 +369,7 @@ function Set-TargetResource
                     $searchVolumes = $searchPartition | Get-Volume
 
                     $volumeMatch = $searchVolumes | Where-Object -FilterScript {
-                        ($_.FileSystem -eq $FSFormat) -and `
-                        ([System.String]::IsNullOrEmpty($_.DriveLetter))
+                        $_.FileSystem -eq $FSFormat
                     }
 
                     if ($volumeMatch)

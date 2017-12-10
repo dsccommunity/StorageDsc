@@ -65,8 +65,14 @@ try
                         & "$($script:DSCResourceName)_Config" `
                             -OutputPath $TestDrive `
                             -ConfigurationData $configData
-                        Start-DscConfiguration -Path $TestDrive `
-                            -ComputerName localhost -Wait -Verbose -Force
+
+                        Start-DscConfiguration `
+                            -Path $TestDrive `
+                            -ComputerName localhost `
+                            -Wait `
+                            -Verbose `
+                            -Force `
+                            -ErrorAction Stop
                     } | Should -Not -Throw
                 }
 
@@ -104,8 +110,14 @@ try
                         & "$($script:DSCResourceName)_Config" `
                             -OutputPath $TestDrive `
                             -ConfigurationData $configData
-                        Start-DscConfiguration -Path $TestDrive `
-                            -ComputerName localhost -Wait -Verbose -Force
+
+                        Start-DscConfiguration `
+                            -Path $TestDrive `
+                            -ComputerName localhost `
+                            -Wait `
+                            -Verbose `
+                            -Force `
+                            -ErrorAction Stop
                     } | Should -Not -Throw
                 }
 
@@ -188,8 +200,14 @@ try
                         & "$($script:DSCResourceName)_Config" `
                             -OutputPath $TestDrive `
                             -ConfigurationData $configData
-                        Start-DscConfiguration -Path $TestDrive `
-                            -ComputerName localhost -Wait -Verbose -Force
+
+                        Start-DscConfiguration `
+                            -Path $TestDrive `
+                            -ComputerName localhost `
+                            -Wait `
+                            -Verbose `
+                            -Force `
+                            -ErrorAction Stop
                     } | Should -Not -Throw
                 }
 
@@ -229,8 +247,14 @@ try
                         & "$($script:DSCResourceName)_ConfigDestructive" `
                             -OutputPath $TestDrive `
                             -ConfigurationData $configData
-                        Start-DscConfiguration -Path $TestDrive `
-                            -ComputerName localhost -Wait -Verbose -Force
+
+                        Start-DscConfiguration `
+                            -Path $TestDrive `
+                            -ComputerName localhost `
+                            -Wait `
+                            -Verbose `
+                            -Force `
+                            -ErrorAction Stop
                     } | Should -Not -Throw
                 }
 
@@ -269,8 +293,14 @@ try
                         & "$($script:DSCResourceName)_Config" `
                             -OutputPath $TestDrive `
                             -ConfigurationData $configData
-                        Start-DscConfiguration -Path $TestDrive `
-                            -ComputerName localhost -Wait -Verbose -Force
+
+                        Start-DscConfiguration `
+                            -Path $TestDrive `
+                            -ComputerName localhost `
+                            -Wait `
+                            -Verbose `
+                            -Force `
+                            -ErrorAction Stop
                     } | Should -Not -Throw
                 }
 
@@ -348,8 +378,14 @@ try
                         & "$($script:DSCResourceName)_Config" `
                             -OutputPath $TestDrive `
                             -ConfigurationData $configData
-                        Start-DscConfiguration -Path $TestDrive `
-                            -ComputerName localhost -Wait -Verbose -Force
+
+                        Start-DscConfiguration `
+                            -Path $TestDrive `
+                            -ComputerName localhost `
+                            -Wait `
+                            -Verbose `
+                            -Force `
+                            -ErrorAction Stop
                     } | Should -Not -Throw
                 }
 
@@ -387,8 +423,14 @@ try
                         & "$($script:DSCResourceName)_Config" `
                             -OutputPath $TestDrive `
                             -ConfigurationData $configData
-                        Start-DscConfiguration -Path $TestDrive `
-                            -ComputerName localhost -Wait -Verbose -Force
+
+                        Start-DscConfiguration `
+                            -Path $TestDrive `
+                            -ComputerName localhost `
+                            -Wait `
+                            -Verbose `
+                            -Force `
+                            -ErrorAction Stop
                     } | Should -Not -Throw
                 }
 
@@ -463,8 +505,14 @@ try
                         & "$($script:DSCResourceName)_Config" `
                             -OutputPath $TestDrive `
                             -ConfigurationData $configData
-                        Start-DscConfiguration -Path $TestDrive `
-                            -ComputerName localhost -Wait -Verbose -Force
+
+                        Start-DscConfiguration `
+                            -Path $TestDrive `
+                            -ComputerName localhost `
+                            -Wait `
+                            -Verbose `
+                            -Force `
+                            -ErrorAction Stop
                     } | Should -Not -Throw
                 }
 
@@ -507,8 +555,14 @@ try
                         & "$($script:DSCResourceName)_Config" `
                             -OutputPath $TestDrive `
                             -ConfigurationData $configData
-                        Start-DscConfiguration -Path $TestDrive `
-                            -ComputerName localhost -Wait -Verbose -Force
+
+                        Start-DscConfiguration `
+                            -Path $TestDrive `
+                            -ComputerName localhost `
+                            -Wait `
+                            -Verbose `
+                            -Force `
+                            -ErrorAction Stop
                     } | Should -Not -Throw
                 }
 
