@@ -66,7 +66,7 @@ function Get-TargetResource
         $DiskId,
 
         [Parameter()]
-        [ValidateSet('Number','UniqueId','Guid')]
+        [ValidateSet('Number', 'UniqueId', 'Guid')]
         [System.String]
         $DiskIdType = 'Number',
 
@@ -184,7 +184,7 @@ function Set-TargetResource
         $DiskId,
 
         [Parameter()]
-        [ValidateSet('Number','UniqueId','Guid')]
+        [ValidateSet('Number', 'UniqueId', 'Guid')]
         [System.String]
         $DiskIdType = 'Number',
 
@@ -329,7 +329,7 @@ function Set-TargetResource
             {
                 # Find the first basic partition matching the size
                 $partition = $partition |
-                    Where-Object -Filter { $_.Type -eq 'Basic' -and $_.Size -eq $Size } |
+                    Where-Object -FilterScript { $_.Type -eq 'Basic' -and $_.Size -eq $Size } |
                     Select-Object -First 1
 
                 if ($partition)
@@ -347,8 +347,45 @@ function Set-TargetResource
             }
             else
             {
-                # No size specified so no partition can be matched
+                <#
+                    No size specified, so see if there is a partition that has a volume
+                    matching the file system type that is not assigned to a drive letter.
+                #>
+                Write-Verbose -Message ($localizedData.MatchingPartitionNoSizeMessage -f `
+                        $DiskIdType, $DiskId)
+
+                $searchPartitions = $partition | Where-Object -FilterScript {
+                    $_.Type -eq 'Basic' -and -not [System.Char]::IsLetter($_.DriveLetter)
+                }
+
                 $partition = $null
+
+                foreach ($searchPartition in $searchPartitions)
+                {
+                    # Look for the volume in the partition.
+                    Write-Verbose -Message ($localizedData.SearchForVolumeMessage -f `
+                            $DiskIdType, $DiskId, $searchPartition.PartitionNumber, $FSFormat)
+
+                    $searchVolumes = $searchPartition | Get-Volume
+
+                    $volumeMatch = $searchVolumes | Where-Object -FilterScript {
+                        $_.FileSystem -eq $FSFormat
+                    }
+
+                    if ($volumeMatch)
+                    {
+                        <#
+                            Found a partition with a volume that matches file system
+                            type and not assigned a drive letter.
+                        #>
+                        $partition = $searchPartition
+
+                        Write-Verbose -Message ($localizedData.VolumeFoundMessage -f `
+                                $DiskIdType, $DiskId, $searchPartition.PartitionNumber, $FSFormat)
+
+                        break
+                    } # if
+                } # foreach
             } # if
         } # if
 
@@ -612,7 +649,7 @@ function Test-TargetResource
         $DiskId,
 
         [Parameter()]
-        [ValidateSet('Number','UniqueId','Guid')]
+        [ValidateSet('Number', 'UniqueId', 'Guid')]
         [System.String]
         $DiskIdType = 'Number',
 
