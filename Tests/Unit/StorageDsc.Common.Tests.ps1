@@ -317,14 +317,14 @@ try
                 }
             }
 
-            Context 'Contains mulitple access paths where one is local' {
+            Context 'Contains multiple access paths where one is local' {
                 It 'Should return $true' {
                     Test-AccessPathAssignedToLocal `
                         -AccessPath @('c:\MountPoint\', '\\?\Volume{99cf0194-ac45-4a23-b36e-3e458158a63e}\') | Should -Be $true
                 }
             }
 
-            Context 'Contains mulitple access paths where none are local' {
+            Context 'Contains multiple access paths where none are local' {
                 It 'Should return $false' {
                     Test-AccessPathAssignedToLocal `
                         -AccessPath @('\\?\Volume{905551f3-33a5-421d-ac24-c993fbfb3184}\','\\?\Volume{99cf0194-ac45-4a23-b36e-3e458158a63e}\') | Should -Be $false
