@@ -29,10 +29,8 @@ ConvertFrom-StringData @'
     MatchingPartitionNotFoundMessage = Disk with {0} '{1}' already contains paritions, but none match required size.
     MatchingPartitionFoundMessage = Disk with {0} '{1}' already contains paritions, and partition '{2}' matches required size.
     AccessPathNotFoundOnPartitionMessage = Disk with {0} '{1}' does not contain a partition assigned to access path '{2}'.
-
     DiskAlreadyInitializedError = Disk with {0} '{1}' is already initialized with {2}.
     NewParitionIsReadOnlyError = New partition '{2}' on disk with {0} '{1}' did not become writable in the expected time.
     TestingPSDriveMessage = Testing for availability of PSDrive {0} for AccessPath {1}
     UnavailablePSDriveMessage = PSDrive {0} is unavailable for AccessPath {1}, refreshing PSDrives.
-  
-'@
+ '@
