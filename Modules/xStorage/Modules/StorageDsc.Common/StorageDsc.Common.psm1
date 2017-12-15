@@ -153,6 +153,44 @@ function Get-DiskByIdentifier
     return $disk
 } # end function Get-DiskByIdentifier
 
+
+<#
+    .SYNOPSIS
+    Get the first current drive letter corresponding to the optical disk drive
+    the Caption and DeviceID properties are used to avoid mounted ISO images in Windows 2012+ and Windows 10.
+    with the Device ID, we look for the length of the string after the final backslash (crude, but appears to work so far)
+
+    An example DeviceID for a virtual drive in a Hyper-V VM looks like this:
+     SCSI\CDROM&VEN_MSFT&PROD_VIRTUAL_DVD-ROM\000006
+
+    An example DeviceID for a mounted ISO in a Hyper-V VM looks like this:
+     SCSI\CDROM&VEN_MSFT&PROD_VIRTUAL_DVD-ROM\2&1F4ADFFE&0&000002
+#>
+function Get-OpticalDiskDriveLetter
+{
+    [CmdletBinding()]
+    [OutputType([String])]
+    param ()
+
+    try
+    {
+        $OpticalDiskDriveLetter = (Get-CimInstance -ClassName win32_cdromdrive | Where-Object {
+            -not (
+                    $_.Caption -eq 'Microsoft Virtual DVD-ROM' -and
+                    ($_.DeviceID.Split('\')[-1]).Length -gt 10
+                )
+            }
+        ).Drive
+    }
+    catch
+    {
+        $OpticalDiskDriveLetter = ''
+    }
+
+    return $OpticalDiskDriveLetter
+
+} # end function Get-OpticalDiskDriveLetter
+
 <#
     .SYNOPSIS
     Tests if any of the access paths from a partition are assigned

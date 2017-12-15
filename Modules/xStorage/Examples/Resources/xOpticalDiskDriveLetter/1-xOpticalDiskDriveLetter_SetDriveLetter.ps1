@@ -1,6 +1,6 @@
 <#
     .EXAMPLE
-        This configuration will set the drive letter of the CD to 'Z'.
+        This configuration will set the drive letter of the optical disk drive to 'Z'.
 #>
 Configuration Example
 {
@@ -9,7 +9,7 @@ Configuration Example
 
     Node localhost
     {
-        xCDROM MapCDROMToZ
+        xOpticalDiskDriveLetter MapOpticalDiskToZ
         {
              DriveLetter = "Z"
         }

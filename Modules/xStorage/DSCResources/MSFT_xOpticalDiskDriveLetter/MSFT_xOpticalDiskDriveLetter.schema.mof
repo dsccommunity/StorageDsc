@@ -1,0 +1,8 @@
+
+[ClassVersion("1.0.0.0"), FriendlyName("xOpticalDiskDriveLetter")]
+class MSFT_xOpticalDiskDriveLetter : OMI_BaseResource
+{
+    [Key, Description("Specifies the drive letter of the optical drive to modify.")] String DriveLetter;
+    [Write, Description("Determines whether the optical drive drive letter should be changed or not."), ValueMap{"Present","Absent"}, Values{"Present","Absent"}] string Ensure;
+};
+

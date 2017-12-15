@@ -1,5 +1,5 @@
 $script:DSCModuleName      = 'xStorage'
-$script:DSCResourceName    = 'MSFT_xCDROM'
+$script:DSCResourceName    = 'MSFT_xOpticalDiskDriveLetter'
 
 Import-Module -Name (Join-Path -Path (Join-Path -Path (Split-Path $PSScriptRoot -Parent) -ChildPath 'TestHelpers') -ChildPath 'CommonTestHelper.psm1') -Global
 
@@ -22,7 +22,8 @@ $TestEnvironment = Initialize-TestEnvironment `
 # Using try/finally to always cleanup even if something awful happens.
 try
 {
-    $DriveLetter = 'Z'
+    $LastDrive = ((Get-Volume).DriveLetter | Sort-Object | Select-Object -Last 1)
+    $DriveLetter = [char](([int][char]$LastDrive)+1)
 
     # Create a config data object to pass to the DSC Configs
     $ConfigData = @{
@@ -34,7 +35,7 @@ try
         )
     }
 
-    # Change drive letter of CDROM
+    # Change drive letter of the optical drive
     $ConfigFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:DSCResourceName).config.ps1"
     . $ConfigFile -Verbose -ErrorAction Stop
 
@@ -49,7 +50,7 @@ try
                                 ).Drive
         }
 
-        Context 'Assign a Drive Letter to the CDROM' {
+        Context 'Assign a Drive Letter to the optical drive' {
             #region DEFAULT TESTS
             It 'should compile and apply the MOF without throwing' {
                 {
@@ -68,20 +69,23 @@ try
 
             if ($currentDriveLetter)
             {
-                It 'Should have set the resource and all the parameters should match' {
-                    $current = Get-DscConfiguration | Where-Object {
-                        $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
-                    }
-                    $current.DriveLetter      | Should Be $DriveLetter
-                    $current.Ensure           | Should Be 'Present'
-                }
+              $skipTests = @{ Skip = $true }
             }
-            else {
-                Write-Verbose 'A cdrom is required to test the resource sets all the parameters correctly.  Mounted ISOs are ignored'
+            else
+            {
+                Write-Verbose 'An optical drive is required to test the resource sets all the parameters correctly.  Mounted ISOs are ignored'
+            }
+
+            It 'Should have set the resource and all the parameters should match' @skipTests {
+                $current = Get-DscConfiguration | Where-Object {
+                    $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
+                }
+                $current.DriveLetter      | Should Be $DriveLetter
+                $current.Ensure           | Should Be 'Present'
             }
         }
     }
-    
+
     #endregion
 }
 finally

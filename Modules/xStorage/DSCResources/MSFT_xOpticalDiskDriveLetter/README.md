@@ -1,8 +1,8 @@
 # Description
 
-The resource is used to set the drive letter of a CDROM
+The resource is used to set the drive letter of an optical disk drive (e.g. a CDROM or DVD drive)
 
-It is designed to ignore 'temporary' CDROMs that are created when mounting
+It is designed to ignore 'temporary' optical disk drives that are created when mounting
 ISOs on Windows Server 2012+
 
 With the Device ID, we look for the length of the string after the final
