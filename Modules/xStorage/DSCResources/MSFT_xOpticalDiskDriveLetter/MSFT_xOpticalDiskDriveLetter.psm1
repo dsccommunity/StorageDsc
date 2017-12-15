@@ -178,7 +178,7 @@ function Test-TargetResource
 
         [ValidateSet('Present','Absent')]
         [System.String]
-        $Ensure
+        $Ensure = 'Present'
     )
 
     # allow use of drive letter without colon
@@ -237,7 +237,6 @@ function Test-TargetResource
     }
 
     $result
-
 }
 
 Export-ModuleMember -Function *-TargetResource
