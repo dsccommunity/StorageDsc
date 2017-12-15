@@ -1,5 +1,5 @@
 $script:DSCModuleName      = 'xStorage'
-$script:DSCResourceName    = 'MSFT_xCDROM'
+$script:DSCResourceName    = 'MSFT_xOpticalDiskDriveLetter'
 
 Import-Module -Name (Join-Path -Path (Join-Path -Path (Split-Path $PSScriptRoot -Parent) -ChildPath 'TestHelpers') -ChildPath 'CommonTestHelper.psm1') -Global
 
@@ -30,9 +30,9 @@ try
 
         $script:testDriveLetter = 'X:'
 
-        $script:mockedNoCDROM = $null
+        $script:mockedNoOpticalDrive = $null
 
-        $script:mockedCDROM  = [pscustomobject] @{
+        $script:mockedOpticalDrive  = [pscustomobject] @{
                 Drive        = $script:testDriveLetter
                 Caption      = 'Microsoft Virtual DVD-ROM'
                 DeviceID     = 'SCSI\CDROM&VEN_MSFT&PROD_VIRTUAL_DVD-ROM\000006'
@@ -44,7 +44,7 @@ try
                 DriveType    = 5
             }
 
-        $script:mockedWrongLetterCDROM = [pscustomobject] @{
+        $script:mockedWrongLetterOpticalDrive = [pscustomobject] @{
                 Drive          = 'W:'
                 Caption        = 'Microsoft Virtual DVD-ROM'
                 DeviceID       = 'SCSI\CDROM&VEN_MSFT&PROD_VIRTUAL_DVD-ROM\000006'
@@ -54,23 +54,23 @@ try
                 DriveLetter       = 'W:'
             }
 
-        $script:mockedVolumeNotCDROM = [pscustomobject] @{
+        $script:mockedVolumeNotOpticalDrive = [pscustomobject] @{
                 DriveLetter  =  $script:testDriveLetter
                 DriveType    = 3
             }
 
-        $script:mockedCDROMiso = [pscustomobject] @{
+        $script:mockedOpticalDriveISO = [pscustomobject] @{
                 Drive          = 'I:'
                 Caption        = 'Microsoft Virtual DVD-ROM'
                 DeviceID       = 'SCSI\CDROM&VEN_MSFT&PROD_VIRTUAL_DVD-ROM\2&1F4ADFFE&0&000002'
             }
 
-        $script:mockedCDROMide = [pscustomobject] @{
+        $script:mockedOpticalDriveIDE = [pscustomobject] @{
                 Drive          = 'I:'
                 Caption        = 'Msft Virtual CD/ROM ATA Device'
                 DeviceID       = 'IDE\CDROMMSFT_VIRTUAL_CD/ROM_____________________1.0_____\5&CFB56DE&0&1.0.0'
             }
-        
+
         function Set-CimInstance {
             Param
             (
@@ -79,20 +79,20 @@ try
                 $InputObject,
 
                 [hashtable]
-                $Property                
+                $Property
             )
         }
 
         #region Function Get-TargetResource
-        Describe 'MSFT_xCDROM\Get-TargetResource' {
-            Context 'CDROM drive present with correct drive letter' {
+        Describe 'MSFT_xOpticalDiskDriveLetter\Get-TargetResource' {
+            Context 'Optical disk drive present with correct drive letter' {
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Get-CimInstance `
                     -ParameterFilter {
                         $ClassName -eq "win32_cdromdrive"
                     } `
-                    -MockWith { $script:mockedCDROM } `
+                    -MockWith { $script:mockedOpticalDrive } `
                     -Verifiable
 
                 $resource = Get-TargetResource `
@@ -108,14 +108,14 @@ try
                 }
             }
 
-            Context 'CDROM drive present with incorrect drive letter' {
+            Context 'Optical disk drive present with incorrect drive letter' {
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Get-CimInstance `
                     -ParameterFilter {
                         $ClassName -eq "win32_cdromdrive"
                     } `
-                    -MockWith { $script:mockedWrongLetterCDROM } `
+                    -MockWith { $script:mockedWrongLetterOpticalDrive } `
                     -Verifiable
 
                 $resource = Get-TargetResource `
@@ -132,14 +132,14 @@ try
             }
 
 
-            Context 'IDE CDROM drive present with incorrect drive letter' {
+            Context 'IDE optical disk drive present with incorrect drive letter' {
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Get-CimInstance `
                     -ParameterFilter {
                         $ClassName -eq "win32_cdromdrive"
                     } `
-                    -MockWith { $script:mockedCDROMide } `
+                    -MockWith { $script:mockedOpticalDriveIDE } `
                     -Verifiable
 
                 $resource = Get-TargetResource `
@@ -155,14 +155,14 @@ try
                 }
             }
 
-            Context 'CDROM drive not present' {
+            Context 'Optical disk drive not present' {
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Get-CimInstance `
                     -ParameterFilter {
                         $ClassName -eq "win32_cdromdrive"
                     } `
-                    -MockWith { $script:mockedNoCDROM } `
+                    -MockWith { $script:mockedNoOpticalDrive } `
                     -Verifiable
 
                 $resource = Get-TargetResource `
@@ -176,19 +176,19 @@ try
                 It 'all the get mocks should be called' {
                     Assert-VerifiableMocks
                 }
-            }            
+            }
         }
 
         #region Function Set-TargetResource
-        Describe 'MSFT_xCDROM\Set-TargetResource' {
-            Context 'CDROM with the correct drive letter' {
+        Describe 'MSFT_xOpticalDiskDriveLetter\Set-TargetResource' {
+            Context 'Optical disk drive with the correct drive letter' {
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Get-CimInstance `
                     -ParameterFilter {
                         $ClassName -eq "win32_cdromdrive"
                     } `
-                    -MockWith { $script:mockedCDROM } `
+                    -MockWith { $script:mockedOpticalDrive } `
                     -Verifiable
 
                 It 'Should not throw' {
@@ -201,18 +201,18 @@ try
 
                 It 'the correct mocks were called' {
                     Assert-VerifiableMocks
-                    Assert-MockCalled -CommandName Get-CimInstance -Times 1                    
+                    Assert-MockCalled -CommandName Get-CimInstance -Times 1
                 }
             }
 
-            Context 'CDROM with the correct drive letter when Ensure is set to Absent' {
+            Context 'Optical disk drive with the correct drive letter when Ensure is set to Absent' {
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Get-CimInstance `
                     -ParameterFilter {
                         $ClassName -eq "win32_cdromdrive"
                     } `
-                    -MockWith { $script:mockedCDROM } `
+                    -MockWith { $script:mockedOpticalDrive } `
                     -Verifiable
 
                 Mock `
@@ -239,18 +239,18 @@ try
 
                 It 'the correct mocks were called' {
                     Assert-VerifiableMocks
-                    Assert-MockCalled -CommandName Get-CimInstance -Times 1                    
+                    Assert-MockCalled -CommandName Get-CimInstance -Times 1
                 }
             }
 
-            Context 'CDROM with the wrong drive letter' {
+            Context 'Optical disk with the wrong drive letter' {
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Get-CimInstance `
                     -ParameterFilter {
                         $ClassName -eq "win32_cdromdrive"
                     } `
-                    -MockWith { $script:mockedWrongLetterCDROM } `
+                    -MockWith { $script:mockedWrongLetterOpticalDrive } `
                     -Verifiable
 
                 Mock `
@@ -277,18 +277,18 @@ try
                 It 'the correct mocks were called' {
                     Assert-VerifiableMocks
                     Assert-MockCalled -CommandName Get-CimInstance -Times 2
-                    Assert-MockCalled -CommandName Set-CimInstance -Times 1               
+                    Assert-MockCalled -CommandName Set-CimInstance -Times 1
                 }
             }
 
-            Context 'IDE CDROM with the wrong drive letter' {
+            Context 'IDE optical disk drive with the wrong drive letter' {
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Get-CimInstance `
                     -ParameterFilter {
                         $ClassName -eq "win32_cdromdrive"
                     } `
-                    -MockWith { $script:mockedCDROMide } `
+                    -MockWith { $script:mockedOpticalDriveide } `
                     -Verifiable
 
                 Mock `
@@ -315,7 +315,7 @@ try
                 It 'the correct mocks were called' {
                     Assert-VerifiableMocks
                     Assert-MockCalled -CommandName Get-CimInstance -Times 2
-                    Assert-MockCalled -CommandName Set-CimInstance -Times 1               
+                    Assert-MockCalled -CommandName Set-CimInstance -Times 1
                 }
             }
 
@@ -327,7 +327,7 @@ try
                     -ParameterFilter {
                         $ClassName -eq "win32_cdromdrive"
                     } `
-                    -MockWith { $script:mockedCDROMiso } `
+                    -MockWith { $script:mockedOpticalDriveISO } `
                     -Verifiable
 
                 It 'Should not throw' {
@@ -340,21 +340,21 @@ try
 
                 It 'the correct mocks were called' {
                     Assert-VerifiableMocks
-                    Assert-MockCalled -CommandName Get-CimInstance -Times 1                    
+                    Assert-MockCalled -CommandName Get-CimInstance -Times 1
                 }
-            }                        
+            }
         }
 
-        Describe 'MSFT_xCDROM\Test-TargetResource' {
+        Describe 'MSFT_xOpticalDiskDriveLetter\Test-TargetResource' {
 
-            Context 'Drive letter is a valid cdrom drive' {
+            Context 'Drive letter is a valid optical disk drive' {
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Get-CimInstance `
                     -ParameterFilter {
                         $ClassName -eq "win32_cdromdrive"
                     } `
-                    -MockWith { $script:mockedCDROM } `
+                    -MockWith { $script:mockedOpticalDrive } `
                     -Verifiable
 
                 Mock `
@@ -374,14 +374,14 @@ try
                 }
             }
 
-            Context 'Drive letter is a valid cdrom drive and $Ensure is set to Absent' {
+            Context 'Drive letter is a valid optical disk drive and $Ensure is set to Absent' {
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Get-CimInstance `
                     -ParameterFilter {
                         $ClassName -eq "win32_cdromdrive"
                     } `
-                    -MockWith { $script:mockedCDROM } `
+                    -MockWith { $script:mockedOpticalDrive } `
                     -Verifiable
 
                 Mock `
@@ -402,14 +402,14 @@ try
                 }
             }
 
-            Context 'There is no cdrom drive' {
+            Context 'There is no optical disk drive' {
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Get-CimInstance `
                     -ParameterFilter {
                         $ClassName -eq "win32_cdromdrive"
                     } `
-                    -MockWith { $script:mockedNoCDROM } `
+                    -MockWith { $script:mockedNoOpticalDrive } `
                     -Verifiable
 
                 Mock `
@@ -430,14 +430,14 @@ try
                 }
             }
 
-            Context 'The drive letter already exists on a volume that is not a cdrom drive' {
+            Context 'The drive letter already exists on a volume that is not a optical disk drive' {
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Get-CimInstance `
                     -ParameterFilter {
                         $ClassName -eq "win32_cdromdrive"
                     } `
-                    -MockWith { $script:mockedCDROM } `
+                    -MockWith { $script:mockedOpticalDrive } `
                     -Verifiable
 
                 Mock `
@@ -445,7 +445,7 @@ try
                     -ParameterFilter {
                         $ClassName -eq "win32_volume"
                     } `
-                    -MockWith { $script:mockedVolumeNotCDROM } `
+                    -MockWith { $script:mockedVolumeNotOpticalDrive } `
                     -Verifiable
 
                 $resource = Test-TargetResource `
@@ -456,12 +456,12 @@ try
                 It 'all the get mocks should be called' {
                     Assert-VerifiableMocks
                 }
-            }              
+            }
         }
 
         #endregion
     }
-} 
+}
 finally
 {
     #region FOOTER

@@ -227,4 +227,5 @@ Export-ModuleMember -Function `
     Assert-DriveLetterValid, `
     Assert-AccessPathValid, `
     Get-DiskByIdentifier,
+    Get-OpticalDiskDriveLetter,
     Test-AccessPathAssignedToLocal
