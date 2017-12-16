@@ -42,8 +42,8 @@ function Get-OpticalDiskDriveLetter
     #>
     $driveLetter = (Get-CimInstance -ClassName win32_cdromdrive | Where-Object {
         -not (
-                $_.Caption -eq "Microsoft Virtual DVD-ROM" -and
-                ($_.DeviceID.Split("\")[-1]).Length -gt 10
+                $_.Caption -eq 'Microsoft Virtual DVD-ROM' -and
+                ($_.DeviceID.Split('\')[-1]).Length -gt 10
             )
         }
         ).Drive
