@@ -42,6 +42,7 @@ try
 
         Context 'Assign a Drive Letter to the optical drive' {
             #region DEFAULT TESTS
+
             It 'Should compile and apply the MOF without throwing' {
                 {
                     # This is to pass to the Config
@@ -57,47 +58,27 @@ try
                     & "$($script:DSCResourceName)_Config" `
                         -OutputPath $TestDrive `
                         -ConfigurationData $configData
-
-                    Start-DscConfiguration `
-                        -Path $TestDrive `
-                        -ComputerName localhost `
-                        -Wait `
-                        -Verbose `
-                        -Force `
-                        -ErrorAction Stop
+                    Start-DscConfiguration -Path $TestDrive -ComputerName localhost -Wait -Verbose -Force
                 } | Should -Not -Throw
             }
 
-            It 'should compile and apply the MOF without throwing' {
-                {
-                    & "$($script:DSCResourceName)_Config" `
-                        -OutputPath $TestDrive `
-                        -ConfigurationData $ConfigData
-                    Start-DscConfiguration -Path $TestDrive `
-                        -ComputerName localhost -Wait -Verbose -Force
-                } | Should not throw
-            }
-
-            It 'should be able to call Get-DscConfiguration without throwing' {
-                { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should Not throw
+            It 'Should be able to call Get-DscConfiguration without throwing' {
+                { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
             }
             #endregion
 
-            if (-not $currentDriveLetter)
+            if ($currentDriveLetter -eq $null)
             {
-              $skipTests = @{ Skip = $true }
-            }
-            else
-            {
-                Write-Verbose 'An optical drive is required to test the resource sets all the parameters correctly.  Mounted ISOs are ignored'
+                Write-Verbose 'An optical drive is required to run the drive letter integration test.  Mounted ISOs are ignored'
+                $skipTests = @{ Skip = $true }
             }
 
             It 'Should have set the resource and all the parameters should match' @skipTests {
                 $current = Get-DscConfiguration | Where-Object {
                     $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
                 }
-                $current.DriveLetter      | Should -Be $DriveLetter
-                $current.Ensure           | Should -Be 'Present'
+                $current.DriveLetter      | Should Be $DriveLetter
+                $current.Ensure           | Should Be 'Present'
             }
         }
     }
