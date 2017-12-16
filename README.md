@@ -7,6 +7,8 @@ The **xStorage** module contains the following resources:
 - **xDisk**: used to initialize, format and mount the partition as a drive letter.
 - **xDiskAccessPath**: used to initialize, format and mount the partition to a
     folder access path.
+- **xOpticalDiskDriveLetter**: used to change the drive letter of an optical
+    disk drive (e.g. a CDROM or DVD drive).  This resource ignores mounted ISOs.
 - **xWaitForDisk** wait for a disk to become available.
 - **xWaitForVolume** wait for a drive to be mounted and become available.
 
