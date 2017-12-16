@@ -48,7 +48,13 @@ function Get-TargetResource
         $($localizedData.UsingGetCimInstanceToFetchDriveLetter)
     ) -join '' )
 
-    $currentDriveLetter = Get-OpticalDiskDriveLetter
+    $currentDriveLetter = (Get-CimInstance -ClassName win32_cdromdrive | Where-Object {
+        -not (
+                $_.Caption -eq "Microsoft Virtual DVD-ROM" -and
+                ($_.DeviceID.Split("\")[-1]).Length -gt 10
+            )
+        }
+        ).Drive
 
     if (-not $currentDriveLetter)
     {
@@ -119,7 +125,21 @@ function Set-TargetResource
     # allow use of drive letter without colon
     $DriveLetter = Assert-DriveLetterValid -DriveLetter $DriveLetter -Colon
 
-    $currentDriveLetter = Get-OpticalDiskDriveLetter
+    <#
+        Get the current drive letter corresponding to the virtual cdrom drive
+        the Caption and DeviceID properties are used to avoid mounted ISO images in Windows 2012+ and Windows 10.
+        with the Device ID, we look for the length of the string after the final backslash (crude, but appears to work so far)
+
+        Example DeviceID for a virtual drive in a Hyper-V VM - SCSI\CDROM&VEN_MSFT&PROD_VIRTUAL_DVD-ROM\000006
+        Example DeviceID for a mounted ISO   in a Hyper-V VM - SCSI\CDROM&VEN_MSFT&PROD_VIRTUAL_DVD-ROM\2&1F4ADFFE&0&000002
+    #>
+    $currentDriveLetter = (Get-CimInstance -ClassName win32_cdromdrive | Where-Object {
+        -not (
+                $_.Caption -eq "Microsoft Virtual DVD-ROM" -and
+                ($_.DeviceID.Split("\")[-1]).Length -gt 10
+            )
+        }
+        ).Drive
 
     if ($currentDriveLetter -eq $DriveLetter -and $Ensure -eq 'Present')
     {
