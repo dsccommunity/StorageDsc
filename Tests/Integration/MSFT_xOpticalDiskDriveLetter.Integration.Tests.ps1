@@ -25,16 +25,6 @@ try
     $LastDrive = ((Get-Volume).DriveLetter | Sort-Object | Select-Object -Last 1)
     $DriveLetter = [char](([int][char]$LastDrive)+1)
 
-    # Create a config data object to pass to the DSC Configs
-    $ConfigData = @{
-        AllNodes = @(
-            @{
-                NodeName    = 'localhost'
-                DriveLetter = $DriveLetter
-            }
-        )
-    }
-
     # Change drive letter of the optical drive
     $ConfigFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:DSCResourceName).config.ps1"
     . $ConfigFile -Verbose -ErrorAction Stop
@@ -52,9 +42,35 @@ try
 
         Context 'Assign a Drive Letter to the optical drive' {
             #region DEFAULT TESTS
+            It 'Should compile and apply the MOF without throwing' {
+                {
+                    # This is to pass to the Config
+                    $configData = @{
+                        AllNodes = @(
+                            @{
+                                NodeName    = 'localhost'
+                                DriveLetter = $DriveLetter
+                            }
+                        )
+                    }
+
+                    & "$($script:DSCResourceName)_Config" `
+                        -OutputPath $TestDrive `
+                        -ConfigurationData $configData
+
+                    Start-DscConfiguration `
+                        -Path $TestDrive `
+                        -ComputerName localhost `
+                        -Wait `
+                        -Verbose `
+                        -Force `
+                        -ErrorAction Stop
+                } | Should -Not -Throw
+            }
+
             It 'should compile and apply the MOF without throwing' {
                 {
-                    & "$($script:DSCResourceName)_config" `
+                    & "$($script:DSCResourceName)_Config" `
                         -OutputPath $TestDrive `
                         -ConfigurationData $ConfigData
                     Start-DscConfiguration -Path $TestDrive `
@@ -67,7 +83,7 @@ try
             }
             #endregion
 
-            if ($currentDriveLetter)
+            if (-not $currentDriveLetter)
             {
               $skipTests = @{ Skip = $true }
             }
@@ -80,8 +96,8 @@ try
                 $current = Get-DscConfiguration | Where-Object {
                     $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
                 }
-                $current.DriveLetter      | Should Be $DriveLetter
-                $current.Ensure           | Should Be 'Present'
+                $current.DriveLetter      | Should -Be $DriveLetter
+                $current.Ensure           | Should -Be 'Present'
             }
         }
     }
