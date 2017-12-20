@@ -26,6 +26,9 @@
     DriveLabelMismatch = Volume assigned to access path '{0}' label '{1}' does not match expected label '{2}'.
     PartitionAlreadyAssignedMessage = Partition '{1}' is already assigned to access path '{0}'.
     MatchingPartitionNotFoundMessage = Disk with {0} '{1}' already contains paritions, but none match required size.
+    MatchingPartitionNoSizeMessage = Disk with {0} '{1}' already contains partitions, but size parameter is not specified.
+    SearchForVolumeMessage = Searching for {3} volume not assigned to path on partition '{2}' disk with {0} '{1}'.
+    VolumeFoundMessage = Found {3} volume not assigned to path on partition '{2}' disk with {0} '{1}'.
     MatchingPartitionFoundMessage = Disk with {0} '{1}' already contains paritions, and partition '{2}' matches required size.
     AccessPathNotFoundOnPartitionMessage = Disk with {0} '{1}' does not contain a partition assigned to access path '{2}'.
 

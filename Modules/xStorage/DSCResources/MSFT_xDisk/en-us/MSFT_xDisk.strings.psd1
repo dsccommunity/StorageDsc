@@ -26,6 +26,9 @@
     DriveLabelMismatch = Volume assigned to drive {0} label '{1}' does not match expected label '{2}'.
     PartitionAlreadyAssignedMessage = Partition '{1}' is already assigned as drive {0}.
     MatchingPartitionNotFoundMessage = Disk with {0} '{1}' already contains partitions, but none match required size.
+    MatchingPartitionNoSizeMessage = Disk with {0} '{1}' already contains partitions, but size parameter is not specified.
+    SearchForVolumeMessage = Searching for {3} volume with no drive letter on partition '{2}' disk with {0} '{1}'.
+    VolumeFoundMessage = Found {3} volume with no drive letter on partition '{2}' disk with {0} '{1}'.
     MatchingPartitionFoundMessage = Disk with {0} '{1}' already contains partitions, and partition '{2}' matches required size.
     DriveNotFoundOnPartitionMessage = Disk with {0} '{1}' does not contain a partition assigned to drive letter '{2}'.
     ClearingDisk = Clearing disk with {0} '{1}' of all existing partitions and volumes.
