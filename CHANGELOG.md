@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 3.4.0.0
+
 - xDisk:
   - Removed duplicate integration tests for Guid Disk Id type.
   - Added new contexts to integration tests improve clarity.
