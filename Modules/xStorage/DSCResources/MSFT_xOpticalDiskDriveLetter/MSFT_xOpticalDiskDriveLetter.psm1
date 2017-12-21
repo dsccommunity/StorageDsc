@@ -23,7 +23,6 @@ $localizedData = Get-LocalizedData `
 <#
     .SYNOPSIS
     This helper function returns the current drive letter assigned to the optical disk.
-
 #>
 function Get-OpticalDiskDriveLetter
 {
@@ -40,7 +39,7 @@ function Get-OpticalDiskDriveLetter
         Example DeviceID for a virtual drive in a Hyper-V VM - SCSI\CDROM&VEN_MSFT&PROD_VIRTUAL_DVD-ROM\000006
         Example DeviceID for a mounted ISO   in a Hyper-V VM - SCSI\CDROM&VEN_MSFT&PROD_VIRTUAL_DVD-ROM\2&1F4ADFFE&0&000002
     #>
-    $driveLetter = (Get-CimInstance -ClassName win32_cdromdrive | Where-Object {
+    $driveLetter = (Get-CimInstance -ClassName Win32_CDROMDrive | Where-Object {
         -not (
                 $_.Caption -eq 'Microsoft Virtual DVD-ROM' -and
                 ($_.DeviceID.Split('\')[-1]).Length -gt 10
@@ -90,7 +89,8 @@ function Get-TargetResource
 
         $Ensure = 'Present'
     }
-    else {
+    else 
+    {
         # check if $driveletter is the location of the optical disk
         if ($currentDriveLetter -eq $DriveLetter)
         {
@@ -113,12 +113,10 @@ function Get-TargetResource
     }
 
     $returnValue = @{
-    DriveLetter = $currentDriveLetter
-    Ensure = $Ensure
-    }
-
-    $returnValue
-
+                     DriveLetter = $currentDriveLetter
+                     Ensure = $Ensure
+                    }
+    return $returnValue
 } # Get-TargetResource
 
 <#
@@ -133,8 +131,7 @@ function Get-TargetResource
 #>
 function Set-TargetResource
 {
-    [CmdletBinding(SupportsShouldProcess=$True,
-                   ConfirmImpact='Low')]
+    [CmdletBinding()]
     param
     (
         # specify the drive letter as a single letter, optionally include the colon
@@ -142,6 +139,7 @@ function Set-TargetResource
         [System.String]
         $DriveLetter,
 
+        [Parameter()]
         [ValidateSet('Present','Absent')]
         [System.String]
         $Ensure = 'Present'
@@ -149,7 +147,6 @@ function Set-TargetResource
 
     # allow use of drive letter without colon
     $DriveLetter = Assert-DriveLetterValid -DriveLetter $DriveLetter -Colon
-
 
     $currentDriveLetter = Get-OpticalDiskDriveLetter
 
@@ -178,6 +175,7 @@ function Set-TargetResource
                 Set-CimInstance -Property @{ DriveLetter = $DriveLetter }
         }
     }
+
     else
     {
         Write-Verbose -Message ( @(
@@ -208,6 +206,7 @@ function Test-TargetResource
         [System.String]
         $DriveLetter,
 
+        [Parameter()]
         [ValidateSet('Present','Absent')]
         [System.String]
         $Ensure = 'Present'
@@ -217,7 +216,8 @@ function Test-TargetResource
     $DriveLetter = Assert-DriveLetterValid -DriveLetter $DriveLetter -Colon
 
     # is there a optical disk
-    $opticalDrive = Get-CimInstance -ClassName Win32_cdromdrive -Property Id
+    $opticalDrive = Get-CimInstance -ClassName Win32_CDROMDrive -Property Id
+
     # what type of drive is attached to $driveletter
     $volumeDriveType = Get-CimInstance -ClassName Win32_Volume -Filter "DriveLetter = '$DriveLetter'" -Property DriveType
 
@@ -236,7 +236,6 @@ function Test-TargetResource
                 "$($MyInvocation.MyCommand): "
                 $($localizedData.DriveLetterVolumeType -f $driveletter, $volumeDriveType.DriveType)
             ) -join '' )
-
         }
         else
         {
@@ -245,7 +244,6 @@ function Test-TargetResource
                 "$($MyInvocation.MyCommand): "
                 $($localizedData.DriveLetterExistsButNotOptical -f $driveletter)
             ) -join '' )
-
         }
 
         # return true if the drive letter is a optical disk resource
@@ -267,9 +265,7 @@ function Test-TargetResource
 
         $result = $false
     }
-
-    $result
+    
+    return $result
 }
-
 Export-ModuleMember -Function *-TargetResource
-
