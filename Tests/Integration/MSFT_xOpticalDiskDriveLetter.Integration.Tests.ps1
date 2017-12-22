@@ -58,7 +58,7 @@ try
                     & "$($script:DSCResourceName)_Config" `
                         -OutputPath $TestDrive `
                         -ConfigurationData $configData
-                    Start-DscConfiguration -Path $TestDrive -ComputerName localhost -Wait -Verbose -Force
+                    Start-DscConfiguration -Path $TestDrive -ComputerName localhost -Wait -Verbose -Force -ErrorAction Stop
                 } | Should -Not -Throw
             }
 
@@ -69,7 +69,7 @@ try
 
             if ($currentDriveLetter -eq $null)
             {
-                Write-Verbose 'An optical drive is required to run the drive letter integration test.  Mounted ISOs are ignored'
+                Write-Verbose -Message 'An optical drive is required to run the drive letter integration test.  Mounted ISOs are ignored'
                 $skipTests = @{ Skip = $true }
             }
 
