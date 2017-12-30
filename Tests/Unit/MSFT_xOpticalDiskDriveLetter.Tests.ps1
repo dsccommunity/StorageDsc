@@ -176,7 +176,8 @@ try
                     Assert-VerifiableMocks
                 }
             }
-        } #endregion
+        } 
+        #endregion
 
         #region Function Set-TargetResource
         Describe 'MSFT_xOpticalDiskDriveLetter\Set-TargetResource' {
@@ -298,7 +299,6 @@ try
 
                 Mock `
                     -CommandName Set-CimInstance `
-                    -MockWith { } `
                     -Verifiable
 
                 It 'Should not throw' {
@@ -340,7 +340,8 @@ try
                     Assert-MockCalled -CommandName Get-CimInstance -Times 1
                 }
             }
-        } #endregion
+        } 
+        #endregion
 
         Describe 'MSFT_xOpticalDiskDriveLetter\Test-TargetResource' {
             Context 'Drive letter is a valid optical disk drive' {
