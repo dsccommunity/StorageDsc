@@ -171,11 +171,11 @@ function Set-TargetResource
             {
                 $DriveLetter = $null
             }
+
             Get-CimInstance -ClassName Win32_Volume -Filter "DriveLetter = '$currentDriveLetter'" |
                 Set-CimInstance -Property @{ DriveLetter = $DriveLetter }
         }
     }
-
     else
     {
         Write-Verbose -Message ( @(
