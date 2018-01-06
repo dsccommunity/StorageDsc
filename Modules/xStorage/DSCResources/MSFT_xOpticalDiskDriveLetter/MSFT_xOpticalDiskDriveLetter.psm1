@@ -237,7 +237,7 @@ function Test-TargetResource
     # Allow use of drive letter without colon
     $DriveLetter = Assert-DriveLetterValid -DriveLetter $DriveLetter -Colon
 
-    # Is there a optical disk?
+    # Is there an optical disk?
     $opticalDrive = Get-CimInstance -ClassName Win32_CDROMDrive -Property Id
 
     # What type of drive is attached to $driveletter
@@ -246,7 +246,7 @@ function Test-TargetResource
         -Filter "DriveLetter = '$DriveLetter'" `
         -Property DriveType
 
-    # Check there is a optical disk
+    # Check there is an optical disk
     if ($opticalDrive)
     {
         Write-Verbose -Message ( @(
@@ -273,7 +273,7 @@ function Test-TargetResource
             $result = $false
         }
 
-        # Return false if the drive letter specified is a optical disk resource & $Ensure -eq 'Absent'
+        # Return false if the drive letter specified is an optical disk resource & $Ensure -eq 'Absent'
         if ($Ensure -eq 'Absent')
         {
             $result = -not $result
