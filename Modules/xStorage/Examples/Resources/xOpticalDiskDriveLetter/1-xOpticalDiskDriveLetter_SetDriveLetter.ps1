@@ -11,7 +11,8 @@ Configuration Example
     {
         xOpticalDiskDriveLetter MapOpticalDiskToZ
         {
-             DriveLetter = 'Z'
+            IsSingleInstance = 'Yes'
+            DriveLetter      = 'Z'
         }
     }
 }

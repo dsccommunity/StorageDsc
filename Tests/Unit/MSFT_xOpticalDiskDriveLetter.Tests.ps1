@@ -1,5 +1,5 @@
-$script:DSCModuleName      = 'xStorage'
-$script:DSCResourceName    = 'MSFT_xOpticalDiskDriveLetter'
+$script:DSCModuleName = 'xStorage'
+$script:DSCResourceName = 'MSFT_xOpticalDiskDriveLetter'
 
 Import-Module -Name (Join-Path -Path (Join-Path -Path (Split-Path $PSScriptRoot -Parent) -ChildPath 'TestHelpers') -ChildPath 'CommonTestHelper.psm1') -Global
 
@@ -7,9 +7,9 @@ Import-Module -Name (Join-Path -Path (Join-Path -Path (Split-Path $PSScriptRoot 
 # Unit Test Template Version: 1.1.0
 [string] $script:moduleRoot = Join-Path -Path $(Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $Script:MyInvocation.MyCommand.Path))) -ChildPath 'Modules\xStorage'
 if ( (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests'))) -or `
-     (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1'))) )
+    (-not (Test-Path -Path (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1'))) )
 {
-    & git @('clone','https://github.com/PowerShell/DscResource.Tests.git',(Join-Path -Path $script:moduleRoot -ChildPath '\DSCResource.Tests\'))
+    & git @('clone', 'https://github.com/PowerShell/DscResource.Tests.git', (Join-Path -Path $script:moduleRoot -ChildPath '\DSCResource.Tests\'))
 }
 
 Import-Module (Join-Path -Path $script:moduleRoot -ChildPath 'DSCResource.Tests\TestHelper.psm1') -Force
@@ -27,57 +27,59 @@ try
     # The InModuleScope command allows you to perform white-box unit testing on the internal
     # (non-exported) code of a Script Module.
     InModuleScope $script:DSCResourceName {
-
         $script:testDriveLetter = 'X:'
 
         $script:mockedNoOpticalDrive = $null
 
-        $script:mockedOpticalDrive  = [pscustomobject] @{
-                Drive        = $script:testDriveLetter
-                Caption      = 'Microsoft Virtual DVD-ROM'
-                DeviceID     = 'SCSI\CDROM&VEN_MSFT&PROD_VIRTUAL_DVD-ROM\000006'
-                Id           = $script:testDriveLetter
-            }
+        $script:mockedOpticalDrive = [pscustomobject] @{
+            Drive    = $script:testDriveLetter
+            Caption  = 'Microsoft Virtual DVD-ROM'
+            DeviceID = 'SCSI\CDROM&VEN_MSFT&PROD_VIRTUAL_DVD-ROM\000006'
+            Id       = $script:testDriveLetter
+        }
 
         $script:mockedVolume = [pscustomobject] @{
-                DriveLetter  = $script:testDriveLetter
-                DriveType    = 5
-            }
+            DriveLetter = $script:testDriveLetter
+            DriveType   = 5
+        }
 
         $script:mockedWrongLetterOpticalDrive = [pscustomobject] @{
-                Drive          = 'W:'
-                Caption        = 'Microsoft Virtual DVD-ROM'
-                DeviceID       = 'SCSI\CDROM&VEN_MSFT&PROD_VIRTUAL_DVD-ROM\000006'
-            }
+            Drive    = 'W:'
+            Caption  = 'Microsoft Virtual DVD-ROM'
+            DeviceID = 'SCSI\CDROM&VEN_MSFT&PROD_VIRTUAL_DVD-ROM\000006'
+        }
 
         $script:mockedWrongVolume = [pscustomobject] @{
-                DriveLetter       = 'W:'
-            }
+            IsSingleInstance = 'Yes'
+            DriveLetter      = 'W:'
+        }
 
         $script:mockedVolumeNotOpticalDrive = [pscustomobject] @{
-                DriveLetter  =  $script:testDriveLetter
-                DriveType    = 3
-            }
+            DriveLetter = $script:testDriveLetter
+            DriveType   = 3
+        }
 
         $script:mockedOpticalDriveISO = [pscustomobject] @{
-                Drive          = 'I:'
-                Caption        = 'Microsoft Virtual DVD-ROM'
-                DeviceID       = 'SCSI\CDROM&VEN_MSFT&PROD_VIRTUAL_DVD-ROM\2&1F4ADFFE&0&000002'
-            }
+            Drive    = 'I:'
+            Caption  = 'Microsoft Virtual DVD-ROM'
+            DeviceID = 'SCSI\CDROM&VEN_MSFT&PROD_VIRTUAL_DVD-ROM\2&1F4ADFFE&0&000002'
+        }
 
         $script:mockedOpticalDriveIDE = [pscustomobject] @{
-                Drive          = 'I:'
-                Caption        = 'Msft Virtual CD/ROM ATA Device'
-                DeviceID       = 'IDE\CDROMMSFT_VIRTUAL_CD/ROM_____________________1.0_____\5&CFB56DE&0&1.0.0'
-            }
+            Drive    = 'I:'
+            Caption  = 'Msft Virtual CD/ROM ATA Device'
+            DeviceID = 'IDE\CDROMMSFT_VIRTUAL_CD/ROM_____________________1.0_____\5&CFB56DE&0&1.0.0'
+        }
 
-        function Set-CimInstance {
+        function Set-CimInstance
+        {
             Param
             (
                 [CmdletBinding()]
                 [Parameter(ValueFromPipeline)]
                 $InputObject,
 
+                [Parameter()]
                 [hashtable]
                 $Property
             )
@@ -90,21 +92,26 @@ try
                 Mock `
                     -CommandName Get-CimInstance `
                     -ParameterFilter {
-                        $ClassName -eq 'Win32_CDROMDrive'
-                    } `
+                    $ClassName -eq 'Win32_CDROMDrive'
+                } `
                     -MockWith { $script:mockedOpticalDrive } `
                     -Verifiable
 
-                $resource = Get-TargetResource `
-                    -DriveLetter $script:testDriveLetter `
-                    -Verbose
+                It 'Should not throw an exception' {
+                    {
+                        $script:result = Get-TargetResource `
+                            -IsSingleInstance 'Yes' `
+                            -Driveletter $script:testDriveLetter `
+                            -Verbose
+                    } | Should -Not -Throw
+                }
 
                 It "DriveLetter should be $($script:testDriveLetter)" {
-                    $resource.DriveLetter | Should -Be $script:testDriveLetter
+                    $script:result.DriveLetter | Should -Be $script:testDriveLetter
                 }
 
                 It 'Should call all the Get mocks' {
-                    Assert-VerifiableMocks
+                    Assert-VerifiableMock
                 }
             }
 
@@ -113,21 +120,26 @@ try
                 Mock `
                     -CommandName Get-CimInstance `
                     -ParameterFilter {
-                        $ClassName -eq 'Win32_CDROMDrive'
-                    } `
+                    $ClassName -eq 'Win32_CDROMDrive'
+                } `
                     -MockWith { $script:mockedWrongLetterOpticalDrive } `
                     -Verifiable
 
-                $resource = Get-TargetResource `
-                    -DriveLetter $script:testDriveLetter `
-                    -Verbose
+                It 'Should not throw an exception' {
+                    {
+                        $script:result = Get-TargetResource `
+                            -IsSingleInstance 'Yes' `
+                            -Driveletter $script:testDriveLetter `
+                            -Verbose
+                    } | Should -Not -Throw
+                }
 
                 It "DriveLetter should be $($script:testDriveLetter)" {
-                    $resource.DriveLetter | Should -Not -Be $script:testDriveLetter
+                    $script:result.DriveLetter | Should -Not -Be $script:testDriveLetter
                 }
 
                 It 'Should call all the Get mocks' {
-                    Assert-VerifiableMocks
+                    Assert-VerifiableMock
                 }
             }
 
@@ -136,21 +148,26 @@ try
                 Mock `
                     -CommandName Get-CimInstance `
                     -ParameterFilter {
-                        $ClassName -eq 'Win32_CDROMDrive'
-                    } `
+                    $ClassName -eq 'Win32_CDROMDrive'
+                } `
                     -MockWith { $script:mockedOpticalDriveIDE } `
                     -Verifiable
 
-                $resource = Get-TargetResource `
-                    -DriveLetter $script:testDriveLetter `
-                    -Verbose
+                It 'Should not throw an exception' {
+                    {
+                        $script:result = Get-TargetResource `
+                            -IsSingleInstance 'Yes' `
+                            -Driveletter $script:testDriveLetter `
+                            -Verbose
+                    } | Should -Not -Throw
+                }
 
                 It "Should be DriveLetter $($script:testDriveLetter)" {
-                    $resource.DriveLetter | Should -Not -Be $script:testDriveLetter
+                    $script:result.DriveLetter | Should -Not -Be $script:testDriveLetter
                 }
 
                 It 'Should call all the Get mocks' {
-                    Assert-VerifiableMocks
+                    Assert-VerifiableMock
                 }
             }
 
@@ -159,24 +176,29 @@ try
                 Mock `
                     -CommandName Get-CimInstance `
                     -ParameterFilter {
-                        $ClassName -eq 'Win32_CDROMDrive'
-                    } `
+                    $ClassName -eq 'Win32_CDROMDrive'
+                } `
                     -MockWith { $script:mockedNoOpticalDrive } `
                     -Verifiable
 
-                $resource = Get-TargetResource `
-                    -DriveLetter $script:testDriveLetter `
-                    -Verbose
+                It 'Should not throw an exception' {
+                    {
+                        $script:result = Get-TargetResource `
+                            -IsSingleInstance 'Yes' `
+                            -Driveletter $script:testDriveLetter `
+                            -Verbose
+                    } | Should -Not -Throw
+                }
 
-                It "DriveLetter should be null" {
-                    $resource.DriveLetter | Should -Be $null
+                It 'DriveLetter should be null' {
+                    $script:result.DriveLetter | Should -Be $null
                 }
 
                 It 'Should call all the Get mocks' {
-                    Assert-VerifiableMocks
+                    Assert-VerifiableMock
                 }
             }
-        } 
+        }
         #endregion
 
         #region Function Set-TargetResource
@@ -186,22 +208,23 @@ try
                 Mock `
                     -CommandName Get-CimInstance `
                     -ParameterFilter {
-                        $ClassName -eq 'Win32_CDROMDrive'
-                    } `
+                    $ClassName -eq 'Win32_CDROMDrive'
+                } `
                     -MockWith { $script:mockedOpticalDrive } `
                     -Verifiable
 
-                It 'Should not throw' {
+                It 'Should not throw an exception' {
                     {
                         Set-TargetResource `
+                            -IsSingleInstance 'Yes' `
                             -Driveletter $script:testDriveLetter `
                             -Verbose
                     } | Should -Not -Throw
                 }
 
                 It 'Should call the correct mocks' {
-                    Assert-VerifiableMocks
-                    Assert-MockCalled -CommandName Get-CimInstance -Times 1
+                    Assert-VerifiableMock
+                    Assert-MockCalled -CommandName Get-CimInstance -Exactly -Times 1
                 }
             }
 
@@ -210,16 +233,16 @@ try
                 Mock `
                     -CommandName Get-CimInstance `
                     -ParameterFilter {
-                        $ClassName -eq 'Win32_CDROMDrive'
-                    } `
+                    $ClassName -eq 'Win32_CDROMDrive'
+                } `
                     -MockWith { $script:mockedOpticalDrive } `
                     -Verifiable
 
                 Mock `
                     -CommandName Get-CimInstance  `
                     -ParameterFilter {
-                        $ClassName -eq 'Win32_Volume'
-                    } `
+                    $ClassName -eq 'Win32_Volume'
+                } `
                     -MockWith { $script:mockedVolume } `
                     -Verifiable
 
@@ -227,9 +250,10 @@ try
                     -CommandName Set-CimInstance `
                     -Verifiable
 
-                It 'Should not throw' {
+                It 'Should not throw an exception' {
                     {
                         Set-TargetResource `
+                            -IsSingleInstance 'Yes' `
                             -Driveletter $script:testDriveLetter `
                             -Ensure 'Absent' `
                             -Verbose
@@ -237,8 +261,8 @@ try
                 }
 
                 It 'Should call the correct mocks' {
-                    Assert-VerifiableMocks
-                    Assert-MockCalled -CommandName Get-CimInstance -Times 1
+                    Assert-VerifiableMock
+                    Assert-MockCalled -CommandName Get-CimInstance -Exactly -Times 2
                 }
             }
 
@@ -247,16 +271,16 @@ try
                 Mock `
                     -CommandName Get-CimInstance `
                     -ParameterFilter {
-                        $ClassName -eq 'Win32_CDROMDrive'
-                    } `
+                    $ClassName -eq 'Win32_CDROMDrive'
+                } `
                     -MockWith { $script:mockedWrongLetterOpticalDrive } `
                     -Verifiable
 
                 Mock `
                     -CommandName Get-CimInstance  `
                     -ParameterFilter {
-                        $ClassName -eq 'Win32_Volume'
-                    } `
+                    $ClassName -eq 'Win32_Volume'
+                } `
                     -MockWith { $script:mockedWrongVolume } `
                     -Verifiable
 
@@ -264,18 +288,19 @@ try
                     -CommandName Set-CimInstance `
                     -Verifiable
 
-                It 'Should not throw' {
+                It 'Should not throw an exception' {
                     {
                         Set-TargetResource `
+                            -IsSingleInstance 'Yes' `
                             -Driveletter $script:testDriveLetter `
                             -Verbose
                     } | Should -Not -Throw
                 }
 
                 It 'Should call the correct mocks' {
-                    Assert-VerifiableMocks
-                    Assert-MockCalled -CommandName Get-CimInstance -Times 2
-                    Assert-MockCalled -CommandName Set-CimInstance -Times 1
+                    Assert-VerifiableMock
+                    Assert-MockCalled -CommandName Get-CimInstance -Exactly -Times 2
+                    Assert-MockCalled -CommandName Set-CimInstance -Exactly -Times 1
                 }
             }
 
@@ -284,16 +309,16 @@ try
                 Mock `
                     -CommandName Get-CimInstance `
                     -ParameterFilter {
-                        $ClassName -eq 'Win32_CDROMDrive'
-                    } `
+                    $ClassName -eq 'Win32_CDROMDrive'
+                } `
                     -MockWith { $script:mockedOpticalDriveide } `
                     -Verifiable
 
                 Mock `
                     -CommandName Get-CimInstance  `
                     -ParameterFilter {
-                        $ClassName -eq 'Win32_Volume'
-                    } `
+                    $ClassName -eq 'Win32_Volume'
+                } `
                     -MockWith { $script:mockedWrongVolume } `
                     -Verifiable
 
@@ -301,18 +326,19 @@ try
                     -CommandName Set-CimInstance `
                     -Verifiable
 
-                It 'Should not throw' {
+                It 'Should not throw an exception' {
                     {
                         Set-TargetResource `
+                            -IsSingleInstance 'Yes' `
                             -Driveletter $script:testDriveLetter `
                             -Verbose
                     } | Should -Not -Throw
                 }
 
                 It 'Should call the correct mocks' {
-                    Assert-VerifiableMocks
-                    Assert-MockCalled -CommandName Get-CimInstance -Times 2
-                    Assert-MockCalled -CommandName Set-CimInstance -Times 1
+                    Assert-VerifiableMock
+                    Assert-MockCalled -CommandName Get-CimInstance -Exactly -Times 2
+                    Assert-MockCalled -CommandName Set-CimInstance -Exactly -Times 1
                 }
             }
 
@@ -322,25 +348,26 @@ try
                 Mock `
                     -CommandName Get-CimInstance `
                     -ParameterFilter {
-                        $ClassName -eq 'Win32_CDROMDrive'
-                    } `
+                    $ClassName -eq 'Win32_CDROMDrive'
+                } `
                     -MockWith { $script:mockedOpticalDriveISO } `
                     -Verifiable
 
-                It 'Should not throw' {
+                It 'Should not throw an exception' {
                     {
                         Set-TargetResource `
+                            -IsSingleInstance 'Yes' `
                             -Driveletter $script:testDriveLetter `
                             -Verbose
                     } | Should -Not -Throw
                 }
 
                 It 'Should call the correct mocks' {
-                    Assert-VerifiableMocks
-                    Assert-MockCalled -CommandName Get-CimInstance -Times 1
+                    Assert-VerifiableMock
+                    Assert-MockCalled -CommandName Get-CimInstance -Exactly -Times 1
                 }
             }
-        } 
+        }
         #endregion
 
         Describe 'MSFT_xOpticalDiskDriveLetter\Test-TargetResource' {
@@ -349,25 +376,34 @@ try
                 Mock `
                     -CommandName Get-CimInstance `
                     -ParameterFilter {
-                        $ClassName -eq 'Win32_CDROMDrive'
-                    } `
+                    $ClassName -eq 'Win32_CDROMDrive'
+                } `
                     -MockWith { $script:mockedOpticalDrive } `
                     -Verifiable
 
                 Mock `
                     -CommandName Get-CimInstance  `
                     -ParameterFilter {
-                        $ClassName -eq 'Win32_Volume'
-                    } `
+                    $ClassName -eq 'Win32_Volume'
+                } `
                     -MockWith { $script:mockedVolume } `
                     -Verifiable
 
-                $resource = Test-TargetResource `
-                    -DriveLetter $script:testDriveLetter `
-                    -Verbose | Should -Be $true
+                It 'Should not throw an exception' {
+                    {
+                        $script:result = Test-TargetResource `
+                            -IsSingleInstance 'Yes' `
+                            -DriveLetter $script:testDriveLetter `
+                            -Verbose
+                    } | Should -Not -Throw
+                }
+
+                It 'Should return $true' {
+                    $script:result | Should -Be $true
+                }
 
                 It 'Should call all the Get mocks' {
-                    Assert-VerifiableMocks
+                    Assert-VerifiableMock
                 }
             }
 
@@ -376,26 +412,35 @@ try
                 Mock `
                     -CommandName Get-CimInstance `
                     -ParameterFilter {
-                        $ClassName -eq 'Win32_CDROMDrive'
-                    } `
+                    $ClassName -eq 'Win32_CDROMDrive'
+                } `
                     -MockWith { $script:mockedOpticalDrive } `
                     -Verifiable
 
                 Mock `
                     -CommandName Get-CimInstance  `
                     -ParameterFilter {
-                        $ClassName -eq 'Win32_Volume'
-                    } `
+                    $ClassName -eq 'Win32_Volume'
+                } `
                     -MockWith { $script:mockedVolume } `
                     -Verifiable
 
-                $resource = Test-TargetResource `
-                    -DriveLetter $script:testDriveLetter `
-                    -Ensure 'Absent' `
-                    -Verbose | Should -Be $false
+                It 'Should not throw an exception' {
+                    {
+                        $script:result = Test-TargetResource `
+                            -IsSingleInstance 'Yes' `
+                            -DriveLetter $script:testDriveLetter `
+                            -Ensure 'Absent' `
+                            -Verbose
+                    } | Should -Not -Throw
+                }
+
+                It 'Should return $false' {
+                    $script:result | Should -Be $false
+                }
 
                 It 'Should call all the Get mocks' {
-                    Assert-VerifiableMocks
+                    Assert-VerifiableMock
                 }
             }
 
@@ -404,26 +449,35 @@ try
                 Mock `
                     -CommandName Get-CimInstance `
                     -ParameterFilter {
-                        $ClassName -eq 'Win32_CDROMDrive'
-                    } `
+                    $ClassName -eq 'Win32_CDROMDrive'
+                } `
                     -MockWith { $script:mockedNoOpticalDrive } `
                     -Verifiable
 
                 Mock `
                     -CommandName Get-CimInstance  `
                     -ParameterFilter {
-                        $ClassName -eq 'Win32_Volume'
-                    } `
+                    $ClassName -eq 'Win32_Volume'
+                } `
                     -MockWith { $script:mockedWrongVolume } `
                     -Verifiable
 
-                $resource = Test-TargetResource `
-                    -DriveLetter $script:testDriveLetter `
-                    -Ensure 'Present' `
-                    -Verbose | Should -Be $false
+                It 'Should not throw an exception' {
+                    {
+                        $script:result = Test-TargetResource `
+                            -IsSingleInstance 'Yes' `
+                            -DriveLetter $script:testDriveLetter `
+                            -Ensure 'Present' `
+                            -Verbose
+                    } | Should -Not -Throw
+                }
+
+                It 'Should return $false' {
+                    $script:result | Should -Be $false
+                }
 
                 It 'Should call all the Get mocks' {
-                    Assert-VerifiableMocks
+                    Assert-VerifiableMock
                 }
             }
 
@@ -432,26 +486,35 @@ try
                 Mock `
                     -CommandName Get-CimInstance `
                     -ParameterFilter {
-                        $ClassName -eq 'Win32_CDROMDrive'
-                    } `
+                    $ClassName -eq 'Win32_CDROMDrive'
+                } `
                     -MockWith { $script:mockedOpticalDrive } `
                     -Verifiable
 
                 Mock `
                     -CommandName Get-CimInstance  `
                     -ParameterFilter {
-                        $ClassName -eq 'Win32_Volume'
-                    } `
+                    $ClassName -eq 'Win32_Volume'
+                } `
                     -MockWith { $script:mockedVolumeNotOpticalDrive } `
                     -Verifiable
 
-                $resource = Test-TargetResource `
-                    -DriveLetter $script:testDriveLetter `
-                    -Ensure 'Present' `
-                    -Verbose | Should -Be $false
+                It 'Should not throw an exception' {
+                    {
+                        $script:result = Test-TargetResource `
+                            -IsSingleInstance 'Yes' `
+                            -DriveLetter $script:testDriveLetter `
+                            -Ensure 'Present' `
+                            -Verbose
+                    } | Should -Not -Throw
+                }
+
+                It 'Should return $false' {
+                    $script:result | Should -Be $false
+                }
 
                 It 'Should call all the Get mocks' {
-                    Assert-VerifiableMocks
+                    Assert-VerifiableMock
                 }
             }
         }
