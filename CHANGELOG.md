@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- xOpticalDiskDriveLetter:
+  - Added new resource.
+  - Added support for setting the drive letter of optical drives (CD/DVD drives).
+
 ## 3.4.0.0
 
 - xDisk:
@@ -14,9 +18,6 @@
   - Fix bug when size not specified and disk partitioned and
     formatted but not assigned to path - See [Issue 103](https://github.com/PowerShell/xStorage/issues/103).
 - Updated tests to meet Pester V4 guidelines - fixes [Issue #120](https://github.com/PowerShell/xStorage/issues/120).
-- xOpticalDiskDriveLetter:
-  - Added new resource.
-  - Added support for setting the drive letter of optical drives (CD/DVD drives).
 
 ## 3.3.0.0
 
