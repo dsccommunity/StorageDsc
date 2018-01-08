@@ -1,9 +1,13 @@
 # Description
 
-The resource is used to set the drive letter of an optical disk drive (e.g. a
- CDROM or DVD drive).
+The resource is used to set the drive letter of an optical disk drive (e.g.
+a CDROM or DVD drive).
 
-It is designed to ignore 'temporary' optical disk drives that are created when
+It can be used to set the drive letter of a specific optical disk drive if
+there are multiple in the system by specifying a value greater than 1 for
+the `DiskId` parameter.
+
+It is designed to ignore _temporary_ optical disk drives that are created when
 mounting ISOs on Windows Server 2012+.
 
 With the Device ID, we look for the length of the string after the final

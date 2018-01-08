@@ -33,20 +33,24 @@ function Assert-DriveLetterValid
         $Colon
     )
 
-    $Matches = @([regex]::matches($DriveLetter, '^([A-Za-z]):?$', 'IgnoreCase'))
-    if (-not $Matches)
+    $matches = @([regex]::matches($DriveLetter, '^([A-Za-z]):?$', 'IgnoreCase'))
+
+    if (-not $matches)
     {
         # DriveLetter format is invalid
         New-InvalidArgumentException `
             -Message $($LocalizedData.InvalidDriveLetterFormatError -f $DriveLetter) `
             -ArgumentName 'DriveLetter'
     }
+
     # This is the drive letter without a colon
-    $DriveLetter = $Matches.Groups[1].Value
+    $DriveLetter = $matches.Groups[1].Value
+
     if ($Colon)
     {
         $DriveLetter = $DriveLetter + ':'
     } # if
+
     return $DriveLetter
 } # end function Assert-DriveLetterValid
 

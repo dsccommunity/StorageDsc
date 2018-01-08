@@ -2,8 +2,8 @@
 [ClassVersion("1.0.0.0"), FriendlyName("xOpticalDiskDriveLetter")]
 class MSFT_xOpticalDiskDriveLetter : OMI_BaseResource
 {
-    [Key, Description("Specifies the resource is a single instance, the value must be 'Yes'."), ValueMap{"Yes"}, Values{"Yes"}] String IsSingleInstance;
-    [Required, Description("Specifies the drive letter to assign to the optical disk. Can be a single letter, optionally followed by a colon.")] String DriveLetter;
-    [Write, Description("Determines whether the optical drive drive letter should be changed or not."), ValueMap{"Present","Absent"}, Values{"Present","Absent"}] string Ensure;
+    [Key, Description("Specifies the optical disk number for the disk to assign the drive letter to.")] String DiskId;
+    [Write, Description("Specifies the drive letter to assign to the optical disk. Can be a single letter, optionally followed by a colon.")] String DriveLetter;
+    [Write, Description("Determines whether a drive letter should be assigned to the optical disk. Defaults to 'Present'."), ValueMap{"Present","Absent"}, Values{"Present","Absent"}] string Ensure;
 };
 
