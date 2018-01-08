@@ -57,7 +57,7 @@ function Get-OpticalDiskDriveLetter
     param
     (
         [Parameter(Mandatory = $true)]
-        [System.Int32]
+        [System.String]
         $DiskId,
 
         [Parameter()]
@@ -147,7 +147,7 @@ function Get-TargetResource
     param
     (
         [Parameter(Mandatory = $true)]
-        [System.Int32]
+        [System.String]
         $DiskId,
 
         [Parameter(Mandatory = $true)]
@@ -208,7 +208,7 @@ function Set-TargetResource
     param
     (
         [Parameter(Mandatory = $true)]
-        [System.Int32]
+        [System.String]
         $DiskId,
 
         [Parameter(Mandatory = $true)]
@@ -291,7 +291,7 @@ function Test-TargetResource
     param
     (
         [Parameter(Mandatory = $true)]
-        [System.Int32]
+        [System.String]
         $DiskId,
 
         [Parameter(Mandatory = $true)]
