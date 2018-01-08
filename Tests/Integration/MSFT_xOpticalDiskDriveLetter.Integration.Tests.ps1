@@ -185,6 +185,9 @@ finally
     Restore-TestEnvironment -TestEnvironment $TestEnvironment
 
     # Mount the optical disk back to where it was
-    $volume | Set-CimInstance -Property @{ DriveLetter = $currentDriveLetter }
+    if ($volume)
+    {
+        $volume | Set-CimInstance -Property @{ DriveLetter = $currentDriveLetter }
+    }
     #endregion
 }
