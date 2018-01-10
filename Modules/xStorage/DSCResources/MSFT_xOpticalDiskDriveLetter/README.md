@@ -13,6 +13,7 @@ be set to 1.
 In systems with multiple optical disks, the `DiskId` should be set to
 the ordinal number of the required optical disk found in the list
 returnedwhen executing the following cmdlet:
+
 ```powershell
 Get-CimInstance -ClassName Win32_CDROMDrive
 ```
