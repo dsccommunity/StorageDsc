@@ -101,7 +101,7 @@ try
             )
         }
 
-        #region Function Get-TargetResource
+        #region Function Get-OpticalDiskDriveLetter
         Describe 'MSFT_xOpticalDiskDriveLetter\Get-OpticalDiskDriveLetter' {
             Context 'Single optical disk drive present and assigned a drive letter' {
                 # verifiable (should be called) mocks
@@ -117,9 +117,8 @@ try
 
                 It 'Should not throw an exception' {
                     {
-                        $script:result = Get-TargetResource `
+                        $script:result = Get-OpticalDiskDriveLetter `
                             -DiskId 1 `
-                            -Driveletter $script:testDriveLetter `
                             -Verbose
                     } | Should -Not -Throw
                 }
@@ -147,15 +146,15 @@ try
 
                 It 'Should not throw an exception' {
                     {
-                        $script:result = Get-TargetResource `
+                        $script:result = Get-OpticalDiskDriveLetter `
                             -DiskId 1 `
-                            -Driveletter $script:testDriveLetter `
                             -Verbose
                     } | Should -Not -Throw
                 }
 
                 It "DriveLetter should be empty" {
                     $script:result.DriveLetter | Should -Be ''
+                    $script:result.DeviceId | Should -Be $script:testDriveLetterNoVolume
                 }
 
                 It 'Should call all the Get mocks' {
@@ -177,9 +176,8 @@ try
 
                 It 'Should not throw an exception' {
                     {
-                        $script:result = Get-TargetResource `
+                        $script:result = Get-OpticalDiskDriveLetter `
                             -DiskId 2 `
-                            -Driveletter $script:testDriveLetter `
                             -Verbose
                     } | Should -Not -Throw
                 }
@@ -211,9 +209,8 @@ try
 
                 It 'Should throw expected exception' {
                     {
-                        $script:result = Get-TargetResource `
+                        $script:result = Get-OpticalDiskDriveLetter `
                             -DiskId 2 `
-                            -Driveletter $script:testDriveLetter `
                             -Verbose
                     } | Should -Throw $errorRecord
                 }
@@ -237,9 +234,8 @@ try
 
                 It 'Should throw expected exception' {
                     {
-                        $script:result = Get-TargetResource `
+                        $script:result = Get-OpticalDiskDriveLetter `
                             -DiskId 1 `
-                            -Driveletter $script:testDriveLetter `
                             -Verbose
                     } | Should -Throw $errorRecord
                 }
@@ -649,17 +645,16 @@ try
                 } `
                     -Verifiable
 
-                It 'Should not throw an exception' {
+                $errorRecord = Get-InvalidOperationRecord `
+                    -Message $($localizedData.DriveLetterAssignedToAnotherDrive -f $script:testDriveLetter)
+
+                It 'Should throw expected exception' {
                     {
                         $script:result = Test-TargetResource `
                             -DiskId 1 `
                             -DriveLetter $script:testDriveLetter `
                             -Verbose
-                    } | Should -Not -Throw
-                }
-
-                It 'Should return $true' {
-                    $script:result | Should -Be $true
+                    } | Should -Throw $errorRecord
                 }
 
                 It 'Should call all the Get mocks' {

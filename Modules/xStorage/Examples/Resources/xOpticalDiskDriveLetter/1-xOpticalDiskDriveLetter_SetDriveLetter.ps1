@@ -5,7 +5,6 @@
 #>
 Configuration Example
 {
-
     Import-DSCResource -ModuleName xStorage
 
     Node localhost

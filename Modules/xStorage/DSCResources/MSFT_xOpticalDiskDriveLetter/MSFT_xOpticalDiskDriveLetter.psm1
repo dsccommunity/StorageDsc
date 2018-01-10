@@ -22,33 +22,29 @@ $localizedData = Get-LocalizedData `
 
 <#
     .SYNOPSIS
-    This helper function returns the current drive letter assigned
-    to the a disk number disk found in the system.
+        This helper function returns a hashtable containing the current
+        drive letter assigned to the optical disk in the system matching
+        the disk number.
 
-    If the drive exists but is not mounted to a drive letter then
-    it will return an empty string.
+        If the drive exists but is not mounted to a drive letter then
+        the DriveLetter will be empty, but the DeviceId will contain the
+        DeviceId representing the optical disk.
 
-    If there are no optical disks found in the system, return null.
+        If there are no optical disks found in the system an exception
+        will be thrown.
 
     .PARAMETER DiskId
-    Specifies the optical disk number for the disk to return the drive
-    letter of.
-
-    .PARAMETER ReturnDeviceIdOnNoDriveLetter
-    This switch will cause the Drive Letter to be returned with the
-    default value that Drive is set to when no Drive Letter is assigned
-    e.g. 'Volume{bba1802b-e7a1-11e3-824e-806e6f6e6963}'.
-
-    Otherwise the Drive Letter will be empty
+        Specifies the optical disk number for the disk to return the drive
+        letter of.
 
     .NOTES
-    The Caption and DeviceID properties are checked to avoid
-    mounted ISO images in Windows 2012+ and Windows 10. The
-    device ID is required because a CD/DVD in a Hyper-V virtual
-    machine has the same caption as a mounted ISO.
+        The Caption and DeviceID properties are checked to avoid
+        mounted ISO images in Windows 2012+ and Windows 10. The
+        device ID is required because a CD/DVD in a Hyper-V virtual
+        machine has the same caption as a mounted ISO.
 
-    Example DeviceID for a virtual drive in a Hyper-V VM - SCSI\CDROM&VEN_MSFT&PROD_VIRTUAL_DVD-ROM\000006
-    Example DeviceID for a mounted ISO   in a Hyper-V VM - SCSI\CDROM&VEN_MSFT&PROD_VIRTUAL_DVD-ROM\2&1F4ADFFE&0&000002
+        Example DeviceID for a virtual drive in a Hyper-V VM - SCSI\CDROM&VEN_MSFT&PROD_VIRTUAL_DVD-ROM\000006
+        Example DeviceID for a mounted ISO   in a Hyper-V VM - SCSI\CDROM&VEN_MSFT&PROD_VIRTUAL_DVD-ROM\2&1F4ADFFE&0&000002
 #>
 function Get-OpticalDiskDriveLetter
 {
@@ -58,11 +54,7 @@ function Get-OpticalDiskDriveLetter
     (
         [Parameter(Mandatory = $true)]
         [System.String]
-        $DiskId,
-
-        [Parameter()]
-        [Switch]
-        $ReturnDeviceIdOnNoDriveLetter
+        $DiskId
     )
 
     $driveLetter = $null
@@ -81,8 +73,17 @@ function Get-OpticalDiskDriveLetter
         )
     }
 
+    $deviceId = ''
+
     if ($opticalDisks)
     {
+        <#
+            To behave in a similar fashion to the other xStorage resources the
+            DiskId represents the number of the optical disk in the system.
+            However as these are returned as an array of 0..x elements then
+            subtract one from the DiskId to get the actual optical disk number
+            that is required.
+        #>
         $opticalDisk = $opticalDisks[$DiskId - 1]
 
         if ($opticalDisk)
@@ -95,25 +96,13 @@ function Get-OpticalDiskDriveLetter
             catch
             {
                 # Optical drive exists but is not mounted to a drive letter
-                if ($ReturnDeviceIdOnNoDriveLetter)
-                {
-                    $driveLetter = $opticalDisk.Drive
+                $deviceId = $opticalDisk.Drive
+                $driveLetter = ''
 
-                    Write-Verbose -Message ( @(
-                            "$($MyInvocation.MyCommand): "
-                            $($localizedData.OpticalDiskAssignedDriveLetter -f $DiskId, $driveLetter)
-                        ) -join '' )
-                }
-                else
-                {
-                    $driveLetter = ''
-
-                    Write-Verbose -Message ( @(
-                            "$($MyInvocation.MyCommand): "
-                            $($localizedData.OpticalDiskNotAssignedDriveLetter -f $DiskId)
-                        ) -join '' )
-
-                }
+                Write-Verbose -Message ( @(
+                        "$($MyInvocation.MyCommand): "
+                        $($localizedData.OpticalDiskNotAssignedDriveLetter -f $DiskId)
+                    ) -join '' )
             }
         }
     }
@@ -125,20 +114,27 @@ function Get-OpticalDiskDriveLetter
             -ArgumentName 'DiskId'
     }
 
-    return $driveLetter
+    $driveInfo = @{
+        DriveLetter = $driveLetter
+        DeviceId    = $deviceId
+
+    }
+
+    return $driveInfo
 }
 
 <#
     .SYNOPSIS
-    Returns the current drive letter assigned to the optical disk.
+        Returns the current drive letter assigned to the optical disk.
 
     .PARAMETER DiskId
-    Specifies the optical disk number for the disk to assign the drive
-    letter to.
+        Specifies the optical disk number for the disk to assign the drive
+        letter to.
 
     .PARAMETER DriveLetter
-    Specifies the drive letter to assign to the optical disk. Can be a
-    single letter, optionally followed by a colon.
+        Specifies the drive letter to assign to the optical disk. Can be a
+        single letter, optionally followed by a colon. This value is ignored
+        if Ensure is set to Absent.
 #>
 function Get-TargetResource
 {
@@ -158,7 +154,8 @@ function Get-TargetResource
     $ensure = 'Absent'
 
     # Get the drive letter assigned to the optical disk
-    $currentDriveLetter = Get-OpticalDiskDriveLetter -DiskId $DiskId
+    $currentDriveInfo = Get-OpticalDiskDriveLetter -DiskId $DiskId
+    $currentDriveLetter = $currentDriveInfo.DriveLetter
 
     if ([System.String]::IsNullOrWhiteSpace($currentDriveLetter))
     {
@@ -188,19 +185,20 @@ function Get-TargetResource
 
 <#
     .SYNOPSIS
-    Sets the drive letter of an optical disk.
+        Sets the drive letter of an optical disk.
 
     .PARAMETER DiskId
-    Specifies the optical disk number for the disk to assign the drive
-    letter to.
+        Specifies the optical disk number for the disk to assign the drive
+        letter to.
 
     .PARAMETER DriveLetter
-    Specifies the drive letter to assign to the optical disk. Can be a
-    single letter, optionally followed by a colon.
+        Specifies the drive letter to assign to the optical disk. Can be a
+        single letter, optionally followed by a colon. This value is ignored
+        if Ensure is set to Absent.
 
     .PARAMETER Ensure
-    Determines whether a drive letter should be assigned to the
-    optical disk. Defaults to 'Present'.
+        Determines whether a drive letter should be assigned to the
+        optical disk. Defaults to 'Present'.
 #>
 function Set-TargetResource
 {
@@ -225,7 +223,8 @@ function Set-TargetResource
     $DriveLetter = Assert-DriveLetterValid -DriveLetter $DriveLetter -Colon
 
     # Get the drive letter assigned to the optical disk
-    $currentDriveLetter = Get-OpticalDiskDriveLetter -DiskId $DiskId
+    $currentDriveInfo = Get-OpticalDiskDriveLetter -DiskId $DiskId
+    $currentDriveLetter = $currentDriveInfo.DriveLetter
 
     if ([System.String]::IsNullOrWhiteSpace($currentDriveLetter))
     {
@@ -234,7 +233,7 @@ function Set-TargetResource
             The DeviceId in the volume will show as \\?\Volume{bba1802b-e7a1-11e3-824e-806e6f6e6963}\
             So we need to change the currentDriveLetter to match this value when we set the drive letter
         #>
-        $deviceId = Get-OpticalDiskDriveLetter -DiskId $DiskId -ReturnDeviceIdOnNoDriveLetter
+        $deviceId = $currentDriveInfo.DeviceId
 
         $volume = Get-CimInstance `
             -ClassName Win32_Volume `
@@ -270,19 +269,20 @@ function Set-TargetResource
 
 <#
     .SYNOPSIS
-    Tests the disk letter assigned to an optical disk is correct.
+        Tests the disk letter assigned to an optical disk is correct.
 
     .PARAMETER DiskId
-    Specifies the optical disk number for the disk to assign the drive
-    letter to.
+        Specifies the optical disk number for the disk to assign the drive
+        letter to.
 
     .PARAMETER DriveLetter
-    Specifies the drive letter to assign to the optical disk. Can be a
-    single letter, optionally followed by a colon.
+        Specifies the drive letter to assign to the optical disk. Can be a
+        single letter, optionally followed by a colon. This value is ignored
+        if Ensure is set to Absent.
 
     .PARAMETER Ensure
-    Determines whether a drive letter should be assigned to the
-    optical disk. Defaults to 'Present'.
+        Determines whether a drive letter should be assigned to the
+        optical disk. Defaults to 'Present'.
 #>
 function Test-TargetResource
 {
@@ -310,7 +310,8 @@ function Test-TargetResource
     $DriveLetter = Assert-DriveLetterValid -DriveLetter $DriveLetter -Colon
 
     # Get the drive letter assigned to the optical disk
-    $currentDriveLetter = Get-OpticalDiskDriveLetter -DiskId $DiskId
+    $currentDriveInfo = Get-OpticalDiskDriveLetter -DiskId $DiskId
+    $currentDriveLetter = $currentDriveInfo.DriveLetter
 
     if ($Ensure -eq 'Absent')
     {
@@ -353,10 +354,8 @@ function Test-TargetResource
             if ($existingVolume)
             {
                 # The desired drive letter is already assigned to another drive - can't proceed
-                Write-Verbose -Message ( @(
-                        "$($MyInvocation.MyCommand): "
-                        $($localizedData.DriveLetterAssignedToAnotherDrive -f $DriveLetter)
-                    ) -join '' )
+                New-InvalidOperationException `
+                    -Message $($localizedData.DriveLetterAssignedToAnotherDrive -f $DriveLetter)
             }
             else
             {

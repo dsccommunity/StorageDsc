@@ -7,6 +7,16 @@ It can be used to set the drive letter of a specific optical disk drive if
 there are multiple in the system by specifying a value greater than 1 for
 the `DiskId` parameter.
 
+In a system with a single optical disk drive then the `DiskId` should
+be set to 1.
+
+In systems with multiple optical disks, the `DiskId` should be set to
+the ordinal number of the required optical disk found in the list returned
+when executing the following cmdlet:
+```powershell
+Get-CimInstance -ClassName Win32_CDROMDrive
+```
+
 It is designed to ignore _temporary_ optical disk drives that are created when
 mounting ISOs on Windows Server 2012+.
 
