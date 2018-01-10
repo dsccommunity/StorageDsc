@@ -17,6 +17,10 @@ when executing the following cmdlet:
 Get-CimInstance -ClassName Win32_CDROMDrive
 ```
 
+Warning: Adding and removing optical drive devices to a system may cause the
+order the optical drives appear in the system to change. Therefore, the
+drive ordinal number may be affected in these situations.
+
 It is designed to ignore _temporary_ optical disk drives that are created when
 mounting ISOs on Windows Server 2012+.
 
