@@ -96,7 +96,6 @@ function Get-OpticalDiskDriveLetter
             catch
             {
                 # Optical drive exists but is not mounted to a drive letter
-                $deviceId = $opticalDisk.Drive
                 $driveLetter = ''
 
                 Write-Verbose -Message ( @(
@@ -104,6 +103,7 @@ function Get-OpticalDiskDriveLetter
                         $($localizedData.OpticalDiskNotAssignedDriveLetter -f $DiskId)
                     ) -join '' )
             }
+            $deviceId = $opticalDisk.Drive
         }
     }
 
@@ -114,13 +114,10 @@ function Get-OpticalDiskDriveLetter
             -ArgumentName 'DiskId'
     }
 
-    $driveInfo = @{
+    return @{
         DriveLetter = $driveLetter
         DeviceId    = $deviceId
-
     }
-
-    return $driveInfo
 }
 
 <#

@@ -24,7 +24,7 @@ Configuration Example
             DriveLetter = 'Z'
         }
 
-        xOpticalDiskDriveLetter RemoveThurdOpticalDiskDriveLetter
+        xOpticalDiskDriveLetter RemoveThirdOpticalDiskDriveLetter
         {
             DiskId      = 3
             DriveLetter = 'A'
