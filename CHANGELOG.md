@@ -5,6 +5,8 @@
 - xOpticalDiskDriveLetter:
   - Added new resource.
   - Added support for setting the drive letter of optical drives (CD/DVD drives).
+  - Removed ShouldProcess from `Set-TargetResource`.
+  - Refactored resource to handle systems with multiple optical disks.
 
 ## 3.4.0.0
 

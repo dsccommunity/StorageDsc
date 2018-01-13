@@ -1,12 +1,15 @@
 ConvertFrom-StringData @'
-    UsingGetCimInstanceToFetchDriveLetter = Using Get-CimInstance to get the drive letter of optical disks in the system.
-    NoOpticalDiskDrive = Without an optical disk in the system, this resource has nothing to do.  Note that this resource does not change the drive letter of mounted ISOs.
-    OpticalDriveSetAsRequested = Optical disk drive letter is currently set to {0} as requested.
-    OpticalDriveNotSetAsRequested = Optical disk drive letter is currently set to {0}, not {1} as requested.
+    UsingGetCimInstanceToFetchDriveLetter = Using Get-CimInstance to get the drive letter of optical disk {0} in the system.
+    OpticalDiskAssignedDriveLetter = The optical disk {0} is currently assigned drive letter '{1}'.
+    OpticalDiskNotAssignedDriveLetter = The optical disk {0} is not currently assigned a drive letter.
+    NoOpticalDiskDriveError = The optical disk {0} could not be found in the system, so this resource has nothing to do. This resource does not change the drive letter of mounted ISOs.
 
-    AttemptingToSetDriveLetter = The current drive letter is {0}, attempting to set to {1}.
+    AttemptingToSetDriveLetter = The optical disk {0} drive letter is '{1}', attempting to set to '{2}'.
+    AttemptingToRemoveDriveLetter = The optical disk {0} drive letter is '{1}', attempting to remove it.
 
-    OpticalDiskDriveFound = Optical disk found with device id: {0}.
-    DriveLetterVolumeType = Volume with driveletter {0} is type '{1}' (type '5' is an optical disk).
-    DriveLetterExistsButNotOptical = Volume with driveletter {0} is already present but is not a optical disk.
+    DriveLetterDoesNotExistAndShouldNot = The optical disk {0} does not have a drive letter assigned. Change not required.
+    DriveLetterExistsButShouldNot = The optical disk {0} is assigned the drive letter '{1}' which should be removed. Change required.
+    DriverLetterExistsAndIsCorrect = The optical disk {0} is assigned the drive letter '{1}' which is correct. Change not required.
+    DriveLetterAssignedToAnotherDrive = Drive letter '{0}' is already present but assigned to a another volume. Change can not proceed.
+    DriverLetterExistsAndIsNotCorrect = The optical disk {0} is assigned the drive letter '{1}' but should be '{2}'. Change required.
 '@
