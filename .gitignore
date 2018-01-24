@@ -6,8 +6,8 @@
 .sln
 DscResource.Tests
 DscResource.Tests/*
-Modules/xStorage/DscResource.Tests
-Modules/xStorage/DscResource.Tests/*
+Modules/StorageDsc/DscResource.Tests
+Modules/StorageDsc/DscResource.Tests/*
 node_modules
 node_modules/*
 markdownissues.txt
