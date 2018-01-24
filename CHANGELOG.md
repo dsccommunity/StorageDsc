@@ -20,9 +20,7 @@
   - Added new contexts to integration tests improve clarity.
   - Fix bug when size not specified and disk partitioned and
     formatted but not assigned to path - See [Issue 103](https://github.com/PowerShell/xStorage/issues/103).
-- xOpticalDiskDriveLetter:
-  - Added new resource.
-  - Added support for setting the drive letter of optical drives (CD/DVD drives).
+- Updated tests to meet Pester V4 guidelines - fixes [Issue #120](https://github.com/PowerShell/xStorage/issues/120).
 
 ## 3.3.0.0
 
@@ -50,7 +48,6 @@
   [issue #116](https://github.com/PowerShell/xStorage/issues/116).
 - Prevent unit tests from DSCResource.Tests from running during test
   execution - fixes [Issue #118](https://github.com/PowerShell/xStorage/issues/118).
-- Updated tests to meet Pester V4 guidelines - fixes [Issue #120](https://github.com/PowerShell/xStorage/issues/120).
 
 ## 3.2.0.0
 

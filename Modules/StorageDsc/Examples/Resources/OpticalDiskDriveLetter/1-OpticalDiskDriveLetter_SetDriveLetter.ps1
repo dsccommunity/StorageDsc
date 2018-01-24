@@ -1,6 +1,7 @@
 <#
     .EXAMPLE
-        This configuration will set the drive letter of the optical disk drive to 'Z'.
+        This configuration will set the drive letter of the first
+        optical disk drive in the system to 'Z'.
 #>
 Configuration Example
 {
@@ -11,7 +12,8 @@ Configuration Example
     {
         OpticalDiskDriveLetter MapOpticalDiskToZ
         {
-             DriveLetter = 'Z'
+            DiskId      = 1
+            DriveLetter = 'Z'
         }
     }
 }

@@ -10,7 +10,7 @@
 # RootModule = ''
 
 # Version number of this module.
-ModuleVersion = '3.3.0.0'
+ModuleVersion = '3.4.0.0'
 
 # ID used to uniquely identify this module
 GUID = '00d73ca1-58b5-46b7-ac1a-5bfcf5814faf'
@@ -102,30 +102,15 @@ PrivateData = @{
         # IconUri = ''
 
         # ReleaseNotes of this module
-        ReleaseNotes = '- Opted into common tests for Module and Script files - See [Issue 115](https://github.com/PowerShell/xStorage/issues/115).
-- xDisk:
-  - Added support for Guid Disk Id type - See [Issue 104](https://github.com/PowerShell/xStorage/issues/104).
-  - Added parameter AllowDestructive - See [Issue 11](https://github.com/PowerShell/xStorage/issues/11).
-  - Added parameter ClearDisk - See [Issue 50](https://github.com/PowerShell/xStorage/issues/50).
+        ReleaseNotes = '- xDisk:
+  - Removed duplicate integration tests for Guid Disk Id type.
+  - Added new contexts to integration tests improve clarity.
+  - Fix bug when size not specified and disk partitioned and
+    formatted but not assigned drive letter - See [Issue 103](https://github.com/PowerShell/xStorage/issues/103).
 - xDiskAccessPath:
-  - Added support for Guid Disk Id type - See [Issue 104](https://github.com/PowerShell/xStorage/issues/104).
-- xWaitForDisk:
-  - Added support for Guid Disk Id type - See [Issue 104](https://github.com/PowerShell/xStorage/issues/104).
-- Added .markdownlint.json file to configure markdown rules to validate.
-- Clean up Badge area in README.MD - See [Issue 110](https://github.com/PowerShell/xStorage/issues/110).
-- Disabled MD013 rule checking to enable badge table.
-- Added .github support files:
-  - CONTRIBUTING.md
-  - ISSUE_TEMPLATE.md
-  - PULL_REQUEST_TEMPLATE.md
-- Changed license year to 2017 and set company name to Microsoft
-  Corporation in LICENSE.MD and module manifest - See [Issue 111](https://github.com/PowerShell/xStorage/issues/111).
-- Set Visual Studio Code setting "powershell.codeFormatting.preset" to
-  "custom" - See [Issue 108](https://github.com/PowerShell/xStorage/issues/108)
-- Added `Documentation and Examples` section to Readme.md file - see
-  [issue 116](https://github.com/PowerShell/xStorage/issues/116).
-- Prevent unit tests from DSCResource.Tests from running during test
-  execution - fixes [Issue 118](https://github.com/PowerShell/xStorage/issues/118).
+  - Added new contexts to integration tests improve clarity.
+  - Fix bug when size not specified and disk partitioned and
+    formatted but not assigned to path - See [Issue 103](https://github.com/PowerShell/xStorage/issues/103).
 
 '
 
@@ -140,6 +125,7 @@ PrivateData = @{
 # DefaultCommandPrefix = ''
 
 }
+
 
 
 
