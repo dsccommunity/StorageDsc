@@ -23,7 +23,7 @@ Configuration Example
              DiskId = 2
              DriveLetter = 'G'
              Size = 10GB
-             DependsOn = '[Disk]Disk2'
+             DependsOn = '[WaitforDisk]Disk2'
         }
 
         Disk JVolume
