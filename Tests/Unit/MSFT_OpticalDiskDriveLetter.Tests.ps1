@@ -375,13 +375,8 @@ try
         #endregion
 
         #region Function Set-TargetResource
-<<<<<<< HEAD:Tests/Unit/MSFT_OpticalDiskDriveLetter.Tests.ps1
         Describe 'MSFT_OpticalDiskDriveLetter\Set-TargetResource' {
             Context 'Optical disk drive with the correct drive letter' {
-=======
-        Describe 'MSFT_xOpticalDiskDriveLetter\Set-TargetResource' {
-            Context 'Optical disk drive exists with the correct drive letter' {
->>>>>>> dev:Tests/Unit/MSFT_xOpticalDiskDriveLetter.Tests.ps1
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Get-CimInstance `
