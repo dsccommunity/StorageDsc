@@ -49,7 +49,7 @@ $localizedData = Get-LocalizedData `
 function Get-OpticalDiskDriveLetter
 {
     [CmdletBinding()]
-    [OutputType([System.String])]
+    [OutputType([System.Collections.Hashtable])]
     param
     (
         [Parameter(Mandatory = $true)]

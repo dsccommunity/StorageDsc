@@ -1,7 +1,8 @@
 # Versions
 
 ## Unreleased
-- BREAKING CHANGE
+
+- BREAKING CHANGE:
   - Renamed xStorage to StorageDsc
   - Renamed MSFT_xDisk to MSFT_Disk
   - Renamed MSFT_xDiskAccessPath to MSFT_DiskAccessPath
@@ -9,8 +10,7 @@
   - Renamed MSFT_xOpticalDiskDriveLetter to MSFT_OpticalDiskDriveLetter
   - Renamed MSFT_xWaitForDisk to MSFT_WaitForDisk
   - Renamed MSFT_xWaitForVolume to MSFT_WaitforVolume
-  - See [Issue 129] (https://github.com/PowerShell/xStorage/issues/129)
- 
+  - See [Issue 129](https://github.com/PowerShell/xStorage/issues/129)
 - xDisk:
   - Removed duplicate integration tests for Guid Disk Id type.
   - Added new contexts to integration tests improve clarity.
