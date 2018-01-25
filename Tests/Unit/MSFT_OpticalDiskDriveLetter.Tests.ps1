@@ -561,13 +561,8 @@ try
         }
         #endregion
 
-<<<<<<< HEAD:Tests/Unit/MSFT_OpticalDiskDriveLetter.Tests.ps1
         Describe 'MSFT_OpticalDiskDriveLetter\Test-TargetResource' {
             Context 'Drive letter is a valid optical disk drive' {
-=======
-        Describe 'MSFT_xOpticalDiskDriveLetter\Test-TargetResource' {
-            Context 'Optical drive exists and is assigned expected drive letter' {
->>>>>>> dev:Tests/Unit/MSFT_xOpticalDiskDriveLetter.Tests.ps1
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Get-CimInstance `
