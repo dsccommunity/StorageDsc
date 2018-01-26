@@ -11,7 +11,7 @@ Configuration Example
 
     Node localhost
     {
-        WaitforDisk Disk2
+        WaitForDisk Disk2
         {
              DiskId = 2
              RetryIntervalSec = 60
@@ -23,7 +23,7 @@ Configuration Example
              DiskId = 2
              DriveLetter = 'G'
              Size = 10GB
-             DependsOn = '[WaitforDisk]Disk2'
+             DependsOn = '[WaitForDisk]Disk2'
         }
 
         Disk JVolume
@@ -34,7 +34,7 @@ Configuration Example
              DependsOn = '[Disk]GVolume'
         }
 
-        WaitforDisk Disk3
+        WaitForDisk Disk3
         {
              DiskId = 3
              RetryIntervalSec = 60

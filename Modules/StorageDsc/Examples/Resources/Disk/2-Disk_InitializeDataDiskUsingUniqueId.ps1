@@ -12,7 +12,7 @@ Configuration Example
 
     Node localhost
     {
-        WaitforDisk Disk2
+        WaitForDisk Disk2
         {
              DiskId = '5E1E50A401000000001517FFFF0AEB84' # Disk 2
              DiskIdType = 'UniqueId'
@@ -38,7 +38,7 @@ Configuration Example
              DependsOn = '[Disk]GVolume'
         }
 
-        WaitforDisk Disk3
+        WaitForDisk Disk3
         {
              DiskId = '5E1E50A4010000000029AB39450AC9A5' # Disk 3
              DiskIdType = 'UniqueId'

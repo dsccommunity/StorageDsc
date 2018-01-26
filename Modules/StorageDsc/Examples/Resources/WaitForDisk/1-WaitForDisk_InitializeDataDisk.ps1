@@ -11,7 +11,7 @@ Configuration Example
 
     Node localhost
     {
-        WaitforDisk Disk2
+        WaitForDisk Disk2
         {
              DiskId = 2
              RetryIntervalSec = 60

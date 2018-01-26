@@ -11,7 +11,7 @@ Configuration Example
 
     Node localhost
     {
-        WaitforDisk Disk2
+        WaitForDisk Disk2
         {
              DiskId = '5E1E50A401000000001517FFFF0AEB84' # Disk 2
              DiskIdType = 'UniqueId'
