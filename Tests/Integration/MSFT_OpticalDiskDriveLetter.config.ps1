@@ -1,4 +1,4 @@
-configuration MSFT_xOpticalDiskDriveLetter_config {
+configuration MSFT_OpticalDiskDriveLetter_config {
     Import-DSCResource -ModuleName StorageDsc
     node localhost {
         if ($Node.Ensure)
