@@ -1,8 +1,20 @@
-configuration MSFT_x\OpticalDiskDriveLetter_config {
+configuration MSFT_xOpticalDiskDriveLetter_config {
     Import-DSCResource -ModuleName StorageDsc
     node localhost {
-        OpticalDiskDriveLetter Integration_Test {
-            DriveLetter = $Node.DriveLetter
+        if ($Node.Ensure)
+        {
+            OpticalDiskDriveLetter Integration_Test {
+                DiskId      = $Node.DiskId
+                DriveLetter = $Node.DriveLetter
+                Ensure      = $Node.Ensure
+            }
+        }
+        else
+        {
+            OpticalDiskDriveLetter Integration_Test {
+                DiskId      = $Node.DiskId
+                DriveLetter = $Node.DriveLetter
+            }
         }
     }
 }
