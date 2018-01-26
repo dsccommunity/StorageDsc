@@ -8,7 +8,7 @@ Configuration Example
     Import-DSCResource -ModuleName StorageDsc
     Node localhost
     {
-        OpticalDiskDriveLetter MapOpticalDiskToZ
+        OpticalDiskDriveLetter SetFirstOpticalDiskDriveLetterToZ
         {
             DiskId      = 1
             DriveLetter = 'Z'
