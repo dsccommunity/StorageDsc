@@ -5,6 +5,7 @@
 configuration Example
 {
     Import-DscResource -ModuleName StorageDsc
+    
     MountImage ISO
     {
         ImagePath   = 'c:\Sources\SQL.iso'
