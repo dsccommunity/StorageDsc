@@ -6,7 +6,7 @@
 Configuration Example
 {
     Import-DSCResource -ModuleName StorageDsc
-    
+
     Node localhost
     {
         OpticalDiskDriveLetter RemoveFirstOpticalDiskDriveLetter

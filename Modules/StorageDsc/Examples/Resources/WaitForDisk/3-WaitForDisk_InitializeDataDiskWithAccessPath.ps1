@@ -7,7 +7,7 @@
 Configuration Example
 {
     Import-DSCResource -ModuleName StorageDsc
-    
+
     Node localhost
     {
         WaitForDisk Disk2
