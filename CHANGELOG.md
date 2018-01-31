@@ -2,14 +2,15 @@
 
 ## Unreleased
 
-- xOpticalDiskDriveLetter:
-  - Added new resource.
-  - Added support for setting the drive letter of optical drives (CD/DVD drives).
-  - Removed ShouldProcess from `Set-TargetResource`.
-  - Refactored resource to handle systems with multiple optical disks.
-
-## 3.4.0.0
-
+- BREAKING CHANGE:
+  - Renamed xStorage to StorageDsc
+  - Renamed MSFT_xDisk to MSFT_Disk
+  - Renamed MSFT_xDiskAccessPath to MSFT_DiskAccessPath
+  - Renamed MSFT_xMountImage to MSFT_MountImage
+  - Renamed MSFT_xOpticalDiskDriveLetter to MSFT_OpticalDiskDriveLetter
+  - Renamed MSFT_xWaitForDisk to MSFT_WaitForDisk
+  - Renamed MSFT_xWaitForVolume to MSFT_WaitforVolume
+  - See [Issue 129](https://github.com/PowerShell/xStorage/issues/129)
 - xDisk:
   - Removed duplicate integration tests for Guid Disk Id type.
   - Added new contexts to integration tests improve clarity.
