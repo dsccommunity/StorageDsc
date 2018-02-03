@@ -10,6 +10,7 @@
   - Renamed MSFT_xOpticalDiskDriveLetter to MSFT_OpticalDiskDriveLetter
   - Renamed MSFT_xWaitForDisk to MSFT_WaitForDisk
   - Renamed MSFT_xWaitForVolume to MSFT_WaitforVolume
+  - Deleted xStorage folder under StorageDsc/Modules
   - See [Issue 129](https://github.com/PowerShell/xStorage/issues/129)
 - xDisk:
   - Removed duplicate integration tests for Guid Disk Id type.
