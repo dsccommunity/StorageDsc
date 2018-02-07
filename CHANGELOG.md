@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 4.0.0.0
+
 - BREAKING CHANGE:
   - Renamed xStorage to StorageDsc
   - Renamed MSFT_xDisk to MSFT_Disk

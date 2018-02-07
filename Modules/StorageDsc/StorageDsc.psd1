@@ -10,7 +10,7 @@
 # RootModule = ''
 
 # Version number of this module.
-ModuleVersion = '3.4.0.0'
+ModuleVersion = '4.0.0.0'
 
 # ID used to uniquely identify this module
 GUID = '00d73ca1-58b5-46b7-ac1a-5bfcf5814faf'
@@ -102,7 +102,17 @@ PrivateData = @{
         # IconUri = ''
 
         # ReleaseNotes of this module
-        ReleaseNotes = '- xDisk:
+        ReleaseNotes = '- BREAKING CHANGE:
+  - Renamed xStorage to StorageDsc
+  - Renamed MSFT_xDisk to MSFT_Disk
+  - Renamed MSFT_xDiskAccessPath to MSFT_DiskAccessPath
+  - Renamed MSFT_xMountImage to MSFT_MountImage
+  - Renamed MSFT_xOpticalDiskDriveLetter to MSFT_OpticalDiskDriveLetter
+  - Renamed MSFT_xWaitForDisk to MSFT_WaitForDisk
+  - Renamed MSFT_xWaitForVolume to MSFT_WaitforVolume
+  - Deleted xStorage folder under StorageDsc/Modules
+  - See [Issue 129](https://github.com/PowerShell/xStorage/issues/129)
+- xDisk:
   - Removed duplicate integration tests for Guid Disk Id type.
   - Added new contexts to integration tests improve clarity.
   - Fix bug when size not specified and disk partitioned and
@@ -111,6 +121,7 @@ PrivateData = @{
   - Added new contexts to integration tests improve clarity.
   - Fix bug when size not specified and disk partitioned and
     formatted but not assigned to path - See [Issue 103](https://github.com/PowerShell/xStorage/issues/103).
+- Updated tests to meet Pester V4 guidelines - fixes [Issue 120](https://github.com/PowerShell/xStorage/issues/120).
 
 '
 
@@ -125,6 +136,7 @@ PrivateData = @{
 # DefaultCommandPrefix = ''
 
 }
+
 
 
 
