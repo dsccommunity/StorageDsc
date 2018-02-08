@@ -14,9 +14,9 @@
   - Renamed MSFT_xWaitForVolume to MSFT_WaitforVolume
   - Deleted xStorage folder under StorageDsc/Modules
   - See [Issue 129](https://github.com/PowerShell/xStorage/issues/129)
-  
+
 ## 3.4.0.0
-  
+
 - xDisk:
   - Removed duplicate integration tests for Guid Disk Id type.
   - Added new contexts to integration tests improve clarity.
