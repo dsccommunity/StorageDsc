@@ -10,12 +10,12 @@ function Invoke-TestHarness
         $DscTestsPath
     )
 
-    Write-Verbose -Message 'Commencing all xStorage tests'
+    Write-Verbose -Message 'Commencing all StorageDsc tests'
 
     $repoDir = Join-Path -Path $PSScriptRoot -ChildPath "..\" -Resolve
 
     $testCoverageFiles = @()
-    Get-ChildItem -Path "$repoDir\modules\xStorage\DSCResources\**\*.psm1" -Recurse | ForEach-Object {
+    Get-ChildItem -Path "$repoDir\modules\StorageDsc\DSCResources\**\*.psm1" -Recurse | ForEach-Object {
         if ($_.FullName -notlike '*\DSCResource.Tests\*')
         {
             $testCoverageFiles += $_.FullName
@@ -29,7 +29,7 @@ function Invoke-TestHarness
         $testResultSettings.Add('OutputFile', $TestResultsFile)
     }
 
-    Import-Module -Name "$repoDir\modules\xStorage\xStorage.psd1"
+    Import-Module -Name "$repoDir\modules\StorageDsc\StorageDsc.psd1"
     $testsToRun = @()
 
     # Run Unit Tests
