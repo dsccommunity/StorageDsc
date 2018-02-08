@@ -112,16 +112,6 @@ PrivateData = @{
   - Renamed MSFT_xWaitForVolume to MSFT_WaitforVolume
   - Deleted xStorage folder under StorageDsc/Modules
   - See [Issue 129](https://github.com/PowerShell/xStorage/issues/129)
-- xDisk:
-  - Removed duplicate integration tests for Guid Disk Id type.
-  - Added new contexts to integration tests improve clarity.
-  - Fix bug when size not specified and disk partitioned and
-    formatted but not assigned drive letter - See [Issue 103](https://github.com/PowerShell/xStorage/issues/103).
-- xDiskAccessPath:
-  - Added new contexts to integration tests improve clarity.
-  - Fix bug when size not specified and disk partitioned and
-    formatted but not assigned to path - See [Issue 103](https://github.com/PowerShell/xStorage/issues/103).
-- Updated tests to meet Pester V4 guidelines - fixes [Issue 120](https://github.com/PowerShell/xStorage/issues/120).
 
 '
 
