@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Enabled PSSA rule violations to fail build - Fixes [Issue #149](https://github.com/PowerShell/StorageDsc/issues/149).
+
 ## 4.0.0.0
 
 - BREAKING CHANGE:
