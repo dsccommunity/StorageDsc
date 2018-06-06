@@ -34,4 +34,6 @@
 
     DiskAlreadyInitializedError = Disk with {0} '{1}' is already initialized with {2}.
     NewParitionIsReadOnlyError = New partition '{2}' on disk with {0} '{1}' did not become writable in the expected time.
+    CheckingPSDriveMessage = Checking availability of PSDrive '{0}' for access path '{1}'.
+    UnavailablePSDriveMessage = PSDrive '{0}' is unavailable for access path '{1}', refreshing PSDrives.
 '@

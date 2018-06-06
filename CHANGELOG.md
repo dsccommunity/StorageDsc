@@ -4,6 +4,7 @@
 
 - Enabled PSSA rule violations to fail build - Fixes [Issue #149](https://github.com/PowerShell/StorageDsc/issues/149).
 - Fixed markdown rule violations in CHANGELOG.MD.
+- Added PSDrive check to MSFT_xDiskAccessPath Set-TargetResource - See [Issue 121](https://github.com/PowerShell/xStorage/issues/121)
 
 ## 4.0.0.0
 

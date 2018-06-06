@@ -194,6 +194,26 @@ function Set-TargetResource
             $($localizedData.SettingDiskMessage -f $DiskIdType, $DiskId, $AccessPath)
         ) -join '' )
 
+    # Validate that the PSDrive is available
+    Try
+    {
+        $accessPathDisk = $AccessPath.Split(":")[0]
+        Write-Verbose -Message ( @(
+                "$($MyInvocation.MyCommand): "
+                $($localizedData.CheckingPSDriveMessage -f $accessPathDisk, $AccessPath)
+            ) -join '' )
+        Get-PSDrive $accessPathDisk -ErrorAction Stop
+    }
+    Catch
+    {
+        Write-Verbose -Message ( @(
+                "$($MyInvocation.MyCommand): "
+                $($localizedData.UnavailablePSDriveMessage -f $accessPathDisk, $AccessPath)
+            ) -join '' )
+
+        Get-PSDrive | Out-Null
+    }
+
     # Validate the AccessPath parameter adding a trailing slash
     $AccessPath = Assert-AccessPathValid -AccessPath $AccessPath -Slash
 
