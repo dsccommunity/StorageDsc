@@ -514,7 +514,7 @@ function Set-TargetResource
                 # A partition resize was required but is not allowed
                 Write-Verbose -Message ( @(
                     "$($MyInvocation.MyCommand): "
-                    $($localizedData.ResizeRefsNotAllowedMessage `
+                    $($localizedData.ResizeNotAllowedMessage `
                             -f $DriveLetter, $assignedPartition.Size, $Size)
                 ) -join '' )
             }

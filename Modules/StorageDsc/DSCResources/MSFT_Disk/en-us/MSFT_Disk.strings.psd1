@@ -39,5 +39,5 @@
     SizeMismatchCorrectionMessage = Switch AllowDestructive is specified. Attempting to resize partition {0} from {1} to {2}.
     FreeSpaceViolationError = Attempted to resize partition {0} from {1} to {2} while maximum allowed size was {3}.
     ResizeRefsNotPossibleMessage = Skipping resize of {0} from {1} to {2}. Resizing ReFS partitions is currently not possible.
-    ResizeRefsNotAllowedMessage = Skipping resize of {0} from {1} to {2}. AllowDestructive is not set to 'True'.
+    ResizeNotAllowedMessage = Skipping resize of {0} from {1} to {2}. AllowDestructive is not set to 'True'.
 '@
