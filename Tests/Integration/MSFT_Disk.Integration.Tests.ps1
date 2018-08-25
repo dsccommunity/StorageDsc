@@ -161,6 +161,135 @@ try
             }
         }
 
+        Context 'Partition and format newly provisioned disk using Disk Number with one volume and assign Drive Letters then resize' {
+            BeforeAll {
+                # Create a VHD and attach it to the computer
+                $VHDPath = Join-Path -Path $TestDrive `
+                    -ChildPath 'TestDisk.vhd'
+                $null = New-VDisk -Path $VHDPath -SizeInMB 1024
+                $null = Mount-DiskImage -ImagePath $VHDPath -StorageType VHD -NoDriveLetter
+                $diskImage = Get-DiskImage -ImagePath $VHDPath
+                $disk = Get-Disk -Number $diskImage.Number
+                $FSLabelA = 'TestDiskA'
+
+                # Get a spare drive letters
+                $lastDrive = ((Get-Volume).DriveLetter | Sort-Object | Select-Object -Last 1)
+                $driveLetterA = [char](([int][char]$lastDrive) + 1)
+            }
+
+            Context "Create volume on Disk Number $($disk.Number)" {
+                It 'Should compile and apply the MOF without throwing' {
+                    {
+                        # This is to pass to the Config
+                        $configData = @{
+                            AllNodes = @(
+                                @{
+                                    NodeName    = 'localhost'
+                                    DriveLetter = $driveLetterA
+                                    DiskId      = $disk.Number
+                                    DiskIdType  = 'Number'
+                                    FSLabel     = $FSLabelA
+                                    Size        = 50MB
+                                }
+                            )
+                        }
+
+                        & "$($script:DSCResourceName)_Config" `
+                            -OutputPath $TestDrive `
+                            -ConfigurationData $configData
+
+                        Start-DscConfiguration `
+                            -Path $TestDrive `
+                            -ComputerName localhost `
+                            -Wait `
+                            -Verbose `
+                            -Force `
+                            -ErrorAction Stop
+                    } | Should -Not -Throw
+                }
+
+                It 'Should be able to call Get-DscConfiguration without throwing' {
+                    { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
+                }
+
+                It 'Should have set the resource and all the parameters should match' {
+                    $current = Get-DscConfiguration | Where-Object {
+                        $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
+                    }
+                    $current.DiskId           | Should -Be $disk.Number
+                    $current.DriveLetter      | Should -Be $driveLetterA
+                    $current.FSLabel          | Should -Be $FSLabelA
+                    $current.Size             | Should -Be 50MB
+                }
+            }
+
+            Context "Resize partition on Disk Number $($disk.Number)" {
+                It 'Should compile and apply the MOF without throwing' {
+                    {
+                        # This is to pass to the Config
+                        $configData = @{
+                            AllNodes = @(
+                                @{
+                                    NodeName    = 'localhost'
+                                    DriveLetter = $driveLetterA
+                                    DiskId      = $disk.Number
+                                    DiskIdType  = 'Number'
+                                    FSLabel     = $FSLabelA
+                                }
+                            )
+                        }
+
+                        & "$($script:DSCResourceName)_Config" `
+                            -OutputPath $TestDrive `
+                            -ConfigurationData $configData
+
+                        Start-DscConfiguration `
+                            -Path $TestDrive `
+                            -ComputerName localhost `
+                            -Wait `
+                            -Verbose `
+                            -Force `
+                            -ErrorAction Stop
+                    } | Should -Not -Throw
+                }
+
+                It 'Should be able to call Get-DscConfiguration without throwing' {
+                    { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
+                }
+
+                It 'Should have set the resource and all the parameters should match' {
+                    $current = Get-DscConfiguration | Where-Object {
+                        $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
+                    }
+                    $current.DiskId           | Should -Be $disk.Number
+                    $current.DriveLetter      | Should -Be $driveLetterA
+                    $current.FSLabel          | Should -Be $FSLabelA
+                    $current.Size             | Should -Be 952041472
+                }
+            }
+
+            # A system partition will have been added to the disk as well as the test partition
+            It 'Should have 2 partitions on disk' {
+                ($disk | Get-Partition).Count | Should -Be 2
+            }
+
+            <#
+                Get a list of all drives mounted - this works better on Windows Server 2012 R2 than
+                trying to get the drive mounted by name.
+            #>
+            $drives = Get-PSDrive
+
+            It "Should have attached drive $driveLetterA" {
+                $drives | Where-Object -Property Name -eq $driveLetterA | Should -Not -BeNullOrEmpty
+            }
+
+            AfterAll {
+                Dismount-DiskImage -ImagePath $VHDPath -StorageType VHD
+                Remove-Item -Path $VHDPath -Force
+            }
+        }
+        #endregion
+
         #region Integration Tests for Disk Unique Id
         Context 'Partition and format newly provisioned disk using Unique Id with two volumes and assign Drive Letters' {
             BeforeAll {
