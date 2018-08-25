@@ -267,7 +267,7 @@ try
                     $current.DriveLetter      | Should -Be $driveLetterA
                     $current.FSLabel          | Should -Be $FSLabelA
                     $current.FSFormat         | Should -Be 'NTFS'
-                    $current.Size             | Should -Be 952041472
+                    $current.Size             | Should -Be 1040104960
                 }
             }
 
