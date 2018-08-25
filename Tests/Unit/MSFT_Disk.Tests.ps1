@@ -137,6 +137,10 @@ try
             FileSystem      = 'ReFS'
             DriveLetter     = $script:testDriveLetter
         }
+
+        $script:parameterFilter_MockedDisk0Number = {
+            $DiskId -eq $script:mockedDisk0.Number -and $DiskIdType -eq 'Number'
+        }
         #endregion
 
         #region functions for mocking pipeline
@@ -314,7 +318,7 @@ try
 
                 Mock `
                     -CommandName Get-DiskByIdentifier `
-                    -ParameterFilter { $DiskId -eq $script:mockedDisk0.Number -and $DiskIdType -eq 'Number' } `
+                    -ParameterFilter $script:parameterFilter_MockedDisk0Number `
                     -MockWith { $script:mockedDisk0 } `
                     -Verifiable
 
@@ -361,7 +365,7 @@ try
                     Assert-VerifiableMock
                     Assert-MockCalled -CommandName Get-CimInstance -Exactly 1
                     Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly 1 `
-                        -ParameterFilter { $DiskId -eq $script:mockedDisk0.Number -and $DiskIdType -eq 'Number' }
+                        -ParameterFilter $script:parameterFilter_MockedDisk0Number
                     Assert-MockCalled -CommandName Get-Partition -Exactly 1
                     Assert-MockCalled -CommandName Get-Volume -Exactly 1
                 }
@@ -564,7 +568,7 @@ try
 
                 Mock `
                     -CommandName Get-DiskByIdentifier `
-                    -ParameterFilter { $DiskId -eq $script:mockedDisk0.Number -and $DiskIdType -eq 'Number' } `
+                    -ParameterFilter $script:parameterFilter_MockedDisk0Number `
                     -MockWith { $script:mockedDisk0 } `
                     -Verifiable
 
@@ -609,7 +613,7 @@ try
                     Assert-VerifiableMock
                     Assert-MockCalled -CommandName Get-CimInstance -Exactly 1
                     Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly 1 `
-                        -ParameterFilter { $DiskId -eq $script:mockedDisk0.Number -and $DiskIdType -eq 'Number' }
+                        -ParameterFilter $script:parameterFilter_MockedDisk0Number
                     Assert-MockCalled -CommandName Get-Partition -Exactly 1
                     Assert-MockCalled -CommandName Get-Volume -Exactly 1
                 }
@@ -819,7 +823,7 @@ try
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Get-DiskByIdentifier `
-                    -ParameterFilter { $DiskId -eq $script:mockedDisk0.Number -and $DiskIdType -eq 'Number' } `
+                    -ParameterFilter $script:parameterFilter_MockedDisk0Number `
                     -MockWith { $script:mockedDisk0Readonly } `
                     -Verifiable
 
@@ -867,7 +871,7 @@ try
                 It 'Should call the correct mocks' {
                     Assert-VerifiableMock
                     Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 1 `
-                        -ParameterFilter { $DiskId -eq $script:mockedDisk0.Number -and $DiskIdType -eq 'Number' }
+                        -ParameterFilter $script:parameterFilter_MockedDisk0Number
                     Assert-MockCalled -CommandName Set-Disk -Exactly -Times 1
                     Assert-MockCalled -CommandName Initialize-Disk -Exactly -Times 0
                     Assert-MockCalled -CommandName Get-Partition -Exactly -Times 1
@@ -885,7 +889,7 @@ try
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Get-DiskByIdentifier `
-                    -ParameterFilter { $DiskId -eq $script:mockedDisk0.Number -and $DiskIdType -eq 'Number' } `
+                    -ParameterFilter $script:parameterFilter_MockedDisk0Number `
                     -MockWith { $script:mockedDisk0OfflineRaw } `
                     -Verifiable
 
@@ -934,7 +938,7 @@ try
                 It 'Should call the correct mocks' {
                     Assert-VerifiableMock
                     Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 1 `
-                        -ParameterFilter { $DiskId -eq $script:mockedDisk0.Number -and $DiskIdType -eq 'Number' }
+                        -ParameterFilter $script:parameterFilter_MockedDisk0Number
                     Assert-MockCalled -CommandName Set-Disk -Exactly -Times 1
                     Assert-MockCalled -CommandName Initialize-Disk -Exactly -Times 1
                     Assert-MockCalled -CommandName Get-Partition -Exactly -Times 1
@@ -952,7 +956,7 @@ try
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Get-DiskByIdentifier `
-                    -ParameterFilter { $DiskId -eq $script:mockedDisk0.Number -and $DiskIdType -eq 'Number' } `
+                    -ParameterFilter $script:parameterFilter_MockedDisk0Number `
                     -MockWith { $script:mockedDisk0Raw } `
                     -Verifiable
 
@@ -1003,7 +1007,7 @@ try
                 It 'Should call the correct mocks' {
                     Assert-VerifiableMock
                     Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 1 `
-                        -ParameterFilter { $DiskId -eq $script:mockedDisk0.Number -and $DiskIdType -eq 'Number' }
+                        -ParameterFilter $script:parameterFilter_MockedDisk0Number
                     Assert-MockCalled -CommandName Set-Disk -Exactly -Times 0
                     Assert-MockCalled -CommandName Initialize-Disk -Exactly -Times 1
                     Assert-MockCalled -CommandName Get-Partition -Exactly -Times 1
@@ -1021,7 +1025,7 @@ try
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Get-DiskByIdentifier `
-                    -ParameterFilter { $DiskId -eq $script:mockedDisk0.Number -and $DiskIdType -eq 'Number' } `
+                    -ParameterFilter $script:parameterFilter_MockedDisk0Number `
                     -MockWith { $script:mockedDisk0 } `
                     -Verifiable
 
@@ -1066,7 +1070,7 @@ try
                 It 'Should call the correct mocks' {
                     Assert-VerifiableMock
                     Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 1 `
-                        -ParameterFilter { $DiskId -eq $script:mockedDisk0.Number -and $DiskIdType -eq 'Number' }
+                        -ParameterFilter $script:parameterFilter_MockedDisk0Number
                     Assert-MockCalled -CommandName Set-Disk -Exactly -Times 0
                     Assert-MockCalled -CommandName Initialize-Disk -Exactly -Times 0
                     Assert-MockCalled -CommandName Get-Partition -Exactly -Times 1
@@ -1084,7 +1088,7 @@ try
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Get-DiskByIdentifier `
-                    -ParameterFilter { $DiskId -eq $script:mockedDisk0.Number -and $DiskIdType -eq 'Number' } `
+                    -ParameterFilter $script:parameterFilter_MockedDisk0Number `
                     -MockWith { $script:mockedDisk0 } `
                     -Verifiable
 
@@ -1111,13 +1115,17 @@ try
 
                 $startTime = Get-Date
 
-                It 'Should throw' {
+                $errorRecord = Get-InvalidOperationRecord `
+                    -Message ($LocalizedData.NewParitionIsReadOnlyError -f `
+                        'Number', $script:mockedDisk0Mbr.Number, $script:mockedPartitionNoDriveLetterReadOnly.PartitionNumber)
+
+                It 'Should throw NewParitionIsReadOnlyError' {
                     {
                         Set-TargetResource `
                             -DiskId $script:mockedDisk0.Number `
                             -Driveletter $script:testDriveLetter `
                             -Verbose
-                    } | Should -Throw
+                    } | Should -Throw $errorRecord
                 }
 
                 $endTime = Get-Date
@@ -1129,7 +1137,7 @@ try
                 It 'Should call the correct mocks' {
                     Assert-VerifiableMock
                     Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 1 `
-                        -ParameterFilter { $DiskId -eq $script:mockedDisk0.Number -and $DiskIdType -eq 'Number' }
+                        -ParameterFilter $script:parameterFilter_MockedDisk0Number
                     Assert-MockCalled -CommandName Set-Disk -Exactly -Times 0
                     Assert-MockCalled -CommandName Initialize-Disk -Exactly -Times 0
                     Assert-MockCalled -CommandName Get-Partition -Exactly -Times 31
@@ -1148,7 +1156,7 @@ try
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Get-DiskByIdentifier `
-                    -ParameterFilter { $DiskId -eq $script:mockedDisk0.Number -and $DiskIdType -eq 'Number' } `
+                    -ParameterFilter $script:parameterFilter_MockedDisk0Number `
                     -MockWith { $script:mockedDisk0Mbr } `
                     -Verifiable
 
@@ -1177,7 +1185,7 @@ try
                 It 'Should call the correct mocks' {
                     Assert-VerifiableMock
                     Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 1 `
-                        -ParameterFilter { $DiskId -eq $script:mockedDisk0.Number -and $DiskIdType -eq 'Number' }
+                        -ParameterFilter $script:parameterFilter_MockedDisk0Number
                     Assert-MockCalled -CommandName Set-Disk -Exactly -Times 0
                     Assert-MockCalled -CommandName Initialize-Disk -Exactly -Times 0
                     Assert-MockCalled -CommandName Get-Partition -Exactly -Times 0
@@ -1278,7 +1286,7 @@ try
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Get-DiskByIdentifier `
-                    -ParameterFilter { $DiskId -eq $script:mockedDisk0.Number -and $DiskIdType -eq 'Number' } `
+                    -ParameterFilter $script:parameterFilter_MockedDisk0Number `
                     -MockWith { $script:mockedDisk0 } `
                     -Verifiable
 
@@ -1311,7 +1319,7 @@ try
                 It 'Should call the correct mocks' {
                     Assert-VerifiableMock
                     Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 1 `
-                        -ParameterFilter { $DiskId -eq $script:mockedDisk0.Number -and $DiskIdType -eq 'Number' }
+                        -ParameterFilter $script:parameterFilter_MockedDisk0Number
                     Assert-MockCalled -CommandName Set-Disk -Exactly -Times 0
                     Assert-MockCalled -CommandName Initialize-Disk -Exactly -Times 0
                     Assert-MockCalled -CommandName Get-Partition -Exactly -Times 1
@@ -1326,7 +1334,7 @@ try
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Get-DiskByIdentifier `
-                    -ParameterFilter { $DiskId -eq $script:mockedDisk0.Number -and $DiskIdType -eq 'Number' } `
+                    -ParameterFilter $script:parameterFilter_MockedDisk0Number `
                     -MockWith { $script:mockedDisk0 } `
                     -Verifiable
 
@@ -1363,7 +1371,7 @@ try
                 It 'Should call the correct mocks' {
                     Assert-VerifiableMock
                     Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 1 `
-                        -ParameterFilter { $DiskId -eq $script:mockedDisk0.Number -and $DiskIdType -eq 'Number' }
+                        -ParameterFilter $script:parameterFilter_MockedDisk0Number
                     Assert-MockCalled -CommandName Set-Disk -Exactly -Times 0
                     Assert-MockCalled -CommandName Initialize-Disk -Exactly -Times 0
                     Assert-MockCalled -CommandName Get-Partition -Exactly -Times 1
@@ -1378,7 +1386,7 @@ try
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Get-DiskByIdentifier `
-                    -ParameterFilter { $DiskId -eq $script:mockedDisk0.Number -and $DiskIdType -eq 'Number' } `
+                    -ParameterFilter $script:parameterFilter_MockedDisk0Number `
                     -MockWith { $script:mockedDisk0 } `
                     -Verifiable
 
@@ -1422,7 +1430,7 @@ try
                 It 'Should call the correct mocks' {
                     Assert-VerifiableMock
                     Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 1 `
-                        -ParameterFilter { $DiskId -eq $script:mockedDisk0.Number -and $DiskIdType -eq 'Number' }
+                        -ParameterFilter $script:parameterFilter_MockedDisk0Number
                     Assert-MockCalled -CommandName Set-Disk -Exactly -Times 0
                     Assert-MockCalled -CommandName Initialize-Disk -Exactly -Times 0
                     Assert-MockCalled -CommandName Get-Partition -Exactly -Times 1
@@ -1437,7 +1445,7 @@ try
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Get-DiskByIdentifier `
-                    -ParameterFilter { $DiskId -eq $script:mockedDisk0.Number -and $DiskIdType -eq 'Number' } `
+                    -ParameterFilter $script:parameterFilter_MockedDisk0Number `
                     -MockWith { $script:mockedDisk0 } `
                     -Verifiable
 
@@ -1473,7 +1481,7 @@ try
                 It 'Should call the correct mocks' {
                     Assert-VerifiableMock
                     Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 1 `
-                        -ParameterFilter { $DiskId -eq $script:mockedDisk0.Number -and $DiskIdType -eq 'Number' }
+                        -ParameterFilter $script:parameterFilter_MockedDisk0Number
                     Assert-MockCalled -CommandName Set-Disk -Exactly -Times 0
                     Assert-MockCalled -CommandName Initialize-Disk -Exactly -Times 0
                     Assert-MockCalled -CommandName Get-Partition -Exactly -Times 1
@@ -1488,7 +1496,7 @@ try
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Get-DiskByIdentifier `
-                    -ParameterFilter { $DiskId -eq $script:mockedDisk0.Number -and $DiskIdType -eq 'Number' } `
+                    -ParameterFilter $script:parameterFilter_MockedDisk0Number `
                     -MockWith { $script:mockedDisk0 } `
                     -Verifiable
 
@@ -1526,7 +1534,7 @@ try
                 It 'Should call the correct mocks' {
                     Assert-VerifiableMock
                     Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 1 `
-                        -ParameterFilter { $DiskId -eq $script:mockedDisk0.Number -and $DiskIdType -eq 'Number' }
+                        -ParameterFilter $script:parameterFilter_MockedDisk0Number
                     Assert-MockCalled -CommandName Set-Disk -Exactly -Times 0
                     Assert-MockCalled -CommandName Initialize-Disk -Exactly -Times 0
                     Assert-MockCalled -CommandName Get-Partition -Exactly -Times 1
@@ -1538,11 +1546,11 @@ try
                 }
             }
 
-            Context 'AllowDestructive: Online GPT disk with matching partition/volume without assigned drive letter and wrong size' {
+            Context 'When AllowDestructive enabled with Online GPT disk with matching partition/volume without assigned drive letter and wrong size' {
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Get-DiskByIdentifier `
-                    -ParameterFilter { $DiskId -eq $script:mockedDisk0.Number -and $DiskIdType -eq 'Number' } `
+                    -ParameterFilter $script:parameterFilter_MockedDisk0Number `
                     -MockWith { $script:mockedDisk0 } `
                     -Verifiable
 
@@ -1554,8 +1562,8 @@ try
                 Mock `
                     -CommandName New-Partition `
                     -ParameterFilter {
-                    $DriveLetter -eq $script:testDriveLetter
-                } `
+                        $DriveLetter -eq $script:testDriveLetter
+                    } `
                     -MockWith { $script:mockedPartitionNoDriveLetter } `
                     -Verifiable
 
@@ -1588,7 +1596,7 @@ try
                 It 'Should call the correct mocks' {
                     Assert-VerifiableMock
                     Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 1 `
-                        -ParameterFilter { $DiskId -eq $script:mockedDisk0.Number -and $DiskIdType -eq 'Number' }
+                        -ParameterFilter $script:parameterFilter_MockedDisk0Number
                     Assert-MockCalled -CommandName Get-Partition -Exactly -Times 1
                     Assert-MockCalled -CommandName New-Partition -Exactly -Times 1
                     Assert-MockCalled -CommandName Get-Volume -Exactly -Times 1
@@ -1600,11 +1608,11 @@ try
                 }
             }
 
-            Context 'AllowDestructive: Online GPT disk with matching partition/volume but wrong size and remaining size too small' {
+            Context 'When AllowDestructive enabled with Online GPT disk with matching partition/volume but wrong size and remaining size too small' {
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Get-DiskByIdentifier `
-                    -ParameterFilter { $DiskId -eq $script:mockedDisk0.Number -and $DiskIdType -eq 'Number' } `
+                    -ParameterFilter $script:parameterFilter_MockedDisk0Number `
                     -MockWith { $script:mockedDisk0 } `
                     -Verifiable
 
@@ -1616,11 +1624,11 @@ try
                 Mock `
                     -CommandName Get-PartitionSupportedSize `
                     -MockWith {
-                    return @{
-                        SizeMin = 0
-                        SizeMax = 1
-                    }
-                } `
+                        return @{
+                            SizeMin = 0
+                            SizeMax = 1
+                        }
+                    } `
                     -Verifiable
 
                 # mocks that should not be called
@@ -1633,7 +1641,12 @@ try
                 Mock -CommandName Set-Volume
                 Mock -CommandName Resize-Partition
 
-                It 'Should throw' {
+                $errorRecord = Get-InvalidArgumentRecord `
+                    -Message ($LocalizedData.FreeSpaceViolationError -f `
+                        $script:mockedPartition.DriveLetter, $script:mockedPartition.Size, ($script:mockedPartitionSize + 1024), 1) `
+                    -ArgumentName 'Size'
+
+                It 'Should throw FreeSpaceViolationError' {
                     {
                         Set-TargetResource `
                             -DiskId $script:mockedDisk0.Number `
@@ -1642,13 +1655,13 @@ try
                             -AllowDestructive $true `
                             -FSLabel 'NewLabel' `
                             -Verbose
-                    } | Should -Throw
+                    } | Should -Throw $errorRecord
                 }
 
                 It 'Should call the correct mocks' {
                     Assert-VerifiableMock
                     Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 1 `
-                        -ParameterFilter { $DiskId -eq $script:mockedDisk0.Number -and $DiskIdType -eq 'Number' }
+                        -ParameterFilter $script:parameterFilter_MockedDisk0Number
                     Assert-MockCalled -CommandName Set-Disk -Exactly -Times 0
                     Assert-MockCalled -CommandName Initialize-Disk -Exactly -Times 0
                     Assert-MockCalled -CommandName Get-Partition -Exactly -Times 1
@@ -1657,14 +1670,87 @@ try
                     Assert-MockCalled -CommandName Format-Volume -Exactly -Times 0
                     Assert-MockCalled -CommandName Set-Partition -Exactly -Times 0
                     Assert-MockCalled -CommandName Set-Volume -Exactly -Times 0
+                    Assert-MockCalled -CommandName Get-PartitionSupportedSize -Exactly -Times 1
+                    Assert-MockCalled -CommandName Resize-Partition -Exactly -Times 0
                 }
             }
 
-            Context 'AllowDestructive: Online GPT disk with matching partition/volume but wrong size and ReFS' {
+            Context 'When AllowDestructive enabled with Size not specified on Online GPT disk with matching partition/volume but wrong size' {
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Get-DiskByIdentifier `
-                    -ParameterFilter { $DiskId -eq $script:mockedDisk0.Number -and $DiskIdType -eq 'Number' } `
+                    -ParameterFilter $script:parameterFilter_MockedDisk0Number `
+                    -MockWith { $script:mockedDisk0 } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-Partition `
+                    -MockWith { $script:mockedPartition } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-PartitionSupportedSize `
+                    -MockWith {
+                        return @{
+                            SizeMin = 0
+                            SizeMax = 2GB
+                        }
+                    } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Resize-Partition `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-Volume `
+                    -MockWith { $script:mockedVolume } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Set-Volume `
+                    -Verifiable
+
+                # mocks that should not be called
+                Mock -CommandName Set-Disk
+                Mock -CommandName Initialize-Disk
+                Mock -CommandName New-Partition
+                Mock -CommandName Set-Partition
+                Mock -CommandName Format-Volume
+
+                It 'Should not throw' {
+                    {
+                        Set-TargetResource `
+                            -DiskId $script:mockedDisk0.Number `
+                            -Driveletter $script:testDriveLetter `
+                            -AllowDestructive $true `
+                            -FSLabel 'NewLabel' `
+                            -Verbose
+                    } | Should -Not -Throw
+                }
+
+                It 'Should call the correct mocks' {
+                    Assert-VerifiableMock
+                    Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 1 `
+                        -ParameterFilter $script:parameterFilter_MockedDisk0Number
+                    Assert-MockCalled -CommandName Set-Disk -Exactly -Times 0
+                    Assert-MockCalled -CommandName Initialize-Disk -Exactly -Times 0
+                    Assert-MockCalled -CommandName Get-Partition -Exactly -Times 1
+                    Assert-MockCalled -CommandName Get-Volume -Exactly -Times 1
+                    Assert-MockCalled -CommandName New-Partition -Exactly -Times 0
+                    Assert-MockCalled -CommandName Format-Volume -Exactly -Times 0
+                    Assert-MockCalled -CommandName Set-Partition -Exactly -Times 0
+                    Assert-MockCalled -CommandName Set-Volume -Exactly -Times 1
+                    Assert-MockCalled -CommandName Get-PartitionSupportedSize -Exactly -Times 1
+                    Assert-MockCalled -CommandName Resize-Partition -Exactly -Times 1
+                }
+            }
+
+            Context 'When AllowDestructive enabled with Online GPT disk with matching partition/volume but wrong size and ReFS' {
+                # verifiable (should be called) mocks
+                Mock `
+                    -CommandName Get-DiskByIdentifier `
+                    -ParameterFilter $script:parameterFilter_MockedDisk0Number `
                     -MockWith { $script:mockedDisk0 } `
                     -Verifiable
 
@@ -1682,6 +1768,17 @@ try
                     -CommandName Set-Volume `
                     -Verifiable
 
+                Mock `
+                    -CommandName Get-PartitionSupportedSize `
+                    -MockWith {
+                        return @{
+                            SizeMin = 0
+                            SizeMax = 1
+                        }
+                    } `
+                    -Verifiable
+
+
                 # mocks that should not be called
                 Mock -CommandName Set-Disk
                 Mock -CommandName Initialize-Disk
@@ -1689,7 +1786,6 @@ try
                 Mock -CommandName Format-Volume
                 Mock -CommandName Set-Partition
                 Mock -CommandName Resize-Partition
-                Mock  -CommandName Get-PartitionSupportedSize
 
                 It 'Should not throw an exception' {
                     {
@@ -1707,7 +1803,7 @@ try
                 It 'Should call the correct mocks' {
                     Assert-VerifiableMock
                     Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 1 `
-                        -ParameterFilter { $DiskId -eq $script:mockedDisk0.Number -and $DiskIdType -eq 'Number' }
+                        -ParameterFilter $script:parameterFilter_MockedDisk0Number
                     Assert-MockCalled -CommandName Set-Disk -Exactly -Times 0
                     Assert-MockCalled -CommandName Initialize-Disk -Exactly -Times 0
                     Assert-MockCalled -CommandName Get-Partition -Exactly -Times 1
@@ -1716,16 +1812,16 @@ try
                     Assert-MockCalled -CommandName Format-Volume -Exactly -Times 0
                     Assert-MockCalled -CommandName Set-Partition -Exactly -Times 0
                     Assert-MockCalled -CommandName Set-Volume -Exactly -Times 1
+                    Assert-MockCalled -CommandName Get-PartitionSupportedSize -Exactly -Times 1
                     Assert-MockCalled -CommandName Resize-Partition -Exactly -Times 0
-                    Assert-MockCalled -CommandName Get-PartitionSupportedSize -Exactly -Times 0
                 }
             }
 
-            Context 'AllowDestructive: Online GPT disk with matching partition/volume but wrong format' {
+            Context 'When AllowDestructive enabled with Online GPT disk with matching partition/volume but wrong format' {
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Get-DiskByIdentifier `
-                    -ParameterFilter { $DiskId -eq $script:mockedDisk0.Number -and $DiskIdType -eq 'Number' } `
+                    -ParameterFilter $script:parameterFilter_MockedDisk0Number `
                     -MockWith { $script:mockedDisk0 } `
                     -Verifiable
 
@@ -1769,7 +1865,7 @@ try
                 It 'Should call the correct mocks' {
                     Assert-VerifiableMock
                     Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 1 `
-                        -ParameterFilter { $DiskId -eq $script:mockedDisk0.Number -and $DiskIdType -eq 'Number' }
+                        -ParameterFilter $script:parameterFilter_MockedDisk0Number
                     Assert-MockCalled -CommandName Set-Disk -Exactly -Times 0
                     Assert-MockCalled -CommandName Initialize-Disk -Exactly -Times 0
                     Assert-MockCalled -CommandName Get-Partition -Exactly -Times 1
@@ -1780,11 +1876,11 @@ try
                 }
             }
 
-            Context 'AllowDestructive: Online GPT disk containing arbitrary partitions' {
+            Context 'When AllowDestructive enabled with Online GPT disk containing arbitrary partitions' {
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Get-DiskByIdentifier `
-                    -ParameterFilter { $DiskId -eq $script:mockedDisk0.Number -and $DiskIdType -eq 'Number' } `
+                    -ParameterFilter $script:parameterFilter_MockedDisk0Number `
                     -MockWith { $script:mockedDisk0 } `
                     -Verifiable
 
@@ -1828,7 +1924,7 @@ try
                 It 'Should call the correct mocks' {
                     Assert-VerifiableMock
                     Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 2 `
-                        -ParameterFilter { $DiskId -eq $script:mockedDisk0.Number -and $DiskIdType -eq 'Number' }
+                        -ParameterFilter $script:parameterFilter_MockedDisk0Number
                     Assert-MockCalled -CommandName Set-Disk -Exactly -Times 0
                     Assert-MockCalled -CommandName Initialize-Disk -Exactly -Times 0
                     Assert-MockCalled -CommandName Get-Partition -Exactly -Times 1
@@ -1852,7 +1948,7 @@ try
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Get-DiskByIdentifier `
-                    -ParameterFilter { $DiskId -eq $script:mockedDisk0.Number -and $DiskIdType -eq 'Number' } `
+                    -ParameterFilter $script:parameterFilter_MockedDisk0Number `
                     -MockWith { $script:mockedDisk0Offline } `
                     -Verifiable
 
@@ -1880,7 +1976,7 @@ try
                 It 'Should call the correct mocks' {
                     Assert-VerifiableMock
                     Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 1 `
-                        -ParameterFilter { $DiskId -eq $script:mockedDisk0.Number -and $DiskIdType -eq 'Number' }
+                        -ParameterFilter $script:parameterFilter_MockedDisk0Number
                     Assert-MockCalled -CommandName Get-Partition -Exactly -Times 0
                     Assert-MockCalled -CommandName Get-Volume -Exactly -Times 0
                     Assert-MockCalled -CommandName Get-CimInstance -Exactly -Times 0
@@ -2049,7 +2145,7 @@ try
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Get-DiskByIdentifier `
-                    -ParameterFilter { $DiskId -eq $script:mockedDisk0.Number -and $DiskIdType -eq 'Number' } `
+                    -ParameterFilter $script:parameterFilter_MockedDisk0Number `
                     -MockWith { $script:mockedDisk0Raw } `
                     -Verifiable
 
@@ -2077,7 +2173,7 @@ try
                 It 'Should call the correct mocks' {
                     Assert-VerifiableMock
                     Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 1 `
-                        -ParameterFilter { $DiskId -eq $script:mockedDisk0.Number -and $DiskIdType -eq 'Number' }
+                        -ParameterFilter $script:parameterFilter_MockedDisk0Number
                     Assert-MockCalled -CommandName Get-Partition -Exactly -Times 0
                     Assert-MockCalled -CommandName Get-Volume -Exactly -Times 0
                     Assert-MockCalled -CommandName Get-CimInstance -Exactly -Times 0
@@ -2088,7 +2184,7 @@ try
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Get-DiskByIdentifier `
-                    -ParameterFilter { $DiskId -eq $script:mockedDisk0.Number -and $DiskIdType -eq 'Number' } `
+                    -ParameterFilter $script:parameterFilter_MockedDisk0Number `
                     -MockWith { $script:mockedDisk0 } `
                     -Verifiable
 
@@ -2127,7 +2223,7 @@ try
                 It 'Should call the correct mocks' {
                     Assert-VerifiableMock
                     Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 1 `
-                        -ParameterFilter { $DiskId -eq $script:mockedDisk0.Number -and $DiskIdType -eq 'Number' }
+                        -ParameterFilter $script:parameterFilter_MockedDisk0Number
                     Assert-MockCalled -CommandName Get-Partition -Exactly -Times 1
                     Assert-MockCalled -CommandName Get-Volume -Exactly -Times 1
                     Assert-MockCalled -CommandName Get-CimInstance -Exactly -Times 1
@@ -2184,7 +2280,7 @@ try
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Get-DiskByIdentifier `
-                    -ParameterFilter { $DiskId -eq $script:mockedDisk0.Number -and $DiskIdType -eq 'Number' } `
+                    -ParameterFilter $script:parameterFilter_MockedDisk0Number `
                     -MockWith { $script:mockedDisk0 } `
                     -Verifiable
 
@@ -2222,7 +2318,7 @@ try
                 It 'Should call the correct mocks' {
                     Assert-VerifiableMock
                     Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 1 `
-                        -ParameterFilter { $DiskId -eq $script:mockedDisk0.Number -and $DiskIdType -eq 'Number' }
+                        -ParameterFilter $script:parameterFilter_MockedDisk0Number
                     Assert-MockCalled -CommandName Get-Partition -Exactly -Times 1
                     Assert-MockCalled -CommandName Get-Volume -Exactly -Times 1
                     Assert-MockCalled -CommandName Get-CimInstance -Exactly -Times 1
@@ -2233,7 +2329,7 @@ try
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Get-DiskByIdentifier `
-                    -ParameterFilter { $DiskId -eq $script:mockedDisk0.Number -and $DiskIdType -eq 'Number' } `
+                    -ParameterFilter $script:parameterFilter_MockedDisk0Number `
                     -MockWith { $script:mockedDisk0 } `
                     -Verifiable
 
@@ -2272,7 +2368,7 @@ try
                 It 'Should call the correct mocks' {
                     Assert-VerifiableMock
                     Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 1 `
-                        -ParameterFilter { $DiskId -eq $script:mockedDisk0.Number -and $DiskIdType -eq 'Number' }
+                        -ParameterFilter $script:parameterFilter_MockedDisk0Number
                     Assert-MockCalled -CommandName Get-Partition -Exactly -Times 1
                     Assert-MockCalled -CommandName Get-Volume -Exactly -Times 1
                     Assert-MockCalled -CommandName Get-CimInstance -Exactly -Times 1
@@ -2283,7 +2379,7 @@ try
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Get-DiskByIdentifier `
-                    -ParameterFilter { $DiskId -eq $script:mockedDisk0.Number -and $DiskIdType -eq 'Number' } `
+                    -ParameterFilter $script:parameterFilter_MockedDisk0Number `
                     -MockWith { $script:mockedDisk0 } `
                     -Verifiable
 
@@ -2321,7 +2417,7 @@ try
                 It 'Should call the correct mocks' {
                     Assert-VerifiableMock
                     Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 1 `
-                        -ParameterFilter { $DiskId -eq $script:mockedDisk0.Number -and $DiskIdType -eq 'Number' }
+                        -ParameterFilter $script:parameterFilter_MockedDisk0Number
                     Assert-MockCalled -CommandName Get-Partition -Exactly -Times 1
                     Assert-MockCalled -CommandName Get-Volume -Exactly -Times 1
                     Assert-MockCalled -CommandName Get-CimInstance -Exactly -Times 1
@@ -2332,7 +2428,7 @@ try
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Get-DiskByIdentifier `
-                    -ParameterFilter { $DiskId -eq $script:mockedDisk0.Number -and $DiskIdType -eq 'Number' } `
+                    -ParameterFilter $script:parameterFilter_MockedDisk0Number `
                     -MockWith { $script:mockedDisk0 } `
                     -Verifiable
 
@@ -2367,7 +2463,7 @@ try
                 It 'Should call the correct mocks' {
                     Assert-VerifiableMock
                     Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 1 `
-                        -ParameterFilter { $DiskId -eq $script:mockedDisk0.Number -and $DiskIdType -eq 'Number' }
+                        -ParameterFilter $script:parameterFilter_MockedDisk0Number
                     Assert-MockCalled -CommandName Get-Partition -Exactly -Times 1
                     Assert-MockCalled -CommandName Get-Volume -Exactly -Times 0
                     Assert-MockCalled -CommandName Get-CimInstance -Exactly -Times 0
@@ -2378,7 +2474,7 @@ try
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Get-DiskByIdentifier `
-                    -ParameterFilter { $DiskId -eq $script:mockedDisk0.Number -and $DiskIdType -eq 'Number' } `
+                    -ParameterFilter $script:parameterFilter_MockedDisk0Number `
                     -MockWith { $script:mockedDisk0 } `
                     -Verifiable
 
@@ -2419,7 +2515,7 @@ try
                 It 'Should call the correct mocks' {
                     Assert-VerifiableMock
                     Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 1 `
-                        -ParameterFilter { $DiskId -eq $script:mockedDisk0.Number -and $DiskIdType -eq 'Number' }
+                        -ParameterFilter $script:parameterFilter_MockedDisk0Number
                     Assert-MockCalled -CommandName Get-Partition -Exactly -Times 1
                     Assert-MockCalled -CommandName Get-Volume -Exactly -Times 1
                     Assert-MockCalled -CommandName Get-CimInstance -Exactly -Times 1

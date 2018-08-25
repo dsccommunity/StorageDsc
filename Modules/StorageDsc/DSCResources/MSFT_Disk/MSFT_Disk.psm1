@@ -258,7 +258,7 @@ function Set-TargetResource
     {
         Write-Verbose -Message ( @(
                 "$($MyInvocation.MyCommand): "
-                $($localizedData.ClearingDisk -f $DiskIdType, $DiskId)
+                $($localizedData.ClearingDiskMessage -f $DiskIdType, $DiskId)
             ) -join '' )
 
         $disk | Clear-Disk -RemoveData -RemoveOEM -Confirm:$true
@@ -447,7 +447,7 @@ function Set-TargetResource
         {
             # The partition is still readonly - throw an exception
             New-InvalidOperationException `
-                -Message ($localizedData.ParitionIsReadOnlyError -f `
+                -Message ($localizedData.NewParitionIsReadOnlyError -f `
                     $DiskIdType, $DiskId, $partition.PartitionNumber)
         } # if
 
@@ -464,15 +464,27 @@ function Set-TargetResource
 
         $assignDriveLetter = $false
 
+        $supportedSize = ($assignedPartition | Get-PartitionSupportedSize)
+
+        <#
+            If the parition size was not specified then try and make the partition
+            use all possible space on the disk.
+        #>
+        if (-not ($PSBoundParameters.ContainsKey('Size')))
+        {
+            $Size = $supportedSize.SizeMax
+        }
+
         if ($assignedPartition.Size -ne $Size)
         {
+            # A patition resize is required
             if ($AllowDestructive)
             {
                 if ($FSFormat -eq 'ReFS')
                 {
                     Write-Verbose -Message ( @(
                             "$($MyInvocation.MyCommand): "
-                            $($localizedData.ResizeRefsNotPossible `
+                            $($localizedData.ResizeRefsNotPossibleMessage `
                                     -f $DriveLetter, $assignedPartition.Size, $Size)
                         ) -join '' )
 
@@ -481,13 +493,11 @@ function Set-TargetResource
                 {
                     Write-Verbose -Message ( @(
                             "$($MyInvocation.MyCommand): "
-                            $($localizedData.SizeMismatchCorrection `
+                            $($localizedData.SizeMismatchCorrectionMessage `
                                     -f $DriveLetter, $assignedPartition.Size, $Size)
                         ) -join '' )
 
-                    $supportedSize = ($assignedPartition | Get-PartitionSupportedSize)
-
-                    if ($size -gt $supportedSize.SizeMax)
+                    if ($Size -gt $supportedSize.SizeMax)
                     {
                         New-InvalidArgumentException -Message ( @(
                                 "$($MyInvocation.MyCommand): "
@@ -498,6 +508,15 @@ function Set-TargetResource
 
                     $assignedPartition | Resize-Partition -Size $Size
                 }
+            }
+            else
+            {
+                # A partition resize was required but is not allowed
+                Write-Verbose -Message ( @(
+                    "$($MyInvocation.MyCommand): "
+                    $($localizedData.ResizeRefsNotAllowedMessage `
+                            -f $DriveLetter, $assignedPartition.Size, $Size)
+                ) -join '' )
             }
         }
     }
@@ -554,7 +573,7 @@ function Set-TargetResource
                 {
                     Write-Verbose -Message ( @(
                             "$($MyInvocation.MyCommand): "
-                            $($localizedData.VolumeFormatInProgress -f `
+                            $($localizedData.VolumeFormatInProgressMessage -f `
                                     $DriveLetter, $fileSystem, $FSFormat)
                         ) -join '' )
 

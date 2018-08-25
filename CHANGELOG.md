@@ -4,6 +4,14 @@
 
 - Enabled PSSA rule violations to fail build - Fixes [Issue #149](https://github.com/PowerShell/StorageDsc/issues/149).
 - Fixed markdown rule violations in CHANGELOG.MD.
+- Disk:
+  - Corrected message strings.
+  - Added message when partition resize required but `AllowDestructive`
+    parameter is not enabled.
+  - Fix error when `Size` not specified and `AllowDestructive` is `$True`
+    and partition can be expanded - Fixes [Issue #162](https://github.com/PowerShell/StorageDsc/issues/162).
+  - Fix incorrect error displaying when newly created partition is not
+    made Read/Write.
 
 ## 4.0.0.0
 
