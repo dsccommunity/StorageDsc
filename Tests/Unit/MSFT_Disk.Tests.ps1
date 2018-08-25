@@ -1944,7 +1944,7 @@ try
                 -CommandName Get-CimInstance `
                 -MockWith { $script:mockedCim }
 
-            Context 'Test disk does not exist using Disk Number' {
+            Context 'When testing disk does not exist using Disk Number' {
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Get-DiskByIdentifier `
@@ -1983,7 +1983,7 @@ try
                 }
             }
 
-            Context 'Test disk offline using Disk Unique Id' {
+            Context 'When testing disk offline using Disk Unique Id' {
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Get-DiskByIdentifier `
@@ -2022,7 +2022,7 @@ try
                 }
             }
 
-            Context 'Test disk offline using Unique Id' {
+            Context 'When testing disk offline using Unique Id' {
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Get-DiskByIdentifier `
@@ -2062,7 +2062,7 @@ try
                 }
             }
 
-            Context 'Test disk offline using Disk Guid' {
+            Context 'When testing disk offline using Disk Guid' {
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Get-DiskByIdentifier `
@@ -2102,7 +2102,7 @@ try
                 }
             }
 
-            Context 'Test disk read only using Disk Number' {
+            Context 'When testing disk read only using Disk Number' {
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Get-DiskByIdentifier `
@@ -2141,7 +2141,7 @@ try
                 }
             }
 
-            Context 'Test online unformatted disk using Disk Number' {
+            Context 'When testing online unformatted disk using Disk Number' {
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Get-DiskByIdentifier `
@@ -2180,7 +2180,7 @@ try
                 }
             }
 
-            Context 'Test mismatching partition size using Disk Number' {
+            Context 'When testing mismatching partition size using Disk Number' {
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Get-DiskByIdentifier `
@@ -2230,7 +2230,169 @@ try
                 }
             }
 
-            Context 'Test mismatched AllocationUnitSize using Disk Number' {
+            Context 'When testing mismatching partition size with AllowDestructive using Disk Number' {
+                # verifiable (should be called) mocks
+                Mock `
+                    -CommandName Get-DiskByIdentifier `
+                    -ParameterFilter $script:parameterFilter_MockedDisk0Number `
+                    -MockWith { $script:mockedDisk0 } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-Partition `
+                    -MockWith { $script:mockedPartition } `
+                    -Verifiable
+
+                # mocks that should not be called
+                Mock -CommandName Get-PartitionSupportedSize
+                Mock -CommandName Get-Volume
+                Mock -CommandName Get-CimInstance
+
+                $script:result = $null
+
+                It 'Should not throw an exception' {
+                    {
+                        $script:result = Test-TargetResource `
+                            -DiskId $script:mockedDisk0.Number `
+                            -DriveLetter $script:testDriveLetter `
+                            -AllocationUnitSize 4096 `
+                            -Size ($script:mockedPartitionSize + 1MB) `
+                            -AllowDestructive $true `
+                            -Verbose
+                    } | Should -Not -Throw
+                }
+
+                It 'Should be false' {
+                    $script:result | Should -Be $false
+                }
+
+                It 'Should call the correct mocks' {
+                    Assert-VerifiableMock
+                    Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 1 `
+                        -ParameterFilter $script:parameterFilter_MockedDisk0Number
+                    Assert-MockCalled -CommandName Get-Partition -Exactly -Times 1
+                    Assert-MockCalled -CommandName Get-PartitionSupportedSize -Exactly -Times 0
+                    Assert-MockCalled -CommandName Get-Volume -Exactly -Times 0
+                    Assert-MockCalled -CommandName Get-CimInstance -Exactly -Times 0
+                }
+            }
+
+            Context 'When testing mismatching partition size without Size specified using Disk Number' {
+                # verifiable (should be called) mocks
+                Mock `
+                    -CommandName Get-DiskByIdentifier `
+                    -ParameterFilter $script:parameterFilter_MockedDisk0Number `
+                    -MockWith { $script:mockedDisk0 } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-Partition `
+                    -MockWith { $script:mockedPartition } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-PartitionSupportedSize `
+                    -MockWith {
+                        return @{
+                            SizeMin = 0
+                            SizeMax = $script:mockedPartition.Size + 1024
+                        }
+                    } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-Volume `
+                    -MockWith { $script:mockedVolume } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-CimInstance `
+                    -MockWith { $script:mockedCim } `
+                    -Verifiable
+
+                $script:result = $null
+
+                It 'Should not throw an exception' {
+                    {
+                        $script:result = Test-TargetResource `
+                            -DiskId $script:mockedDisk0.Number `
+                            -DriveLetter $script:testDriveLetter `
+                            -AllocationUnitSize 4096 `
+                            -Verbose
+                    } | Should -Not -Throw
+                }
+
+                It 'Should be true' {
+                    $script:result | Should -Be $true
+                }
+
+                It 'Should call the correct mocks' {
+                    Assert-VerifiableMock
+                    Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 1 `
+                        -ParameterFilter $script:parameterFilter_MockedDisk0Number
+                    Assert-MockCalled -CommandName Get-Partition -Exactly -Times 1
+                    Assert-MockCalled -CommandName Get-PartitionSupportedSize -Exactly -Times 1
+                    Assert-MockCalled -CommandName Get-Volume -Exactly -Times 1
+                    Assert-MockCalled -CommandName Get-CimInstance -Exactly -Times 1
+                }
+            }
+
+            Context 'When testing mismatching partition size with AllowDestructive and without Size specified using Disk Number' {
+                # verifiable (should be called) mocks
+                Mock `
+                    -CommandName Get-DiskByIdentifier `
+                    -ParameterFilter $script:parameterFilter_MockedDisk0Number `
+                    -MockWith { $script:mockedDisk0 } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-Partition `
+                    -MockWith { $script:mockedPartition } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-PartitionSupportedSize `
+                    -MockWith {
+                        return @{
+                            SizeMin = 0
+                            SizeMax = $script:mockedPartition.Size + 1024
+                        }
+                    } `
+                    -Verifiable
+
+                # mocks that should not be called
+                Mock -CommandName Get-Volume
+                Mock -CommandName Get-CimInstance
+
+                $script:result = $null
+
+                It 'Should not throw an exception' {
+                    {
+                        $script:result = Test-TargetResource `
+                            -DiskId $script:mockedDisk0.Number `
+                            -DriveLetter $script:testDriveLetter `
+                            -AllocationUnitSize 4096 `
+                            -AllowDestructive $true `
+                            -Verbose
+                    } | Should -Not -Throw
+                }
+
+                It 'Should be false' {
+                    $script:result | Should -Be $false
+                }
+
+                It 'Should call the correct mocks' {
+                    Assert-VerifiableMock
+                    Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 1 `
+                        -ParameterFilter $script:parameterFilter_MockedDisk0Number
+                    Assert-MockCalled -CommandName Get-Partition -Exactly -Times 1
+                    Assert-MockCalled -CommandName Get-PartitionSupportedSize -Exactly -Times 1
+                    Assert-MockCalled -CommandName Get-Volume -Exactly -Times 0
+                    Assert-MockCalled -CommandName Get-CimInstance -Exactly -Times 0
+                }
+            }
+
+            Context 'When testing mismatched AllocationUnitSize using Disk Number' {
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Get-DiskByIdentifier `
@@ -2276,7 +2438,7 @@ try
                 }
             }
 
-            Context 'Test mismatching FSFormat using Disk Number' {
+            Context 'When testing mismatching FSFormat using Disk Number' {
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Get-DiskByIdentifier `
@@ -2325,7 +2487,7 @@ try
                 }
             }
 
-            Context 'Test mismatching FSFormat using Disk Number and AllowDestructive' {
+            Context 'When testing mismatching FSFormat using Disk Number and AllowDestructive' {
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Get-DiskByIdentifier `
@@ -2375,7 +2537,7 @@ try
                 }
             }
 
-            Context 'Test mismatching FSLabel using Disk Number' {
+            Context 'When testing mismatching FSLabel using Disk Number' {
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Get-DiskByIdentifier `
@@ -2424,7 +2586,7 @@ try
                 }
             }
 
-            Context 'Test mismatching DriveLetter using Disk Number' {
+            Context 'When testing mismatching DriveLetter using Disk Number' {
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Get-DiskByIdentifier `
@@ -2470,7 +2632,7 @@ try
                 }
             }
 
-            Context 'Test all disk properties matching using Disk Number' {
+            Context 'When testing all disk properties matching using Disk Number' {
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Get-DiskByIdentifier `

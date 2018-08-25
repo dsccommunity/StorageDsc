@@ -27,7 +27,40 @@ configuration MSFT_Disk_Config {
     }
 }
 
-configuration MSFT_Disk_ConfigDestructive {
+configuration MSFT_Disk_ConfigAllowDestructive {
+
+    Import-DscResource -ModuleName StorageDsc
+
+    node localhost {
+        if ($Node.Size)
+        {
+            Disk Integration_Test
+            {
+                DiskId           = $Node.DiskId
+                DiskIdType       = $Node.DiskIdType
+                DriveLetter      = $Node.DriveLetter
+                FSLabel          = $Node.FSLabel
+                Size             = $Node.Size
+                FSFormat         = $Node.FSFormat
+                AllowDestructive = $true
+            }
+        }
+        else
+        {
+            Disk Integration_Test
+            {
+                DiskId           = $Node.DiskId
+                DiskIdType       = $Node.DiskIdType
+                DriveLetter      = $Node.DriveLetter
+                FSLabel          = $Node.FSLabel
+                FSFormat         = $Node.FSFormat
+                AllowDestructive = $true
+            }
+        }
+    }
+}
+
+configuration MSFT_Disk_ConfigClearDisk {
 
     Import-DscResource -ModuleName StorageDsc
 

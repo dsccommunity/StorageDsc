@@ -759,6 +759,7 @@ function Test-TargetResource
     $partition = Get-Partition `
         -DriveLetter $DriveLetter `
         -ErrorAction SilentlyContinue
+
     if ($partition.DriveLetter -ne $DriveLetter)
     {
         Write-Verbose -Message ( @(
@@ -769,21 +770,36 @@ function Test-TargetResource
         return $false
     } # if
 
-    # Drive size
+    # Check the partition size
+    if ($partition -and -not ($PSBoundParameters.ContainsKey('Size')))
+    {
+        $supportedSize = ($partition | Get-PartitionSupportedSize)
+
+        $Size = $supportedSize.SizeMax
+    }
+
     if ($Size)
     {
         if ($partition.Size -ne $Size)
         {
             # The partition size mismatches
-            Write-Verbose -Message ( @(
+            if ($AllowDestructive)
+            {
+                Write-Verbose -Message ( @(
+                    "$($MyInvocation.MyCommand): "
+                    $($localizedData.SizeMismatchWithAllowDestructiveMessage `
+                            -f $DriveLetter, $Partition.Size, $Size)
+                ) -join '' )
+
+                return $false
+            }
+            else
+            {
+                Write-Verbose -Message ( @(
                     "$($MyInvocation.MyCommand): "
                     $($localizedData.SizeMismatchMessage `
                             -f $DriveLetter, $Partition.Size, $Size)
                 ) -join '' )
-
-            if ($AllowDestructive)
-            {
-                return $false
             }
         } # if
     } # if

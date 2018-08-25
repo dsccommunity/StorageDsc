@@ -20,7 +20,8 @@
     DiskReadOnlyMessage = Disk with {0} '{1}' is readonly.
     DiskNotGPTMessage = Disk with {0} '{1}' is initialized with '{2}' partition style. GPT required.
     DriveLetterNotFoundMessage = Drive {0} was not found.
-    SizeMismatchMessage = Partition assigned to drive {0} has size {1}, which does not match expected size {2}.
+    SizeMismatchMessage = Partition assigned to drive {0} has size {1}, which does not match expected size {2}. Set AllowDestructive to 'True' to enable resizing of partition.
+    SizeMismatchWithAllowDestructiveMessage = Partition assigned to drive {0} has size {1}, which does not match expected size {2}.
     AllocationUnitSizeMismatchMessage = Volume assigned to drive {0} has allocation unit size {1} KB does not match expected allocation unit size {2} KB.
     FileSystemFormatMismatch = Volume assigned to drive {0} filesystem format '{1}' does not match expected format '{2}'.
     DriveLabelMismatch = Volume assigned to drive {0} label '{1}' does not match expected label '{2}'.
@@ -38,5 +39,5 @@
     SizeMismatchCorrectionMessage = Switch AllowDestructive is specified. Attempting to resize partition {0} from {1} to {2}.
     FreeSpaceViolationError = Attempted to resize partition {0} from {1} to {2} while maximum allowed size was {3}.
     ResizeRefsNotPossibleMessage = Skipping resize of {0} from {1} to {2}. Resizing ReFS partitions is currently not possible.
-    ResizeRefsNotAllowedMessage = Skipping resize of {0} from {1} to {2}. AllowDestructive flag is not set to 'True'.
+    ResizeRefsNotAllowedMessage = Skipping resize of {0} from {1} to {2}. AllowDestructive is not set to 'True'.
 '@

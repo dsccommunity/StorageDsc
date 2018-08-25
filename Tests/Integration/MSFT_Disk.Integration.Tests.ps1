@@ -219,11 +219,12 @@ try
                     $current.DiskId           | Should -Be $disk.Number
                     $current.DriveLetter      | Should -Be $driveLetterA
                     $current.FSLabel          | Should -Be $FSLabelA
+                    $current.FSFormat         | Should -Be 'NTFS'
                     $current.Size             | Should -Be 50MB
                 }
             }
 
-            Context "Resize partition on Disk Number $($disk.Number)" {
+            Context "Resize partition on Disk Number $($disk.Number) with AllowDestructive" {
                 It 'Should compile and apply the MOF without throwing' {
                     {
                         # This is to pass to the Config
@@ -235,11 +236,12 @@ try
                                     DiskId      = $disk.Number
                                     DiskIdType  = 'Number'
                                     FSLabel     = $FSLabelA
+                                    FSFormat    = 'NTFS'
                                 }
                             )
                         }
 
-                        & "$($script:DSCResourceName)_Config" `
+                        & "$($script:DSCResourceName)_ConfigAllowDestructive" `
                             -OutputPath $TestDrive `
                             -ConfigurationData $configData
 
@@ -259,11 +261,12 @@ try
 
                 It 'Should have set the resource and all the parameters should match' {
                     $current = Get-DscConfiguration | Where-Object {
-                        $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
+                        $_.ConfigurationName -eq "$($script:DSCResourceName)_ConfigAllowDestructive"
                     }
                     $current.DiskId           | Should -Be $disk.Number
                     $current.DriveLetter      | Should -Be $driveLetterA
                     $current.FSLabel          | Should -Be $FSLabelA
+                    $current.FSFormat         | Should -Be 'NTFS'
                     $current.Size             | Should -Be 952041472
                 }
             }
@@ -373,7 +376,7 @@ try
                             )
                         }
 
-                        & "$($script:DSCResourceName)_ConfigDestructive" `
+                        & "$($script:DSCResourceName)_ConfigClearDisk" `
                             -OutputPath $TestDrive `
                             -ConfigurationData $configData
 
@@ -393,7 +396,7 @@ try
 
                 It 'should have set the resource and all the parameters should match' {
                     $current = Get-DscConfiguration | Where-Object {
-                        $_.ConfigurationName -eq "$($script:DSCResourceName)_ConfigDestructive"
+                        $_.ConfigurationName -eq "$($script:DSCResourceName)_ConfigClearDisk"
                     }
                     $current.DiskId           | Should -Be $disk.UniqueId
                     $current.DriveLetter      | Should -Be $driveLetterA
