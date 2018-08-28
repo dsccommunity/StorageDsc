@@ -464,7 +464,7 @@ function Set-TargetResource
 
         $assignDriveLetter = $false
 
-        $supportedSize = ($assignedPartition | Get-PartitionSupportedSize)
+        $supportedSize = $assignedPartition | Get-PartitionSupportedSize
 
         <#
             If the parition size was not specified then try and make the partition
@@ -482,7 +482,7 @@ function Set-TargetResource
             {
                 if ($FSFormat -eq 'ReFS')
                 {
-                    Write-Verbose -Message ( @(
+                    Write-Warning -Message ( @(
                             "$($MyInvocation.MyCommand): "
                             $($localizedData.ResizeRefsNotPossibleMessage `
                                     -f $DriveLetter, $assignedPartition.Size, $Size)
@@ -512,7 +512,7 @@ function Set-TargetResource
             else
             {
                 # A partition resize was required but is not allowed
-                Write-Verbose -Message ( @(
+                Write-Warning -Message ( @(
                     "$($MyInvocation.MyCommand): "
                     $($localizedData.ResizeNotAllowedMessage `
                             -f $DriveLetter, $assignedPartition.Size, $Size)

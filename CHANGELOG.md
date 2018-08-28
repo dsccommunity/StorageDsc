@@ -8,10 +8,12 @@
   - Corrected message strings.
   - Added message when partition resize required but `AllowDestructive`
     parameter is not enabled.
-  - Fix error when `Size` not specified and `AllowDestructive` is `$True`
+  - Fix error when `Size` not specified and `AllowDestructive` is `$true`
     and partition can be expanded - Fixes [Issue #162](https://github.com/PowerShell/StorageDsc/issues/162).
   - Fix incorrect error displaying when newly created partition is not
     made Read/Write.
+  - Change verbose messages to show warnings when a partition resize would
+    have occured but the `AllowDestructive` flag is set to `$false`.
 
 ## 4.0.0.0
 
