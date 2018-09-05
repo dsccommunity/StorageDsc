@@ -1,0 +1,11 @@
+
+[ClassVersion("0.1.0.0"), FriendlyName("StoragePool")]
+class StoragePool : OMI_BaseResource
+{
+    [Key, Description("This setting provides a unique name for the configuration")] String FriendlyName;
+    [Write, Description("Specifies the new name of an existing StorageSpace configuration")] String NewFriendlyName;
+    [Write, Description("Specifies the number of disks to be added, adds any 'canpool' disk")] Uint32 NumberOfDisks;
+    [Write, Description("Specifies the size of the disk to filter on in the 'canpool' collection.")] Uint32 DriveSize;
+    [Write, Description("Determines whether the setting should be applied or removed"), ValueMap{"Present","Absent"}, Values{"Present","Absent"}] String Ensure;
+};
+

@@ -1,0 +1,11 @@
+
+[ClassVersion("0.1.0.0"), FriendlyName("cDisk")] 
+class ITON_cDisk : OMI_BaseResource
+{
+    [key] string DriveLetter;
+    [write] uint32 DiskNumber;
+    [write] string DiskFriendlyName;
+    [write] uint64 Size;
+    [write] string FSLabel;
+    [write] uint32 AllocationUnitSize;
+};

@@ -1,0 +1,12 @@
+
+[ClassVersion("0.1.0.0"), FriendlyName("VirtualDisk")]
+class VirtualDisk : OMI_BaseResource
+{
+    [Key, Description("Specifies the name of the VirtualDisk te be created")] String FriendlyName;
+    [Key, Description("Specifies the StorageSpace on which the VirtualDisk has to be placed")] String StoragePoolFriendlyName;
+    [Write, Description("Specifies the size of the disk (in GB)")] Uint32 Size;
+    [Write, Description("ProvisioningType of the VirtualDisk. If omitted, defaults to Fixed"), ValueMap{"Thin","Fixed"}, Values{"Thin","Fixed"}] String ProvisioningType;
+    [Write, Description("Resiliency setting of the VirtualDisk. If omitted, defaults to Mirror"), ValueMap{"Simple","Mirror","Parity"}, Values{"Simple","Mirror","Parity"}] String ResiliencySettingName;
+    [Write, Description("Determines whether the setting should be applied or removed"), ValueMap{"Present","Absent"}, Values{"Present","Absent"}] String Ensure;
+};
+
