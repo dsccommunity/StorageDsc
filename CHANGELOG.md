@@ -2,6 +2,21 @@
 
 ## Unreleased
 
+## 4.1.0.0
+
+- Enabled PSSA rule violations to fail build - Fixes [Issue #149](https://github.com/PowerShell/StorageDsc/issues/149).
+- Fixed markdown rule violations in CHANGELOG.MD.
+- Disk:
+  - Corrected message strings.
+  - Added message when partition resize required but `AllowDestructive`
+    parameter is not enabled.
+  - Fix error when `Size` not specified and `AllowDestructive` is `$true`
+    and partition can be expanded - Fixes [Issue #162](https://github.com/PowerShell/StorageDsc/issues/162).
+  - Fix incorrect error displaying when newly created partition is not
+    made Read/Write.
+  - Change verbose messages to show warnings when a partition resize would
+    have occured but the `AllowDestructive` flag is set to `$false`.
+
 ## 4.0.0.0
 
 - BREAKING CHANGE:
@@ -123,8 +138,8 @@
   - Additional log entries added for improved diagnostics.
   - Additional integration tests added.
   - Improve timeout loop.
-- Converted integration tests to use ```$TestDrive``` as working folder or
-  ```temp``` folder when persistence across tests is required.
+- Converted integration tests to use ```$TestDrive``` as working folder
+  or ```temp``` folder when persistence across tests is required.
 - Suppress ```PSUseShouldProcessForStateChangingFunctions``` rule violations in resources.
 - Rename ```Test-AccessPath``` function to ```Assert-AccessPathValid```.
 - Rename ```Test-DriveLetter``` function to ```Assert-DriveLetterValid```.
@@ -132,8 +147,8 @@
 - Added ```CommonTestsHelper.psm1``` module  (based on PSDscResources).
 - Converted all modules to load localization data using ```Get-LocalizedData```
   from CommonResourceHelper.
-- Converted all exception calls and tests to use functions in
-  ```CommonResourceHelper.psm1``` and ```CommonTestsHelper.psm1``` respectively.
+- Converted all exception calls and tests to use functions
+  in ```CommonResourceHelper.psm1``` and ```CommonTestsHelper.psm1``` respectively.
 - Fixed examples:
   - Sample_InitializeDataDisk.ps1
   - Sample_InitializeDataDiskWithAccessPath.ps1

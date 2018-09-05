@@ -10,7 +10,7 @@
 # RootModule = ''
 
 # Version number of this module.
-ModuleVersion = '4.0.0.0'
+moduleVersion = '4.1.0.0'
 
 # ID used to uniquely identify this module
 GUID = '00d73ca1-58b5-46b7-ac1a-5bfcf5814faf'
@@ -102,16 +102,18 @@ PrivateData = @{
         # IconUri = ''
 
         # ReleaseNotes of this module
-        ReleaseNotes = '- BREAKING CHANGE:
-  - Renamed xStorage to StorageDsc
-  - Renamed MSFT_xDisk to MSFT_Disk
-  - Renamed MSFT_xDiskAccessPath to MSFT_DiskAccessPath
-  - Renamed MSFT_xMountImage to MSFT_MountImage
-  - Renamed MSFT_xOpticalDiskDriveLetter to MSFT_OpticalDiskDriveLetter
-  - Renamed MSFT_xWaitForDisk to MSFT_WaitForDisk
-  - Renamed MSFT_xWaitForVolume to MSFT_WaitforVolume
-  - Deleted xStorage folder under StorageDsc/Modules
-  - See [Issue 129](https://github.com/PowerShell/xStorage/issues/129)
+        ReleaseNotes = '- Enabled PSSA rule violations to fail build - Fixes [Issue 149](https://github.com/PowerShell/StorageDsc/issues/149).
+- Fixed markdown rule violations in CHANGELOG.MD.
+- Disk:
+  - Corrected message strings.
+  - Added message when partition resize required but `AllowDestructive`
+    parameter is not enabled.
+  - Fix error when `Size` not specified and `AllowDestructive` is `$true`
+    and partition can be expanded - Fixes [Issue 162](https://github.com/PowerShell/StorageDsc/issues/162).
+  - Fix incorrect error displaying when newly created partition is not
+    made Read/Write.
+  - Change verbose messages to show warnings when a partition resize would
+    have occured but the `AllowDestructive` flag is set to `$false`.
 
 '
 
@@ -126,6 +128,7 @@ PrivateData = @{
 # DefaultCommandPrefix = ''
 
 }
+
 
 
 
