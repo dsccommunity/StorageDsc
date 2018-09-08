@@ -78,11 +78,11 @@ try
                 }
 
                 It 'Should be able to call Get-DscConfiguration without throwing' {
-                    { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
+                    { $script:currentConfiguration = Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
                 }
 
                 It 'Should have set the resource and all the parameters should match' {
-                    $current = Get-DscConfiguration | Where-Object -FilterScript {
+                    $current = $script:currentConfiguration | Where-Object -FilterScript {
                         $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
                     }
                     $current.DiskId           | Should -Be $disk.Number
@@ -125,11 +125,11 @@ try
                 }
 
                 It 'Should be able to call Get-DscConfiguration without throwing' {
-                    { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
+                    { $script:currentConfiguration = Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
                 }
 
                 It 'Should have set the resource and all the parameters should match' {
-                    $current = Get-DscConfiguration | Where-Object -FilterScript {
+                    $current = $script:currentConfiguration | Where-Object -FilterScript {
                         $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
                     }
                     $current.DiskId           | Should -Be $disk.Number
@@ -214,11 +214,11 @@ try
                 }
 
                 It 'Should be able to call Get-DscConfiguration without throwing' {
-                    { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
+                    { $script:currentConfiguration = Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
                 }
 
                 It 'Should have set the resource and all the parameters should match' {
-                    $current = Get-DscConfiguration | Where-Object -FilterScript {
+                    $current = $script:currentConfiguration | Where-Object -FilterScript {
                         $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
                     }
                     $current.DiskId           | Should -Be $disk.Number
@@ -262,11 +262,11 @@ try
                 }
 
                 It 'Should be able to call Get-DscConfiguration without throwing' {
-                    { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
+                    { $script:currentConfiguration = Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
                 }
 
                 It 'Should have set the resource and all the parameters should match' {
-                    $current = Get-DscConfiguration | Where-Object -FilterScript {
+                    $current = $script:currentConfiguration | Where-Object -FilterScript {
                         $_.ConfigurationName -eq "$($script:DSCResourceName)_ConfigAllowDestructive"
                     }
                     $current.DiskId           | Should -Be $disk.Number
@@ -347,11 +347,11 @@ try
                 }
 
                 It 'Should be able to call Get-DscConfiguration without throwing' {
-                    { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
+                    { $script:currentConfiguration = Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
                 }
 
                 It 'Should have set the resource and all the parameters should match' {
-                    $current = Get-DscConfiguration | Where-Object -FilterScript {
+                    $current = $script:currentConfiguration | Where-Object -FilterScript {
                         $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
                     }
                     $current.DiskId           | Should -Be $disk.Number
@@ -397,11 +397,11 @@ try
                 }
 
                 It 'Should be able to call Get-DscConfiguration without throwing' {
-                    { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
+                    { $script:currentConfiguration = Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
                 }
 
                 It 'Should have set the resource and all the parameters should match' {
-                    $current = Get-DscConfiguration | Where-Object -FilterScript {
+                    $current = $script:currentConfiguration | Where-Object -FilterScript {
                         $_.ConfigurationName -eq "$($script:DSCResourceName)_ConfigClearDisk"
                     }
                     $current.DiskId           | Should -Be $disk.Number
@@ -487,11 +487,11 @@ try
                 }
 
                 It 'Should be able to call Get-DscConfiguration without throwing' {
-                    { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
+                    { $script:currentConfiguration = Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
                 }
 
                 It 'Should have set the resource and all the parameters should match' {
-                    $current = Get-DscConfiguration | Where-Object -FilterScript {
+                    $current = $script:currentConfiguration | Where-Object -FilterScript {
                         $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
                     }
                     $current.DiskId           | Should -Be $disk.UniqueId
@@ -536,11 +536,11 @@ try
                 }
 
                 It 'should be able to call Get-DscConfiguration without throwing' {
-                    { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
+                    { $script:currentConfiguration = Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
                 }
 
                 It 'should have set the resource and all the parameters should match' {
-                    $current = Get-DscConfiguration | Where-Object -FilterScript {
+                    $current = $script:currentConfiguration | Where-Object -FilterScript {
                         $_.ConfigurationName -eq "$($script:DSCResourceName)_ConfigClearDisk"
                     }
                     $current.DiskId           | Should -Be $disk.UniqueId
@@ -584,11 +584,11 @@ try
                 }
 
                 It 'Should be able to call Get-DscConfiguration without throwing' {
-                    { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
+                    { $script:currentConfiguration = Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
                 }
 
                 It 'Should have set the resource and all the parameters should match' {
-                    $current = Get-DscConfiguration | Where-Object -FilterScript {
+                    $current = $script:currentConfiguration | Where-Object -FilterScript {
                         $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
                     }
                     $current.DiskId           | Should -Be $disk.UniqueId
@@ -671,11 +671,11 @@ try
                 }
 
                 It 'Should be able to call Get-DscConfiguration without throwing' {
-                    { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
+                    { $script:currentConfiguration = Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
                 }
 
                 It 'Should have set the resource and all the parameters should match' {
-                    $current = Get-DscConfiguration | Where-Object -FilterScript {
+                    $current = $script:currentConfiguration | Where-Object -FilterScript {
                         $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
                     }
                     $current.DiskId           | Should -Be $disk.Guid
@@ -718,11 +718,11 @@ try
                 }
 
                 It 'Should be able to call Get-DscConfiguration without throwing' {
-                    { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
+                    { $script:currentConfiguration = Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
                 }
 
                 It 'Should have set the resource and all the parameters should match' {
-                    $current = Get-DscConfiguration | Where-Object -FilterScript {
+                    $current = $script:currentConfiguration | Where-Object -FilterScript {
                         $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
                     }
                     $current.DiskId           | Should -Be $disk.Guid
@@ -802,11 +802,11 @@ try
                 }
 
                 It 'Should be able to call Get-DscConfiguration without throwing' {
-                    { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
+                    { $script:currentConfiguration = Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
                 }
 
                 It 'Should have set the resource and all the parameters should match' {
-                    $current = Get-DscConfiguration | Where-Object -FilterScript {
+                    $current = $script:currentConfiguration | Where-Object -FilterScript {
                         $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
                     }
                     $current.DiskId           | Should -Be $disk.Number
@@ -854,11 +854,11 @@ try
                 }
 
                 It 'Should be able to call Get-DscConfiguration without throwing' {
-                    { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
+                    { $script:currentConfiguration = Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
                 }
 
                 It 'Should have set the resource and all the parameters should match' {
-                    $current = Get-DscConfiguration | Where-Object -FilterScript {
+                    $current = $script:currentConfiguration | Where-Object -FilterScript {
                         $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
                     }
                     $current.DiskId           | Should -Be $disk.Number
