@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Disk:
+  - Added `PartitionType` parameter - Fixes [Issue #137](https://github.com/PowerShell/StorageDsc/issues/37).
+
 ## 4.1.0.0
 
 - Enabled PSSA rule violations to fail build - Fixes [Issue #149](https://github.com/PowerShell/StorageDsc/issues/149).

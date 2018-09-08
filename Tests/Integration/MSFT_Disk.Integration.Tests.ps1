@@ -52,12 +52,13 @@ try
                         $configData = @{
                             AllNodes = @(
                                 @{
-                                    NodeName    = 'localhost'
-                                    DriveLetter = $driveLetterA
-                                    DiskId      = $disk.Number
-                                    DiskIdType  = 'Number'
-                                    FSLabel     = $FSLabelA
-                                    Size        = 100MB
+                                    NodeName       = 'localhost'
+                                    DriveLetter    = $driveLetterA
+                                    DiskId         = $disk.Number
+                                    DiskIdType     = 'Number'
+                                    PartitionStyle = 'GPT'
+                                    FSLabel        = $FSLabelA
+                                    Size           = 100MB
                                 }
                             )
                         }
@@ -81,11 +82,12 @@ try
                 }
 
                 It 'Should have set the resource and all the parameters should match' {
-                    $current = Get-DscConfiguration | Where-Object {
+                    $current = Get-DscConfiguration | Where-Object -FilterScript {
                         $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
                     }
                     $current.DiskId           | Should -Be $disk.Number
                     $current.DriveLetter      | Should -Be $driveLetterA
+                    $current.PartitionStyle   | Should -Be 'GPT'
                     $current.FSLabel          | Should -Be $FSLabelA
                     $current.Size             | Should -Be 100MB
                 }
@@ -98,11 +100,12 @@ try
                         $configData = @{
                             AllNodes = @(
                                 @{
-                                    NodeName    = 'localhost'
-                                    DriveLetter = $driveLetterB
-                                    DiskId      = $disk.Number
-                                    DiskIdType  = 'Number'
-                                    FSLabel     = $FSLabelB
+                                    NodeName       = 'localhost'
+                                    DriveLetter    = $driveLetterB
+                                    DiskId         = $disk.Number
+                                    DiskIdType     = 'Number'
+                                    PartitionStyle = 'GPT'
+                                    FSLabel        = $FSLabelB
                                 }
                             )
                         }
@@ -126,12 +129,13 @@ try
                 }
 
                 It 'Should have set the resource and all the parameters should match' {
-                    $current = Get-DscConfiguration | Where-Object {
+                    $current = Get-DscConfiguration | Where-Object -FilterScript {
                         $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
                     }
                     $current.DiskId           | Should -Be $disk.Number
                     $current.DriveLetter      | Should -Be $driveLetterB
                     $current.FSLabel          | Should -Be $FSLabelB
+                    $current.PartitionStyle   | Should -Be 'GPT'
                     $current.Size             | Should -Be 935198720
                 }
             }
@@ -184,12 +188,13 @@ try
                         $configData = @{
                             AllNodes = @(
                                 @{
-                                    NodeName    = 'localhost'
-                                    DriveLetter = $driveLetterA
-                                    DiskId      = $disk.Number
-                                    DiskIdType  = 'Number'
-                                    FSLabel     = $FSLabelA
-                                    Size        = 50MB
+                                    NodeName       = 'localhost'
+                                    DriveLetter    = $driveLetterA
+                                    DiskId         = $disk.Number
+                                    DiskIdType     = 'Number'
+                                    PartitionStyle = 'GPT'
+                                    FSLabel        = $FSLabelA
+                                    Size           = 50MB
                                 }
                             )
                         }
@@ -213,11 +218,12 @@ try
                 }
 
                 It 'Should have set the resource and all the parameters should match' {
-                    $current = Get-DscConfiguration | Where-Object {
+                    $current = Get-DscConfiguration | Where-Object -FilterScript {
                         $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
                     }
                     $current.DiskId           | Should -Be $disk.Number
                     $current.DriveLetter      | Should -Be $driveLetterA
+                    $current.PartitionStyle   | Should -Be 'GPT'
                     $current.FSLabel          | Should -Be $FSLabelA
                     $current.FSFormat         | Should -Be 'NTFS'
                     $current.Size             | Should -Be 50MB
@@ -260,12 +266,148 @@ try
                 }
 
                 It 'Should have set the resource and all the parameters should match' {
-                    $current = Get-DscConfiguration | Where-Object {
+                    $current = Get-DscConfiguration | Where-Object -FilterScript {
                         $_.ConfigurationName -eq "$($script:DSCResourceName)_ConfigAllowDestructive"
                     }
                     $current.DiskId           | Should -Be $disk.Number
                     $current.DriveLetter      | Should -Be $driveLetterA
                     $current.FSLabel          | Should -Be $FSLabelA
+                    $current.FSFormat         | Should -Be 'NTFS'
+                    $current.Size             | Should -Be 1040104960
+                }
+            }
+
+            # A system partition will have been added to the disk as well as the test partition
+            It 'Should have 2 partitions on disk' {
+                ($disk | Get-Partition).Count | Should -Be 2
+            }
+
+            <#
+                Get a list of all drives mounted - this works better on Windows Server 2012 R2 than
+                trying to get the drive mounted by name.
+            #>
+            $drives = Get-PSDrive
+
+            It "Should have attached drive $driveLetterA" {
+                $drives | Where-Object -Property Name -eq $driveLetterA | Should -Not -BeNullOrEmpty
+            }
+
+            AfterAll {
+                Dismount-DiskImage -ImagePath $VHDPath -StorageType VHD
+                Remove-Item -Path $VHDPath -Force
+            }
+        }
+
+        Context 'Partition and format newly provisioned disk using Disk Number with one volume using MBR then convert to GPT' {
+            BeforeAll {
+                # Create a VHD and attach it to the computer
+                $VHDPath = Join-Path -Path $TestDrive `
+                    -ChildPath 'TestDisk.vhd'
+                $null = New-VDisk -Path $VHDPath -SizeInMB 1024
+                $null = Mount-DiskImage -ImagePath $VHDPath -StorageType VHD -NoDriveLetter
+                $diskImage = Get-DiskImage -ImagePath $VHDPath
+                $disk = Get-Disk -Number $diskImage.Number
+                $FSLabelA = 'TestDiskA'
+
+                # Get a spare drive letters
+                $lastDrive = ((Get-Volume).DriveLetter | Sort-Object | Select-Object -Last 1)
+                $driveLetterA = [char](([int][char]$lastDrive) + 1)
+            }
+
+            Context "Create volume on Disk Number $($disk.Number)" {
+                It 'Should compile and apply the MOF without throwing' {
+                    {
+                        # This is to pass to the Config
+                        $configData = @{
+                            AllNodes = @(
+                                @{
+                                    NodeName       = 'localhost'
+                                    DriveLetter    = $driveLetterA
+                                    DiskId         = $disk.Number
+                                    DiskIdType     = 'Number'
+                                    PartitionStyle = 'MBR'
+                                    FSLabel        = $FSLabelA
+                                    Size           = 50MB
+                                }
+                            )
+                        }
+
+                        & "$($script:DSCResourceName)_Config" `
+                            -OutputPath $TestDrive `
+                            -ConfigurationData $configData
+
+                        Start-DscConfiguration `
+                            -Path $TestDrive `
+                            -ComputerName localhost `
+                            -Wait `
+                            -Verbose `
+                            -Force `
+                            -ErrorAction Stop
+                    } | Should -Not -Throw
+                }
+
+                It 'Should be able to call Get-DscConfiguration without throwing' {
+                    { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
+                }
+
+                It 'Should have set the resource and all the parameters should match' {
+                    $current = Get-DscConfiguration | Where-Object -FilterScript {
+                        $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
+                    }
+                    $current.DiskId           | Should -Be $disk.Number
+                    $current.DriveLetter      | Should -Be $driveLetterA
+                    $current.PartitionStyle   | Should -Be 'MBR'
+                    $current.FSLabel          | Should -Be $FSLabelA
+                    $current.FSFormat         | Should -Be 'NTFS'
+                    $current.Size             | Should -Be 50MB
+                }
+            }
+
+            Context "Resize partition on Disk Number $($disk.Number) with AllowDestructive" {
+                It 'Should compile and apply the MOF without throwing' {
+                    {
+                        # This is to pass to the Config
+                        $configData = @{
+                            AllNodes = @(
+                                @{
+                                    NodeName       = 'localhost'
+                                    DriveLetter    = $driveLetterA
+                                    DiskId         = $disk.Number
+                                    DiskIdType     = 'Number'
+                                    PartitionStyle = 'GPT'
+                                    FSLabel        = $FSLabelA
+                                    Size           = 50MB
+
+                                }
+                            )
+                        }
+
+                        & "$($script:DSCResourceName)_ConfigClearDisk" `
+                            -OutputPath $TestDrive `
+                            -ConfigurationData $configData
+
+                        Start-DscConfiguration `
+                            -Path $TestDrive `
+                            -ComputerName localhost `
+                            -Wait `
+                            -Verbose `
+                            -Force `
+                            -ErrorAction Stop
+                    } | Should -Not -Throw
+                }
+
+                It 'Should be able to call Get-DscConfiguration without throwing' {
+                    { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
+                }
+
+                It 'Should have set the resource and all the parameters should match' {
+                    $current = Get-DscConfiguration | Where-Object -FilterScript {
+                        $_.ConfigurationName -eq "$($script:DSCResourceName)_ConfigClearDisk"
+                    }
+                    $current.DiskId           | Should -Be $disk.Number
+                    $current.DriveLetter      | Should -Be $driveLetterA
+                    $current.FSLabel          | Should -Be $FSLabelA
+                    $current.PartitionStyle   | Should -Be 'GPT'
                     $current.FSFormat         | Should -Be 'NTFS'
                     $current.Size             | Should -Be 1040104960
                 }
@@ -319,12 +461,13 @@ try
                         $configData = @{
                             AllNodes = @(
                                 @{
-                                    NodeName    = 'localhost'
-                                    DriveLetter = $driveLetterA
-                                    DiskId      = $disk.UniqueId
-                                    DiskIdType  = 'UniqueId'
-                                    FSLabel     = $FSLabelA
-                                    Size        = 100MB
+                                    NodeName       = 'localhost'
+                                    DriveLetter    = $driveLetterA
+                                    DiskId         = $disk.UniqueId
+                                    DiskIdType     = 'UniqueId'
+                                    PartitionStyle = 'GPT'
+                                    FSLabel        = $FSLabelA
+                                    Size           = 100MB
                                 }
                             )
                         }
@@ -348,11 +491,12 @@ try
                 }
 
                 It 'Should have set the resource and all the parameters should match' {
-                    $current = Get-DscConfiguration | Where-Object {
+                    $current = Get-DscConfiguration | Where-Object -FilterScript {
                         $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
                     }
                     $current.DiskId           | Should -Be $disk.UniqueId
                     $current.DriveLetter      | Should -Be $driveLetterA
+                    $current.PartitionStyle   | Should -Be 'GPT'
                     $current.FSLabel          | Should -Be $FSLabelA
                     $current.Size             | Should -Be 100MB
                 }
@@ -365,13 +509,14 @@ try
                         $configData = @{
                             AllNodes = @(
                                 @{
-                                    NodeName    = 'localhost'
-                                    DriveLetter = $driveLetterA
-                                    DiskId      = $disk.UniqueId
-                                    DiskIdType  = 'UniqueId'
-                                    FSLabel     = $FSLabelA
-                                    Size        = 900MB
-                                    FSFormat    = 'ReFS'
+                                    NodeName       = 'localhost'
+                                    DriveLetter    = $driveLetterA
+                                    DiskId         = $disk.UniqueId
+                                    DiskIdType     = 'UniqueId'
+                                    PartitionStyle = 'GPT'
+                                    FSLabel        = $FSLabelA
+                                    Size           = 900MB
+                                    FSFormat       = 'ReFS'
                                 }
                             )
                         }
@@ -395,11 +540,12 @@ try
                 }
 
                 It 'should have set the resource and all the parameters should match' {
-                    $current = Get-DscConfiguration | Where-Object {
+                    $current = Get-DscConfiguration | Where-Object -FilterScript {
                         $_.ConfigurationName -eq "$($script:DSCResourceName)_ConfigClearDisk"
                     }
                     $current.DiskId           | Should -Be $disk.UniqueId
                     $current.DriveLetter      | Should -Be $driveLetterA
+                    $current.PartitionStyle   | Should -Be 'GPT'
                     $current.FSLabel          | Should -Be $FSLabelA
                     $current.Size             | Should -Be 900MB
                     $current.FSFormat         | Should -Be 'ReFS'
@@ -413,11 +559,12 @@ try
                         $configData = @{
                             AllNodes = @(
                                 @{
-                                    NodeName    = 'localhost'
-                                    DriveLetter = $driveLetterB
-                                    DiskId      = $disk.UniqueId
-                                    DiskIdType  = 'UniqueId'
-                                    FSLabel     = $FSLabelB
+                                    NodeName       = 'localhost'
+                                    DriveLetter    = $driveLetterB
+                                    DiskId         = $disk.UniqueId
+                                    DiskIdType     = 'UniqueId'
+                                    PartitionStyle = 'GPT'
+                                    FSLabel        = $FSLabelB
                                 }
                             )
                         }
@@ -441,10 +588,11 @@ try
                 }
 
                 It 'Should have set the resource and all the parameters should match' {
-                    $current = Get-DscConfiguration | Where-Object {
+                    $current = Get-DscConfiguration | Where-Object -FilterScript {
                         $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
                     }
                     $current.DiskId           | Should -Be $disk.UniqueId
+                    $current.PartitionStyle   | Should -Be 'GPT'
                     $current.DriveLetter      | Should -Be $driveLetterB
                     $current.FSLabel          | Should -Be $FSLabelB
                     $current.Size             | Should -Be 96337920
@@ -497,12 +645,13 @@ try
                         $configData = @{
                             AllNodes = @(
                                 @{
-                                    NodeName    = 'localhost'
-                                    DriveLetter = $driveLetterA
-                                    DiskId      = $disk.Guid
-                                    DiskIdType  = 'Guid'
-                                    FSLabel     = $FSLabelA
-                                    Size        = 100MB
+                                    NodeName       = 'localhost'
+                                    DriveLetter    = $driveLetterA
+                                    DiskId         = $disk.Guid
+                                    DiskIdType     = 'Guid'
+                                    PartitionStyle = 'GPT'
+                                    FSLabel        = $FSLabelA
+                                    Size           = 100MB
                                 }
                             )
                         }
@@ -526,10 +675,11 @@ try
                 }
 
                 It 'Should have set the resource and all the parameters should match' {
-                    $current = Get-DscConfiguration | Where-Object {
+                    $current = Get-DscConfiguration | Where-Object -FilterScript {
                         $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
                     }
                     $current.DiskId           | Should -Be $disk.Guid
+                    $current.PartitionStyle   | Should -Be 'GPT'
                     $current.DriveLetter      | Should -Be $driveLetterA
                     $current.FSLabel          | Should -Be $FSLabelA
                     $current.Size             | Should -Be 100MB
@@ -543,11 +693,12 @@ try
                         $configData = @{
                             AllNodes = @(
                                 @{
-                                    NodeName    = 'localhost'
-                                    DriveLetter = $driveLetterB
-                                    DiskId      = $disk.Guid
-                                    DiskIdType  = 'Guid'
-                                    FSLabel     = $FSLabelB
+                                    NodeName       = 'localhost'
+                                    DriveLetter    = $driveLetterB
+                                    DiskId         = $disk.Guid
+                                    DiskIdType     = 'Guid'
+                                    PartitionStyle = 'GPT'
+                                    FSLabel        = $FSLabelB
                                 }
                             )
                         }
@@ -571,10 +722,11 @@ try
                 }
 
                 It 'Should have set the resource and all the parameters should match' {
-                    $current = Get-DscConfiguration | Where-Object {
+                    $current = Get-DscConfiguration | Where-Object -FilterScript {
                         $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
                     }
                     $current.DiskId           | Should -Be $disk.Guid
+                    $current.PartitionStyle   | Should -Be 'GPT'
                     $current.DriveLetter      | Should -Be $driveLetterB
                     $current.FSLabel          | Should -Be $FSLabelB
                     $current.Size             | Should -Be 935198720
@@ -625,11 +777,12 @@ try
                         $configData = @{
                             AllNodes = @(
                                 @{
-                                    NodeName    = 'localhost'
-                                    DriveLetter = $driveLetterA
-                                    DiskId      = $disk.Number
-                                    DiskIdType  = 'Number'
-                                    FSLabel     = $FSLabelA
+                                    NodeName       = 'localhost'
+                                    DriveLetter    = $driveLetterA
+                                    DiskId         = $disk.Number
+                                    DiskIdType     = 'Number'
+                                    PartitionStyle = 'GPT'
+                                    FSLabel        = $FSLabelA
                                 }
                             )
                         }
@@ -653,10 +806,11 @@ try
                 }
 
                 It 'Should have set the resource and all the parameters should match' {
-                    $current = Get-DscConfiguration | Where-Object {
+                    $current = Get-DscConfiguration | Where-Object -FilterScript {
                         $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
                     }
                     $current.DiskId           | Should -Be $disk.Number
+                    $current.PartitionStyle   | Should -Be 'GPT'
                     $current.DriveLetter      | Should -Be $driveLetterA
                     $current.FSLabel          | Should -Be $FSLabelA
                 }
@@ -675,11 +829,12 @@ try
                         $configData = @{
                             AllNodes = @(
                                 @{
-                                    NodeName    = 'localhost'
-                                    DriveLetter = $driveLetterA
-                                    DiskId      = $disk.Number
-                                    DiskIdType  = 'Number'
-                                    FSLabel     = $FSLabelA
+                                    NodeName       = 'localhost'
+                                    DriveLetter    = $driveLetterA
+                                    DiskId         = $disk.Number
+                                    DiskIdType     = 'Number'
+                                    PartitionStyle = 'GPT'
+                                    FSLabel        = $FSLabelA
                                 }
                             )
                         }
@@ -703,10 +858,11 @@ try
                 }
 
                 It 'Should have set the resource and all the parameters should match' {
-                    $current = Get-DscConfiguration | Where-Object {
+                    $current = Get-DscConfiguration | Where-Object -FilterScript {
                         $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
                     }
                     $current.DiskId           | Should -Be $disk.Number
+                    $current.PartitionStyle   | Should -Be 'GPT'
                     $current.DriveLetter      | Should -Be $driveLetterA
                     $current.FSLabel          | Should -Be $FSLabelA
                 }

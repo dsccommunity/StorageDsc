@@ -4,8 +4,8 @@
     SetDiskOnlineMessage = Setting disk with {0} '{1}' online.
     SetDiskReadWriteMessage = Setting disk with {0} '{1}' to read/write.
     CheckingDiskPartitionStyleMessage = Checking disk with {0} '{1}' partition style.
-    InitializingDiskMessage = Initializing disk with {0} '{1}'.
-    DiskAlreadyInitializedMessage = Disk with {0} '{1}' is already initialized with GPT.
+    InitializingDiskMessage = Initializing disk with {0} '{1}' as '{2}'.
+    DiskAlreadyInitializedMessage = Disk with {0} '{1}' is already initialized with '{2}'.
     CreatingPartitionMessage = Creating partition on disk with {0} '{1}' with drive letter '{2}' using {3}.
     FormattingVolumeMessage = Formatting the volume as '{0}'.
     SuccessfullyInitializedMessage = Successfully initialized '{0}'.
@@ -18,7 +18,8 @@
     DiskNotFoundMessage = Disk with {0} '{1}' was not found.
     DiskNotOnlineMessage = Disk with {0} '{1}' is not online.
     DiskReadOnlyMessage = Disk with {0} '{1}' is readonly.
-    DiskNotGPTMessage = Disk with {0} '{1}' is initialized with '{2}' partition style. GPT required.
+    DiskPartitionNotMatchMessage = Disk with {0} '{1}' is initialized with '{2}' partition style but '{3}' required.
+    DiskInitializedWithWrongPartitionStyleError = Disk with {0} '{1}' is already initialized with '{2}' but should be '{3}'. Set AllowDestructive and ClearDisk to 'True' to allow disk to be reinitialized.
     DriveLetterNotFoundMessage = Drive {0} was not found.
     SizeMismatchMessage = Partition assigned to drive {0} has size {1}, which does not match expected size {2}. Set AllowDestructive to 'True' to enable resizing of partition.
     SizeMismatchWithAllowDestructiveMessage = Partition assigned to drive {0} has size {1}, which does not match expected size {2}.
@@ -33,7 +34,6 @@
     MatchingPartitionFoundMessage = Disk with {0} '{1}' already contains partitions, and partition '{2}' matches required size.
     DriveNotFoundOnPartitionMessage = Disk with {0} '{1}' does not contain a partition assigned to drive letter '{2}'.
     ClearingDiskMessage = Clearing disk with {0} '{1}' of all existing partitions and volumes.
-    DiskAlreadyInitializedError = Disk with {0} '{1}' is already initialized with {2}.
     NewParitionIsReadOnlyError = New partition '{2}' on disk with {0} '{1}' did not become writable in the expected time.
     VolumeFormatInProgressMessage = Switch AllowDestructive is specified. Attempting to format volume on {0} with '{2}', was '{1}'.
     SizeMismatchCorrectionMessage = Switch AllowDestructive is specified. Attempting to resize partition {0} from {1} to {2}.
