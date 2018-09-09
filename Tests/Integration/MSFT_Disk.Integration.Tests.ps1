@@ -230,7 +230,7 @@ try
                 }
             }
 
-            Context "Resize partition on Disk Number $($disk.Number) with AllowDestructive" {
+            Context "Resize partition on Disk Number $($disk.Number) to use all free space with AllowDestructive" {
                 It 'Should compile and apply the MOF without throwing' {
                     {
                         # This is to pass to the Config
@@ -365,7 +365,7 @@ try
                 }
             }
 
-            Context "Resize partition on Disk Number $($disk.Number) with AllowDestructive" {
+            Context "Resize partition on Disk Number $($disk.Number) to use 50MB with AllowDestructive" {
                 It 'Should compile and apply the MOF without throwing' {
                     {
                         # This is to pass to the Config
@@ -411,7 +411,7 @@ try
                     $current.FSLabel         | Should -Be $FSLabelA
                     $current.PartitionFormat | Should -Be 'GPT'
                     $current.FSFormat        | Should -Be 'NTFS'
-                    $current.Size            | Should -Be 1040104960
+                    $current.Size            | Should -Be 52428800
                 }
             }
 
