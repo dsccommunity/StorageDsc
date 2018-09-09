@@ -237,12 +237,13 @@ try
                         $configData = @{
                             AllNodes = @(
                                 @{
-                                    NodeName    = 'localhost'
-                                    DriveLetter = $driveLetterA
-                                    DiskId      = $disk.Number
-                                    DiskIdType  = 'Number'
-                                    FSLabel     = $FSLabelA
-                                    FSFormat    = 'NTFS'
+                                    NodeName        = 'localhost'
+                                    DriveLetter     = $driveLetterA
+                                    DiskId          = $disk.Number
+                                    DiskIdType      = 'Number'
+                                    PartitionFormat = 'GPT'
+                                    FSLabel         = $FSLabelA
+                                    FSFormat        = 'NTFS'
                                 }
                             )
                         }
@@ -269,11 +270,12 @@ try
                     $current = $script:currentConfiguration | Where-Object -FilterScript {
                         $_.ConfigurationName -eq "$($script:DSCResourceName)_ConfigAllowDestructive"
                     }
-                    $current.DiskId           | Should -Be $disk.Number
-                    $current.DriveLetter      | Should -Be $driveLetterA
-                    $current.FSLabel          | Should -Be $FSLabelA
-                    $current.FSFormat         | Should -Be 'NTFS'
-                    $current.Size             | Should -Be 1040104960
+                    $current.DiskId          | Should -Be $disk.Number
+                    $current.DriveLetter     | Should -Be $driveLetterA
+                    $current.PartitionFormat | Should -Be 'GPT'
+                    $current.FSLabel         | Should -Be $FSLabelA
+                    $current.FSFormat        | Should -Be 'NTFS'
+                    $current.Size            | Should -Be 1040104960
                 }
             }
 
@@ -376,8 +378,8 @@ try
                                     DiskIdType      = 'Number'
                                     PartitionFormat = 'GPT'
                                     FSLabel         = $FSLabelA
+                                    FSFormat        = 'NTFS'
                                     Size            = 50MB
-
                                 }
                             )
                         }
