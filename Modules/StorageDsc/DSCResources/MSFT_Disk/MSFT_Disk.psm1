@@ -33,8 +33,8 @@ $localizedData = Get-LocalizedData `
     .PARAMETER DiskIdType
     Specifies the identifier type the DiskId contains. Defaults to Number.
 
-    .PARAMETER PartitionStyle
-    Specifies the partition style of the disk. Defaults to GPT.
+    .PARAMETER PartitionFormat
+    Specifies the partition format of the disk. Defaults to GPT.
     This value of this parameter is ignored.
 
     .PARAMETER Size
@@ -84,7 +84,7 @@ function Get-TargetResource
         [Parameter()]
         [ValidateSet('GPT', 'MBR')]
         [System.String]
-        $PartitionStyle = 'GPT',
+        $PartitionFormat = 'GPT',
 
         [Parameter()]
         [System.UInt64]
@@ -133,9 +133,6 @@ function Get-TargetResource
         -DriveLetter $DriveLetter `
         -ErrorAction SilentlyContinue
 
-    $fileSystem = $volume.FileSystem
-    $FSLabel = $volume.FileSystemLabel
-
     $blockSize = (Get-CimInstance `
             -Query "SELECT BlockSize from Win32_Volume WHERE DriveLetter = '$($DriveLetter):'" `
             -ErrorAction SilentlyContinue).BlockSize
@@ -144,11 +141,11 @@ function Get-TargetResource
         DiskId             = $DiskId
         DiskIdType         = $DiskIdType
         DriveLetter        = $partition.DriveLetter
-        PartitionStyle     = $disk.PartitionStyle
+        PartitionFormat    = $disk.PartitionStyle
         Size               = $partition.Size
-        FSLabel            = $FSLabel
+        FSLabel            = $volume.FileSystemLabel
         AllocationUnitSize = $blockSize
-        FSFormat           = $fileSystem
+        FSFormat           = $volume.FileSystem
     }
 } # Get-TargetResource
 
@@ -165,8 +162,8 @@ function Get-TargetResource
     .PARAMETER DiskIdType
     Specifies the identifier type the DiskId contains. Defaults to Number.
 
-    .PARAMETER PartitionStyle
-    Specifies the partition style of the disk. Defaults to GPT.
+    .PARAMETER PartitionFormat
+    Specifies the partition format of the disk. Defaults to GPT.
 
     .PARAMETER Size
     Specifies the size of new volume. Leave empty to use the remaining free space.
@@ -210,7 +207,7 @@ function Set-TargetResource
         [Parameter()]
         [ValidateSet('GPT', 'MBR')]
         [System.String]
-        $PartitionStyle = 'GPT',
+        $PartitionFormat = 'GPT',
 
         [Parameter()]
         [System.UInt64]
@@ -275,7 +272,7 @@ function Set-TargetResource
 
     Write-Verbose -Message ( @(
             "$($MyInvocation.MyCommand): "
-            $($localizedData.CheckingDiskPartitionStyleMessage -f $DiskIdType, $DiskId)
+            $($localizedData.CheckingDiskPartitionFormatMessage -f $DiskIdType, $DiskId)
         ) -join '' )
 
     if ($AllowDestructive -and $ClearDisk -and $disk.PartitionStyle -ne 'RAW')
@@ -297,16 +294,16 @@ function Set-TargetResource
     {
         Write-Verbose -Message ( @(
             "$($MyInvocation.MyCommand): "
-            $($localizedData.InitializingDiskMessage -f $DiskIdType, $DiskId, $PartitionStyle)
+            $($localizedData.InitializingDiskMessage -f $DiskIdType, $DiskId, $PartitionFormat)
         ) -join '' )
 
-        $disk | Initialize-Disk -PartitionStyle $PartitionStyle
+        $disk | Initialize-Disk -PartitionStyle $PartitionFormat
     }
     else
     {
-        if ($disk.PartitionStyle -eq $PartitionStyle)
+        if ($disk.PartitionStyle -eq $PartitionFormat)
         {
-            # The disk partition is already initialized with the correct partition style
+            # The disk partition is already initialized with the correct partition format
             Write-Verbose -Message ( @(
                     "$($MyInvocation.MyCommand): "
                     $($localizedData.DiskAlreadyInitializedMessage `
@@ -316,10 +313,10 @@ function Set-TargetResource
         }
         else
         {
-            # This disk is initialized but with the incorrect partition style
+            # This disk is initialized but with the incorrect partition format
             New-InvalidOperationException `
-                -Message ($localizedData.DiskInitializedWithWrongPartitionStyleError `
-                    -f $DiskIdType, $DiskId, $Disk.PartitionStyle, $PartitionStyle)
+                -Message ($localizedData.DiskInitializedWithWrongPartitionFormatError `
+                    -f $DiskIdType, $DiskId, $disk.PartitionStyle, $PartitionFormat)
         }
     }
 
@@ -654,8 +651,8 @@ function Set-TargetResource
     .PARAMETER DiskIdType
     Specifies the identifier type the DiskId contains. Defaults to Number.
 
-    .PARAMETER PartitionStyle
-    Specifies the partition style of the disk. Defaults to GPT.
+    .PARAMETER PartitionFormat
+    Specifies the partition format of the disk. Defaults to GPT.
 
     .PARAMETER Size
     Specifies the size of new volume. Leave empty to use the remaining free space.
@@ -698,7 +695,7 @@ function Test-TargetResource
         [Parameter()]
         [ValidateSet('GPT', 'MBR')]
         [System.String]
-        $PartitionStyle = 'GPT',
+        $PartitionFormat = 'GPT',
 
         [Parameter()]
         [System.UInt64]
@@ -775,12 +772,12 @@ function Test-TargetResource
         return $false
     } # if
 
-    if ($disk.PartitionStyle -ne $PartitionStyle)
+    if ($disk.PartitionStyle -ne $PartitionFormat)
     {
         Write-Verbose -Message ( @(
                 "$($MyInvocation.MyCommand): "
-                $($localizedData.DiskPartitionNotMatchMessage `
-                    -f $DiskIdType, $DiskId, $Disk.PartitionStyle, $PartitionStyle)
+                $($localizedData.DiskPartitionFormatNotMatchMessage `
+                    -f $DiskIdType, $DiskId, $disk.PartitionStyle, $PartitionFormat)
             ) -join '' )
 
         if ($disk.PartitionStyle -eq 'RAW' -or ($AllowDestructive -and $ClearDisk))
@@ -789,10 +786,10 @@ function Test-TargetResource
         }
         else
         {
-            # This disk is initialized but with the incorrect partition style
+            # This disk is initialized but with the incorrect partition format
             New-InvalidOperationException `
-                -Message ($localizedData.DiskInitializedWithWrongPartitionStyleError `
-                    -f $DiskIdType, $DiskId, $Disk.PartitionStyle, $PartitionStyle)
+                -Message ($localizedData.DiskInitializedWithWrongPartitionFormatError `
+                    -f $DiskIdType, $DiskId, $disk.PartitionStyle, $PartitionFormat)
         }
     } # if
 

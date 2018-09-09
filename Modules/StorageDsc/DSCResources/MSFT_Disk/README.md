@@ -22,4 +22,4 @@ has been created (e.g. the disk has been initialized). Therefore to use this met
 of disk selection the disk must have been initialized by some other method.
 
 The _Guid_ identifier method of specifying disks is only supported as an identifier
-for disks formatted with `GPT` partition table style.
+for disks with `GPT` partition table format.
