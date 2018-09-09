@@ -4,8 +4,10 @@
 
 - Disk:
   - Added `PartitionFormat` parameter - Fixes [Issue #137](https://github.com/PowerShell/StorageDsc/issues/37).
-- Opt-in to Common Tests `Common Tests - Validate Example Files
-  To Be Published` and `Common Tests - Validate Markdown Links`.
+- Opt-in to Common Tests:
+  - Common Tests - Validate Example Files To Be Published
+  - Common Tests - Validate Markdown Links
+  - Common Tests - Relative Path Length
 - Added .VSCode settings for applying DSC PSSA rules - fixes [Issue #168](https://github.com/PowerShell/StorageDsc/issues/168).
 
 ## 4.1.0.0
