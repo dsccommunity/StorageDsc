@@ -3,7 +3,9 @@
 ## Unreleased
 
 - Disk:
-  - Added `PartitionType` parameter - Fixes [Issue #137](https://github.com/PowerShell/StorageDsc/issues/37).
+  - Added `PartitionFormat` parameter - Fixes [Issue #137](https://github.com/PowerShell/StorageDsc/issues/37).
+- Opt-in to Common Tests `Common Tests - Validate Example Files
+  To Be Published` and `Common Tests - Validate Markdown Links`
 
 ## 4.1.0.0
 
