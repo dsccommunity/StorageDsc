@@ -1,6 +1,6 @@
 
 [ClassVersion("1.0.0.0"), FriendlyName("DiskAccessPath")]
-class MSFT_DiskAccessPath : OMI_BaseResource
+class MSFTDSC_DiskAccessPath : OMI_BaseResource
 {
     [Key, Description("Specifies the access path folder to the assign the disk volume to.")] String AccessPath;
     [Required, Description("Specifies the disk identifier for the disk to modify.")] String DiskId;

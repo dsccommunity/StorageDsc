@@ -3,7 +3,7 @@
     SettingDiskMessage = Setting disk with {0} '{1}' status for drive letter '{2}'.
     SetDiskOnlineMessage = Setting disk with {0} '{1}' online.
     SetDiskReadWriteMessage = Setting disk with {0} '{1}' to read/write.
-    CheckingDiskPartitionFormatMessage = Checking disk with {0} '{1}' partition format.
+    CheckingDiskPartitionStyleMessage = Checking disk with {0} '{1}' partition style.
     InitializingDiskMessage = Initializing disk with {0} '{1}' as '{2}'.
     DiskAlreadyInitializedMessage = Disk with {0} '{1}' is already initialized with '{2}'.
     CreatingPartitionMessage = Creating partition on disk with {0} '{1}' with drive letter '{2}' using {3}.
@@ -18,8 +18,8 @@
     DiskNotFoundMessage = Disk with {0} '{1}' was not found.
     DiskNotOnlineMessage = Disk with {0} '{1}' is not online.
     DiskReadOnlyMessage = Disk with {0} '{1}' is readonly.
-    DiskPartitionFormatNotMatchMessage = Disk with {0} '{1}' is initialized with partition format '{2}' but '{3}' required.
-    DiskInitializedWithWrongPartitionFormatError = Disk with {0} '{1}' is already initialized with partition format '{2}' but '{3}' required. Set AllowDestructive and ClearDisk to 'True' to allow disk to be reinitialized.
+    DiskPartitionStyleNotMatchMessage = Disk with {0} '{1}' is initialized with partition style '{2}' but '{3}' required.
+    DiskInitializedWithWrongPartitionStyleError = Disk with {0} '{1}' is already initialized with partition style '{2}' but '{3}' required. Set AllowDestructive and ClearDisk to 'True' to allow disk to be reinitialized.
     DriveLetterNotFoundMessage = Drive {0} was not found.
     SizeMismatchMessage = Partition assigned to drive {0} has size {1}, which does not match expected size {2}. Set AllowDestructive to 'True' to enable resizing of partition.
     SizeMismatchWithAllowDestructiveMessage = Partition assigned to drive {0} has size {1}, which does not match expected size {2}.

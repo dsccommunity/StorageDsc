@@ -1,5 +1,5 @@
 $script:DSCModuleName = 'StorageDsc'
-$script:DSCResourceName = 'MSFT_Disk'
+$script:DSCResourceName = 'MSFTDSC_Disk'
 
 Import-Module -Name (Join-Path -Path (Join-Path -Path (Split-Path $PSScriptRoot -Parent) -ChildPath 'TestHelpers') -ChildPath 'CommonTestHelper.psm1') -Global
 
@@ -307,7 +307,7 @@ try
         #endregion
 
         #region Function Get-TargetResource
-        Describe 'MSFT_Disk\Get-TargetResource' {
+        Describe 'MSFTDSC_Disk\Get-TargetResource' {
             Context 'Online GPT disk with a partition/volume and correct Drive Letter assigned using Disk Number' {
                 # verifiable (should be called) mocks
                 Mock `
@@ -340,8 +340,8 @@ try
                     $resource.DiskId | Should -Be $script:mockedDisk0Gpt.Number
                 }
 
-                It "Should return PartitionFormat $($script:mockedDisk0Gpt.PartitionStyle)" {
-                    $resource.PartitionFormat | Should -Be $script:mockedDisk0Gpt.PartitionStyle
+                It "Should return PartitionStyle $($script:mockedDisk0Gpt.PartitionStyle)" {
+                    $resource.PartitionStyle | Should -Be $script:mockedDisk0Gpt.PartitionStyle
                 }
 
                 It "Should return DriveLetter $($script:testDriveLetter)" {
@@ -407,8 +407,8 @@ try
                     $resource.DiskId | Should -Be $script:mockedDisk0Gpt.UniqueId
                 }
 
-                It "Should return PartitionFormat $($script:mockedDisk0Gpt.PartitionStyle)" {
-                    $resource.PartitionFormat | Should -Be $script:mockedDisk0Gpt.PartitionStyle
+                It "Should return PartitionStyle $($script:mockedDisk0Gpt.PartitionStyle)" {
+                    $resource.PartitionStyle | Should -Be $script:mockedDisk0Gpt.PartitionStyle
                 }
 
                 It "Should return DriveLetter $($script:testDriveLetter)" {
@@ -474,8 +474,8 @@ try
                     $resource.DiskId | Should -Be $script:mockedDisk0Gpt.Guid
                 }
 
-                It "Should return PartitionFormat $($script:mockedDisk0Gpt.PartitionStyle)" {
-                    $resource.PartitionFormat | Should -Be $script:mockedDisk0Gpt.PartitionStyle
+                It "Should return PartitionStyle $($script:mockedDisk0Gpt.PartitionStyle)" {
+                    $resource.PartitionStyle | Should -Be $script:mockedDisk0Gpt.PartitionStyle
                 }
 
                 It "Should return DriveLetter $($script:testDriveLetter)" {
@@ -541,8 +541,8 @@ try
                     $resource.DiskId | Should -Be $script:mockedDisk0Gpt.Guid
                 }
 
-                It "Should return PartitionFormat $($script:mockedDisk0Gpt.PartitionStyle)" {
-                    $resource.PartitionFormat | Should -Be $script:mockedDisk0Gpt.PartitionStyle
+                It "Should return PartitionStyle $($script:mockedDisk0Gpt.PartitionStyle)" {
+                    $resource.PartitionStyle | Should -Be $script:mockedDisk0Gpt.PartitionStyle
                 }
 
                 It "Should return DriveLetter $($script:testDriveLetter)" {
@@ -604,8 +604,8 @@ try
                     $resource.DiskId | Should -Be $script:mockedDisk0Gpt.Number
                 }
 
-                It "Should return PartitionFormat $($script:mockedDisk0Gpt.PartitionStyle)" {
-                    $resource.PartitionFormat | Should -Be $script:mockedDisk0Gpt.PartitionStyle
+                It "Should return PartitionStyle $($script:mockedDisk0Gpt.PartitionStyle)" {
+                    $resource.PartitionStyle | Should -Be $script:mockedDisk0Gpt.PartitionStyle
                 }
 
                 It "Should return an empty drive letter" {
@@ -667,8 +667,8 @@ try
                     $resource.DiskId | Should -Be $script:mockedDisk0Mbr.Number
                 }
 
-                It "Should return PartitionFormat $($script:mockedDisk0Mbr.PartitionStyle)" {
-                    $resource.PartitionFormat | Should -Be $script:mockedDisk0Mbr.PartitionStyle
+                It "Should return PartitionStyle $($script:mockedDisk0Mbr.PartitionStyle)" {
+                    $resource.PartitionStyle | Should -Be $script:mockedDisk0Mbr.PartitionStyle
                 }
 
                 It "Should return an empty drive letter" {
@@ -730,8 +730,8 @@ try
                     $resource.DiskId | Should -Be $script:mockedDisk0Raw.Number
                 }
 
-                It "Should return PartitionFormat $($script:mockedDisk0Raw.PartitionStyle)" {
-                    $resource.PartitionFormat | Should -Be $script:mockedDisk0Raw.PartitionStyle
+                It "Should return PartitionStyle $($script:mockedDisk0Raw.PartitionStyle)" {
+                    $resource.PartitionStyle | Should -Be $script:mockedDisk0Raw.PartitionStyle
                 }
 
                 It "Should return an empty drive letter" {
@@ -767,7 +767,7 @@ try
         #endregion
 
         #region Function Set-TargetResource
-        Describe 'MSFT_Disk\Set-TargetResource' {
+        Describe 'MSFTDSC_Disk\Set-TargetResource' {
             Context 'Offline GPT disk using Disk Number' {
                 # verifiable (should be called) mocks
                 Mock `
@@ -1315,10 +1315,10 @@ try
                 Mock -CommandName Set-Partition
 
                 $errorRecord = Get-InvalidOperationRecord `
-                    -Message ($LocalizedData.DiskInitializedWithWrongPartitionFormatError -f `
+                    -Message ($LocalizedData.DiskInitializedWithWrongPartitionStyleError -f `
                         'Number', $script:mockedDisk0Mbr.Number, $script:mockedDisk0Mbr.PartitionStyle, 'GPT')
 
-                It 'Should not throw DiskInitializedWithWrongPartitionFormatError' {
+                It 'Should not throw DiskInitializedWithWrongPartitionStyleError' {
                     {
                         Set-TargetResource `
                             -DiskId $script:mockedDisk0Mbr.Number `
@@ -1358,10 +1358,10 @@ try
                 Mock -CommandName Set-Partition
 
                 $errorRecord = Get-InvalidOperationRecord `
-                    -Message ($LocalizedData.DiskInitializedWithWrongPartitionFormatError -f `
+                    -Message ($LocalizedData.DiskInitializedWithWrongPartitionStyleError -f `
                         'UniqueId', $script:mockedDisk0Mbr.UniqueId, $script:mockedDisk0Mbr.PartitionStyle, 'GPT')
 
-                It 'Should throw DiskInitializedWithWrongPartitionFormatError' {
+                It 'Should throw DiskInitializedWithWrongPartitionStyleError' {
                     {
                         Set-TargetResource `
                             -DiskId $script:mockedDisk0Mbr.UniqueId `
@@ -2133,7 +2133,7 @@ try
         #endregion
 
         #region Function Test-TargetResource
-        Describe 'MSFT_Disk\Test-TargetResource' {
+        Describe 'MSFTDSC_Disk\Test-TargetResource' {
             Mock `
                 -CommandName Get-CimInstance `
                 -MockWith { $script:mockedCim }
@@ -2374,7 +2374,7 @@ try
                 }
             }
 
-            Context 'When testing online disk using Disk Number with partition format GPT but requiring MBR' {
+            Context 'When testing online disk using Disk Number with partition style GPT but requiring MBR' {
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Get-DiskByIdentifier `
@@ -2388,10 +2388,10 @@ try
                 Mock -CommandName Get-CimInstance
 
                 $errorRecord = Get-InvalidOperationRecord `
-                    -Message ($LocalizedData.DiskInitializedWithWrongPartitionFormatError -f `
+                    -Message ($LocalizedData.DiskInitializedWithWrongPartitionStyleError -f `
                         'Number', $script:mockedDisk0Mbr.Number, $script:mockedDisk0Mbr.PartitionStyle, 'GPT')
 
-                It 'Should throw DiskInitializedWithWrongPartitionFormatError' {
+                It 'Should throw DiskInitializedWithWrongPartitionStyleError' {
                     {
                         Test-TargetResource `
                             -DiskId $script:mockedDisk0Mbr.Number `
@@ -2411,7 +2411,7 @@ try
                 }
             }
 
-            Context 'When testing online disk using Disk Number with partition format MBR but requiring GPT' {
+            Context 'When testing online disk using Disk Number with partition style MBR but requiring GPT' {
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Get-DiskByIdentifier `
@@ -2425,16 +2425,16 @@ try
                 Mock -CommandName Get-CimInstance
 
                 $errorRecord = Get-InvalidOperationRecord `
-                    -Message ($LocalizedData.DiskInitializedWithWrongPartitionFormatError -f `
+                    -Message ($LocalizedData.DiskInitializedWithWrongPartitionStyleError -f `
                         'Number', $script:mockedDisk0Gpt.Number, $script:mockedDisk0Gpt.PartitionStyle, 'MBR')
 
-                It 'Should throw DiskInitializedWithWrongPartitionFormatError' {
+                It 'Should throw DiskInitializedWithWrongPartitionStyleError' {
                     {
                         Test-TargetResource `
                             -DiskId $script:mockedDisk0Gpt.Number `
                             -DriveLetter $script:testDriveLetter `
                             -AllocationUnitSize 4096 `
-                            -PartitionFormat 'MBR' `
+                            -PartitionStyle 'MBR' `
                             -Verbose
                     } | Should -Throw $errorRecord
                 }
@@ -2449,7 +2449,7 @@ try
                 }
             }
 
-            Context 'When testing online disk using Disk Number with partition format MBR but requiring GPT and AllowDestructive and ClearDisk is True' {
+            Context 'When testing online disk using Disk Number with partition style MBR but requiring GPT and AllowDestructive and ClearDisk is True' {
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Get-DiskByIdentifier `
@@ -2470,7 +2470,7 @@ try
                             -DiskId $script:mockedDisk0Gpt.Number `
                             -DriveLetter $script:testDriveLetter `
                             -AllocationUnitSize 4096 `
-                            -PartitionFormat 'MBR' `
+                            -PartitionStyle 'MBR' `
                             -AllowDestructive $true `
                             -ClearDisk $true `
                             -Verbose

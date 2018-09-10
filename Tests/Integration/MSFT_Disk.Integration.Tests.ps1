@@ -1,5 +1,5 @@
 $script:DSCModuleName = 'StorageDsc'
-$script:DSCResourceName = 'MSFT_Disk'
+$script:DSCResourceName = 'MSFTDSC_Disk'
 
 Import-Module -Name (Join-Path -Path (Join-Path -Path (Split-Path $PSScriptRoot -Parent) -ChildPath 'TestHelpers') -ChildPath 'CommonTestHelper.psm1') -Global
 
@@ -52,13 +52,13 @@ try
                         $configData = @{
                             AllNodes = @(
                                 @{
-                                    NodeName        = 'localhost'
-                                    DriveLetter     = $driveLetterA
-                                    DiskId          = $disk.Number
-                                    DiskIdType      = 'Number'
-                                    PartitionFormat = 'GPT'
-                                    FSLabel         = $FSLabelA
-                                    Size            = 100MB
+                                    NodeName       = 'localhost'
+                                    DriveLetter    = $driveLetterA
+                                    DiskId         = $disk.Number
+                                    DiskIdType     = 'Number'
+                                    PartitionStyle = 'GPT'
+                                    FSLabel        = $FSLabelA
+                                    Size           = 100MB
                                 }
                             )
                         }
@@ -85,11 +85,11 @@ try
                     $current = $script:currentConfiguration | Where-Object -FilterScript {
                         $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
                     }
-                    $current.DiskId          | Should -Be $disk.Number
-                    $current.DriveLetter     | Should -Be $driveLetterA
-                    $current.PartitionFormat | Should -Be 'GPT'
-                    $current.FSLabel         | Should -Be $FSLabelA
-                    $current.Size            | Should -Be 100MB
+                    $current.DiskId         | Should -Be $disk.Number
+                    $current.DriveLetter    | Should -Be $driveLetterA
+                    $current.PartitionStyle | Should -Be 'GPT'
+                    $current.FSLabel        | Should -Be $FSLabelA
+                    $current.Size           | Should -Be 100MB
                 }
             }
 
@@ -100,12 +100,12 @@ try
                         $configData = @{
                             AllNodes = @(
                                 @{
-                                    NodeName        = 'localhost'
-                                    DriveLetter     = $driveLetterB
-                                    DiskId          = $disk.Number
-                                    DiskIdType      = 'Number'
-                                    PartitionFormat = 'GPT'
-                                    FSLabel         = $FSLabelB
+                                    NodeName       = 'localhost'
+                                    DriveLetter    = $driveLetterB
+                                    DiskId         = $disk.Number
+                                    DiskIdType     = 'Number'
+                                    PartitionStyle = 'GPT'
+                                    FSLabel        = $FSLabelB
                                 }
                             )
                         }
@@ -132,11 +132,11 @@ try
                     $current = $script:currentConfiguration | Where-Object -FilterScript {
                         $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
                     }
-                    $current.DiskId          | Should -Be $disk.Number
-                    $current.DriveLetter     | Should -Be $driveLetterB
-                    $current.FSLabel         | Should -Be $FSLabelB
-                    $current.PartitionFormat | Should -Be 'GPT'
-                    $current.Size            | Should -Be 935198720
+                    $current.DiskId         | Should -Be $disk.Number
+                    $current.DriveLetter    | Should -Be $driveLetterB
+                    $current.FSLabel        | Should -Be $FSLabelB
+                    $current.PartitionStyle | Should -Be 'GPT'
+                    $current.Size           | Should -Be 935198720
                 }
             }
 
@@ -188,13 +188,13 @@ try
                         $configData = @{
                             AllNodes = @(
                                 @{
-                                    NodeName        = 'localhost'
-                                    DriveLetter     = $driveLetterA
-                                    DiskId          = $disk.Number
-                                    DiskIdType      = 'Number'
-                                    PartitionFormat = 'GPT'
-                                    FSLabel         = $FSLabelA
-                                    Size            = 50MB
+                                    NodeName       = 'localhost'
+                                    DriveLetter    = $driveLetterA
+                                    DiskId         = $disk.Number
+                                    DiskIdType     = 'Number'
+                                    PartitionStyle = 'GPT'
+                                    FSLabel        = $FSLabelA
+                                    Size           = 50MB
                                 }
                             )
                         }
@@ -221,12 +221,12 @@ try
                     $current = $script:currentConfiguration | Where-Object -FilterScript {
                         $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
                     }
-                    $current.DiskId          | Should -Be $disk.Number
-                    $current.DriveLetter     | Should -Be $driveLetterA
-                    $current.PartitionFormat | Should -Be 'GPT'
-                    $current.FSLabel         | Should -Be $FSLabelA
-                    $current.FSFormat        | Should -Be 'NTFS'
-                    $current.Size            | Should -Be 50MB
+                    $current.DiskId         | Should -Be $disk.Number
+                    $current.DriveLetter    | Should -Be $driveLetterA
+                    $current.PartitionStyle | Should -Be 'GPT'
+                    $current.FSLabel        | Should -Be $FSLabelA
+                    $current.FSFormat       | Should -Be 'NTFS'
+                    $current.Size           | Should -Be 50MB
                 }
             }
 
@@ -237,13 +237,13 @@ try
                         $configData = @{
                             AllNodes = @(
                                 @{
-                                    NodeName        = 'localhost'
-                                    DriveLetter     = $driveLetterA
-                                    DiskId          = $disk.Number
-                                    DiskIdType      = 'Number'
-                                    PartitionFormat = 'GPT'
-                                    FSLabel         = $FSLabelA
-                                    FSFormat        = 'NTFS'
+                                    NodeName       = 'localhost'
+                                    DriveLetter    = $driveLetterA
+                                    DiskId         = $disk.Number
+                                    DiskIdType     = 'Number'
+                                    PartitionStyle = 'GPT'
+                                    FSLabel        = $FSLabelA
+                                    FSFormat       = 'NTFS'
                                 }
                             )
                         }
@@ -270,12 +270,12 @@ try
                     $current = $script:currentConfiguration | Where-Object -FilterScript {
                         $_.ConfigurationName -eq "$($script:DSCResourceName)_ConfigAllowDestructive"
                     }
-                    $current.DiskId          | Should -Be $disk.Number
-                    $current.DriveLetter     | Should -Be $driveLetterA
-                    $current.PartitionFormat | Should -Be 'GPT'
-                    $current.FSLabel         | Should -Be $FSLabelA
-                    $current.FSFormat        | Should -Be 'NTFS'
-                    $current.Size            | Should -Be 1040104960
+                    $current.DiskId         | Should -Be $disk.Number
+                    $current.DriveLetter    | Should -Be $driveLetterA
+                    $current.PartitionStyle | Should -Be 'GPT'
+                    $current.FSLabel        | Should -Be $FSLabelA
+                    $current.FSFormat       | Should -Be 'NTFS'
+                    $current.Size           | Should -Be 1040104960
                 }
             }
 
@@ -323,13 +323,13 @@ try
                         $configData = @{
                             AllNodes = @(
                                 @{
-                                    NodeName        = 'localhost'
-                                    DriveLetter     = $driveLetterA
-                                    DiskId          = $disk.Number
-                                    DiskIdType      = 'Number'
-                                    PartitionFormat = 'MBR'
-                                    FSLabel         = $FSLabelA
-                                    Size            = 50MB
+                                    NodeName       = 'localhost'
+                                    DriveLetter    = $driveLetterA
+                                    DiskId         = $disk.Number
+                                    DiskIdType     = 'Number'
+                                    PartitionStyle = 'MBR'
+                                    FSLabel        = $FSLabelA
+                                    Size           = 50MB
                                 }
                             )
                         }
@@ -356,12 +356,12 @@ try
                     $current = $script:currentConfiguration | Where-Object -FilterScript {
                         $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
                     }
-                    $current.DiskId          | Should -Be $disk.Number
-                    $current.DriveLetter     | Should -Be $driveLetterA
-                    $current.PartitionFormat | Should -Be 'MBR'
-                    $current.FSLabel         | Should -Be $FSLabelA
-                    $current.FSFormat        | Should -Be 'NTFS'
-                    $current.Size            | Should -Be 50MB
+                    $current.DiskId         | Should -Be $disk.Number
+                    $current.DriveLetter    | Should -Be $driveLetterA
+                    $current.PartitionStyle | Should -Be 'MBR'
+                    $current.FSLabel        | Should -Be $FSLabelA
+                    $current.FSFormat       | Should -Be 'NTFS'
+                    $current.Size           | Should -Be 50MB
                 }
             }
 
@@ -372,14 +372,14 @@ try
                         $configData = @{
                             AllNodes = @(
                                 @{
-                                    NodeName        = 'localhost'
-                                    DriveLetter     = $driveLetterA
-                                    DiskId          = $disk.Number
-                                    DiskIdType      = 'Number'
-                                    PartitionFormat = 'GPT'
-                                    FSLabel         = $FSLabelA
-                                    FSFormat        = 'NTFS'
-                                    Size            = 50MB
+                                    NodeName       = 'localhost'
+                                    DriveLetter    = $driveLetterA
+                                    DiskId         = $disk.Number
+                                    DiskIdType     = 'Number'
+                                    PartitionStyle = 'GPT'
+                                    FSLabel        = $FSLabelA
+                                    FSFormat       = 'NTFS'
+                                    Size           = 50MB
                                 }
                             )
                         }
@@ -406,12 +406,12 @@ try
                     $current = $script:currentConfiguration | Where-Object -FilterScript {
                         $_.ConfigurationName -eq "$($script:DSCResourceName)_ConfigClearDisk"
                     }
-                    $current.DiskId          | Should -Be $disk.Number
-                    $current.DriveLetter     | Should -Be $driveLetterA
-                    $current.FSLabel         | Should -Be $FSLabelA
-                    $current.PartitionFormat | Should -Be 'GPT'
-                    $current.FSFormat        | Should -Be 'NTFS'
-                    $current.Size            | Should -Be 52428800
+                    $current.DiskId         | Should -Be $disk.Number
+                    $current.DriveLetter    | Should -Be $driveLetterA
+                    $current.FSLabel        | Should -Be $FSLabelA
+                    $current.PartitionStyle | Should -Be 'GPT'
+                    $current.FSFormat       | Should -Be 'NTFS'
+                    $current.Size           | Should -Be 52428800
                 }
             }
 
@@ -463,13 +463,13 @@ try
                         $configData = @{
                             AllNodes = @(
                                 @{
-                                    NodeName        = 'localhost'
-                                    DriveLetter     = $driveLetterA
-                                    DiskId          = $disk.UniqueId
-                                    DiskIdType      = 'UniqueId'
-                                    PartitionFormat = 'GPT'
-                                    FSLabel         = $FSLabelA
-                                    Size            = 100MB
+                                    NodeName       = 'localhost'
+                                    DriveLetter    = $driveLetterA
+                                    DiskId         = $disk.UniqueId
+                                    DiskIdType     = 'UniqueId'
+                                    PartitionStyle = 'GPT'
+                                    FSLabel        = $FSLabelA
+                                    Size           = 100MB
                                 }
                             )
                         }
@@ -496,11 +496,11 @@ try
                     $current = $script:currentConfiguration | Where-Object -FilterScript {
                         $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
                     }
-                    $current.DiskId          | Should -Be $disk.UniqueId
-                    $current.DriveLetter     | Should -Be $driveLetterA
-                    $current.PartitionFormat | Should -Be 'GPT'
-                    $current.FSLabel         | Should -Be $FSLabelA
-                    $current.Size            | Should -Be 100MB
+                    $current.DiskId         | Should -Be $disk.UniqueId
+                    $current.DriveLetter    | Should -Be $driveLetterA
+                    $current.PartitionStyle | Should -Be 'GPT'
+                    $current.FSLabel        | Should -Be $FSLabelA
+                    $current.Size           | Should -Be 100MB
                 }
             }
 
@@ -511,14 +511,14 @@ try
                         $configData = @{
                             AllNodes = @(
                                 @{
-                                    NodeName        = 'localhost'
-                                    DriveLetter     = $driveLetterA
-                                    DiskId          = $disk.UniqueId
-                                    DiskIdType      = 'UniqueId'
-                                    PartitionFormat = 'GPT'
-                                    FSLabel         = $FSLabelA
-                                    Size            = 900MB
-                                    FSFormat        = 'ReFS'
+                                    NodeName       = 'localhost'
+                                    DriveLetter    = $driveLetterA
+                                    DiskId         = $disk.UniqueId
+                                    DiskIdType     = 'UniqueId'
+                                    PartitionStyle = 'GPT'
+                                    FSLabel        = $FSLabelA
+                                    Size           = 900MB
+                                    FSFormat       = 'ReFS'
                                 }
                             )
                         }
@@ -545,12 +545,12 @@ try
                     $current = $script:currentConfiguration | Where-Object -FilterScript {
                         $_.ConfigurationName -eq "$($script:DSCResourceName)_ConfigClearDisk"
                     }
-                    $current.DiskId          | Should -Be $disk.UniqueId
-                    $current.DriveLetter     | Should -Be $driveLetterA
-                    $current.PartitionFormat | Should -Be 'GPT'
-                    $current.FSLabel         | Should -Be $FSLabelA
-                    $current.Size            | Should -Be 900MB
-                    $current.FSFormat        | Should -Be 'ReFS'
+                    $current.DiskId         | Should -Be $disk.UniqueId
+                    $current.DriveLetter    | Should -Be $driveLetterA
+                    $current.PartitionStyle | Should -Be 'GPT'
+                    $current.FSLabel        | Should -Be $FSLabelA
+                    $current.Size           | Should -Be 900MB
+                    $current.FSFormat       | Should -Be 'ReFS'
                 }
             }
 
@@ -561,12 +561,12 @@ try
                         $configData = @{
                             AllNodes = @(
                                 @{
-                                    NodeName        = 'localhost'
-                                    DriveLetter     = $driveLetterB
-                                    DiskId          = $disk.UniqueId
-                                    DiskIdType      = 'UniqueId'
-                                    PartitionFormat = 'GPT'
-                                    FSLabel         = $FSLabelB
+                                    NodeName       = 'localhost'
+                                    DriveLetter    = $driveLetterB
+                                    DiskId         = $disk.UniqueId
+                                    DiskIdType     = 'UniqueId'
+                                    PartitionStyle = 'GPT'
+                                    FSLabel        = $FSLabelB
                                 }
                             )
                         }
@@ -593,11 +593,11 @@ try
                     $current = $script:currentConfiguration | Where-Object -FilterScript {
                         $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
                     }
-                    $current.DiskId          | Should -Be $disk.UniqueId
-                    $current.PartitionFormat | Should -Be 'GPT'
-                    $current.DriveLetter     | Should -Be $driveLetterB
-                    $current.FSLabel         | Should -Be $FSLabelB
-                    $current.Size            | Should -Be 96337920
+                    $current.DiskId         | Should -Be $disk.UniqueId
+                    $current.PartitionStyle | Should -Be 'GPT'
+                    $current.DriveLetter    | Should -Be $driveLetterB
+                    $current.FSLabel        | Should -Be $FSLabelB
+                    $current.Size           | Should -Be 96337920
                 }
             }
 
@@ -647,13 +647,13 @@ try
                         $configData = @{
                             AllNodes = @(
                                 @{
-                                    NodeName        = 'localhost'
-                                    DriveLetter     = $driveLetterA
-                                    DiskId          = $disk.Guid
-                                    DiskIdType      = 'Guid'
-                                    PartitionFormat = 'GPT'
-                                    FSLabel         = $FSLabelA
-                                    Size            = 100MB
+                                    NodeName       = 'localhost'
+                                    DriveLetter    = $driveLetterA
+                                    DiskId         = $disk.Guid
+                                    DiskIdType     = 'Guid'
+                                    PartitionStyle = 'GPT'
+                                    FSLabel        = $FSLabelA
+                                    Size           = 100MB
                                 }
                             )
                         }
@@ -680,11 +680,11 @@ try
                     $current = $script:currentConfiguration | Where-Object -FilterScript {
                         $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
                     }
-                    $current.DiskId          | Should -Be $disk.Guid
-                    $current.PartitionFormat | Should -Be 'GPT'
-                    $current.DriveLetter     | Should -Be $driveLetterA
-                    $current.FSLabel         | Should -Be $FSLabelA
-                    $current.Size            | Should -Be 100MB
+                    $current.DiskId         | Should -Be $disk.Guid
+                    $current.PartitionStyle | Should -Be 'GPT'
+                    $current.DriveLetter    | Should -Be $driveLetterA
+                    $current.FSLabel        | Should -Be $FSLabelA
+                    $current.Size           | Should -Be 100MB
                 }
             }
 
@@ -695,12 +695,12 @@ try
                         $configData = @{
                             AllNodes = @(
                                 @{
-                                    NodeName        = 'localhost'
-                                    DriveLetter     = $driveLetterB
-                                    DiskId          = $disk.Guid
-                                    DiskIdType      = 'Guid'
-                                    PartitionFormat = 'GPT'
-                                    FSLabel         = $FSLabelB
+                                    NodeName       = 'localhost'
+                                    DriveLetter    = $driveLetterB
+                                    DiskId         = $disk.Guid
+                                    DiskIdType     = 'Guid'
+                                    PartitionStyle = 'GPT'
+                                    FSLabel        = $FSLabelB
                                 }
                             )
                         }
@@ -727,11 +727,11 @@ try
                     $current = $script:currentConfiguration | Where-Object -FilterScript {
                         $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
                     }
-                    $current.DiskId          | Should -Be $disk.Guid
-                    $current.PartitionFormat | Should -Be 'GPT'
-                    $current.DriveLetter     | Should -Be $driveLetterB
-                    $current.FSLabel         | Should -Be $FSLabelB
-                    $current.Size            | Should -Be 935198720
+                    $current.DiskId         | Should -Be $disk.Guid
+                    $current.PartitionStyle | Should -Be 'GPT'
+                    $current.DriveLetter    | Should -Be $driveLetterB
+                    $current.FSLabel        | Should -Be $FSLabelB
+                    $current.Size           | Should -Be 935198720
                 }
             }
 
@@ -779,12 +779,12 @@ try
                         $configData = @{
                             AllNodes = @(
                                 @{
-                                    NodeName        = 'localhost'
-                                    DriveLetter     = $driveLetterA
-                                    DiskId          = $disk.Number
-                                    DiskIdType      = 'Number'
-                                    PartitionFormat = 'GPT'
-                                    FSLabel         = $FSLabelA
+                                    NodeName       = 'localhost'
+                                    DriveLetter    = $driveLetterA
+                                    DiskId         = $disk.Number
+                                    DiskIdType     = 'Number'
+                                    PartitionStyle = 'GPT'
+                                    FSLabel        = $FSLabelA
                                 }
                             )
                         }
@@ -811,10 +811,10 @@ try
                     $current = $script:currentConfiguration | Where-Object -FilterScript {
                         $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
                     }
-                    $current.DiskId          | Should -Be $disk.Number
-                    $current.PartitionFormat | Should -Be 'GPT'
-                    $current.DriveLetter     | Should -Be $driveLetterA
-                    $current.FSLabel         | Should -Be $FSLabelA
+                    $current.DiskId         | Should -Be $disk.Number
+                    $current.PartitionStyle | Should -Be 'GPT'
+                    $current.DriveLetter    | Should -Be $driveLetterA
+                    $current.FSLabel        | Should -Be $FSLabelA
                 }
             }
 
@@ -831,12 +831,12 @@ try
                         $configData = @{
                             AllNodes = @(
                                 @{
-                                    NodeName        = 'localhost'
-                                    DriveLetter     = $driveLetterA
-                                    DiskId          = $disk.Number
-                                    DiskIdType      = 'Number'
-                                    PartitionFormat = 'GPT'
-                                    FSLabel         = $FSLabelA
+                                    NodeName       = 'localhost'
+                                    DriveLetter    = $driveLetterA
+                                    DiskId         = $disk.Number
+                                    DiskIdType     = 'Number'
+                                    PartitionStyle = 'GPT'
+                                    FSLabel        = $FSLabelA
                                 }
                             )
                         }
@@ -863,10 +863,10 @@ try
                     $current = $script:currentConfiguration | Where-Object -FilterScript {
                         $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
                     }
-                    $current.DiskId          | Should -Be $disk.Number
-                    $current.PartitionFormat | Should -Be 'GPT'
-                    $current.DriveLetter     | Should -Be $driveLetterA
-                    $current.FSLabel         | Should -Be $FSLabelA
+                    $current.DiskId         | Should -Be $disk.Number
+                    $current.PartitionStyle | Should -Be 'GPT'
+                    $current.DriveLetter    | Should -Be $driveLetterA
+                    $current.FSLabel        | Should -Be $FSLabelA
                 }
             }
 
