@@ -1,5 +1,6 @@
 
 [ClassVersion("1.0.0.0"), FriendlyName("Disk")]
+// This resource uses the MSFTDSC Prefix to prevent conflict with built in MSFT_Disk CIM Class.
 class MSFTDSC_Disk : OMI_BaseResource
 {
     [Key, Description("Specifies the identifier for which disk to modify.")] String DriveLetter;
