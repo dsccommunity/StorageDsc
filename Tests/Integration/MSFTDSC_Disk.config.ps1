@@ -9,7 +9,7 @@ configuration MSFTDSC_Disk_Config {
             {
                 DiskId          = $Node.DiskId
                 DiskIdType      = $Node.DiskIdType
-                PartitionStyle = $Node.PartitionStyle
+                PartitionStyle  = $Node.PartitionStyle
                 DriveLetter     = $Node.DriveLetter
                 FSLabel         = $Node.FSLabel
                 Size            = $Node.Size
@@ -21,7 +21,7 @@ configuration MSFTDSC_Disk_Config {
             {
                 DiskId          = $Node.DiskId
                 DiskIdType      = $Node.DiskIdType
-                PartitionStyle = $Node.PartitionStyle
+                PartitionStyle  = $Node.PartitionStyle
                 DriveLetter     = $Node.DriveLetter
                 FSLabel         = $Node.FSLabel
             }
@@ -40,7 +40,7 @@ configuration MSFTDSC_Disk_ConfigAllowDestructive {
             {
                 DiskId           = $Node.DiskId
                 DiskIdType       = $Node.DiskIdType
-                PartitionStyle  = $Node.PartitionStyle
+                PartitionStyle   = $Node.PartitionStyle
                 DriveLetter      = $Node.DriveLetter
                 FSLabel          = $Node.FSLabel
                 Size             = $Node.Size
@@ -54,7 +54,7 @@ configuration MSFTDSC_Disk_ConfigAllowDestructive {
             {
                 DiskId           = $Node.DiskId
                 DiskIdType       = $Node.DiskIdType
-                PartitionStyle  = $Node.PartitionStyle
+                PartitionStyle   = $Node.PartitionStyle
                 DriveLetter      = $Node.DriveLetter
                 FSLabel          = $Node.FSLabel
                 FSFormat         = $Node.FSFormat
@@ -75,7 +75,7 @@ configuration MSFTDSC_Disk_ConfigClearDisk {
             {
                 DiskId           = $Node.DiskId
                 DiskIdType       = $Node.DiskIdType
-                PartitionStyle  = $Node.PartitionStyle
+                PartitionStyle   = $Node.PartitionStyle
                 DriveLetter      = $Node.DriveLetter
                 FSLabel          = $Node.FSLabel
                 Size             = $Node.Size
@@ -90,7 +90,7 @@ configuration MSFTDSC_Disk_ConfigClearDisk {
             {
                 DiskId           = $Node.DiskId
                 DiskIdType       = $Node.DiskIdType
-                PartitionStyle  = $Node.PartitionStyle
+                PartitionStyle   = $Node.PartitionStyle
                 DriveLetter      = $Node.DriveLetter
                 FSLabel          = $Node.FSLabel
                 FSFormat         = $Node.FSFormat

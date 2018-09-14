@@ -18,10 +18,10 @@
     DiskNotFoundMessage = Disk with {0} '{1}' was not found.
     DiskNotOnlineMessage = Disk with {0} '{1}' is not online.
     DiskReadOnlyMessage = Disk with {0} '{1}' is readonly.
-    DiskPartitionStyleNotMatchMessage = Disk with {0} '{1}' is initialized with partition style '{2}' but '{3}' required.
-    DiskInitializedWithWrongPartitionStyleError = Disk with {0} '{1}' is already initialized with partition style '{2}' but '{3}' required. Set AllowDestructive and ClearDisk to 'True' to allow disk to be reinitialized.
+    DiskPartitionStyleNotMatchMessage = Disk with {0} '{1}' is initialized with partition style '{2}' but '{3}' is required.
+    DiskInitializedWithWrongPartitionStyleError = Disk with {0} '{1}' is already initialized with partition style '{2}' but '{3}' is required. Set AllowDestructive and ClearDisk to $true to allow disk to be reinitialized.
     DriveLetterNotFoundMessage = Drive {0} was not found.
-    SizeMismatchMessage = Partition assigned to drive {0} has size {1}, which does not match expected size {2}. Set AllowDestructive to 'True' to enable resizing of partition.
+    SizeMismatchMessage = Partition assigned to drive {0} has size {1}, which does not match expected size {2}. Set AllowDestructive to $true to enable resizing of partition.
     SizeMismatchWithAllowDestructiveMessage = Partition assigned to drive {0} has size {1}, which does not match expected size {2}.
     AllocationUnitSizeMismatchMessage = Volume assigned to drive {0} has allocation unit size {1} KB does not match expected allocation unit size {2} KB.
     FileSystemFormatMismatch = Volume assigned to drive {0} filesystem format '{1}' does not match expected format '{2}'.
@@ -39,5 +39,5 @@
     SizeMismatchCorrectionMessage = Switch AllowDestructive is specified. Attempting to resize partition {0} from {1} to {2}.
     FreeSpaceViolationError = Attempted to resize partition {0} from {1} to {2} while maximum allowed size was {3}.
     ResizeRefsNotPossibleMessage = Skipping resize of {0} from {1} to {2}. Resizing ReFS partitions is currently not possible.
-    ResizeNotAllowedMessage = Skipping resize of {0} from {1} to {2}. AllowDestructive is not set to 'True'.
+    ResizeNotAllowedMessage = Skipping resize of {0} from {1} to {2}. AllowDestructive is not set to $true.
 '@

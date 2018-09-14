@@ -35,32 +35,32 @@ $localizedData = Get-LocalizedData `
 
     .PARAMETER PartitionStyle
     Specifies the partition style of the disk. Defaults to GPT.
-    This value of this parameter is ignored.
+    This parameter is not used in Get-TargetResource.
 
     .PARAMETER Size
     Specifies the size of new volume (use all available space on disk if not provided).
-    This value of this parameter is ignored.
+    This parameter is not used in Get-TargetResource.
 
     .PARAMETER FSLabel
     Specifies the volume label to assign to the volume.
-    This value of this parameter is ignored.
+    This parameter is not used in Get-TargetResource.
 
     .PARAMETER AllocationUnitSize
     Specifies the allocation unit size to use when formatting the volume.
-    This value of this parameter is ignored.
+    This parameter is not used in Get-TargetResource.
 
     .PARAMETER FSFormat
     Specifies the file system format of the new volume.
-    This value of this parameter is ignored.
+    This parameter is not used in Get-TargetResource.
 
     .PARAMETER AllowDestructive
     Specifies if potentially destructive operations may occur.
-    This value of this parameter is ignored.
+    This parameter is not used in Get-TargetResource.
 
     .PARAMETER ClearDisk
     Specifies if the disks partition schema should be removed entirely, even if data and OEM
     partitions are present. Only possible with AllowDestructive enabled.
-    This value of this parameter is ignored.
+    This parameter is not used in Get-TargetResource.
 #>
 function Get-TargetResource
 {

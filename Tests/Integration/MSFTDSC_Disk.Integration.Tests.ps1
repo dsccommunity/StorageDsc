@@ -365,7 +365,7 @@ try
                 }
             }
 
-            Context "Resize partition on Disk Number $($disk.Number) to use 50MB with AllowDestructive" {
+            Context "Clear Disk Number $($disk.Number) and change the partition style to GPT and add a 50MB partition" {
                 It 'Should compile and apply the MOF without throwing' {
                     {
                         # This is to pass to the Config
@@ -504,7 +504,7 @@ try
                 }
             }
 
-            Context "Resize first volume on Disk Unique Id $($disk.UniqueId)" {
+            Context "Resize first volume on Disk Unique Id $($disk.UniqueId) and allowing the disk to be cleared" {
                 It 'should compile and apply the MOF without throwing' {
                     {
                         # This is to pass to the Config

@@ -5,7 +5,7 @@
 - Disk:
   - Added `PartitionStyle` parameter - Fixes [Issue #137](https://github.com/PowerShell/StorageDsc/issues/37).
   - Changed MOF name from `MSFT_Disk` to `MSFTDSC_Disk` to remove conflict
-    with Windows built-in CIM class.
+    with Windows built-in CIM class - Fixes [Issue #167](https://github.com/PowerShell/StorageDsc/issues/167).
 - Opt-in to Common Tests:
   - Common Tests - Validate Example Files To Be Published
   - Common Tests - Validate Markdown Links
