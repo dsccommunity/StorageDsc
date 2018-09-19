@@ -27,7 +27,7 @@ try
 
     Describe "$($script:DSCResourceName)_Integration" {
         #region Integration Tests for DiskNumber
-        Context 'Partition and format newly provisioned disk using Disk Number with two volumes and assign Drive Letters' {
+        Context 'When partitioning and formatting a newly provisioned disk using Disk Number with two volumes and assigning Drive Letters' {
             BeforeAll {
                 # Create a VHD and attach it to the computer
                 $VHDPath = Join-Path -Path $TestDrive `
@@ -45,7 +45,7 @@ try
                 $driveLetterB = [char](([int][char]$lastDrive) + 2)
             }
 
-            Context "Create first volume on Disk Number $($disk.Number)" {
+            Context "When creating the first volume on Disk Number $($disk.Number)" {
                 It 'Should compile and apply the MOF without throwing' {
                     {
                         # This is to pass to the Config
@@ -93,7 +93,7 @@ try
                 }
             }
 
-            Context "Create second volume on Disk Number $($disk.Number)" {
+            Context "When creating the second volume on Disk Number $($disk.Number)" {
                 It 'Should compile and apply the MOF without throwing' {
                     {
                         # This is to pass to the Config
@@ -165,7 +165,7 @@ try
             }
         }
 
-        Context 'Partition and format newly provisioned disk using Disk Number with one volume and assign Drive Letters then resize' {
+        Context 'When partitioniong and formatting a newly provisioned disk using Disk Number with one volume and assigning Drive Letters then resizing' {
             BeforeAll {
                 # Create a VHD and attach it to the computer
                 $VHDPath = Join-Path -Path $TestDrive `
@@ -181,7 +181,7 @@ try
                 $driveLetterA = [char](([int][char]$lastDrive) + 1)
             }
 
-            Context "Create volume on Disk Number $($disk.Number)" {
+            Context "When creating a volume on Disk Number $($disk.Number)" {
                 It 'Should compile and apply the MOF without throwing' {
                     {
                         # This is to pass to the Config
@@ -230,7 +230,7 @@ try
                 }
             }
 
-            Context "Resize partition on Disk Number $($disk.Number) to use all free space with AllowDestructive" {
+            Context "When resizing a partition on Disk Number $($disk.Number) to use all free space with AllowDestructive" {
                 It 'Should compile and apply the MOF without throwing' {
                     {
                         # This is to pass to the Config
@@ -300,7 +300,7 @@ try
             }
         }
 
-        Context 'Partition and format newly provisioned disk using Disk Number with one volume using MBR then convert to GPT' {
+        Context 'When partitioning and formatting a newly provisioned disk using Disk Number with one volume using MBR then convert to GPT' {
             BeforeAll {
                 # Create a VHD and attach it to the computer
                 $VHDPath = Join-Path -Path $TestDrive `
@@ -316,7 +316,7 @@ try
                 $driveLetterA = [char](([int][char]$lastDrive) + 1)
             }
 
-            Context "Create volume on Disk Number $($disk.Number)" {
+            Context "When creating a volume on Disk Number $($disk.Number)" {
                 It 'Should compile and apply the MOF without throwing' {
                     {
                         # This is to pass to the Config
@@ -365,7 +365,7 @@ try
                 }
             }
 
-            Context "Clear Disk Number $($disk.Number) and change the partition style to GPT and add a 50MB partition" {
+            Context "When clearing Disk Number $($disk.Number) and changing the partition style to GPT and adding a 50MB partition" {
                 It 'Should compile and apply the MOF without throwing' {
                     {
                         # This is to pass to the Config
@@ -438,7 +438,7 @@ try
         #endregion
 
         #region Integration Tests for Disk Unique Id
-        Context 'Partition and format newly provisioned disk using Unique Id with two volumes and assign Drive Letters' {
+        Context 'When partitioning and formatting a newly provisioned disk using Unique Id with two volumes and assigning Drive Letters' {
             BeforeAll {
                 # Create a VHD and attach it to the computer
                 $VHDPath = Join-Path -Path $TestDrive `
@@ -456,7 +456,7 @@ try
                 $driveLetterB = [char](([int][char]$lastDrive) + 2)
             }
 
-            Context "Create first volume on Disk Unique Id $($disk.UniqueId)" {
+            Context "When creating the first volume on Disk Unique Id $($disk.UniqueId)" {
                 It 'Should compile and apply the MOF without throwing' {
                     {
                         # This is to pass to the Config
@@ -504,7 +504,7 @@ try
                 }
             }
 
-            Context "Resize first volume on Disk Unique Id $($disk.UniqueId) and allowing the disk to be cleared" {
+            Context "When resizing the first volume on Disk Unique Id $($disk.UniqueId) and allowing the disk to be cleared" {
                 It 'should compile and apply the MOF without throwing' {
                     {
                         # This is to pass to the Config
@@ -554,7 +554,7 @@ try
                 }
             }
 
-            Context "Create second volume on Disk Unique Id $($disk.UniqueId)" {
+            Context "When creating second volume on Disk Unique Id $($disk.UniqueId)" {
                 It 'Should compile and apply the MOF without throwing' {
                     {
                         # This is to pass to the Config
@@ -622,7 +622,7 @@ try
         #endregion
 
         #region Integration Tests for Disk Guid
-        Context 'Partition and format newly provisioned disk using Guid with two volumes and assign Drive Letters' {
+        Context 'When partitioning and formating a newly provisioned disk using Guid with two volumes and assign Drive Letters' {
             BeforeAll {
                 # Create a VHD and attach it to the computer
                 $VHDPath = Join-Path -Path $TestDrive `
@@ -640,7 +640,7 @@ try
                 $driveLetterB = [char](([int][char]$lastDrive) + 2)
             }
 
-            Context "Create first volume on Disk Guid $($disk.Guid)" {
+            Context "When creating the first volume on Disk Guid $($disk.Guid)" {
                 It 'Should compile and apply the MOF without throwing' {
                     {
                         # This is to pass to the Config
@@ -688,7 +688,7 @@ try
                 }
             }
 
-            Context "Create first volume on Disk Guid $($disk.Guid)" {
+            Context "When creating the first volume on Disk Guid $($disk.Guid)" {
                 It 'Should compile and apply the MOF without throwing' {
                     {
                         # This is to pass to the Config
@@ -756,7 +756,7 @@ try
         #endregion
 
         #region Integration Tests for DiskNumber to test if a single disk with a volume using the whole disk can be remounted
-        Context 'Partition a disk using Disk Number with a single volume using the whole disk, dismount the volume then reprovision it' {
+        Context 'When partitioning a disk using Disk Number with a single volume using the whole disk, dismounting the volume then reprovisioning it' {
             BeforeAll {
                 # Create a VHD and attach it to the computer
                 $VHDPath = Join-Path -Path $TestDrive `
@@ -772,7 +772,7 @@ try
                 $driveLetterA = [char](([int][char]$lastDrive) + 1)
             }
 
-            Context "Create first volume on Disk Number $($disk.Number)" {
+            Context "When creating the first volume on Disk Number $($disk.Number)" {
                 It 'Should compile and apply the MOF without throwing' {
                     {
                         # This is to pass to the Config
@@ -824,7 +824,7 @@ try
                 -PartitionNumber 2 `
                 -AccessPath "$($driveLetterA):"
 
-            Context "Attach first volume on Disk Number $($disk.Number)" {
+            Context "When attaching the first volume on Disk Number $($disk.Number)" {
                 It 'Should compile and apply the MOF without throwing' {
                     {
                         # This is to pass to the Config

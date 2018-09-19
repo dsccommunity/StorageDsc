@@ -308,7 +308,7 @@ try
 
         #region Function Get-TargetResource
         Describe 'MSFTDSC_Disk\Get-TargetResource' {
-            Context 'Online GPT disk with a partition/volume and correct Drive Letter assigned using Disk Number' {
+            Context 'When online GPT disk with a partition/volume and correct Drive Letter assigned using Disk Number' {
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Get-CimInstance `
@@ -374,7 +374,7 @@ try
                 }
             }
 
-            Context 'Online GPT disk with a partition/volume and correct Drive Letter assigned using Disk Unique Id' {
+            Context 'When online GPT disk with a partition/volume and correct Drive Letter assigned using Disk Unique Id' {
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Get-CimInstance `
@@ -441,7 +441,7 @@ try
                 }
             }
 
-            Context 'Online GPT disk with a partition/volume and correct Drive Letter assigned using Disk Guid' {
+            Context 'When online GPT disk with a partition/volume and correct Drive Letter assigned using Disk Guid' {
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Get-CimInstance `
@@ -508,7 +508,7 @@ try
                 }
             }
 
-            Context 'Online GPT disk with a partition/volume and correct Drive Letter assigned using Disk Guid' {
+            Context 'When online GPT disk with a partition/volume and correct Drive Letter assigned using Disk Guid' {
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Get-CimInstance `
@@ -575,7 +575,7 @@ try
                 }
             }
 
-            Context 'Online GPT disk with no partition using Disk Number' {
+            Context 'When online GPT disk with no partition using Disk Number' {
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Get-CimInstance `
@@ -638,7 +638,7 @@ try
                 }
             }
 
-            Context 'Online MBR disk with no partition using Disk Number' {
+            Context 'When online MBR disk with no partition using Disk Number' {
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Get-CimInstance `
@@ -701,7 +701,7 @@ try
                 }
             }
 
-            Context 'Online RAW disk with no partition using Disk Number' {
+            Context 'When online RAW disk with no partition using Disk Number' {
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Get-CimInstance `
@@ -768,7 +768,7 @@ try
 
         #region Function Set-TargetResource
         Describe 'MSFTDSC_Disk\Set-TargetResource' {
-            Context 'Offline GPT disk using Disk Number' {
+            Context 'When offline GPT disk using Disk Number' {
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Get-DiskByIdentifier `
@@ -830,7 +830,7 @@ try
                 }
             }
 
-            Context 'Offline GPT disk using Disk Unique Id' {
+            Context 'When offline GPT disk using Disk Unique Id' {
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Get-DiskByIdentifier `
@@ -897,7 +897,7 @@ try
                 }
             }
 
-            Context 'Offline GPT disk using Disk Guid' {
+            Context 'When offline GPT disk using Disk Guid' {
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Get-DiskByIdentifier `
@@ -964,7 +964,7 @@ try
                 }
             }
 
-            Context 'Readonly GPT disk using Disk Number' {
+            Context 'When readonly GPT disk using Disk Number' {
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Get-DiskByIdentifier `
@@ -1030,7 +1030,7 @@ try
                 }
             }
 
-            Context 'Offline RAW disk using Disk Number' {
+            Context 'When offline RAW disk using Disk Number' {
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Get-DiskByIdentifier `
@@ -1097,7 +1097,7 @@ try
                 }
             }
 
-            Context 'Online RAW disk with Size using Disk Number' {
+            Context 'When online RAW disk with Size using Disk Number' {
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Get-DiskByIdentifier `
@@ -1166,7 +1166,7 @@ try
                 }
             }
 
-            Context 'Online GPT disk with no partitions using Disk Number' {
+            Context 'When online GPT disk with no partitions using Disk Number' {
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Get-DiskByIdentifier `
@@ -1229,7 +1229,7 @@ try
                 }
             }
 
-            Context 'Online GPT disk with no partitions using Disk Number, partition fails to become writeable' {
+            Context 'When online GPT disk with no partitions using Disk Number, partition fails to become writeable' {
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Get-DiskByIdentifier `
@@ -1297,7 +1297,7 @@ try
                 }
             }
 
-            Context 'Online MBR disk using Disk Number' {
+            Context 'When online MBR disk using Disk Number' {
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Get-DiskByIdentifier `
@@ -1341,7 +1341,7 @@ try
                 }
             }
 
-            Context 'Online MBR disk using Disk Unique Id but GPT required and AllowDestructive and ClearDisk are false' {
+            Context 'When online MBR disk using Disk Unique Id but GPT required and AllowDestructive and ClearDisk are false' {
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Get-DiskByIdentifier `
@@ -1384,7 +1384,7 @@ try
                 }
             }
 
-            Context 'Online GPT disk with partition/volume already assigned using Disk Number' {
+            Context 'When online GPT disk with partition/volume already assigned using Disk Number' {
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Get-DiskByIdentifier `
@@ -1432,7 +1432,7 @@ try
                 }
             }
 
-            Context 'Online GPT disk containing matching partition but not assigned using Disk Number' {
+            Context 'When online GPT disk containing matching partition but not assigned using Disk Number' {
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Get-DiskByIdentifier `
@@ -1484,7 +1484,7 @@ try
                 }
             }
 
-            Context 'Online GPT disk with a partition/volume and wrong Drive Letter assigned using Disk Number' {
+            Context 'When online GPT disk with a partition/volume and wrong Drive Letter assigned using Disk Number' {
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Get-DiskByIdentifier `
@@ -1543,7 +1543,7 @@ try
                 }
             }
 
-            Context 'Online GPT disk with a partition/volume and no Drive Letter assigned using Disk Number' {
+            Context 'When online GPT disk with a partition/volume and no Drive Letter assigned using Disk Number' {
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Get-DiskByIdentifier `
@@ -1594,7 +1594,7 @@ try
                 }
             }
 
-            Context 'Online GPT disk with a partition/volume and wrong Volume Label assigned using Disk Number' {
+            Context 'When online GPT disk with a partition/volume and wrong Volume Label assigned using Disk Number' {
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Get-DiskByIdentifier `
