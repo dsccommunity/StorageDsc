@@ -17,7 +17,7 @@ Import-Module -Name (Join-Path -Path $modulePath `
 
 # Import Localization Strings
 $localizedData = Get-LocalizedData `
-    -ResourceName 'MSFT_Disk' `
+    -ResourceName 'MSFTDSC_Disk' `
     -ResourcePath (Split-Path -Parent $Script:MyInvocation.MyCommand.Path)
 
 <#
@@ -33,23 +33,34 @@ $localizedData = Get-LocalizedData `
     .PARAMETER DiskIdType
     Specifies the identifier type the DiskId contains. Defaults to Number.
 
+    .PARAMETER PartitionStyle
+    Specifies the partition style of the disk. Defaults to GPT.
+    This parameter is not used in Get-TargetResource.
+
     .PARAMETER Size
     Specifies the size of new volume (use all available space on disk if not provided).
+    This parameter is not used in Get-TargetResource.
 
     .PARAMETER FSLabel
     Specifies the volume label to assign to the volume.
+    This parameter is not used in Get-TargetResource.
 
     .PARAMETER AllocationUnitSize
     Specifies the allocation unit size to use when formatting the volume.
+    This parameter is not used in Get-TargetResource.
 
     .PARAMETER FSFormat
     Specifies the file system format of the new volume.
+    This parameter is not used in Get-TargetResource.
 
     .PARAMETER AllowDestructive
-    Specifies if potentially destructive operations may occur
+    Specifies if potentially destructive operations may occur.
+    This parameter is not used in Get-TargetResource.
 
     .PARAMETER ClearDisk
-    Specifies if the disks partition schema should be removed entirely, even if data and oem partitions are present. Only possible with AllowDestructive enabled.
+    Specifies if the disks partition schema should be removed entirely, even if data and OEM
+    partitions are present. Only possible with AllowDestructive enabled.
+    This parameter is not used in Get-TargetResource.
 #>
 function Get-TargetResource
 {
@@ -69,6 +80,11 @@ function Get-TargetResource
         [ValidateSet('Number', 'UniqueId', 'Guid')]
         [System.String]
         $DiskIdType = 'Number',
+
+        [Parameter()]
+        [ValidateSet('GPT', 'MBR')]
+        [System.String]
+        $PartitionStyle = 'GPT',
 
         [Parameter()]
         [System.UInt64]
@@ -117,24 +133,20 @@ function Get-TargetResource
         -DriveLetter $DriveLetter `
         -ErrorAction SilentlyContinue
 
-    $fileSystem = $volume.FileSystem
-    $FSLabel = $volume.FileSystemLabel
-
     $blockSize = (Get-CimInstance `
             -Query "SELECT BlockSize from Win32_Volume WHERE DriveLetter = '$($DriveLetter):'" `
             -ErrorAction SilentlyContinue).BlockSize
 
-    $returnValue = @{
+    return @{
         DiskId             = $DiskId
         DiskIdType         = $DiskIdType
         DriveLetter        = $partition.DriveLetter
+        PartitionStyle    = $disk.PartitionStyle
         Size               = $partition.Size
-        FSLabel            = $FSLabel
+        FSLabel            = $volume.FileSystemLabel
         AllocationUnitSize = $blockSize
-        FSFormat           = $fileSystem
+        FSFormat           = $volume.FileSystem
     }
-
-    $returnValue
 } # Get-TargetResource
 
 <#
@@ -150,6 +162,9 @@ function Get-TargetResource
     .PARAMETER DiskIdType
     Specifies the identifier type the DiskId contains. Defaults to Number.
 
+    .PARAMETER PartitionStyle
+    Specifies the partition style of the disk. Defaults to GPT.
+
     .PARAMETER Size
     Specifies the size of new volume. Leave empty to use the remaining free space.
 
@@ -163,10 +178,11 @@ function Get-TargetResource
     Specifies the file system format of the new volume.
 
     .PARAMETER AllowDestructive
-    Specifies if potentially destructive operations may occur
+    Specifies if potentially destructive operations may occur.
 
     .PARAMETER ClearDisk
-    Specifies if the disks partition schema should be removed entirely, even if data and oem partitions are present. Only possible with AllowDestructive enabled.
+    Specifies if the disks partition schema should be removed entirely, even if data and OEM
+    partitions are present. Only possible with AllowDestructive enabled.
 #>
 function Set-TargetResource
 {
@@ -187,6 +203,11 @@ function Set-TargetResource
         [ValidateSet('Number', 'UniqueId', 'Guid')]
         [System.String]
         $DiskIdType = 'Number',
+
+        [Parameter()]
+        [ValidateSet('GPT', 'MBR')]
+        [System.String]
+        $PartitionStyle = 'GPT',
 
         [Parameter()]
         [System.UInt64]
@@ -269,41 +290,35 @@ function Set-TargetResource
             -DiskIdType $DiskIdType
     }
 
-    switch ($disk.PartitionStyle)
+    if ($disk.PartitionStyle -eq 'RAW')
     {
-        'RAW'
+        Write-Verbose -Message ( @(
+            "$($MyInvocation.MyCommand): "
+            $($localizedData.InitializingDiskMessage -f $DiskIdType, $DiskId, $PartitionStyle)
+        ) -join '' )
+
+        $disk | Initialize-Disk -PartitionStyle $PartitionStyle
+    }
+    else
+    {
+        if ($disk.PartitionStyle -eq $PartitionStyle)
         {
-            # The disk partition table is not yet initialized, so initialize it with GPT
+            # The disk partition is already initialized with the correct partition style
             Write-Verbose -Message ( @(
                     "$($MyInvocation.MyCommand): "
-                    $($localizedData.InitializingDiskMessage -f $DiskIdType, $DiskId)
+                    $($localizedData.DiskAlreadyInitializedMessage `
+                        -f $DiskIdType, $DiskId, $disk.PartitionStyle)
                 ) -join '' )
 
-            $disk | Initialize-Disk `
-                -PartitionStyle 'GPT'
-
-            break
-        } # 'RAW'
-
-        'GPT'
+        }
+        else
         {
-            # The disk partition is already initialized with GPT.
-            Write-Verbose -Message ( @(
-                    "$($MyInvocation.MyCommand): "
-                    $($localizedData.DiskAlreadyInitializedMessage -f $DiskIdType, $DiskId)
-                ) -join '' )
-
-            break
-        } # 'GPT'
-
-        default
-        {
-            # This disk is initialized but not as GPT - so raise an exception.
+            # This disk is initialized but with the incorrect partition style
             New-InvalidOperationException `
-                -Message ($localizedData.DiskAlreadyInitializedError -f `
-                    $DiskIdType, $DiskId, $Disk.PartitionStyle)
-        } # default
-    } # switch
+                -Message ($localizedData.DiskInitializedWithWrongPartitionStyleError `
+                    -f $DiskIdType, $DiskId, $disk.PartitionStyle, $PartitionStyle)
+        }
+    }
 
     # Get the partitions on the disk
     $partition = $disk | Get-Partition -ErrorAction SilentlyContinue
@@ -318,7 +333,8 @@ function Set-TargetResource
         # There is no partiton with this drive letter
         Write-Verbose -Message ( @(
                 "$($MyInvocation.MyCommand): "
-                $($localizedData.DriveNotFoundOnPartitionMessage -f $DiskIdType, $DiskId, $DriveLetter)
+                $($localizedData.DriveNotFoundOnPartitionMessage `
+                    -f $DiskIdType, $DiskId, $DriveLetter)
             ) -join '' )
 
         # Are there any partitions defined on this disk?
@@ -335,14 +351,14 @@ function Set-TargetResource
                 if ($partition)
                 {
                     # A partition matching the required size was found
-                    Write-Verbose -Message ($localizedData.MatchingPartitionFoundMessage -f `
-                            $DiskIdType, $DiskId, $partition.PartitionNumber)
+                    Write-Verbose -Message ($localizedData.MatchingPartitionFoundMessage `
+                            -f $DiskIdType, $DiskId, $partition.PartitionNumber)
                 }
                 else
                 {
                     # A partition matching the required size was not found
-                    Write-Verbose -Message ($localizedData.MatchingPartitionNotFoundMessage -f `
-                            $DiskIdType, $DiskId)
+                    Write-Verbose -Message ($localizedData.MatchingPartitionNotFoundMessage `
+                            -f $DiskIdType, $DiskId)
                 } # if
             }
             else
@@ -351,8 +367,8 @@ function Set-TargetResource
                     No size specified, so see if there is a partition that has a volume
                     matching the file system type that is not assigned to a drive letter.
                 #>
-                Write-Verbose -Message ($localizedData.MatchingPartitionNoSizeMessage -f `
-                        $DiskIdType, $DiskId)
+                Write-Verbose -Message ($localizedData.MatchingPartitionNoSizeMessage `
+                        -f $DiskIdType, $DiskId)
 
                 $searchPartitions = $partition | Where-Object -FilterScript {
                     $_.Type -eq 'Basic' -and -not [System.Char]::IsLetter($_.DriveLetter)
@@ -363,8 +379,8 @@ function Set-TargetResource
                 foreach ($searchPartition in $searchPartitions)
                 {
                     # Look for the volume in the partition.
-                    Write-Verbose -Message ($localizedData.SearchForVolumeMessage -f `
-                            $DiskIdType, $DiskId, $searchPartition.PartitionNumber, $FSFormat)
+                    Write-Verbose -Message ($localizedData.SearchForVolumeMessage `
+                            -f $DiskIdType, $DiskId, $searchPartition.PartitionNumber, $FSFormat)
 
                     $searchVolumes = $searchPartition | Get-Volume
 
@@ -380,8 +396,8 @@ function Set-TargetResource
                         #>
                         $partition = $searchPartition
 
-                        Write-Verbose -Message ($localizedData.VolumeFoundMessage -f `
-                                $DiskIdType, $DiskId, $searchPartition.PartitionNumber, $FSFormat)
+                        Write-Verbose -Message ($localizedData.VolumeFoundMessage `
+                                -f $DiskIdType, $DiskId, $searchPartition.PartitionNumber, $FSFormat)
 
                         break
                     } # if
@@ -433,7 +449,7 @@ function Set-TargetResource
                 Write-Verbose -Message ( @(
                         "$($MyInvocation.MyCommand): "
                         ($localizedData.NewPartitionIsReadOnlyMessage `
-                                -f $DiskIdType, $DiskId, $partition.PartitionNumber)
+                            -f $DiskIdType, $DiskId, $partition.PartitionNumber)
                     ) -join '' )
 
                 Start-Sleep -Seconds 1
@@ -447,8 +463,8 @@ function Set-TargetResource
         {
             # The partition is still readonly - throw an exception
             New-InvalidOperationException `
-                -Message ($localizedData.NewParitionIsReadOnlyError -f `
-                    $DiskIdType, $DiskId, $partition.PartitionNumber)
+                -Message ($localizedData.NewParitionIsReadOnlyError `
+                    -f $DiskIdType, $DiskId, $partition.PartitionNumber)
         } # if
 
         $assignDriveLetter = $true
@@ -458,8 +474,8 @@ function Set-TargetResource
         # The disk already has a partition on it that is assigned to the Drive Letter
         Write-Verbose -Message ( @(
                 "$($MyInvocation.MyCommand): "
-                $($localizedData.PartitionAlreadyAssignedMessage -f `
-                        $DriveLetter, $assignedPartition.PartitionNumber)
+                $($localizedData.PartitionAlreadyAssignedMessage `
+                    -f $DriveLetter, $assignedPartition.PartitionNumber)
             ) -join '' )
 
         $assignDriveLetter = $false
@@ -485,7 +501,7 @@ function Set-TargetResource
                     Write-Warning -Message ( @(
                             "$($MyInvocation.MyCommand): "
                             $($localizedData.ResizeRefsNotPossibleMessage `
-                                    -f $DriveLetter, $assignedPartition.Size, $Size)
+                                -f $DriveLetter, $assignedPartition.Size, $Size)
                         ) -join '' )
 
                 }
@@ -494,7 +510,7 @@ function Set-TargetResource
                     Write-Verbose -Message ( @(
                             "$($MyInvocation.MyCommand): "
                             $($localizedData.SizeMismatchCorrectionMessage `
-                                    -f $DriveLetter, $assignedPartition.Size, $Size)
+                                -f $DriveLetter, $assignedPartition.Size, $Size)
                         ) -join '' )
 
                     if ($Size -gt $supportedSize.SizeMax)
@@ -565,16 +581,16 @@ function Set-TargetResource
                 # The file system format does not match
                 Write-Verbose -Message ( @(
                         "$($MyInvocation.MyCommand): "
-                        $($localizedData.FileSystemFormatMismatch -f `
-                                $DriveLetter, $fileSystem, $FSFormat)
+                        $($localizedData.FileSystemFormatMismatch `
+                            -f $DriveLetter, $fileSystem, $FSFormat)
                     ) -join '' )
 
                 if ($AllowDestructive)
                 {
                     Write-Verbose -Message ( @(
                             "$($MyInvocation.MyCommand): "
-                            $($localizedData.VolumeFormatInProgressMessage -f `
-                                    $DriveLetter, $fileSystem, $FSFormat)
+                            $($localizedData.VolumeFormatInProgressMessage `
+                                -f $DriveLetter, $fileSystem, $FSFormat)
                         ) -join '' )
 
                     $formatParam = @{
@@ -602,7 +618,7 @@ function Set-TargetResource
                 Write-Verbose -Message ( @(
                         "$($MyInvocation.MyCommand): "
                         $($localizedData.ChangingVolumeLabelMessage `
-                                -f $DriveLetter, $FSLabel)
+                            -f $DriveLetter, $FSLabel)
                     ) -join '' )
 
                 $volume | Set-Volume -NewFileSystemLabel $FSLabel
@@ -635,6 +651,9 @@ function Set-TargetResource
     .PARAMETER DiskIdType
     Specifies the identifier type the DiskId contains. Defaults to Number.
 
+    .PARAMETER PartitionStyle
+    Specifies the partition style of the disk. Defaults to GPT.
+
     .PARAMETER Size
     Specifies the size of new volume. Leave empty to use the remaining free space.
 
@@ -648,10 +667,11 @@ function Set-TargetResource
     Specifies the file system format of the new volume.
 
     .PARAMETER AllowDestructive
-    Specifies if potentially destructive operations may occur
+    Specifies if potentially destructive operations may occur.
 
     .PARAMETER ClearDisk
-    Specifies if the disks partition schema should be removed entirely, even if data and oem partitions are present. Only possible with AllowDestructive enabled.
+    Specifies if the disks partition schema should be removed entirely, even if data and OEM
+    partitions are present. Only possible with AllowDestructive enabled.
 #>
 function Test-TargetResource
 {
@@ -671,6 +691,11 @@ function Test-TargetResource
         [ValidateSet('Number', 'UniqueId', 'Guid')]
         [System.String]
         $DiskIdType = 'Number',
+
+        [Parameter()]
+        [ValidateSet('GPT', 'MBR')]
+        [System.String]
+        $PartitionStyle = 'GPT',
 
         [Parameter()]
         [System.UInt64]
@@ -740,20 +765,32 @@ function Test-TargetResource
     {
         Write-Verbose -Message ( @(
                 "$($MyInvocation.MyCommand): "
-                $($localizedData.DiskReadOnlyMessage -f $DiskIdType, $DiskId)
+                $($localizedData.DiskReadOnlyMessage `
+                    -f $DiskIdType, $DiskId)
             ) -join '' )
 
         return $false
     } # if
 
-    if ($disk.PartitionStyle -ne 'GPT')
+    if ($disk.PartitionStyle -ne $PartitionStyle)
     {
         Write-Verbose -Message ( @(
                 "$($MyInvocation.MyCommand): "
-                $($localizedData.DiskNotGPTMessage -f $DiskIdType, $DiskId, $Disk.PartitionStyle)
+                $($localizedData.DiskPartitionStyleNotMatchMessage `
+                    -f $DiskIdType, $DiskId, $disk.PartitionStyle, $PartitionStyle)
             ) -join '' )
 
-        return $false
+        if ($disk.PartitionStyle -eq 'RAW' -or ($AllowDestructive -and $ClearDisk))
+        {
+            return $false
+        }
+        else
+        {
+            # This disk is initialized but with the incorrect partition style
+            New-InvalidOperationException `
+                -Message ($localizedData.DiskInitializedWithWrongPartitionStyleError `
+                    -f $DiskIdType, $DiskId, $disk.PartitionStyle, $PartitionStyle)
+        }
     } # if
 
     $partition = Get-Partition `
@@ -840,7 +877,7 @@ function Test-TargetResource
             Write-Verbose -Message ( @(
                     "$($MyInvocation.MyCommand): "
                     $($localizedData.FileSystemFormatMismatch `
-                            -f $DriveLetter, $fileSystem, $FSFormat)
+                        -f $DriveLetter, $fileSystem, $FSFormat)
                 ) -join '' )
 
             if ($AllowDestructive)
@@ -860,7 +897,7 @@ function Test-TargetResource
             Write-Verbose -Message ( @(
                     "$($MyInvocation.MyCommand): "
                     $($localizedData.DriveLabelMismatch `
-                            -f $DriveLetter, $label, $FSLabel)
+                        -f $DriveLetter, $label, $FSLabel)
                 ) -join '' )
 
             return $false
