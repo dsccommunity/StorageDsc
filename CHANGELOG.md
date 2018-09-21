@@ -11,6 +11,9 @@
   - Common Tests - Validate Markdown Links
   - Common Tests - Relative Path Length
 - Added .VSCode settings for applying DSC PSSA rules - fixes [Issue #168](https://github.com/PowerShell/StorageDsc/issues/168).
+- Disk:
+  - Added 'defragsvc' service conflict known issue to README.MD - fixes
+    [Issue #172](https://github.com/PowerShell/StorageDsc/issues/172).
 
 ## 4.1.0.0
 

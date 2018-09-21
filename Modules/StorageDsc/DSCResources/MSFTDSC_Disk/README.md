@@ -22,3 +22,21 @@ identifier for disks with `GPT` partition table format. If the disk is `RAW`
 (e.g. the disk has been initialized) then the _Guid_ identifier method can not
 be used. This is because the _Guid_ for a disk is only assigned once the partition
 table for the disk has been created.
+
+## Known Issues
+
+The 'defragsvc' service ('Optimize Drives') may cause the following errors when
+enabled with this resource. The following error may occur when testing the state
+of the resource:
+
+```text
+PartitionSupportedSize
++ CategoryInfo : NotSpecified: (StorageWMI:) [], CimException
++ FullyQualifiedErrorId : StorageWMI 4,Get-PartitionSupportedSize
++ PSComputerName : localhost
+```
+
+The 'defragsvc' service should be stopped and set to manual start up to prevent
+this error. Use the `Service` resource in either the 'xPSDesiredStateConfgiuration'
+or 'PSDSCResources' resource module to set the 'defragsvc' service is always
+stopped and set to manual start up.
