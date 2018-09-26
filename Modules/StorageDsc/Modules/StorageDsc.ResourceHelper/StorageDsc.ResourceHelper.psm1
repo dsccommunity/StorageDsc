@@ -21,12 +21,18 @@ function Test-IsNanoServer
 <#
     .SYNOPSIS
         Tests if the the specified command is found.
+
+    .PARAMETER Name
+        The name of the command to find.
+
 #>
 function Test-Command
 {
     param
     (
-        [String] $Name
+        [Parameter(Mandatory = $true)]
+        [System.String]
+        $Name
     )
 
     return ($null -ne (Get-Command -Name $Name -ErrorAction Continue 2> $null))
@@ -49,21 +55,30 @@ function New-InvalidArgumentException
     (
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [String]
+        [System.String]
         $Message,
 
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [String]
+        [System.String]
         $ArgumentName
     )
 
-    $argumentException = New-Object -TypeName 'ArgumentException' -ArgumentList @( $Message,
-        $ArgumentName )
+    $argumentException = New-Object -TypeName 'ArgumentException' -ArgumentList @(
+        $Message
+        $ArgumentName
+    )
+
     $newObjectParams = @{
         TypeName = 'System.Management.Automation.ErrorRecord'
-        ArgumentList = @( $argumentException, $ArgumentName, 'InvalidArgument', $null )
+        ArgumentList = @(
+            $argumentException
+            $ArgumentName
+            'InvalidArgument'
+            $null
+        )
     }
+
     $errorRecord = New-Object @newObjectParams
 
     throw $errorRecord
@@ -85,7 +100,7 @@ function New-InvalidOperationException
     param
     (
         [ValidateNotNullOrEmpty()]
-        [String]
+        [System.String]
         $Message,
 
         [ValidateNotNull()]
@@ -100,20 +115,29 @@ function New-InvalidOperationException
     elseif ($null -eq $ErrorRecord)
     {
         $invalidOperationException =
-            New-Object -TypeName 'InvalidOperationException' -ArgumentList @( $Message )
+            New-Object -TypeName 'InvalidOperationException' -ArgumentList @(
+                $Message
+            )
     }
     else
     {
         $invalidOperationException =
-            New-Object -TypeName 'InvalidOperationException' -ArgumentList @( $Message,
-                $ErrorRecord.Exception )
+            New-Object -TypeName 'InvalidOperationException' -ArgumentList @(
+                $Message
+                $ErrorRecord.Exception
+            )
     }
 
     $newObjectParams = @{
         TypeName = 'System.Management.Automation.ErrorRecord'
-        ArgumentList = @( $invalidOperationException.ToString(), 'MachineStateIncorrect',
-            'InvalidOperation', $null )
+        ArgumentList = @(
+            $invalidOperationException.ToString()
+            'MachineStateIncorrect'
+            'InvalidOperation'
+            $null
+        )
     }
+
     $errorRecordToThrow = New-Object @newObjectParams
     throw $errorRecordToThrow
 }
@@ -141,12 +165,12 @@ function Get-LocalizedData
     (
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [String]
+        [System.String]
         $ResourceName,
 
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [String]
+        [System.String]
         $ResourcePath
     )
 
@@ -166,5 +190,8 @@ function Get-LocalizedData
     return $localizedData
 }
 
-Export-ModuleMember -Function @( 'Test-IsNanoServer', 'New-InvalidArgumentException',
-    'New-InvalidOperationException', 'Get-LocalizedData' )
+Export-ModuleMember -Function `
+    Test-IsNanoServer, `
+    New-InvalidArgumentException, `
+    New-InvalidOperationException, `
+    Get-LocalizedData

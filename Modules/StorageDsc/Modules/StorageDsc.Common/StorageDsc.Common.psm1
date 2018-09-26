@@ -21,14 +21,15 @@ $localizedData = Get-LocalizedData `
 function Assert-DriveLetterValid
 {
     [CmdletBinding()]
-    [OutputType([String])]
+    [OutputType([System.String])]
     param
     (
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
         [System.String]
         $DriveLetter,
 
+        [Parameter()]
         [Switch]
         $Colon
     )
@@ -69,14 +70,15 @@ function Assert-DriveLetterValid
 function Assert-AccessPathValid
 {
     [CmdletBinding()]
-    [OutputType([String])]
+    [OutputType([System.String])]
     param
     (
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
         [System.String]
         $AccessPath,
 
+        [Parameter()]
         [Switch]
         $Slash
     )
@@ -176,6 +178,7 @@ function Test-AccessPathAssignedToLocal
     )
 
     $accessPathAssigned = $false
+
     foreach ($path in $AccessPath)
     {
         if ($path -match '[a-zA-Z]:\\')
