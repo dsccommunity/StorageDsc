@@ -87,6 +87,10 @@ try
                 It "Should return a RetryIntervalSec of $($disk0ParametersByNumber.RetryCount)" {
                     $script:result.RetryCount | Should -Be $disk0ParametersByNumber.RetryCount
                 }
+
+                It "Should return a IsAvailable boolean" {
+                    $script:result.IsAvailable | Should -BeOfType boolean
+                }
             }
 
             Context 'Disk is specified by Unique Id' {
@@ -113,6 +117,10 @@ try
                 It "Should return a RetryIntervalSec of $($disk0ParametersByUniqueId.RetryCount)" {
                     $script:result.RetryCount | Should -Be $disk0ParametersByUniqueId.RetryCount
                 }
+
+                It "Should return a IsAvailable boolean" {
+                    $script:result.IsAvailable | Should -BeOfType boolean
+                }
             }
 
             Context 'Disk is specified by Guid' {
@@ -138,6 +146,10 @@ try
 
                 It "Should return a RetryIntervalSec of $($disk0ParametersByGptGuid.RetryCount)" {
                     $script:result.RetryCount | Should -Be $disk0ParametersByGptGuid.RetryCount
+                }
+
+                It "Should return a IsAvailable boolean" {
+                    $script:result.IsAvailable | Should -BeOfType boolean
                 }
             }
         }
