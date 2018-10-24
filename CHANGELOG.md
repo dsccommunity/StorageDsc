@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 4.2.0.0
+
 - Disk:
   - Added `PartitionStyle` parameter - Fixes [Issue #137](https://github.com/PowerShell/StorageDsc/issues/37).
   - Changed MOF name from `MSFT_Disk` to `MSFTDSC_Disk` to remove conflict
