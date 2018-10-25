@@ -21,14 +21,15 @@ $localizedData = Get-LocalizedData `
 function Assert-DriveLetterValid
 {
     [CmdletBinding()]
-    [OutputType([String])]
+    [OutputType([System.String])]
     param
     (
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
         [System.String]
         $DriveLetter,
 
+        [Parameter()]
         [Switch]
         $Colon
     )
@@ -69,14 +70,15 @@ function Assert-DriveLetterValid
 function Assert-AccessPathValid
 {
     [CmdletBinding()]
-    [OutputType([String])]
+    [OutputType([System.String])]
     param
     (
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
         [System.String]
         $AccessPath,
 
+        [Parameter()]
         [Switch]
         $Slash
     )
@@ -139,8 +141,7 @@ function Get-DiskByIdentifier
     if ($DiskIdType -eq 'Guid')
     {
         # The Disk Id requested uses a Guid so have to get all disks and filter
-        $disk = Get-Disk `
-            -ErrorAction SilentlyContinue |
+        $disk = Get-Disk -ErrorAction SilentlyContinue |
             Where-Object -Property Guid -EQ $DiskId
     }
     else
@@ -177,6 +178,7 @@ function Test-AccessPathAssignedToLocal
     )
 
     $accessPathAssigned = $false
+
     foreach ($path in $AccessPath)
     {
         if ($path -match '[a-zA-Z]:\\')

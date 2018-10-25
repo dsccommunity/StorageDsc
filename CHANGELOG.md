@@ -2,6 +2,23 @@
 
 ## Unreleased
 
+## 4.2.0.0
+
+- Disk:
+  - Added `PartitionStyle` parameter - Fixes [Issue #137](https://github.com/PowerShell/StorageDsc/issues/37).
+  - Changed MOF name from `MSFT_Disk` to `MSFTDSC_Disk` to remove conflict
+    with Windows built-in CIM class - Fixes [Issue #167](https://github.com/PowerShell/StorageDsc/issues/167).
+- Opt-in to Common Tests:
+  - Common Tests - Validate Example Files To Be Published
+  - Common Tests - Validate Markdown Links
+  - Common Tests - Relative Path Length
+- Added .VSCode settings for applying DSC PSSA rules - fixes [Issue #168](https://github.com/PowerShell/StorageDsc/issues/168).
+- Disk:
+  - Added 'defragsvc' service conflict known issue to README.MD - fixes
+    [Issue #172](https://github.com/PowerShell/StorageDsc/issues/172).
+- Corrected style violations in StorageDsc.Common module - fixes [Issue #153](https://github.com/PowerShell/StorageDsc/issues/153).
+- Corrected style violations in StorageDsc.ResourceHelper module.
+
 ## 4.1.0.0
 
 - Enabled PSSA rule violations to fail build - Fixes [Issue #149](https://github.com/PowerShell/StorageDsc/issues/149).

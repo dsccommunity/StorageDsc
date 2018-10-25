@@ -1,5 +1,5 @@
 $script:DSCModuleName = 'StorageDsc'
-$script:DSCResourceName = 'MSFT_Disk'
+$script:DSCResourceName = 'MSFTDSC_Disk'
 
 Import-Module -Name (Join-Path -Path (Join-Path -Path (Split-Path $PSScriptRoot -Parent) -ChildPath 'TestHelpers') -ChildPath 'CommonTestHelper.psm1') -Global
 
@@ -27,7 +27,7 @@ try
 
     Describe "$($script:DSCResourceName)_Integration" {
         #region Integration Tests for DiskNumber
-        Context 'Partition and format newly provisioned disk using Disk Number with two volumes and assign Drive Letters' {
+        Context 'When partitioning and formatting a newly provisioned disk using Disk Number with two volumes and assigning Drive Letters' {
             BeforeAll {
                 # Create a VHD and attach it to the computer
                 $VHDPath = Join-Path -Path $TestDrive `
@@ -45,19 +45,20 @@ try
                 $driveLetterB = [char](([int][char]$lastDrive) + 2)
             }
 
-            Context "Create first volume on Disk Number $($disk.Number)" {
+            Context "When creating the first volume on Disk Number $($disk.Number)" {
                 It 'Should compile and apply the MOF without throwing' {
                     {
                         # This is to pass to the Config
                         $configData = @{
                             AllNodes = @(
                                 @{
-                                    NodeName    = 'localhost'
-                                    DriveLetter = $driveLetterA
-                                    DiskId      = $disk.Number
-                                    DiskIdType  = 'Number'
-                                    FSLabel     = $FSLabelA
-                                    Size        = 100MB
+                                    NodeName       = 'localhost'
+                                    DriveLetter    = $driveLetterA
+                                    DiskId         = $disk.Number
+                                    DiskIdType     = 'Number'
+                                    PartitionStyle = 'GPT'
+                                    FSLabel        = $FSLabelA
+                                    Size           = 100MB
                                 }
                             )
                         }
@@ -77,32 +78,34 @@ try
                 }
 
                 It 'Should be able to call Get-DscConfiguration without throwing' {
-                    { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
+                    { $script:currentConfiguration = Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
                 }
 
                 It 'Should have set the resource and all the parameters should match' {
-                    $current = Get-DscConfiguration | Where-Object {
+                    $current = $script:currentConfiguration | Where-Object -FilterScript {
                         $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
                     }
-                    $current.DiskId           | Should -Be $disk.Number
-                    $current.DriveLetter      | Should -Be $driveLetterA
-                    $current.FSLabel          | Should -Be $FSLabelA
-                    $current.Size             | Should -Be 100MB
+                    $current.DiskId         | Should -Be $disk.Number
+                    $current.DriveLetter    | Should -Be $driveLetterA
+                    $current.PartitionStyle | Should -Be 'GPT'
+                    $current.FSLabel        | Should -Be $FSLabelA
+                    $current.Size           | Should -Be 100MB
                 }
             }
 
-            Context "Create second volume on Disk Number $($disk.Number)" {
+            Context "When creating the second volume on Disk Number $($disk.Number)" {
                 It 'Should compile and apply the MOF without throwing' {
                     {
                         # This is to pass to the Config
                         $configData = @{
                             AllNodes = @(
                                 @{
-                                    NodeName    = 'localhost'
-                                    DriveLetter = $driveLetterB
-                                    DiskId      = $disk.Number
-                                    DiskIdType  = 'Number'
-                                    FSLabel     = $FSLabelB
+                                    NodeName       = 'localhost'
+                                    DriveLetter    = $driveLetterB
+                                    DiskId         = $disk.Number
+                                    DiskIdType     = 'Number'
+                                    PartitionStyle = 'GPT'
+                                    FSLabel        = $FSLabelB
                                 }
                             )
                         }
@@ -122,17 +125,18 @@ try
                 }
 
                 It 'Should be able to call Get-DscConfiguration without throwing' {
-                    { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
+                    { $script:currentConfiguration = Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
                 }
 
                 It 'Should have set the resource and all the parameters should match' {
-                    $current = Get-DscConfiguration | Where-Object {
+                    $current = $script:currentConfiguration | Where-Object -FilterScript {
                         $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
                     }
-                    $current.DiskId           | Should -Be $disk.Number
-                    $current.DriveLetter      | Should -Be $driveLetterB
-                    $current.FSLabel          | Should -Be $FSLabelB
-                    $current.Size             | Should -Be 935198720
+                    $current.DiskId         | Should -Be $disk.Number
+                    $current.DriveLetter    | Should -Be $driveLetterB
+                    $current.FSLabel        | Should -Be $FSLabelB
+                    $current.PartitionStyle | Should -Be 'GPT'
+                    $current.Size           | Should -Be 935198720
                 }
             }
 
@@ -161,7 +165,7 @@ try
             }
         }
 
-        Context 'Partition and format newly provisioned disk using Disk Number with one volume and assign Drive Letters then resize' {
+        Context 'When partitioniong and formatting a newly provisioned disk using Disk Number with one volume and assigning Drive Letters then resizing' {
             BeforeAll {
                 # Create a VHD and attach it to the computer
                 $VHDPath = Join-Path -Path $TestDrive `
@@ -177,19 +181,20 @@ try
                 $driveLetterA = [char](([int][char]$lastDrive) + 1)
             }
 
-            Context "Create volume on Disk Number $($disk.Number)" {
+            Context "When creating a volume on Disk Number $($disk.Number)" {
                 It 'Should compile and apply the MOF without throwing' {
                     {
                         # This is to pass to the Config
                         $configData = @{
                             AllNodes = @(
                                 @{
-                                    NodeName    = 'localhost'
-                                    DriveLetter = $driveLetterA
-                                    DiskId      = $disk.Number
-                                    DiskIdType  = 'Number'
-                                    FSLabel     = $FSLabelA
-                                    Size        = 50MB
+                                    NodeName       = 'localhost'
+                                    DriveLetter    = $driveLetterA
+                                    DiskId         = $disk.Number
+                                    DiskIdType     = 'Number'
+                                    PartitionStyle = 'GPT'
+                                    FSLabel        = $FSLabelA
+                                    Size           = 50MB
                                 }
                             )
                         }
@@ -209,34 +214,36 @@ try
                 }
 
                 It 'Should be able to call Get-DscConfiguration without throwing' {
-                    { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
+                    { $script:currentConfiguration = Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
                 }
 
                 It 'Should have set the resource and all the parameters should match' {
-                    $current = Get-DscConfiguration | Where-Object {
+                    $current = $script:currentConfiguration | Where-Object -FilterScript {
                         $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
                     }
-                    $current.DiskId           | Should -Be $disk.Number
-                    $current.DriveLetter      | Should -Be $driveLetterA
-                    $current.FSLabel          | Should -Be $FSLabelA
-                    $current.FSFormat         | Should -Be 'NTFS'
-                    $current.Size             | Should -Be 50MB
+                    $current.DiskId         | Should -Be $disk.Number
+                    $current.DriveLetter    | Should -Be $driveLetterA
+                    $current.PartitionStyle | Should -Be 'GPT'
+                    $current.FSLabel        | Should -Be $FSLabelA
+                    $current.FSFormat       | Should -Be 'NTFS'
+                    $current.Size           | Should -Be 50MB
                 }
             }
 
-            Context "Resize partition on Disk Number $($disk.Number) with AllowDestructive" {
+            Context "When resizing a partition on Disk Number $($disk.Number) to use all free space with AllowDestructive" {
                 It 'Should compile and apply the MOF without throwing' {
                     {
                         # This is to pass to the Config
                         $configData = @{
                             AllNodes = @(
                                 @{
-                                    NodeName    = 'localhost'
-                                    DriveLetter = $driveLetterA
-                                    DiskId      = $disk.Number
-                                    DiskIdType  = 'Number'
-                                    FSLabel     = $FSLabelA
-                                    FSFormat    = 'NTFS'
+                                    NodeName       = 'localhost'
+                                    DriveLetter    = $driveLetterA
+                                    DiskId         = $disk.Number
+                                    DiskIdType     = 'Number'
+                                    PartitionStyle = 'GPT'
+                                    FSLabel        = $FSLabelA
+                                    FSFormat       = 'NTFS'
                                 }
                             )
                         }
@@ -256,18 +263,155 @@ try
                 }
 
                 It 'Should be able to call Get-DscConfiguration without throwing' {
-                    { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
+                    { $script:currentConfiguration = Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
                 }
 
                 It 'Should have set the resource and all the parameters should match' {
-                    $current = Get-DscConfiguration | Where-Object {
+                    $current = $script:currentConfiguration | Where-Object -FilterScript {
                         $_.ConfigurationName -eq "$($script:DSCResourceName)_ConfigAllowDestructive"
                     }
-                    $current.DiskId           | Should -Be $disk.Number
-                    $current.DriveLetter      | Should -Be $driveLetterA
-                    $current.FSLabel          | Should -Be $FSLabelA
-                    $current.FSFormat         | Should -Be 'NTFS'
-                    $current.Size             | Should -Be 1040104960
+                    $current.DiskId         | Should -Be $disk.Number
+                    $current.DriveLetter    | Should -Be $driveLetterA
+                    $current.PartitionStyle | Should -Be 'GPT'
+                    $current.FSLabel        | Should -Be $FSLabelA
+                    $current.FSFormat       | Should -Be 'NTFS'
+                    $current.Size           | Should -Be 1040104960
+                }
+            }
+
+            # A system partition will have been added to the disk as well as the test partition
+            It 'Should have 2 partitions on disk' {
+                ($disk | Get-Partition).Count | Should -Be 2
+            }
+
+            <#
+                Get a list of all drives mounted - this works better on Windows Server 2012 R2 than
+                trying to get the drive mounted by name.
+            #>
+            $drives = Get-PSDrive
+
+            It "Should have attached drive $driveLetterA" {
+                $drives | Where-Object -Property Name -eq $driveLetterA | Should -Not -BeNullOrEmpty
+            }
+
+            AfterAll {
+                Dismount-DiskImage -ImagePath $VHDPath -StorageType VHD
+                Remove-Item -Path $VHDPath -Force
+            }
+        }
+
+        Context 'When partitioning and formatting a newly provisioned disk using Disk Number with one volume using MBR then convert to GPT' {
+            BeforeAll {
+                # Create a VHD and attach it to the computer
+                $VHDPath = Join-Path -Path $TestDrive `
+                    -ChildPath 'TestDisk.vhd'
+                $null = New-VDisk -Path $VHDPath -SizeInMB 1024
+                $null = Mount-DiskImage -ImagePath $VHDPath -StorageType VHD -NoDriveLetter
+                $diskImage = Get-DiskImage -ImagePath $VHDPath
+                $disk = Get-Disk -Number $diskImage.Number
+                $FSLabelA = 'TestDiskA'
+
+                # Get a spare drive letters
+                $lastDrive = ((Get-Volume).DriveLetter | Sort-Object | Select-Object -Last 1)
+                $driveLetterA = [char](([int][char]$lastDrive) + 1)
+            }
+
+            Context "When creating a volume on Disk Number $($disk.Number)" {
+                It 'Should compile and apply the MOF without throwing' {
+                    {
+                        # This is to pass to the Config
+                        $configData = @{
+                            AllNodes = @(
+                                @{
+                                    NodeName       = 'localhost'
+                                    DriveLetter    = $driveLetterA
+                                    DiskId         = $disk.Number
+                                    DiskIdType     = 'Number'
+                                    PartitionStyle = 'MBR'
+                                    FSLabel        = $FSLabelA
+                                    Size           = 50MB
+                                }
+                            )
+                        }
+
+                        & "$($script:DSCResourceName)_Config" `
+                            -OutputPath $TestDrive `
+                            -ConfigurationData $configData
+
+                        Start-DscConfiguration `
+                            -Path $TestDrive `
+                            -ComputerName localhost `
+                            -Wait `
+                            -Verbose `
+                            -Force `
+                            -ErrorAction Stop
+                    } | Should -Not -Throw
+                }
+
+                It 'Should be able to call Get-DscConfiguration without throwing' {
+                    { $script:currentConfiguration = Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
+                }
+
+                It 'Should have set the resource and all the parameters should match' {
+                    $current = $script:currentConfiguration | Where-Object -FilterScript {
+                        $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
+                    }
+                    $current.DiskId         | Should -Be $disk.Number
+                    $current.DriveLetter    | Should -Be $driveLetterA
+                    $current.PartitionStyle | Should -Be 'MBR'
+                    $current.FSLabel        | Should -Be $FSLabelA
+                    $current.FSFormat       | Should -Be 'NTFS'
+                    $current.Size           | Should -Be 50MB
+                }
+            }
+
+            Context "When clearing Disk Number $($disk.Number) and changing the partition style to GPT and adding a 50MB partition" {
+                It 'Should compile and apply the MOF without throwing' {
+                    {
+                        # This is to pass to the Config
+                        $configData = @{
+                            AllNodes = @(
+                                @{
+                                    NodeName       = 'localhost'
+                                    DriveLetter    = $driveLetterA
+                                    DiskId         = $disk.Number
+                                    DiskIdType     = 'Number'
+                                    PartitionStyle = 'GPT'
+                                    FSLabel        = $FSLabelA
+                                    FSFormat       = 'NTFS'
+                                    Size           = 50MB
+                                }
+                            )
+                        }
+
+                        & "$($script:DSCResourceName)_ConfigClearDisk" `
+                            -OutputPath $TestDrive `
+                            -ConfigurationData $configData
+
+                        Start-DscConfiguration `
+                            -Path $TestDrive `
+                            -ComputerName localhost `
+                            -Wait `
+                            -Verbose `
+                            -Force `
+                            -ErrorAction Stop
+                    } | Should -Not -Throw
+                }
+
+                It 'Should be able to call Get-DscConfiguration without throwing' {
+                    { $script:currentConfiguration = Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
+                }
+
+                It 'Should have set the resource and all the parameters should match' {
+                    $current = $script:currentConfiguration | Where-Object -FilterScript {
+                        $_.ConfigurationName -eq "$($script:DSCResourceName)_ConfigClearDisk"
+                    }
+                    $current.DiskId         | Should -Be $disk.Number
+                    $current.DriveLetter    | Should -Be $driveLetterA
+                    $current.FSLabel        | Should -Be $FSLabelA
+                    $current.PartitionStyle | Should -Be 'GPT'
+                    $current.FSFormat       | Should -Be 'NTFS'
+                    $current.Size           | Should -Be 52428800
                 }
             }
 
@@ -294,7 +438,7 @@ try
         #endregion
 
         #region Integration Tests for Disk Unique Id
-        Context 'Partition and format newly provisioned disk using Unique Id with two volumes and assign Drive Letters' {
+        Context 'When partitioning and formatting a newly provisioned disk using Unique Id with two volumes and assigning Drive Letters' {
             BeforeAll {
                 # Create a VHD and attach it to the computer
                 $VHDPath = Join-Path -Path $TestDrive `
@@ -312,19 +456,20 @@ try
                 $driveLetterB = [char](([int][char]$lastDrive) + 2)
             }
 
-            Context "Create first volume on Disk Unique Id $($disk.UniqueId)" {
+            Context "When creating the first volume on Disk Unique Id $($disk.UniqueId)" {
                 It 'Should compile and apply the MOF without throwing' {
                     {
                         # This is to pass to the Config
                         $configData = @{
                             AllNodes = @(
                                 @{
-                                    NodeName    = 'localhost'
-                                    DriveLetter = $driveLetterA
-                                    DiskId      = $disk.UniqueId
-                                    DiskIdType  = 'UniqueId'
-                                    FSLabel     = $FSLabelA
-                                    Size        = 100MB
+                                    NodeName       = 'localhost'
+                                    DriveLetter    = $driveLetterA
+                                    DiskId         = $disk.UniqueId
+                                    DiskIdType     = 'UniqueId'
+                                    PartitionStyle = 'GPT'
+                                    FSLabel        = $FSLabelA
+                                    Size           = 100MB
                                 }
                             )
                         }
@@ -344,34 +489,36 @@ try
                 }
 
                 It 'Should be able to call Get-DscConfiguration without throwing' {
-                    { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
+                    { $script:currentConfiguration = Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
                 }
 
                 It 'Should have set the resource and all the parameters should match' {
-                    $current = Get-DscConfiguration | Where-Object {
+                    $current = $script:currentConfiguration | Where-Object -FilterScript {
                         $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
                     }
-                    $current.DiskId           | Should -Be $disk.UniqueId
-                    $current.DriveLetter      | Should -Be $driveLetterA
-                    $current.FSLabel          | Should -Be $FSLabelA
-                    $current.Size             | Should -Be 100MB
+                    $current.DiskId         | Should -Be $disk.UniqueId
+                    $current.DriveLetter    | Should -Be $driveLetterA
+                    $current.PartitionStyle | Should -Be 'GPT'
+                    $current.FSLabel        | Should -Be $FSLabelA
+                    $current.Size           | Should -Be 100MB
                 }
             }
 
-            Context "Resize first volume on Disk Unique Id $($disk.UniqueId)" {
+            Context "When resizing the first volume on Disk Unique Id $($disk.UniqueId) and allowing the disk to be cleared" {
                 It 'should compile and apply the MOF without throwing' {
                     {
                         # This is to pass to the Config
                         $configData = @{
                             AllNodes = @(
                                 @{
-                                    NodeName    = 'localhost'
-                                    DriveLetter = $driveLetterA
-                                    DiskId      = $disk.UniqueId
-                                    DiskIdType  = 'UniqueId'
-                                    FSLabel     = $FSLabelA
-                                    Size        = 900MB
-                                    FSFormat    = 'ReFS'
+                                    NodeName       = 'localhost'
+                                    DriveLetter    = $driveLetterA
+                                    DiskId         = $disk.UniqueId
+                                    DiskIdType     = 'UniqueId'
+                                    PartitionStyle = 'GPT'
+                                    FSLabel        = $FSLabelA
+                                    Size           = 900MB
+                                    FSFormat       = 'ReFS'
                                 }
                             )
                         }
@@ -391,33 +538,35 @@ try
                 }
 
                 It 'should be able to call Get-DscConfiguration without throwing' {
-                    { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
+                    { $script:currentConfiguration = Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
                 }
 
                 It 'should have set the resource and all the parameters should match' {
-                    $current = Get-DscConfiguration | Where-Object {
+                    $current = $script:currentConfiguration | Where-Object -FilterScript {
                         $_.ConfigurationName -eq "$($script:DSCResourceName)_ConfigClearDisk"
                     }
-                    $current.DiskId           | Should -Be $disk.UniqueId
-                    $current.DriveLetter      | Should -Be $driveLetterA
-                    $current.FSLabel          | Should -Be $FSLabelA
-                    $current.Size             | Should -Be 900MB
-                    $current.FSFormat         | Should -Be 'ReFS'
+                    $current.DiskId         | Should -Be $disk.UniqueId
+                    $current.DriveLetter    | Should -Be $driveLetterA
+                    $current.PartitionStyle | Should -Be 'GPT'
+                    $current.FSLabel        | Should -Be $FSLabelA
+                    $current.Size           | Should -Be 900MB
+                    $current.FSFormat       | Should -Be 'ReFS'
                 }
             }
 
-            Context "Create second volume on Disk Unique Id $($disk.UniqueId)" {
+            Context "When creating second volume on Disk Unique Id $($disk.UniqueId)" {
                 It 'Should compile and apply the MOF without throwing' {
                     {
                         # This is to pass to the Config
                         $configData = @{
                             AllNodes = @(
                                 @{
-                                    NodeName    = 'localhost'
-                                    DriveLetter = $driveLetterB
-                                    DiskId      = $disk.UniqueId
-                                    DiskIdType  = 'UniqueId'
-                                    FSLabel     = $FSLabelB
+                                    NodeName       = 'localhost'
+                                    DriveLetter    = $driveLetterB
+                                    DiskId         = $disk.UniqueId
+                                    DiskIdType     = 'UniqueId'
+                                    PartitionStyle = 'GPT'
+                                    FSLabel        = $FSLabelB
                                 }
                             )
                         }
@@ -437,17 +586,18 @@ try
                 }
 
                 It 'Should be able to call Get-DscConfiguration without throwing' {
-                    { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
+                    { $script:currentConfiguration = Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
                 }
 
                 It 'Should have set the resource and all the parameters should match' {
-                    $current = Get-DscConfiguration | Where-Object {
+                    $current = $script:currentConfiguration | Where-Object -FilterScript {
                         $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
                     }
-                    $current.DiskId           | Should -Be $disk.UniqueId
-                    $current.DriveLetter      | Should -Be $driveLetterB
-                    $current.FSLabel          | Should -Be $FSLabelB
-                    $current.Size             | Should -Be 96337920
+                    $current.DiskId         | Should -Be $disk.UniqueId
+                    $current.PartitionStyle | Should -Be 'GPT'
+                    $current.DriveLetter    | Should -Be $driveLetterB
+                    $current.FSLabel        | Should -Be $FSLabelB
+                    $current.Size           | Should -Be 96337920
                 }
             }
 
@@ -472,7 +622,7 @@ try
         #endregion
 
         #region Integration Tests for Disk Guid
-        Context 'Partition and format newly provisioned disk using Guid with two volumes and assign Drive Letters' {
+        Context 'When partitioning and formating a newly provisioned disk using Guid with two volumes and assign Drive Letters' {
             BeforeAll {
                 # Create a VHD and attach it to the computer
                 $VHDPath = Join-Path -Path $TestDrive `
@@ -490,19 +640,20 @@ try
                 $driveLetterB = [char](([int][char]$lastDrive) + 2)
             }
 
-            Context "Create first volume on Disk Guid $($disk.Guid)" {
+            Context "When creating the first volume on Disk Guid $($disk.Guid)" {
                 It 'Should compile and apply the MOF without throwing' {
                     {
                         # This is to pass to the Config
                         $configData = @{
                             AllNodes = @(
                                 @{
-                                    NodeName    = 'localhost'
-                                    DriveLetter = $driveLetterA
-                                    DiskId      = $disk.Guid
-                                    DiskIdType  = 'Guid'
-                                    FSLabel     = $FSLabelA
-                                    Size        = 100MB
+                                    NodeName       = 'localhost'
+                                    DriveLetter    = $driveLetterA
+                                    DiskId         = $disk.Guid
+                                    DiskIdType     = 'Guid'
+                                    PartitionStyle = 'GPT'
+                                    FSLabel        = $FSLabelA
+                                    Size           = 100MB
                                 }
                             )
                         }
@@ -522,32 +673,34 @@ try
                 }
 
                 It 'Should be able to call Get-DscConfiguration without throwing' {
-                    { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
+                    { $script:currentConfiguration = Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
                 }
 
                 It 'Should have set the resource and all the parameters should match' {
-                    $current = Get-DscConfiguration | Where-Object {
+                    $current = $script:currentConfiguration | Where-Object -FilterScript {
                         $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
                     }
-                    $current.DiskId           | Should -Be $disk.Guid
-                    $current.DriveLetter      | Should -Be $driveLetterA
-                    $current.FSLabel          | Should -Be $FSLabelA
-                    $current.Size             | Should -Be 100MB
+                    $current.DiskId         | Should -Be $disk.Guid
+                    $current.PartitionStyle | Should -Be 'GPT'
+                    $current.DriveLetter    | Should -Be $driveLetterA
+                    $current.FSLabel        | Should -Be $FSLabelA
+                    $current.Size           | Should -Be 100MB
                 }
             }
 
-            Context "Create first volume on Disk Guid $($disk.Guid)" {
+            Context "When creating the first volume on Disk Guid $($disk.Guid)" {
                 It 'Should compile and apply the MOF without throwing' {
                     {
                         # This is to pass to the Config
                         $configData = @{
                             AllNodes = @(
                                 @{
-                                    NodeName    = 'localhost'
-                                    DriveLetter = $driveLetterB
-                                    DiskId      = $disk.Guid
-                                    DiskIdType  = 'Guid'
-                                    FSLabel     = $FSLabelB
+                                    NodeName       = 'localhost'
+                                    DriveLetter    = $driveLetterB
+                                    DiskId         = $disk.Guid
+                                    DiskIdType     = 'Guid'
+                                    PartitionStyle = 'GPT'
+                                    FSLabel        = $FSLabelB
                                 }
                             )
                         }
@@ -567,17 +720,18 @@ try
                 }
 
                 It 'Should be able to call Get-DscConfiguration without throwing' {
-                    { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
+                    { $script:currentConfiguration = Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
                 }
 
                 It 'Should have set the resource and all the parameters should match' {
-                    $current = Get-DscConfiguration | Where-Object {
+                    $current = $script:currentConfiguration | Where-Object -FilterScript {
                         $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
                     }
-                    $current.DiskId           | Should -Be $disk.Guid
-                    $current.DriveLetter      | Should -Be $driveLetterB
-                    $current.FSLabel          | Should -Be $FSLabelB
-                    $current.Size             | Should -Be 935198720
+                    $current.DiskId         | Should -Be $disk.Guid
+                    $current.PartitionStyle | Should -Be 'GPT'
+                    $current.DriveLetter    | Should -Be $driveLetterB
+                    $current.FSLabel        | Should -Be $FSLabelB
+                    $current.Size           | Should -Be 935198720
                 }
             }
 
@@ -602,7 +756,7 @@ try
         #endregion
 
         #region Integration Tests for DiskNumber to test if a single disk with a volume using the whole disk can be remounted
-        Context 'Partition a disk using Disk Number with a single volume using the whole disk, dismount the volume then reprovision it' {
+        Context 'When partitioning a disk using Disk Number with a single volume using the whole disk, dismounting the volume then reprovisioning it' {
             BeforeAll {
                 # Create a VHD and attach it to the computer
                 $VHDPath = Join-Path -Path $TestDrive `
@@ -618,18 +772,19 @@ try
                 $driveLetterA = [char](([int][char]$lastDrive) + 1)
             }
 
-            Context "Create first volume on Disk Number $($disk.Number)" {
+            Context "When creating the first volume on Disk Number $($disk.Number)" {
                 It 'Should compile and apply the MOF without throwing' {
                     {
                         # This is to pass to the Config
                         $configData = @{
                             AllNodes = @(
                                 @{
-                                    NodeName    = 'localhost'
-                                    DriveLetter = $driveLetterA
-                                    DiskId      = $disk.Number
-                                    DiskIdType  = 'Number'
-                                    FSLabel     = $FSLabelA
+                                    NodeName       = 'localhost'
+                                    DriveLetter    = $driveLetterA
+                                    DiskId         = $disk.Number
+                                    DiskIdType     = 'Number'
+                                    PartitionStyle = 'GPT'
+                                    FSLabel        = $FSLabelA
                                 }
                             )
                         }
@@ -649,16 +804,17 @@ try
                 }
 
                 It 'Should be able to call Get-DscConfiguration without throwing' {
-                    { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
+                    { $script:currentConfiguration = Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
                 }
 
                 It 'Should have set the resource and all the parameters should match' {
-                    $current = Get-DscConfiguration | Where-Object {
+                    $current = $script:currentConfiguration | Where-Object -FilterScript {
                         $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
                     }
-                    $current.DiskId           | Should -Be $disk.Number
-                    $current.DriveLetter      | Should -Be $driveLetterA
-                    $current.FSLabel          | Should -Be $FSLabelA
+                    $current.DiskId         | Should -Be $disk.Number
+                    $current.PartitionStyle | Should -Be 'GPT'
+                    $current.DriveLetter    | Should -Be $driveLetterA
+                    $current.FSLabel        | Should -Be $FSLabelA
                 }
             }
 
@@ -668,18 +824,19 @@ try
                 -PartitionNumber 2 `
                 -AccessPath "$($driveLetterA):"
 
-            Context "Attach first volume on Disk Number $($disk.Number)" {
+            Context "When attaching the first volume on Disk Number $($disk.Number)" {
                 It 'Should compile and apply the MOF without throwing' {
                     {
                         # This is to pass to the Config
                         $configData = @{
                             AllNodes = @(
                                 @{
-                                    NodeName    = 'localhost'
-                                    DriveLetter = $driveLetterA
-                                    DiskId      = $disk.Number
-                                    DiskIdType  = 'Number'
-                                    FSLabel     = $FSLabelA
+                                    NodeName       = 'localhost'
+                                    DriveLetter    = $driveLetterA
+                                    DiskId         = $disk.Number
+                                    DiskIdType     = 'Number'
+                                    PartitionStyle = 'GPT'
+                                    FSLabel        = $FSLabelA
                                 }
                             )
                         }
@@ -699,16 +856,17 @@ try
                 }
 
                 It 'Should be able to call Get-DscConfiguration without throwing' {
-                    { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
+                    { $script:currentConfiguration = Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
                 }
 
                 It 'Should have set the resource and all the parameters should match' {
-                    $current = Get-DscConfiguration | Where-Object {
+                    $current = $script:currentConfiguration | Where-Object -FilterScript {
                         $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
                     }
-                    $current.DiskId           | Should -Be $disk.Number
-                    $current.DriveLetter      | Should -Be $driveLetterA
-                    $current.FSLabel          | Should -Be $FSLabelA
+                    $current.DiskId         | Should -Be $disk.Number
+                    $current.PartitionStyle | Should -Be 'GPT'
+                    $current.DriveLetter    | Should -Be $driveLetterA
+                    $current.FSLabel        | Should -Be $FSLabelA
                 }
             }
 

@@ -1,5 +1,5 @@
 $script:DSCModuleName = 'StorageDsc'
-$script:DSCResourceName = 'MSFT_Disk'
+$script:DSCResourceName = 'MSFTDSC_Disk'
 
 Import-Module -Name (Join-Path -Path (Join-Path -Path (Split-Path $PSScriptRoot -Parent) -ChildPath 'TestHelpers') -ChildPath 'CommonTestHelper.psm1') -Global
 
@@ -32,9 +32,8 @@ try
         $script:testDiskNumber = 1
         $script:testDiskUniqueId = 'TESTDISKUNIQUEID'
         $script:testDiskGptGuid = [guid]::NewGuid()
-        $script:testDiskMbrGuid = '123456'
 
-        $script:mockedDisk0 = [pscustomobject] @{
+        $script:mockedDisk0Gpt = [pscustomobject] @{
             Number         = $script:testDiskNumber
             UniqueId       = $script:testDiskUniqueId
             Guid           = $script:testDiskGptGuid
@@ -46,37 +45,10 @@ try
         $script:mockedDisk0Mbr = [pscustomobject] @{
             Number         = $script:testDiskNumber
             UniqueId       = $script:testDiskUniqueId
-            Guid           = $script:testDiskMbrGuid
+            Guid           = ''
             IsOffline      = $false
             IsReadOnly     = $false
             PartitionStyle = 'MBR'
-        }
-
-        $script:mockedDisk0Offline = [pscustomobject] @{
-            Number         = $script:testDiskNumber
-            UniqueId       = $script:testDiskUniqueId
-            Guid           = $script:testDiskGptGuid
-            IsOffline      = $true
-            IsReadOnly     = $false
-            PartitionStyle = 'GPT'
-        }
-
-        $script:mockedDisk0OfflineRaw = [pscustomobject] @{
-            Number         = $script:testDiskNumber
-            UniqueId       = $script:testDiskUniqueId
-            Guid           = ''
-            IsOffline      = $true
-            IsReadOnly     = $false
-            PartitionStyle = 'Raw'
-        }
-
-        $script:mockedDisk0Readonly = [pscustomobject] @{
-            Number         = $script:testDiskNumber
-            UniqueId       = $script:testDiskUniqueId
-            Guid           = $script:testDiskGptGuid
-            IsOffline      = $false
-            IsReadOnly     = $true
-            PartitionStyle = 'GPT'
         }
 
         $script:mockedDisk0Raw = [pscustomobject] @{
@@ -85,7 +57,34 @@ try
             Guid           = ''
             IsOffline      = $false
             IsReadOnly     = $false
-            PartitionStyle = 'Raw'
+            PartitionStyle = 'RAW'
+        }
+
+        $script:mockedDisk0GptOffline = [pscustomobject] @{
+            Number         = $script:testDiskNumber
+            UniqueId       = $script:testDiskUniqueId
+            Guid           = $script:testDiskGptGuid
+            IsOffline      = $true
+            IsReadOnly     = $false
+            PartitionStyle = 'GPT'
+        }
+
+        $script:mockedDisk0RawOffline = [pscustomobject] @{
+            Number         = $script:testDiskNumber
+            UniqueId       = $script:testDiskUniqueId
+            Guid           = ''
+            IsOffline      = $true
+            IsReadOnly     = $false
+            PartitionStyle = 'RAW'
+        }
+
+        $script:mockedDisk0GptReadonly = [pscustomobject] @{
+            Number         = $script:testDiskNumber
+            UniqueId       = $script:testDiskUniqueId
+            Guid           = $script:testDiskGptGuid
+            IsOffline      = $false
+            IsReadOnly     = $true
+            PartitionStyle = 'GPT'
         }
 
         $script:mockedCim = [pscustomobject] @{BlockSize = 4096}
@@ -139,7 +138,7 @@ try
         }
 
         $script:parameterFilter_MockedDisk0Number = {
-            $DiskId -eq $script:mockedDisk0.Number -and $DiskIdType -eq 'Number'
+            $DiskId -eq $script:mockedDisk0Gpt.Number -and $DiskIdType -eq 'Number'
         }
         #endregion
 
@@ -308,8 +307,8 @@ try
         #endregion
 
         #region Function Get-TargetResource
-        Describe 'MSFT_Disk\Get-TargetResource' {
-            Context 'Online GPT disk with a partition/volume and correct Drive Letter assigned using Disk Number' {
+        Describe 'MSFTDSC_Disk\Get-TargetResource' {
+            Context 'When online GPT disk with a partition/volume and correct Drive Letter assigned using Disk Number' {
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Get-CimInstance `
@@ -319,7 +318,7 @@ try
                 Mock `
                     -CommandName Get-DiskByIdentifier `
                     -ParameterFilter $script:parameterFilter_MockedDisk0Number `
-                    -MockWith { $script:mockedDisk0 } `
+                    -MockWith { $script:mockedDisk0Gpt } `
                     -Verifiable
 
                 Mock `
@@ -333,12 +332,16 @@ try
                     -Verifiable
 
                 $resource = Get-TargetResource `
-                    -DiskId $script:mockedDisk0.Number `
+                    -DiskId $script:mockedDisk0Gpt.Number `
                     -DriveLetter $script:testDriveLetter `
                     -Verbose
 
-                It "Should return DiskId $($script:mockedDisk0.Number)" {
-                    $resource.DiskId | Should -Be $script:mockedDisk0.Number
+                It "Should return DiskId $($script:mockedDisk0Gpt.Number)" {
+                    $resource.DiskId | Should -Be $script:mockedDisk0Gpt.Number
+                }
+
+                It "Should return PartitionStyle $($script:mockedDisk0Gpt.PartitionStyle)" {
+                    $resource.PartitionStyle | Should -Be $script:mockedDisk0Gpt.PartitionStyle
                 }
 
                 It "Should return DriveLetter $($script:testDriveLetter)" {
@@ -371,7 +374,7 @@ try
                 }
             }
 
-            Context 'Online GPT disk with a partition/volume and correct Drive Letter assigned using Disk Unique Id' {
+            Context 'When online GPT disk with a partition/volume and correct Drive Letter assigned using Disk Unique Id' {
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Get-CimInstance `
@@ -380,8 +383,8 @@ try
 
                 Mock `
                     -CommandName Get-DiskByIdentifier `
-                    -ParameterFilter { $DiskId -eq $script:mockedDisk0.UniqueId -and $DiskIdType -eq 'UniqueId' } `
-                    -MockWith { $script:mockedDisk0 } `
+                    -ParameterFilter { $DiskId -eq $script:mockedDisk0Gpt.UniqueId -and $DiskIdType -eq 'UniqueId' } `
+                    -MockWith { $script:mockedDisk0Gpt } `
                     -Verifiable
 
                 Mock `
@@ -395,13 +398,17 @@ try
                     -Verifiable
 
                 $resource = Get-TargetResource `
-                    -DiskId $script:mockedDisk0.UniqueId `
+                    -DiskId $script:mockedDisk0Gpt.UniqueId `
                     -DiskIdType 'UniqueId' `
                     -DriveLetter $script:testDriveLetter `
                     -Verbose
 
-                It "Should return DiskId $($script:mockedDisk0.UniqueId)" {
-                    $resource.DiskId | Should -Be $script:mockedDisk0.UniqueId
+                It "Should return DiskId $($script:mockedDisk0Gpt.UniqueId)" {
+                    $resource.DiskId | Should -Be $script:mockedDisk0Gpt.UniqueId
+                }
+
+                It "Should return PartitionStyle $($script:mockedDisk0Gpt.PartitionStyle)" {
+                    $resource.PartitionStyle | Should -Be $script:mockedDisk0Gpt.PartitionStyle
                 }
 
                 It "Should return DriveLetter $($script:testDriveLetter)" {
@@ -428,13 +435,13 @@ try
                     Assert-VerifiableMock
                     Assert-MockCalled -CommandName Get-CimInstance -Exactly 1
                     Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly 1 `
-                        -ParameterFilter { $DiskId -eq $script:mockedDisk0.UniqueId -and $DiskIdType -eq 'UniqueId' }
+                        -ParameterFilter { $DiskId -eq $script:mockedDisk0Gpt.UniqueId -and $DiskIdType -eq 'UniqueId' }
                     Assert-MockCalled -CommandName Get-Partition -Exactly 1
                     Assert-MockCalled -CommandName Get-Volume -Exactly 1
                 }
             }
 
-            Context 'Online GPT disk with a partition/volume and correct Drive Letter assigned using Disk Guid' {
+            Context 'When online GPT disk with a partition/volume and correct Drive Letter assigned using Disk Guid' {
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Get-CimInstance `
@@ -443,8 +450,8 @@ try
 
                 Mock `
                     -CommandName Get-DiskByIdentifier `
-                    -ParameterFilter { $DiskId -eq $script:mockedDisk0.Guid -and $DiskIdType -eq 'Guid' } `
-                    -MockWith { $script:mockedDisk0 } `
+                    -ParameterFilter { $DiskId -eq $script:mockedDisk0Gpt.Guid -and $DiskIdType -eq 'Guid' } `
+                    -MockWith { $script:mockedDisk0Gpt } `
                     -Verifiable
 
                 Mock `
@@ -458,13 +465,17 @@ try
                     -Verifiable
 
                 $resource = Get-TargetResource `
-                    -DiskId $script:mockedDisk0.Guid `
+                    -DiskId $script:mockedDisk0Gpt.Guid `
                     -DiskIdType 'Guid' `
                     -DriveLetter $script:testDriveLetter `
                     -Verbose
 
-                It "Should return DiskId $($script:mockedDisk0.Guid)" {
-                    $resource.DiskId | Should -Be $script:mockedDisk0.Guid
+                It "Should return DiskId $($script:mockedDisk0Gpt.Guid)" {
+                    $resource.DiskId | Should -Be $script:mockedDisk0Gpt.Guid
+                }
+
+                It "Should return PartitionStyle $($script:mockedDisk0Gpt.PartitionStyle)" {
+                    $resource.PartitionStyle | Should -Be $script:mockedDisk0Gpt.PartitionStyle
                 }
 
                 It "Should return DriveLetter $($script:testDriveLetter)" {
@@ -491,13 +502,13 @@ try
                     Assert-VerifiableMock
                     Assert-MockCalled -CommandName Get-CimInstance -Exactly 1
                     Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly 1 `
-                        -ParameterFilter { $DiskId -eq $script:mockedDisk0.Guid -and $DiskIdType -eq 'Guid' }
+                        -ParameterFilter { $DiskId -eq $script:mockedDisk0Gpt.Guid -and $DiskIdType -eq 'Guid' }
                     Assert-MockCalled -CommandName Get-Partition -Exactly 1
                     Assert-MockCalled -CommandName Get-Volume -Exactly 1
                 }
             }
 
-            Context 'Online GPT disk with a partition/volume and correct Drive Letter assigned using Disk Guid' {
+            Context 'When online GPT disk with a partition/volume and correct Drive Letter assigned using Disk Guid' {
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Get-CimInstance `
@@ -506,8 +517,8 @@ try
 
                 Mock `
                     -CommandName Get-DiskByIdentifier `
-                    -ParameterFilter { $DiskId -eq $script:mockedDisk0.Guid -and $DiskIdType -eq 'Guid' } `
-                    -MockWith { $script:mockedDisk0 } `
+                    -ParameterFilter { $DiskId -eq $script:mockedDisk0Gpt.Guid -and $DiskIdType -eq 'Guid' } `
+                    -MockWith { $script:mockedDisk0Gpt } `
                     -Verifiable
 
                 Mock `
@@ -521,13 +532,17 @@ try
                     -Verifiable
 
                 $resource = Get-TargetResource `
-                    -DiskId $script:mockedDisk0.Guid `
+                    -DiskId $script:mockedDisk0Gpt.Guid `
                     -DiskIdType 'Guid' `
                     -DriveLetter $script:testDriveLetter `
                     -Verbose
 
-                It "Should return DiskId $($script:mockedDisk0.Guid)" {
-                    $resource.DiskId | Should -Be $script:mockedDisk0.Guid
+                It "Should return DiskId $($script:mockedDisk0Gpt.Guid)" {
+                    $resource.DiskId | Should -Be $script:mockedDisk0Gpt.Guid
+                }
+
+                It "Should return PartitionStyle $($script:mockedDisk0Gpt.PartitionStyle)" {
+                    $resource.PartitionStyle | Should -Be $script:mockedDisk0Gpt.PartitionStyle
                 }
 
                 It "Should return DriveLetter $($script:testDriveLetter)" {
@@ -554,13 +569,13 @@ try
                     Assert-VerifiableMock
                     Assert-MockCalled -CommandName Get-CimInstance -Exactly 1
                     Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly 1 `
-                        -ParameterFilter { $DiskId -eq $script:mockedDisk0.Guid -and $DiskIdType -eq 'Guid' }
+                        -ParameterFilter { $DiskId -eq $script:mockedDisk0Gpt.Guid -and $DiskIdType -eq 'Guid' }
                     Assert-MockCalled -CommandName Get-Partition -Exactly 1
                     Assert-MockCalled -CommandName Get-Volume -Exactly 1
                 }
             }
 
-            Context 'Online GPT disk with no partition using Disk Number' {
+            Context 'When online GPT disk with no partition using Disk Number' {
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Get-CimInstance `
@@ -569,7 +584,7 @@ try
                 Mock `
                     -CommandName Get-DiskByIdentifier `
                     -ParameterFilter $script:parameterFilter_MockedDisk0Number `
-                    -MockWith { $script:mockedDisk0 } `
+                    -MockWith { $script:mockedDisk0Gpt } `
                     -Verifiable
 
                 Mock `
@@ -581,32 +596,162 @@ try
                     -Verifiable
 
                 $resource = Get-TargetResource `
-                    -DiskId $script:mockedDisk0.Number `
+                    -DiskId $script:mockedDisk0Gpt.Number `
                     -DriveLetter $script:testDriveLetter `
                     -Verbose
 
-                It "Should return DiskId $($script:mockedDisk0.Number)" {
-                    $resource.DiskId | Should -Be $script:mockedDisk0.Number
+                It "Should return DiskId $($script:mockedDisk0Gpt.Number)" {
+                    $resource.DiskId | Should -Be $script:mockedDisk0Gpt.Number
+                }
+
+                It "Should return PartitionStyle $($script:mockedDisk0Gpt.PartitionStyle)" {
+                    $resource.PartitionStyle | Should -Be $script:mockedDisk0Gpt.PartitionStyle
                 }
 
                 It "Should return an empty drive letter" {
-                    $resource.DriveLetter | Should -Be $null
+                    $resource.DriveLetter | Should -BeNullOrEmpty
                 }
 
                 It "Should return a zero size" {
-                    $resource.Size | Should -Be $null
+                    $resource.Size | Should -BeNullOrEmpty
                 }
 
                 It "Should return no FSLabel" {
-                    $resource.FSLabel | Should -Be ''
+                    $resource.FSLabel | Should -BeNullOrEmpty
                 }
 
                 It "Should return an AllocationUnitSize of 0" {
-                    $resource.AllocationUnitSize | Should -Be $null
+                    $resource.AllocationUnitSize | Should -BeNullOrEmpty
                 }
 
                 It "Should return no FSFormat" {
-                    $resource.FSFormat | Should -Be $null
+                    $resource.FSFormat | Should -BeNullOrEmpty
+                }
+
+                It 'Should call the correct mocks' {
+                    Assert-VerifiableMock
+                    Assert-MockCalled -CommandName Get-CimInstance -Exactly 1
+                    Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly 1 `
+                        -ParameterFilter $script:parameterFilter_MockedDisk0Number
+                    Assert-MockCalled -CommandName Get-Partition -Exactly 1
+                    Assert-MockCalled -CommandName Get-Volume -Exactly 1
+                }
+            }
+
+            Context 'When online MBR disk with no partition using Disk Number' {
+                # verifiable (should be called) mocks
+                Mock `
+                    -CommandName Get-CimInstance `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-DiskByIdentifier `
+                    -ParameterFilter $script:parameterFilter_MockedDisk0Number `
+                    -MockWith { $script:mockedDisk0Mbr } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-Partition `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-Volume `
+                    -Verifiable
+
+                $resource = Get-TargetResource `
+                    -DiskId $script:mockedDisk0Mbr.Number `
+                    -DriveLetter $script:testDriveLetter `
+                    -Verbose
+
+                It "Should return DiskId $($script:mockedDisk0Mbr.Number)" {
+                    $resource.DiskId | Should -Be $script:mockedDisk0Mbr.Number
+                }
+
+                It "Should return PartitionStyle $($script:mockedDisk0Mbr.PartitionStyle)" {
+                    $resource.PartitionStyle | Should -Be $script:mockedDisk0Mbr.PartitionStyle
+                }
+
+                It "Should return an empty drive letter" {
+                    $resource.DriveLetter | Should -BeNullOrEmpty
+                }
+
+                It "Should return a zero size" {
+                    $resource.Size | Should -BeNullOrEmpty
+                }
+
+                It "Should return no FSLabel" {
+                    $resource.FSLabel | Should -BeNullOrEmpty
+                }
+
+                It "Should return an AllocationUnitSize of 0" {
+                    $resource.AllocationUnitSize | Should -BeNullOrEmpty
+                }
+
+                It "Should return no FSFormat" {
+                    $resource.FSFormat | Should -BeNullOrEmpty
+                }
+
+                It 'Should call the correct mocks' {
+                    Assert-VerifiableMock
+                    Assert-MockCalled -CommandName Get-CimInstance -Exactly 1
+                    Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly 1 `
+                        -ParameterFilter $script:parameterFilter_MockedDisk0Number
+                    Assert-MockCalled -CommandName Get-Partition -Exactly 1
+                    Assert-MockCalled -CommandName Get-Volume -Exactly 1
+                }
+            }
+
+            Context 'When online RAW disk with no partition using Disk Number' {
+                # verifiable (should be called) mocks
+                Mock `
+                    -CommandName Get-CimInstance `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-DiskByIdentifier `
+                    -ParameterFilter $script:parameterFilter_MockedDisk0Number `
+                    -MockWith { $script:mockedDisk0Raw } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-Partition `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-Volume `
+                    -Verifiable
+
+                $resource = Get-TargetResource `
+                    -DiskId $script:mockedDisk0Raw.Number `
+                    -DriveLetter $script:testDriveLetter `
+                    -Verbose
+
+                It "Should return DiskId $($script:mockedDisk0Raw.Number)" {
+                    $resource.DiskId | Should -Be $script:mockedDisk0Raw.Number
+                }
+
+                It "Should return PartitionStyle $($script:mockedDisk0Raw.PartitionStyle)" {
+                    $resource.PartitionStyle | Should -Be $script:mockedDisk0Raw.PartitionStyle
+                }
+
+                It "Should return an empty drive letter" {
+                    $resource.DriveLetter | Should -BeNullOrEmpty
+                }
+
+                It "Should return a zero size" {
+                    $resource.Size | Should -BeNullOrEmpty
+                }
+
+                It "Should return no FSLabel" {
+                    $resource.FSLabel | Should -BeNullOrEmpty
+                }
+
+                It "Should return an AllocationUnitSize of 0" {
+                    $resource.AllocationUnitSize | Should -BeNullOrEmpty
+                }
+
+                It "Should return no FSFormat" {
+                    $resource.FSFormat | Should -BeNullOrEmpty
                 }
 
                 It 'Should call the correct mocks' {
@@ -622,13 +767,13 @@ try
         #endregion
 
         #region Function Set-TargetResource
-        Describe 'MSFT_Disk\Set-TargetResource' {
-            Context 'Offline GPT disk using Disk Number' {
+        Describe 'MSFTDSC_Disk\Set-TargetResource' {
+            Context 'When offline GPT disk using Disk Number' {
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Get-DiskByIdentifier `
-                    -ParameterFilter { $DiskId -eq $script:mockedDisk0Offline.Number -and $DiskIdType -eq 'Number' } `
-                    -MockWith { $script:mockedDisk0Offline } `
+                    -ParameterFilter { $DiskId -eq $script:mockedDisk0GptOffline.Number -and $DiskIdType -eq 'Number' } `
+                    -MockWith { $script:mockedDisk0GptOffline } `
                     -Verifiable
 
                 Mock `
@@ -664,7 +809,7 @@ try
                 It 'Should not throw an exception' {
                     {
                         Set-TargetResource `
-                            -DiskId $script:mockedDisk0Offline.Number `
+                            -DiskId $script:mockedDisk0GptOffline.Number `
                             -Driveletter $script:testDriveLetter `
                             -Verbose
                     } | Should -Not -Throw
@@ -673,7 +818,7 @@ try
                 It 'Should call the correct mocks' {
                     Assert-VerifiableMock
                     Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 1 `
-                        -ParameterFilter { $DiskId -eq $script:mockedDisk0Offline.Number -and $DiskIdType -eq 'Number' }
+                        -ParameterFilter { $DiskId -eq $script:mockedDisk0GptOffline.Number -and $DiskIdType -eq 'Number' }
                     Assert-MockCalled -CommandName Set-Disk -Exactly -Times 1
                     Assert-MockCalled -CommandName Initialize-Disk -Exactly -Times 0
                     Assert-MockCalled -CommandName Get-Partition -Exactly -Times 1
@@ -685,12 +830,12 @@ try
                 }
             }
 
-            Context 'Offline GPT disk using Disk Unique Id' {
+            Context 'When offline GPT disk using Disk Unique Id' {
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Get-DiskByIdentifier `
-                    -ParameterFilter { $DiskId -eq $script:mockedDisk0Offline.UniqueId -and $DiskIdType -eq 'UniqueId' } `
-                    -MockWith { $script:mockedDisk0Offline } `
+                    -ParameterFilter { $DiskId -eq $script:mockedDisk0GptOffline.UniqueId -and $DiskIdType -eq 'UniqueId' } `
+                    -MockWith { $script:mockedDisk0GptOffline } `
                     -Verifiable
 
                 Mock `
@@ -728,7 +873,7 @@ try
                 It 'Should not throw an exception' {
                     {
                         Set-TargetResource `
-                            -DiskId $script:mockedDisk0Offline.UniqueId `
+                            -DiskId $script:mockedDisk0GptOffline.UniqueId `
                             -DiskIdType 'UniqueId' `
                             -Driveletter $script:testDriveLetter `
                             -Verbose
@@ -738,7 +883,7 @@ try
                 It 'Should call the correct mocks' {
                     Assert-VerifiableMock
                     Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 1 `
-                        -ParameterFilter { $DiskId -eq $script:mockedDisk0Offline.UniqueId -and $DiskIdType -eq 'UniqueId' }
+                        -ParameterFilter { $DiskId -eq $script:mockedDisk0GptOffline.UniqueId -and $DiskIdType -eq 'UniqueId' }
                     Assert-MockCalled -CommandName Set-Disk -Exactly -Times 1
                     Assert-MockCalled -CommandName Initialize-Disk -Exactly -Times 0
                     Assert-MockCalled -CommandName Get-Partition -Exactly -Times 1
@@ -752,12 +897,12 @@ try
                 }
             }
 
-            Context 'Offline GPT disk using Disk Guid' {
+            Context 'When offline GPT disk using Disk Guid' {
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Get-DiskByIdentifier `
-                    -ParameterFilter { $DiskId -eq $script:mockedDisk0Offline.Guid -and $DiskIdType -eq 'Guid' } `
-                    -MockWith { $script:mockedDisk0Offline } `
+                    -ParameterFilter { $DiskId -eq $script:mockedDisk0GptOffline.Guid -and $DiskIdType -eq 'Guid' } `
+                    -MockWith { $script:mockedDisk0GptOffline } `
                     -Verifiable
 
                 Mock `
@@ -795,7 +940,7 @@ try
                 It 'Should not throw an exception' {
                     {
                         Set-TargetResource `
-                            -DiskId $script:mockedDisk0Offline.Guid `
+                            -DiskId $script:mockedDisk0GptOffline.Guid `
                             -DiskIdType 'Guid' `
                             -Driveletter $script:testDriveLetter `
                             -Verbose
@@ -805,7 +950,7 @@ try
                 It 'Should call the correct mocks' {
                     Assert-VerifiableMock
                     Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 1 `
-                        -ParameterFilter { $DiskId -eq $script:mockedDisk0Offline.Guid -and $DiskIdType -eq 'Guid' }
+                        -ParameterFilter { $DiskId -eq $script:mockedDisk0GptOffline.Guid -and $DiskIdType -eq 'Guid' }
                     Assert-MockCalled -CommandName Set-Disk -Exactly -Times 1
                     Assert-MockCalled -CommandName Initialize-Disk -Exactly -Times 0
                     Assert-MockCalled -CommandName Get-Partition -Exactly -Times 1
@@ -819,12 +964,12 @@ try
                 }
             }
 
-            Context 'Readonly GPT disk using Disk Number' {
+            Context 'When readonly GPT disk using Disk Number' {
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Get-DiskByIdentifier `
                     -ParameterFilter $script:parameterFilter_MockedDisk0Number `
-                    -MockWith { $script:mockedDisk0Readonly } `
+                    -MockWith { $script:mockedDisk0GptReadonly } `
                     -Verifiable
 
                 Mock `
@@ -862,7 +1007,7 @@ try
                 It 'Should not throw an exception' {
                     {
                         Set-TargetResource `
-                            -DiskId $script:mockedDisk0Readonly.Number `
+                            -DiskId $script:mockedDisk0GptReadonly.Number `
                             -Driveletter $script:testDriveLetter `
                             -Verbose
                     } | Should -Not -Throw
@@ -885,12 +1030,12 @@ try
                 }
             }
 
-            Context 'Offline RAW disk using Disk Number' {
+            Context 'When offline RAW disk using Disk Number' {
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Get-DiskByIdentifier `
                     -ParameterFilter $script:parameterFilter_MockedDisk0Number `
-                    -MockWith { $script:mockedDisk0OfflineRaw } `
+                    -MockWith { $script:mockedDisk0RawOffline } `
                     -Verifiable
 
                 Mock `
@@ -929,7 +1074,7 @@ try
                 It 'Should not throw an exception' {
                     {
                         Set-TargetResource `
-                            -DiskId $script:mockedDisk0OfflineRaw.Number `
+                            -DiskId $script:mockedDisk0RawOffline.Number `
                             -Driveletter $script:testDriveLetter `
                             -Verbose
                     } | Should -Not -Throw
@@ -952,7 +1097,7 @@ try
                 }
             }
 
-            Context 'Online RAW disk with Size using Disk Number' {
+            Context 'When online RAW disk with Size using Disk Number' {
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Get-DiskByIdentifier `
@@ -1021,12 +1166,12 @@ try
                 }
             }
 
-            Context 'Online GPT disk with no partitions using Disk Number' {
+            Context 'When online GPT disk with no partitions using Disk Number' {
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Get-DiskByIdentifier `
                     -ParameterFilter $script:parameterFilter_MockedDisk0Number `
-                    -MockWith { $script:mockedDisk0 } `
+                    -MockWith { $script:mockedDisk0Gpt } `
                     -Verifiable
 
                 Mock `
@@ -1061,7 +1206,7 @@ try
                 It 'Should not throw an exception' {
                     {
                         Set-TargetResource `
-                            -DiskId $script:mockedDisk0.Number `
+                            -DiskId $script:mockedDisk0Gpt.Number `
                             -Driveletter $script:testDriveLetter `
                             -Verbose
                     } | Should -Not -Throw
@@ -1084,12 +1229,12 @@ try
                 }
             }
 
-            Context 'Online GPT disk with no partitions using Disk Number, partition fails to become writeable' {
+            Context 'When online GPT disk with no partitions using Disk Number, partition fails to become writeable' {
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Get-DiskByIdentifier `
                     -ParameterFilter $script:parameterFilter_MockedDisk0Number `
-                    -MockWith { $script:mockedDisk0 } `
+                    -MockWith { $script:mockedDisk0Gpt } `
                     -Verifiable
 
                 Mock `
@@ -1122,7 +1267,7 @@ try
                 It 'Should throw NewParitionIsReadOnlyError' {
                     {
                         Set-TargetResource `
-                            -DiskId $script:mockedDisk0.Number `
+                            -DiskId $script:mockedDisk0Gpt.Number `
                             -Driveletter $script:testDriveLetter `
                             -Verbose
                     } | Should -Throw $errorRecord
@@ -1152,7 +1297,7 @@ try
                 }
             }
 
-            Context 'Online MBR disk using Disk Number' {
+            Context 'When online MBR disk using Disk Number' {
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Get-DiskByIdentifier `
@@ -1170,10 +1315,10 @@ try
                 Mock -CommandName Set-Partition
 
                 $errorRecord = Get-InvalidOperationRecord `
-                    -Message ($LocalizedData.DiskAlreadyInitializedError -f `
-                        'Number', $script:mockedDisk0Mbr.Number, $script:mockedDisk0Mbr.PartitionStyle)
+                    -Message ($LocalizedData.DiskInitializedWithWrongPartitionStyleError -f `
+                        'Number', $script:mockedDisk0Mbr.Number, $script:mockedDisk0Mbr.PartitionStyle, 'GPT')
 
-                It 'Should throw DiskAlreadyInitializedError' {
+                It 'Should not throw DiskInitializedWithWrongPartitionStyleError' {
                     {
                         Set-TargetResource `
                             -DiskId $script:mockedDisk0Mbr.Number `
@@ -1196,7 +1341,7 @@ try
                 }
             }
 
-            Context 'Online MBR disk using Disk Unique Id' {
+            Context 'When online MBR disk using Disk Unique Id but GPT required and AllowDestructive and ClearDisk are false' {
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Get-DiskByIdentifier `
@@ -1213,10 +1358,10 @@ try
                 Mock -CommandName Set-Partition
 
                 $errorRecord = Get-InvalidOperationRecord `
-                    -Message ($LocalizedData.DiskAlreadyInitializedError -f `
-                        'UniqueId', $script:mockedDisk0Mbr.UniqueId, $script:mockedDisk0Mbr.PartitionStyle)
+                    -Message ($LocalizedData.DiskInitializedWithWrongPartitionStyleError -f `
+                        'UniqueId', $script:mockedDisk0Mbr.UniqueId, $script:mockedDisk0Mbr.PartitionStyle, 'GPT')
 
-                It 'Should throw DiskAlreadyInitializedError' {
+                It 'Should throw DiskInitializedWithWrongPartitionStyleError' {
                     {
                         Set-TargetResource `
                             -DiskId $script:mockedDisk0Mbr.UniqueId `
@@ -1239,55 +1384,12 @@ try
                 }
             }
 
-            Context 'Online MBR disk using Disk Guid' {
-                # verifiable (should be called) mocks
-                Mock `
-                    -CommandName Get-DiskByIdentifier `
-                    -MockWith { $script:mockedDisk0Mbr } `
-                    -Verifiable
-
-                # mocks that should not be called
-                Mock -CommandName Set-Disk
-                Mock -CommandName Initialize-Disk
-                Mock -CommandName Get-Partition
-                Mock -CommandName New-Partition
-                Mock -CommandName Format-Volume
-                Mock -CommandName Get-Volume
-                Mock -CommandName Set-Partition
-
-                $errorRecord = Get-InvalidOperationRecord `
-                    -Message ($LocalizedData.DiskAlreadyInitializedError -f `
-                        'Guid', $script:mockedDisk0Mbr.Guid, $script:mockedDisk0Mbr.PartitionStyle)
-
-                It 'Should throw DiskAlreadyInitializedError' {
-                    {
-                        Set-TargetResource `
-                            -DiskId $script:mockedDisk0Mbr.Guid `
-                            -DiskIdType 'Guid' `
-                            -Driveletter $script:testDriveLetter `
-                            -Verbose
-                    } | Should -Throw $errorRecord
-                }
-
-                It 'Should call the correct mocks' {
-                    Assert-VerifiableMock
-                    Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 1
-                    Assert-MockCalled -CommandName Set-Disk -Exactly -Times 0
-                    Assert-MockCalled -CommandName Initialize-Disk -Exactly -Times 0
-                    Assert-MockCalled -CommandName Get-Partition -Exactly -Times 0
-                    Assert-MockCalled -CommandName Get-Volume -Exactly -Times 0
-                    Assert-MockCalled -CommandName New-Partition -Exactly -Times 0
-                    Assert-MockCalled -CommandName Format-Volume -Exactly -Times 0
-                    Assert-MockCalled -CommandName Set-Partition -Exactly -Times 0
-                }
-            }
-
-            Context 'Online GPT disk with partition/volume already assigned using Disk Number' {
+            Context 'When online GPT disk with partition/volume already assigned using Disk Number' {
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Get-DiskByIdentifier `
                     -ParameterFilter $script:parameterFilter_MockedDisk0Number `
-                    -MockWith { $script:mockedDisk0 } `
+                    -MockWith { $script:mockedDisk0Gpt } `
                     -Verifiable
 
                 Mock `
@@ -1310,7 +1412,7 @@ try
                 It 'Should not throw an exception' {
                     {
                         Set-targetResource `
-                            -DiskId $script:mockedDisk0.Number `
+                            -DiskId $script:mockedDisk0Gpt.Number `
                             -DriveLetter $script:testDriveLetter `
                             -Verbose
                     } | Should -Not -Throw
@@ -1330,12 +1432,12 @@ try
                 }
             }
 
-            Context 'Online GPT disk containing matching partition but not assigned using Disk Number' {
+            Context 'When online GPT disk containing matching partition but not assigned using Disk Number' {
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Get-DiskByIdentifier `
                     -ParameterFilter $script:parameterFilter_MockedDisk0Number `
-                    -MockWith { $script:mockedDisk0 } `
+                    -MockWith { $script:mockedDisk0Gpt } `
                     -Verifiable
 
                 Mock `
@@ -1361,7 +1463,7 @@ try
                 It 'Should not throw an exception' {
                     {
                         Set-targetResource `
-                            -DiskId $script:mockedDisk0.Number `
+                            -DiskId $script:mockedDisk0Gpt.Number `
                             -DriveLetter $script:testDriveLetter `
                             -Size $script:mockedPartitionSize `
                             -Verbose
@@ -1382,12 +1484,12 @@ try
                 }
             }
 
-            Context 'Online GPT disk with a partition/volume and wrong Drive Letter assigned using Disk Number' {
+            Context 'When online GPT disk with a partition/volume and wrong Drive Letter assigned using Disk Number' {
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Get-DiskByIdentifier `
                     -ParameterFilter $script:parameterFilter_MockedDisk0Number `
-                    -MockWith { $script:mockedDisk0 } `
+                    -MockWith { $script:mockedDisk0Gpt } `
                     -Verifiable
 
                 Mock `
@@ -1421,7 +1523,7 @@ try
                 It 'Should not throw an exception' {
                     {
                         Set-TargetResource `
-                            -DiskId $script:mockedDisk0.Number `
+                            -DiskId $script:mockedDisk0Gpt.Number `
                             -Driveletter 'H' `
                             -Verbose
                     } | Should -Not -Throw
@@ -1441,12 +1543,12 @@ try
                 }
             }
 
-            Context 'Online GPT disk with a partition/volume and no Drive Letter assigned using Disk Number' {
+            Context 'When online GPT disk with a partition/volume and no Drive Letter assigned using Disk Number' {
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Get-DiskByIdentifier `
                     -ParameterFilter $script:parameterFilter_MockedDisk0Number `
-                    -MockWith { $script:mockedDisk0 } `
+                    -MockWith { $script:mockedDisk0Gpt } `
                     -Verifiable
 
                 Mock `
@@ -1472,7 +1574,7 @@ try
                 It 'Should not throw an exception' {
                     {
                         Set-TargetResource `
-                            -DiskId $script:mockedDisk0.Number `
+                            -DiskId $script:mockedDisk0Gpt.Number `
                             -Driveletter 'H' `
                             -Verbose
                     } | Should -Not -Throw
@@ -1492,12 +1594,12 @@ try
                 }
             }
 
-            Context 'Online GPT disk with a partition/volume and wrong Volume Label assigned using Disk Number' {
+            Context 'When online GPT disk with a partition/volume and wrong Volume Label assigned using Disk Number' {
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Get-DiskByIdentifier `
                     -ParameterFilter $script:parameterFilter_MockedDisk0Number `
-                    -MockWith { $script:mockedDisk0 } `
+                    -MockWith { $script:mockedDisk0Gpt } `
                     -Verifiable
 
                 Mock `
@@ -1524,7 +1626,7 @@ try
                 It 'Should not throw an exception' {
                     {
                         Set-TargetResource `
-                            -DiskId $script:mockedDisk0.Number `
+                            -DiskId $script:mockedDisk0Gpt.Number `
                             -Driveletter $script:testDriveLetter `
                             -FSLabel 'NewLabel' `
                             -Verbose
@@ -1551,7 +1653,7 @@ try
                 Mock `
                     -CommandName Get-DiskByIdentifier `
                     -ParameterFilter $script:parameterFilter_MockedDisk0Number `
-                    -MockWith { $script:mockedDisk0 } `
+                    -MockWith { $script:mockedDisk0Gpt } `
                     -Verifiable
 
                 Mock `
@@ -1584,7 +1686,7 @@ try
                 It 'Should not throw an exception' {
                     {
                         Set-TargetResource `
-                            -DiskId $script:mockedDisk0.Number `
+                            -DiskId $script:mockedDisk0Gpt.Number `
                             -Driveletter $script:testDriveLetter `
                             -Size ($script:mockedPartitionSize + 1024) `
                             -AllowDestructive $true `
@@ -1613,7 +1715,7 @@ try
                 Mock `
                     -CommandName Get-DiskByIdentifier `
                     -ParameterFilter $script:parameterFilter_MockedDisk0Number `
-                    -MockWith { $script:mockedDisk0 } `
+                    -MockWith { $script:mockedDisk0Gpt } `
                     -Verifiable
 
                 Mock `
@@ -1649,7 +1751,7 @@ try
                 It 'Should throw FreeSpaceViolationError' {
                     {
                         Set-TargetResource `
-                            -DiskId $script:mockedDisk0.Number `
+                            -DiskId $script:mockedDisk0Gpt.Number `
                             -Driveletter $script:testDriveLetter `
                             -Size ($script:mockedPartitionSize + 1024) `
                             -AllowDestructive $true `
@@ -1680,7 +1782,7 @@ try
                 Mock `
                     -CommandName Get-DiskByIdentifier `
                     -ParameterFilter $script:parameterFilter_MockedDisk0Number `
-                    -MockWith { $script:mockedDisk0 } `
+                    -MockWith { $script:mockedDisk0Gpt } `
                     -Verifiable
 
                 Mock `
@@ -1721,7 +1823,7 @@ try
                 It 'Should not throw' {
                     {
                         Set-TargetResource `
-                            -DiskId $script:mockedDisk0.Number `
+                            -DiskId $script:mockedDisk0Gpt.Number `
                             -Driveletter $script:testDriveLetter `
                             -AllowDestructive $true `
                             -FSLabel 'NewLabel' `
@@ -1751,7 +1853,7 @@ try
                 Mock `
                     -CommandName Get-DiskByIdentifier `
                     -ParameterFilter $script:parameterFilter_MockedDisk0Number `
-                    -MockWith { $script:mockedDisk0 } `
+                    -MockWith { $script:mockedDisk0Gpt } `
                     -Verifiable
 
                 Mock `
@@ -1790,7 +1892,7 @@ try
                 It 'Should not throw an exception' {
                     {
                         Set-TargetResource `
-                            -DiskId $script:mockedDisk0.Number `
+                            -DiskId $script:mockedDisk0Gpt.Number `
                             -Driveletter $script:testDriveLetter `
                             -Size ($script:mockedPartitionSize + 1024) `
                             -AllowDestructive $true `
@@ -1822,7 +1924,7 @@ try
                 Mock `
                     -CommandName Get-DiskByIdentifier `
                     -ParameterFilter $script:parameterFilter_MockedDisk0Number `
-                    -MockWith { $script:mockedDisk0 } `
+                    -MockWith { $script:mockedDisk0Gpt } `
                     -Verifiable
 
                 Mock `
@@ -1852,7 +1954,7 @@ try
                 It 'Should not throw an exception' {
                     {
                         Set-TargetResource `
-                            -DiskId $script:mockedDisk0.Number `
+                            -DiskId $script:mockedDisk0Gpt.Number `
                             -Driveletter $script:testDriveLetter `
                             -Size $script:mockedPartitionSize `
                             -FSFormat 'ReFS' `
@@ -1876,12 +1978,12 @@ try
                 }
             }
 
-            Context 'When AllowDestructive enabled with Online GPT disk containing arbitrary partitions' {
+            Context 'When AllowDestructive and ClearDisk enabled with Online GPT disk containing arbitrary partitions' {
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Get-DiskByIdentifier `
                     -ParameterFilter $script:parameterFilter_MockedDisk0Number `
-                    -MockWith { $script:mockedDisk0 } `
+                    -MockWith { $script:mockedDisk0Gpt } `
                     -Verifiable
 
                 Mock `
@@ -1897,6 +1999,7 @@ try
                 Mock `
                     -CommandName Set-Volume `
                     -Verifiable
+
                 Mock `
                     -CommandName Clear-Disk `
                     -Verifiable
@@ -1911,7 +2014,7 @@ try
                 It 'Should not throw an exception' {
                     {
                         Set-TargetResource `
-                            -DiskId $script:mockedDisk0.Number `
+                            -DiskId $script:mockedDisk0Gpt.Number `
                             -Driveletter $script:testDriveLetter `
                             -Size $script:mockedPartitionSize `
                             -FSLabel 'NewLabel' `
@@ -1935,11 +2038,102 @@ try
                     Assert-MockCalled -CommandName Set-Volume -Exactly -Times 1
                 }
             }
+
+            Context 'When AllowDestructive and ClearDisk enabled with Online MBR disk containing arbitrary partitions but GPT required' {
+                <#
+                    This variable is so that we can change the behavior of the
+                    Get-DiskByIdentifier mock after the first time it is called
+                    in the Set-TargetResource function.
+                #>
+                $script:getDiskByIdentifierCalled = $false
+
+                $script:parameterFilter_MockedDisk0Number = {
+                    $DiskId -eq $script:mockedDisk0Gpt.Number -and $DiskIdType -eq 'Number'
+                }
+
+                # verifiable (should be called) mocks
+                Mock `
+                    -CommandName Get-DiskByIdentifier `
+                    -ParameterFilter {
+                        $DiskId -eq $script:mockedDisk0Gpt.Number `
+                            -and $DiskIdType -eq 'Number' `
+                            -and $script:getDiskByIdentifierCalled -eq $false
+                    } `
+                    -MockWith {
+                        $script:getDiskByIdentifierCalled = $true
+                        return $script:mockedDisk0Mbr
+                    } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-DiskByIdentifier `
+                    -ParameterFilter {
+                        $DiskId -eq $script:mockedDisk0Gpt.Number `
+                            -and $DiskIdType -eq 'Number' `
+                            -and $script:getDiskByIdentifierCalled -eq $true
+                    } `
+                    -MockWith {
+                        return $script:mockedDisk0Raw
+                    } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-Partition `
+                    -MockWith { $script:mockedPartition } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-Volume `
+                    -MockWith { $script:mockedVolume } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Set-Volume `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Clear-Disk `
+                    -Verifiable
+
+                # mocks that should not be called
+                Mock -CommandName Set-Disk
+                Mock -CommandName Initialize-Disk
+                Mock -CommandName New-Partition
+                Mock -CommandName Format-Volume
+                Mock -CommandName Set-Partition
+
+                It 'Should not throw an exception' {
+                    {
+                        Set-TargetResource `
+                            -DiskId $script:mockedDisk0Gpt.Number `
+                            -Driveletter $script:testDriveLetter `
+                            -Size $script:mockedPartitionSize `
+                            -FSLabel 'NewLabel' `
+                            -AllowDestructive $true `
+                            -ClearDisk $true `
+                            -Verbose
+                    } | Should -Not -Throw
+                }
+
+                It 'Should call the correct mocks' {
+                    Assert-VerifiableMock
+                    Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 2 `
+                        -ParameterFilter $script:parameterFilter_MockedDisk0Number
+                    Assert-MockCalled -CommandName Set-Disk -Exactly -Times 0
+                    Assert-MockCalled -CommandName Initialize-Disk -Exactly -Times 1
+                    Assert-MockCalled -CommandName Get-Partition -Exactly -Times 1
+                    Assert-MockCalled -CommandName Get-Volume -Exactly -Times 1
+                    Assert-MockCalled -CommandName New-Partition -Exactly -Times 0
+                    Assert-MockCalled -CommandName Format-Volume -Exactly -Times 0
+                    Assert-MockCalled -CommandName Set-Partition -Exactly -Times 0
+                    Assert-MockCalled -CommandName Set-Volume -Exactly -Times 1
+                }
+            }
         }
         #endregion
 
         #region Function Test-TargetResource
-        Describe 'MSFT_Disk\Test-TargetResource' {
+        Describe 'MSFTDSC_Disk\Test-TargetResource' {
             Mock `
                 -CommandName Get-CimInstance `
                 -MockWith { $script:mockedCim }
@@ -1949,7 +2143,7 @@ try
                 Mock `
                     -CommandName Get-DiskByIdentifier `
                     -ParameterFilter $script:parameterFilter_MockedDisk0Number `
-                    -MockWith { $script:mockedDisk0Offline } `
+                    -MockWith { $script:mockedDisk0GptOffline } `
                     -Verifiable
 
                 # mocks that should not be called
@@ -1962,7 +2156,7 @@ try
                 It 'Should not throw an exception' {
                     {
                         $script:result = Test-TargetResource `
-                            -DiskId $script:mockedDisk0Offline.Number `
+                            -DiskId $script:mockedDisk0GptOffline.Number `
                             -DriveLetter $script:testDriveLetter `
                             -AllocationUnitSize 4096 `
                             -Verbose
@@ -1987,8 +2181,8 @@ try
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Get-DiskByIdentifier `
-                    -ParameterFilter { $DiskId -eq $script:mockedDisk0Offline.Number -and $DiskIdType -eq 'Number' } `
-                    -MockWith { $script:mockedDisk0Offline } `
+                    -ParameterFilter { $DiskId -eq $script:mockedDisk0GptOffline.Number -and $DiskIdType -eq 'Number' } `
+                    -MockWith { $script:mockedDisk0GptOffline } `
                     -Verifiable
 
                 # mocks that should not be called
@@ -2001,7 +2195,7 @@ try
                 It 'Should not throw an exception' {
                     {
                         $script:result = Test-TargetResource `
-                            -DiskId $script:mockedDisk0Offline.Number `
+                            -DiskId $script:mockedDisk0GptOffline.Number `
                             -DriveLetter $script:testDriveLetter `
                             -AllocationUnitSize 4096 `
                             -Verbose
@@ -2015,7 +2209,7 @@ try
                 It 'Should call the correct mocks' {
                     Assert-VerifiableMock
                     Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 1 `
-                        -ParameterFilter { $DiskId -eq $script:mockedDisk0Offline.Number -and $DiskIdType -eq 'Number' }
+                        -ParameterFilter { $DiskId -eq $script:mockedDisk0GptOffline.Number -and $DiskIdType -eq 'Number' }
                     Assert-MockCalled -CommandName Get-Partition -Exactly -Times 0
                     Assert-MockCalled -CommandName Get-Volume -Exactly -Times 0
                     Assert-MockCalled -CommandName Get-CimInstance -Exactly -Times 0
@@ -2026,8 +2220,8 @@ try
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Get-DiskByIdentifier `
-                    -ParameterFilter { $DiskId -eq $script:mockedDisk0.UniqueId -and $DiskIdType -eq 'UniqueId' } `
-                    -MockWith { $script:mockedDisk0Offline } `
+                    -ParameterFilter { $DiskId -eq $script:mockedDisk0Gpt.UniqueId -and $DiskIdType -eq 'UniqueId' } `
+                    -MockWith { $script:mockedDisk0GptOffline } `
                     -Verifiable
 
                 # mocks that should not be called
@@ -2040,7 +2234,7 @@ try
                 It 'Should not throw an exception' {
                     {
                         $script:result = Test-TargetResource `
-                            -DiskId $script:mockedDisk0Offline.UniqueId `
+                            -DiskId $script:mockedDisk0GptOffline.UniqueId `
                             -DiskIdType 'UniqueId' `
                             -DriveLetter $script:testDriveLetter `
                             -AllocationUnitSize 4096 `
@@ -2055,7 +2249,7 @@ try
                 It 'Should call the correct mocks' {
                     Assert-VerifiableMock
                     Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 1 `
-                        -ParameterFilter { $DiskId -eq $script:mockedDisk0Offline.UniqueId -and $DiskIdType -eq 'UniqueId' }
+                        -ParameterFilter { $DiskId -eq $script:mockedDisk0GptOffline.UniqueId -and $DiskIdType -eq 'UniqueId' }
                     Assert-MockCalled -CommandName Get-Partition -Exactly -Times 0
                     Assert-MockCalled -CommandName Get-Volume -Exactly -Times 0
                     Assert-MockCalled -CommandName Get-CimInstance -Exactly -Times 0
@@ -2066,8 +2260,8 @@ try
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Get-DiskByIdentifier `
-                    -ParameterFilter { $DiskId -eq $script:mockedDisk0.Guid -and $DiskIdType -eq 'Guid' } `
-                    -MockWith { $script:mockedDisk0Offline } `
+                    -ParameterFilter { $DiskId -eq $script:mockedDisk0Gpt.Guid -and $DiskIdType -eq 'Guid' } `
+                    -MockWith { $script:mockedDisk0GptOffline } `
                     -Verifiable
 
                 # mocks that should not be called
@@ -2080,7 +2274,7 @@ try
                 It 'Should not throw an exception' {
                     {
                         $script:result = Test-TargetResource `
-                            -DiskId $script:mockedDisk0Offline.Guid `
+                            -DiskId $script:mockedDisk0GptOffline.Guid `
                             -DiskIdType 'Guid' `
                             -DriveLetter $script:testDriveLetter `
                             -AllocationUnitSize 4096 `
@@ -2095,7 +2289,7 @@ try
                 It 'Should call the correct mocks' {
                     Assert-VerifiableMock
                     Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 1 `
-                        -ParameterFilter { $DiskId -eq $script:mockedDisk0Offline.Guid -and $DiskIdType -eq 'Guid' }
+                        -ParameterFilter { $DiskId -eq $script:mockedDisk0GptOffline.Guid -and $DiskIdType -eq 'Guid' }
                     Assert-MockCalled -CommandName Get-Partition -Exactly -Times 0
                     Assert-MockCalled -CommandName Get-Volume -Exactly -Times 0
                     Assert-MockCalled -CommandName Get-CimInstance -Exactly -Times 0
@@ -2106,8 +2300,8 @@ try
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Get-DiskByIdentifier `
-                    -ParameterFilter { $DiskId -eq $script:mockedDisk0Readonly.Number -and $DiskIdType -eq 'Number' } `
-                    -MockWith { $script:mockedDisk0Readonly } `
+                    -ParameterFilter { $DiskId -eq $script:mockedDisk0GptReadonly.Number -and $DiskIdType -eq 'Number' } `
+                    -MockWith { $script:mockedDisk0GptReadonly } `
                     -Verifiable
 
                 # mocks that should not be called
@@ -2120,7 +2314,7 @@ try
                 It 'Should not throw an exception' {
                     {
                         $script:result = Test-TargetResource `
-                            -DiskId $script:mockedDisk0Readonly.Number `
+                            -DiskId $script:mockedDisk0GptReadonly.Number `
                             -DriveLetter $script:testDriveLetter `
                             -AllocationUnitSize 4096 `
                             -Verbose
@@ -2134,7 +2328,7 @@ try
                 It 'Should call the correct mocks' {
                     Assert-VerifiableMock
                     Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 1 `
-                        -ParameterFilter { $DiskId -eq $script:mockedDisk0Readonly.Number -and $DiskIdType -eq 'Number' }
+                        -ParameterFilter { $DiskId -eq $script:mockedDisk0GptReadonly.Number -and $DiskIdType -eq 'Number' }
                     Assert-MockCalled -CommandName Get-Partition -Exactly -Times 0
                     Assert-MockCalled -CommandName Get-Volume -Exactly -Times 0
                     Assert-MockCalled -CommandName Get-CimInstance -Exactly -Times 0
@@ -2180,12 +2374,129 @@ try
                 }
             }
 
+            Context 'When testing online disk using Disk Number with partition style GPT but requiring MBR' {
+                # verifiable (should be called) mocks
+                Mock `
+                    -CommandName Get-DiskByIdentifier `
+                    -ParameterFilter $script:parameterFilter_MockedDisk0Number `
+                    -MockWith { $script:mockedDisk0Mbr } `
+                    -Verifiable
+
+                # mocks that should not be called
+                Mock -CommandName Get-Volume
+                Mock -CommandName Get-Partition
+                Mock -CommandName Get-CimInstance
+
+                $errorRecord = Get-InvalidOperationRecord `
+                    -Message ($LocalizedData.DiskInitializedWithWrongPartitionStyleError -f `
+                        'Number', $script:mockedDisk0Mbr.Number, $script:mockedDisk0Mbr.PartitionStyle, 'GPT')
+
+                It 'Should throw DiskInitializedWithWrongPartitionStyleError' {
+                    {
+                        Test-TargetResource `
+                            -DiskId $script:mockedDisk0Mbr.Number `
+                            -DriveLetter $script:testDriveLetter `
+                            -AllocationUnitSize 4096 `
+                            -Verbose
+                    } | Should -Throw $errorRecord
+                }
+
+                It 'Should call the correct mocks' {
+                    Assert-VerifiableMock
+                    Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 1 `
+                        -ParameterFilter $script:parameterFilter_MockedDisk0Number
+                    Assert-MockCalled -CommandName Get-Partition -Exactly -Times 0
+                    Assert-MockCalled -CommandName Get-Volume -Exactly -Times 0
+                    Assert-MockCalled -CommandName Get-CimInstance -Exactly -Times 0
+                }
+            }
+
+            Context 'When testing online disk using Disk Number with partition style MBR but requiring GPT' {
+                # verifiable (should be called) mocks
+                Mock `
+                    -CommandName Get-DiskByIdentifier `
+                    -ParameterFilter $script:parameterFilter_MockedDisk0Number `
+                    -MockWith { $script:mockedDisk0Gpt } `
+                    -Verifiable
+
+                # mocks that should not be called
+                Mock -CommandName Get-Volume
+                Mock -CommandName Get-Partition
+                Mock -CommandName Get-CimInstance
+
+                $errorRecord = Get-InvalidOperationRecord `
+                    -Message ($LocalizedData.DiskInitializedWithWrongPartitionStyleError -f `
+                        'Number', $script:mockedDisk0Gpt.Number, $script:mockedDisk0Gpt.PartitionStyle, 'MBR')
+
+                It 'Should throw DiskInitializedWithWrongPartitionStyleError' {
+                    {
+                        Test-TargetResource `
+                            -DiskId $script:mockedDisk0Gpt.Number `
+                            -DriveLetter $script:testDriveLetter `
+                            -AllocationUnitSize 4096 `
+                            -PartitionStyle 'MBR' `
+                            -Verbose
+                    } | Should -Throw $errorRecord
+                }
+
+                It 'Should call the correct mocks' {
+                    Assert-VerifiableMock
+                    Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 1 `
+                        -ParameterFilter $script:parameterFilter_MockedDisk0Number
+                    Assert-MockCalled -CommandName Get-Partition -Exactly -Times 0
+                    Assert-MockCalled -CommandName Get-Volume -Exactly -Times 0
+                    Assert-MockCalled -CommandName Get-CimInstance -Exactly -Times 0
+                }
+            }
+
+            Context 'When testing online disk using Disk Number with partition style MBR but requiring GPT and AllowDestructive and ClearDisk is True' {
+                # verifiable (should be called) mocks
+                Mock `
+                    -CommandName Get-DiskByIdentifier `
+                    -ParameterFilter $script:parameterFilter_MockedDisk0Number `
+                    -MockWith { $script:mockedDisk0Gpt } `
+                    -Verifiable
+
+                # mocks that should not be called
+                Mock -CommandName Get-Volume
+                Mock -CommandName Get-Partition
+                Mock -CommandName Get-CimInstance
+
+                $script:result = $null
+
+                It 'Should not throw an exception' {
+                    {
+                        $script:result = Test-TargetResource `
+                            -DiskId $script:mockedDisk0Gpt.Number `
+                            -DriveLetter $script:testDriveLetter `
+                            -AllocationUnitSize 4096 `
+                            -PartitionStyle 'MBR' `
+                            -AllowDestructive $true `
+                            -ClearDisk $true `
+                            -Verbose
+                    } | Should -Not -Throw
+                }
+
+                It 'Should be false' {
+                    $script:result | Should -Be $false
+                }
+
+                It 'Should call the correct mocks' {
+                    Assert-VerifiableMock
+                    Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 1 `
+                        -ParameterFilter $script:parameterFilter_MockedDisk0Number
+                    Assert-MockCalled -CommandName Get-Partition -Exactly -Times 0
+                    Assert-MockCalled -CommandName Get-Volume -Exactly -Times 0
+                    Assert-MockCalled -CommandName Get-CimInstance -Exactly -Times 0
+                }
+            }
+
             Context 'When testing mismatching partition size using Disk Number' {
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Get-DiskByIdentifier `
                     -ParameterFilter $script:parameterFilter_MockedDisk0Number `
-                    -MockWith { $script:mockedDisk0 } `
+                    -MockWith { $script:mockedDisk0Gpt } `
                     -Verifiable
 
                 Mock `
@@ -2208,7 +2519,7 @@ try
                 It 'Should not throw an exception' {
                     {
                         $script:result = Test-TargetResource `
-                            -DiskId $script:mockedDisk0.Number `
+                            -DiskId $script:mockedDisk0Gpt.Number `
                             -DriveLetter $script:testDriveLetter `
                             -AllocationUnitSize 4096 `
                             -Size ($script:mockedPartitionSize + 1MB) `
@@ -2235,7 +2546,7 @@ try
                 Mock `
                     -CommandName Get-DiskByIdentifier `
                     -ParameterFilter $script:parameterFilter_MockedDisk0Number `
-                    -MockWith { $script:mockedDisk0 } `
+                    -MockWith { $script:mockedDisk0Gpt } `
                     -Verifiable
 
                 Mock `
@@ -2253,7 +2564,7 @@ try
                 It 'Should not throw an exception' {
                     {
                         $script:result = Test-TargetResource `
-                            -DiskId $script:mockedDisk0.Number `
+                            -DiskId $script:mockedDisk0Gpt.Number `
                             -DriveLetter $script:testDriveLetter `
                             -AllocationUnitSize 4096 `
                             -Size ($script:mockedPartitionSize + 1MB) `
@@ -2282,7 +2593,7 @@ try
                 Mock `
                     -CommandName Get-DiskByIdentifier `
                     -ParameterFilter $script:parameterFilter_MockedDisk0Number `
-                    -MockWith { $script:mockedDisk0 } `
+                    -MockWith { $script:mockedDisk0Gpt } `
                     -Verifiable
 
                 Mock `
@@ -2315,7 +2626,7 @@ try
                 It 'Should not throw an exception' {
                     {
                         $script:result = Test-TargetResource `
-                            -DiskId $script:mockedDisk0.Number `
+                            -DiskId $script:mockedDisk0Gpt.Number `
                             -DriveLetter $script:testDriveLetter `
                             -AllocationUnitSize 4096 `
                             -Verbose
@@ -2342,7 +2653,7 @@ try
                 Mock `
                     -CommandName Get-DiskByIdentifier `
                     -ParameterFilter $script:parameterFilter_MockedDisk0Number `
-                    -MockWith { $script:mockedDisk0 } `
+                    -MockWith { $script:mockedDisk0Gpt } `
                     -Verifiable
 
                 Mock `
@@ -2369,7 +2680,7 @@ try
                 It 'Should not throw an exception' {
                     {
                         $script:result = Test-TargetResource `
-                            -DiskId $script:mockedDisk0.Number `
+                            -DiskId $script:mockedDisk0Gpt.Number `
                             -DriveLetter $script:testDriveLetter `
                             -AllocationUnitSize 4096 `
                             -AllowDestructive $true `
@@ -2396,7 +2707,7 @@ try
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Get-DiskByIdentifier `
-                    -MockWith { $script:mockedDisk0 } `
+                    -MockWith { $script:mockedDisk0Gpt } `
                     -Verifiable
 
                 Mock `
@@ -2417,7 +2728,7 @@ try
                 It 'Should not throw an exception' {
                     {
                         $script:result = Test-TargetResource `
-                            -DiskId $script:mockedDisk0.Number `
+                            -DiskId $script:mockedDisk0Gpt.Number `
                             -DriveLetter $script:testDriveLetter `
                             -AllocationUnitSize 4097 `
                             -AllowDestructive $true `
@@ -2443,7 +2754,7 @@ try
                 Mock `
                     -CommandName Get-DiskByIdentifier `
                     -ParameterFilter $script:parameterFilter_MockedDisk0Number `
-                    -MockWith { $script:mockedDisk0 } `
+                    -MockWith { $script:mockedDisk0Gpt } `
                     -Verifiable
 
                 Mock `
@@ -2466,7 +2777,7 @@ try
                 It 'Should not throw an exception' {
                     {
                         $script:result = Test-TargetResource `
-                            -DiskId $script:mockedDisk0.Number `
+                            -DiskId $script:mockedDisk0Gpt.Number `
                             -DriveLetter $script:testDriveLetter `
                             -FSFormat 'ReFS' `
                             -Verbose
@@ -2492,7 +2803,7 @@ try
                 Mock `
                     -CommandName Get-DiskByIdentifier `
                     -ParameterFilter $script:parameterFilter_MockedDisk0Number `
-                    -MockWith { $script:mockedDisk0 } `
+                    -MockWith { $script:mockedDisk0Gpt } `
                     -Verifiable
 
                 Mock `
@@ -2515,7 +2826,7 @@ try
                 It 'Should not throw an exception' {
                     {
                         $script:result = Test-TargetResource `
-                            -DiskId $script:mockedDisk0.Number `
+                            -DiskId $script:mockedDisk0Gpt.Number `
                             -DriveLetter $script:testDriveLetter `
                             -FSFormat 'ReFS' `
                             -AllowDestructive $true `
@@ -2542,7 +2853,7 @@ try
                 Mock `
                     -CommandName Get-DiskByIdentifier `
                     -ParameterFilter $script:parameterFilter_MockedDisk0Number `
-                    -MockWith { $script:mockedDisk0 } `
+                    -MockWith { $script:mockedDisk0Gpt } `
                     -Verifiable
 
                 Mock `
@@ -2565,7 +2876,7 @@ try
                 It 'Should not throw an exception' {
                     {
                         $script:result = Test-TargetResource `
-                            -DiskId $script:mockedDisk0.Number `
+                            -DiskId $script:mockedDisk0Gpt.Number `
                             -DriveLetter $script:testDriveLetter `
                             -FSLabel 'NewLabel' `
                             -Verbose
@@ -2591,7 +2902,7 @@ try
                 Mock `
                     -CommandName Get-DiskByIdentifier `
                     -ParameterFilter $script:parameterFilter_MockedDisk0Number `
-                    -MockWith { $script:mockedDisk0 } `
+                    -MockWith { $script:mockedDisk0Gpt } `
                     -Verifiable
 
                 Mock `
@@ -2612,7 +2923,7 @@ try
                 It 'Should not throw an exception' {
                     {
                         $script:result = Test-TargetResource `
-                            -DiskId $script:mockedDisk0.Number `
+                            -DiskId $script:mockedDisk0Gpt.Number `
                             -DriveLetter 'Z' `
                             -Verbose
                     } | Should -Not -Throw
@@ -2637,7 +2948,7 @@ try
                 Mock `
                     -CommandName Get-DiskByIdentifier `
                     -ParameterFilter $script:parameterFilter_MockedDisk0Number `
-                    -MockWith { $script:mockedDisk0 } `
+                    -MockWith { $script:mockedDisk0Gpt } `
                     -Verifiable
 
                 Mock `
@@ -2660,7 +2971,7 @@ try
                 It 'Should not throw an exception' {
                     {
                         $script:result = Test-TargetResource `
-                            -DiskId $script:mockedDisk0.Number `
+                            -DiskId $script:mockedDisk0Gpt.Number `
                             -DriveLetter $script:testDriveLetter `
                             -AllocationUnitSize 4096 `
                             -Size $script:mockedPartition.Size `

@@ -1,4 +1,4 @@
-configuration MSFT_Disk_Config {
+configuration MSFTDSC_Disk_Config {
 
     Import-DscResource -ModuleName StorageDsc
 
@@ -7,27 +7,29 @@ configuration MSFT_Disk_Config {
         {
             Disk Integration_Test
             {
-                DiskId      = $Node.DiskId
-                DiskIdType  = $Node.DiskIdType
-                DriveLetter = $Node.DriveLetter
-                FSLabel     = $Node.FSLabel
-                Size        = $Node.Size
+                DiskId          = $Node.DiskId
+                DiskIdType      = $Node.DiskIdType
+                PartitionStyle  = $Node.PartitionStyle
+                DriveLetter     = $Node.DriveLetter
+                FSLabel         = $Node.FSLabel
+                Size            = $Node.Size
             }
         }
         else
         {
             Disk Integration_Test
             {
-                DiskId      = $Node.DiskId
-                DiskIdType  = $Node.DiskIdType
-                DriveLetter = $Node.DriveLetter
-                FSLabel     = $Node.FSLabel
+                DiskId          = $Node.DiskId
+                DiskIdType      = $Node.DiskIdType
+                PartitionStyle  = $Node.PartitionStyle
+                DriveLetter     = $Node.DriveLetter
+                FSLabel         = $Node.FSLabel
             }
         }
     }
 }
 
-configuration MSFT_Disk_ConfigAllowDestructive {
+configuration MSFTDSC_Disk_ConfigAllowDestructive {
 
     Import-DscResource -ModuleName StorageDsc
 
@@ -38,6 +40,7 @@ configuration MSFT_Disk_ConfigAllowDestructive {
             {
                 DiskId           = $Node.DiskId
                 DiskIdType       = $Node.DiskIdType
+                PartitionStyle   = $Node.PartitionStyle
                 DriveLetter      = $Node.DriveLetter
                 FSLabel          = $Node.FSLabel
                 Size             = $Node.Size
@@ -51,6 +54,7 @@ configuration MSFT_Disk_ConfigAllowDestructive {
             {
                 DiskId           = $Node.DiskId
                 DiskIdType       = $Node.DiskIdType
+                PartitionStyle   = $Node.PartitionStyle
                 DriveLetter      = $Node.DriveLetter
                 FSLabel          = $Node.FSLabel
                 FSFormat         = $Node.FSFormat
@@ -60,7 +64,7 @@ configuration MSFT_Disk_ConfigAllowDestructive {
     }
 }
 
-configuration MSFT_Disk_ConfigClearDisk {
+configuration MSFTDSC_Disk_ConfigClearDisk {
 
     Import-DscResource -ModuleName StorageDsc
 
@@ -71,6 +75,7 @@ configuration MSFT_Disk_ConfigClearDisk {
             {
                 DiskId           = $Node.DiskId
                 DiskIdType       = $Node.DiskIdType
+                PartitionStyle   = $Node.PartitionStyle
                 DriveLetter      = $Node.DriveLetter
                 FSLabel          = $Node.FSLabel
                 Size             = $Node.Size
@@ -85,6 +90,7 @@ configuration MSFT_Disk_ConfigClearDisk {
             {
                 DiskId           = $Node.DiskId
                 DiskIdType       = $Node.DiskIdType
+                PartitionStyle   = $Node.PartitionStyle
                 DriveLetter      = $Node.DriveLetter
                 FSLabel          = $Node.FSLabel
                 FSFormat         = $Node.FSFormat
