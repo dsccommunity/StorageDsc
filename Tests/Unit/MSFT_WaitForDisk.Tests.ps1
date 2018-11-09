@@ -63,6 +63,12 @@ try
 
         #region Function Get-TargetResource
         Describe "MSFT_WaitForDisk\Get-TargetResource" {
+
+            Mock `
+            -CommandName Test-TargetResource `
+            -MockWith { return $true } `
+            -Verifiable
+
             Context 'Disk is specified by Number' {
                 $script:result = $null
 
@@ -88,8 +94,13 @@ try
                     $script:result.RetryCount | Should -Be $disk0ParametersByNumber.RetryCount
                 }
 
-                It "Should return a IsAvailable boolean" {
-                    $script:result.IsAvailable | Should -BeOfType boolean
+                It "Should return a IsAvailable of true" {
+                    $script:result.IsAvailable | Should -Be $true
+                }
+
+                It 'Should call the correct mocks' {
+                    Assert-VerifiableMock
+                    Assert-MockCalled -CommandName Test-TargetResource -Exactly -Times 1
                 }
             }
 
@@ -118,8 +129,13 @@ try
                     $script:result.RetryCount | Should -Be $disk0ParametersByUniqueId.RetryCount
                 }
 
-                It "Should return a IsAvailable boolean" {
-                    $script:result.IsAvailable | Should -BeOfType boolean
+                It "Should return a IsAvailable of true" {
+                    $script:result.IsAvailable | Should -Be $true
+                }
+
+                It 'Should call the correct mocks' {
+                    Assert-VerifiableMock
+                    Assert-MockCalled -CommandName Test-TargetResource -Exactly -Times 1
                 }
             }
 
@@ -148,8 +164,13 @@ try
                     $script:result.RetryCount | Should -Be $disk0ParametersByGptGuid.RetryCount
                 }
 
-                It "Should return a IsAvailable boolean" {
-                    $script:result.IsAvailable | Should -BeOfType boolean
+                It "Should return a IsAvailable of true" {
+                    $script:result.IsAvailable | Should -Be $true
+                }
+
+                It 'Should call the correct mocks' {
+                    Assert-VerifiableMock
+                    Assert-MockCalled -CommandName Test-TargetResource -Exactly -Times 1
                 }
             }
         }

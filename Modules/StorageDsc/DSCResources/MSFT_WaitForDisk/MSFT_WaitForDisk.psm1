@@ -60,7 +60,7 @@ function Get-TargetResource
         $RetryCount = 60
     )
 
-    $isAvailable = Test-TargetResource -DiskId $DiskId -DiskIdType $DiskIdType -RetryIntervalSec $RetryIntervalSec -RetryCount $RetryCount
+    $isAvailable = Test-TargetResource @PSBoundParameters
 
     Write-Verbose -Message ( @(
             "$($MyInvocation.MyCommand): "
