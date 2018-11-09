@@ -10,7 +10,7 @@
 # RootModule = ''
 
 # Version number of this module.
-moduleVersion = '4.1.0.0'
+moduleVersion = '4.2.0.0'
 
 # ID used to uniquely identify this module
 GUID = '00d73ca1-58b5-46b7-ac1a-5bfcf5814faf'
@@ -102,18 +102,20 @@ PrivateData = @{
         # IconUri = ''
 
         # ReleaseNotes of this module
-        ReleaseNotes = '- Enabled PSSA rule violations to fail build - Fixes [Issue 149](https://github.com/PowerShell/StorageDsc/issues/149).
-- Fixed markdown rule violations in CHANGELOG.MD.
+        ReleaseNotes = '- Disk:
+  - Added `PartitionStyle` parameter - Fixes [Issue 137](https://github.com/PowerShell/StorageDsc/issues/37).
+  - Changed MOF name from `MSFT_Disk` to `MSFTDSC_Disk` to remove conflict
+    with Windows built-in CIM class - Fixes [Issue 167](https://github.com/PowerShell/StorageDsc/issues/167).
+- Opt-in to Common Tests:
+  - Common Tests - Validate Example Files To Be Published
+  - Common Tests - Validate Markdown Links
+  - Common Tests - Relative Path Length
+- Added .VSCode settings for applying DSC PSSA rules - fixes [Issue 168](https://github.com/PowerShell/StorageDsc/issues/168).
 - Disk:
-  - Corrected message strings.
-  - Added message when partition resize required but `AllowDestructive`
-    parameter is not enabled.
-  - Fix error when `Size` not specified and `AllowDestructive` is `$true`
-    and partition can be expanded - Fixes [Issue 162](https://github.com/PowerShell/StorageDsc/issues/162).
-  - Fix incorrect error displaying when newly created partition is not
-    made Read/Write.
-  - Change verbose messages to show warnings when a partition resize would
-    have occured but the `AllowDestructive` flag is set to `$false`.
+  - Added "defragsvc" service conflict known issue to README.MD - fixes
+    [Issue 172](https://github.com/PowerShell/StorageDsc/issues/172).
+- Corrected style violations in StorageDsc.Common module - fixes [Issue 153](https://github.com/PowerShell/StorageDsc/issues/153).
+- Corrected style violations in StorageDsc.ResourceHelper module.
 
 '
 
@@ -128,6 +130,7 @@ PrivateData = @{
 # DefaultCommandPrefix = ''
 
 }
+
 
 
 
