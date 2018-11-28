@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- WaitForDisk:
+  - Added readonly-property isAvailable which shows the current state
+    of the disk as a boolean - fixes [Issue #158](https://github.com/PowerShell/StorageDsc/issues/158).
+
 ## 4.2.0.0
 
 - Disk:
@@ -18,9 +22,6 @@
     [Issue #172](https://github.com/PowerShell/StorageDsc/issues/172).
 - Corrected style violations in StorageDsc.Common module - fixes [Issue #153](https://github.com/PowerShell/StorageDsc/issues/153).
 - Corrected style violations in StorageDsc.ResourceHelper module.
-- WaitForDisk:
-  - Added readonly-property isAvailable which shows the current state
-    of the disk as a boolean - fixes [Issue #158](https://github.com/PowerShell/StorageDsc/issues/158).
 
 ## 4.1.0.0
 
