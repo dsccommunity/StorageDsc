@@ -10,7 +10,7 @@
 # RootModule = ''
 
 # Version number of this module.
-moduleVersion = '4.2.0.0'
+moduleVersion = '4.3.0.0'
 
 # ID used to uniquely identify this module
 GUID = '00d73ca1-58b5-46b7-ac1a-5bfcf5814faf'
@@ -102,20 +102,9 @@ PrivateData = @{
         # IconUri = ''
 
         # ReleaseNotes of this module
-        ReleaseNotes = '- Disk:
-  - Added `PartitionStyle` parameter - Fixes [Issue 137](https://github.com/PowerShell/StorageDsc/issues/37).
-  - Changed MOF name from `MSFT_Disk` to `MSFTDSC_Disk` to remove conflict
-    with Windows built-in CIM class - Fixes [Issue 167](https://github.com/PowerShell/StorageDsc/issues/167).
-- Opt-in to Common Tests:
-  - Common Tests - Validate Example Files To Be Published
-  - Common Tests - Validate Markdown Links
-  - Common Tests - Relative Path Length
-- Added .VSCode settings for applying DSC PSSA rules - fixes [Issue 168](https://github.com/PowerShell/StorageDsc/issues/168).
-- Disk:
-  - Added "defragsvc" service conflict known issue to README.MD - fixes
-    [Issue 172](https://github.com/PowerShell/StorageDsc/issues/172).
-- Corrected style violations in StorageDsc.Common module - fixes [Issue 153](https://github.com/PowerShell/StorageDsc/issues/153).
-- Corrected style violations in StorageDsc.ResourceHelper module.
+        ReleaseNotes = '- WaitForDisk:
+  - Added readonly-property isAvailable which shows the current state
+    of the disk as a boolean - fixes [Issue 158](https://github.com/PowerShell/StorageDsc/issues/158).
 
 '
 
@@ -130,6 +119,7 @@ PrivateData = @{
 # DefaultCommandPrefix = ''
 
 }
+
 
 
 

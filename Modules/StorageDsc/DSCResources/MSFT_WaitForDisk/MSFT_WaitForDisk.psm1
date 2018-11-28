@@ -60,6 +60,8 @@ function Get-TargetResource
         $RetryCount = 60
     )
 
+    $isAvailable = Test-TargetResource @PSBoundParameters
+
     Write-Verbose -Message ( @(
             "$($MyInvocation.MyCommand): "
             $($localizedData.GettingWaitForDiskStatusMessage -f $DiskIdType,$DiskId)
@@ -70,6 +72,7 @@ function Get-TargetResource
         DiskIdType       = $DiskIdType
         RetryIntervalSec = $RetryIntervalSec
         RetryCount       = $RetryCount
+        IsAvailable      = $isAvailable
     }
     return $returnValue
 } # function Get-TargetResource

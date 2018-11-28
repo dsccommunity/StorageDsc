@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## 4.3.0.0
+
+- WaitForDisk:
+  - Added readonly-property isAvailable which shows the current state
+    of the disk as a boolean - fixes [Issue #158](https://github.com/PowerShell/StorageDsc/issues/158).
+
 ## 4.2.0.0
 
 - Disk:

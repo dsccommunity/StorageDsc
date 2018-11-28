@@ -67,6 +67,7 @@ try
                 $current.DiskId           | Should -Be $Disk.Number
                 $current.RetryIntervalSec | Should -Be 1
                 $current.RetryCount       | Should -Be 5
+                $current.IsAvailable      | Should -Be $true
             }
         }
 
@@ -107,6 +108,7 @@ try
                 $current.DiskId           | Should -Be $Disk.UniqueId
                 $current.RetryIntervalSec | Should -Be 1
                 $current.RetryCount       | Should -Be 5
+                $current.IsAvailable      | Should -Be $true
             }
         }
 
@@ -147,6 +149,7 @@ try
                 $current.DiskId           | Should -Be $Disk.Guid
                 $current.RetryIntervalSec | Should -Be 1
                 $current.RetryCount       | Should -Be 5
+                $current.IsAvailable      | Should -Be $true
             }
         }
     }
