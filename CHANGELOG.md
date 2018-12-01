@@ -7,7 +7,7 @@
 - Updated Examples to support deployment to PowerShell Gallery scripts.
 - Removed limitation on using Pester 4.0.8 during AppVeyor CI.
 - Moved the Code of Conduct text out of the README.md and into a
-  CODE_OF_CONDUCT.md file.
+  CODE\_OF\_CONDUCT.md file.
 
 ## 4.3.0.0
 
