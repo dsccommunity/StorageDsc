@@ -1,10 +1,29 @@
+<#PSScriptInfo
+.VERSION 1.0.0
+.GUID 66daf7c5-bebb-4463-8f18-016c3e8576e8
+.AUTHOR Microsoft Corporation
+.COMPANYNAME Microsoft Corporation
+.COPYRIGHT
+.TAGS DSCConfiguration
+.LICENSEURI https://github.com/PowerShell/StorageDsc/blob/master/LICENSE
+.PROJECTURI https://github.com/PowerShell/StorageDsc
+.ICONURI
+.EXTERNALMODULEDEPENDENCIES
+.REQUIREDSCRIPTS
+.EXTERNALSCRIPTDEPENDENCIES
+.RELEASENOTES First version.
+.PRIVATEDATA 2016-Datacenter,2016-Datacenter-Server-Core
+#>
+
+#Requires -module StorageDsc
+
 <#
-    .EXAMPLE
+    .DESCRIPTION
         This configuration will wait for disk 2 to become available, and then make the disk available as
         two new formatted volumes mounted to folders c:\SQLData and c:\SQLLog, with c:\SQLLog using all
         available space after c:\SQLData has been created.
 #>
-Configuration Example
+Configuration WaitForDisk_InitializeDataDiskWithAccessPath
 {
     Import-DSCResource -ModuleName StorageDsc
 

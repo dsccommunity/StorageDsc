@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+- Refactored module folder structure to move resource to root folder of
+  repository and remove test harness - fixes [Issue #169](https://github.com/PowerShell/StorageDsc/issues/169).
+- Updated Examples to support deployment to PowerShell Gallery scripts.
+- Removed limitation on using Pester 4.0.8 during AppVeyor CI.
+- Moved the Code of Conduct text out of the README.md and into a
+  CODE_OF_CONDUCT.md file.
+
 ## 4.3.0.0
 
 - WaitForDisk:
