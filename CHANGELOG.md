@@ -2,7 +2,8 @@
 
 ## Unreleased
 
-  Added a while loop to wait on the volume format - fixes [Issue #85](https://github.com/PowerShell/StorageDsc/issues/85).
+- Disk:
+  - Added a while loop to wait on the volume format - fixes [Issue #85](https://github.com/PowerShell/StorageDsc/issues/85).
 
 ## 4.3.0.0
 
