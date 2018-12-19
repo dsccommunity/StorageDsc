@@ -437,7 +437,7 @@ function Set-TargetResource
             } # if
 
             # Create the partition.
-            $partition = $disk | New-Partition @partitionParams | ForEach-Object { Start-Sleep -Seconds 3}
+            $partition = $disk | New-Partition @partitionParams | ForEach-Object { Start-Sleep -Seconds 3; $_}
 
             <#
                 After creating the partition it can take a few seconds for it to become writeable
