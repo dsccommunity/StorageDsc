@@ -1188,6 +1188,7 @@ try
 
                 Mock `
                     -CommandName Get-Volume `
+                    -ParameterFilter $script:parameterFilter_MockedDisk0Number
                     -MockWith { $script:mockedVolumeUnformatted } `
                     -Verifiable
 
@@ -1218,7 +1219,6 @@ try
                         -ParameterFilter $script:parameterFilter_MockedDisk0Number
                     Assert-MockCalled -CommandName Set-Disk -Exactly -Times 0
                     Assert-MockCalled -CommandName Initialize-Disk -Exactly -Times 0
-                    Assert-MockCalled -CommandName Get-Partition -Exactly -Times 1
                     Assert-MockCalled -CommandName Get-Volume -Exactly -Times 1
                     Assert-MockCalled -CommandName New-Partition -Exactly -Times 1 `
                         -ParameterFilter {
@@ -1230,6 +1230,74 @@ try
             }
 
             Context 'When online GPT disk with no partitions using Disk Number, partition fails to become writeable' {
+                # verifiable (should be called) mocks
+                Mock `
+                    -CommandName Get-DiskByIdentifier `
+                    -ParameterFilter $script:parameterFilter_MockedDisk0Number `
+                    -MockWith { $script:mockedDisk0Gpt } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-Partition `
+                    -MockWith { $script:mockedPartitionNoDriveLetterReadOnly } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName New-Partition `
+                    -ParameterFilter {
+                    $DriveLetter -eq $script:testDriveLetter
+                } `
+                    -MockWith { $script:mockedPartitionNoDriveLetterReadOnly } `
+                    -Verifiable
+
+                # mocks that should not be called
+                Mock -CommandName Set-Disk
+                Mock -CommandName Initialize-Disk
+                Mock -CommandName Set-Volume
+                Mock -CommandName Get-Volume
+                Mock -CommandName Format-Volume
+                Mock -CommandName Set-Partition
+
+                $startTime = Get-Date
+
+                $errorRecord = Get-InvalidOperationRecord `
+                    -Message ($LocalizedData.NewParitionIsReadOnlyError -f `
+                        'Number', $script:mockedDisk0Mbr.Number, $script:mockedPartitionNoDriveLetterReadOnly.PartitionNumber)
+
+                It 'Should throw NewParitionIsReadOnlyError' {
+                    {
+                        Set-TargetResource `
+                            -DiskId $script:mockedDisk0Gpt.Number `
+                            -Driveletter $script:testDriveLetter `
+                            -Verbose
+                    } | Should -Throw $errorRecord
+                }
+
+                $endTime = Get-Date
+
+                It 'Should take at least 30s' {
+                    ($endTime - $startTime).TotalSeconds | Should -BeGreaterThan 29
+                }
+
+                It 'Should call the correct mocks' {
+                    Assert-VerifiableMock
+                    Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 1 `
+                        -ParameterFilter $script:parameterFilter_MockedDisk0Number
+                    Assert-MockCalled -CommandName Set-Disk -Exactly -Times 0
+                    Assert-MockCalled -CommandName Initialize-Disk -Exactly -Times 0
+                    Assert-MockCalled -CommandName Get-Partition -Exactly -Times 31
+                    Assert-MockCalled -CommandName Get-Volume -Exactly -Times 1
+                    Assert-MockCalled -CommandName New-Partition -Exactly -Times 1 `
+                        -ParameterFilter {
+                        $DriveLetter -eq $script:testDriveLetter
+                    }
+                    Assert-MockCalled -CommandName Format-Volume -Exactly -Times 0
+                    Assert-MockCalled -CommandName Set-Volume -Exactly -Times 0
+                    Assert-MockCalled -CommandName Set-Partition -Exactly -Times 0
+                }
+            }
+
+            Context 'When online GPT disk with no partitions using Disk UUID, volume fails to format waiting on partition to create' {
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Get-DiskByIdentifier `
