@@ -6,7 +6,7 @@
     CheckingDiskPartitionStyleMessage = Checking disk with {0} '{1}' partition style.
     InitializingDiskMessage = Initializing disk with {0} '{1}' as '{2}'.
     DiskAlreadyInitializedMessage = Disk with {0} '{1}' is already initialized with '{2}'.
-    CreatingPartitionWaitMessage = Creating partition on disk with {0} '{1}' with drive letter '{2}'.
+    CreatingPartitionMessage = Creating partition on disk with {0} '{1}' with drive letter '{2}' using {3}.
     FormattingVolumeMessage = Formatting the volume as '{0}'.
     SuccessfullyInitializedMessage = Successfully initialized '{0}'.
     ChangingDriveLetterMessage = The volume already exists, changing drive letter '{0}' to '{1}'.
