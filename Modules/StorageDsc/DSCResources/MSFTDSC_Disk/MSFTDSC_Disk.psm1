@@ -436,8 +436,15 @@ function Set-TargetResource
                 $partitionParams['UseMaximumSize'] = $true
             } # if
 
-            # Create the partition.
-            $partition = $disk | New-Partition @partitionParams | ForEach-Object { Start-Sleep -Seconds 3; $_}
+            # Create the partition with a 3 second sleep to allow completion before formatting
+            $partition = $disk | New-Partition @partitionParams
+
+            Write-Verbose -Message ( @(
+                    "$($MyInvocation.MyCommand): "
+                    $('waiting for 3 seconds for partition creation to complete')
+                ) -join '' )
+
+            Start-Sleep -Seconds 3
 
             <#
                 After creating the partition it can take a few seconds for it to become writeable
