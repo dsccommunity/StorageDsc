@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 4.4.0.0
+
 - Refactored module folder structure to move resource to root folder of
   repository and remove test harness - fixes [Issue #169](https://github.com/PowerShell/StorageDsc/issues/169).
 - Updated Examples to support deployment to PowerShell Gallery scripts.
