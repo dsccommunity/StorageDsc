@@ -8,6 +8,7 @@
 - Removed limitation on using Pester 4.0.8 during AppVeyor CI.
 - Moved the Code of Conduct text out of the README.md and into a
   CODE\_OF\_CONDUCT.md file.
+- Explicitly removed extra hidden files from release package
 
 ## 4.3.0.0
 
