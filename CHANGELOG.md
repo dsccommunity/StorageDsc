@@ -9,6 +9,12 @@
   - There appears to be no property to determine if the partition is
     sufficiently ready to format and it will often format as a raw volume when
     the error occurs.
+- Refactored module folder structure to move resource to root folder of
+  repository and remove test harness - fixes [Issue #169](https://github.com/PowerShell/StorageDsc/issues/169).
+- Updated Examples to support deployment to PowerShell Gallery scripts.
+- Removed limitation on using Pester 4.0.8 during AppVeyor CI.
+- Moved the Code of Conduct text out of the README.md and into a
+  CODE\_OF\_CONDUCT.md file.
 
 ## 4.3.0.0
 
