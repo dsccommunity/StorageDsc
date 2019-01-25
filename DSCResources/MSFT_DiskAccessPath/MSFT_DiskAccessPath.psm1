@@ -162,6 +162,10 @@ function Set-TargetResource
         [System.String]
         $AccessPath,
 
+        [Parameter()]
+        [System.Boolean]
+        $NoDefaultDriveLetter = $true,
+
         [Parameter(Mandatory = $true)]
         [System.String]
         $DiskId,
@@ -496,6 +500,10 @@ function Set-TargetResource
             -AccessPath $AccessPath `
             -DiskNumber $disk.Number `
             -PartitionNumber $partition.PartitionNumber
+
+        Set-Partition -PartitionNumber $partition.PartitionNumber `
+        -DiskNumber $disk.Number `
+        -NoDefaultDriveLetter $NoDefaultDriveLetter
 
         Write-Verbose -Message ( @(
                 "$($MyInvocation.MyCommand): "
