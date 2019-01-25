@@ -9,6 +9,10 @@
 - Moved the Code of Conduct text out of the README.md and into a
   CODE\_OF\_CONDUCT.md file.
 
+- DiskAccessPath
+  update the resource to not assign a drive letter by default when adding
+  a disk access path. Fixes [Issue #145](https://github.com/PowerShell/StorageDsc/issues/145).
+
 ## 4.3.0.0
 
 - WaitForDisk:
