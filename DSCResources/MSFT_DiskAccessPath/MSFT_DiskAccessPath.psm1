@@ -501,6 +501,7 @@ function Set-TargetResource
             -DiskNumber $disk.Number `
             -PartitionNumber $partition.PartitionNumber
 
+        # setting the partition property NoDefaultDriveLetter to True to prevent adding drive letter on reboot
         Set-Partition -PartitionNumber $partition.PartitionNumber `
         -DiskNumber $disk.Number `
         -NoDefaultDriveLetter $NoDefaultDriveLetter

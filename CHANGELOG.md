@@ -10,8 +10,13 @@
   CODE\_OF\_CONDUCT.md file.
 
 - DiskAccessPath
-  update the resource to not assign a drive letter by default when adding
-  a disk access path. Fixes [Issue #145](https://github.com/PowerShell/StorageDsc/issues/145).
+  Update the resource to not assign a drive letter by default when adding
+  a disk access path. Adding a Set-Partition -NoDefaultDriveLetter $NoDefaultDriveLetter block
+  defaulting to true. When adding access paths the disks will no longer have
+  drive letters automatically assigned on next reboot which is the desired
+  behavior.
+
+  Fixes [Issue #145](https://github.com/PowerShell/StorageDsc/issues/145).
 
 ## 4.3.0.0
 
