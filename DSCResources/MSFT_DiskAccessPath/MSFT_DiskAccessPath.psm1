@@ -55,6 +55,10 @@ function Get-TargetResource
         [System.String]
         $AccessPath,
 
+        [Parameter()]
+        [System.Boolean]
+        $NoDefaultDriveLetter = $true,
+
         [Parameter(Mandatory = $true)]
         [System.String]
         $DiskId,
@@ -115,13 +119,14 @@ function Get-TargetResource
             -ErrorAction SilentlyContinue).BlockSize
 
     $returnValue = @{
-        DiskId             = $DiskId
-        DiskIdType         = $DiskIdType
-        AccessPath         = $AccessPath
-        Size               = $assignedPartition.Size
-        FSLabel            = $FSLabel
-        AllocationUnitSize = $blockSize
-        FSFormat           = $fileSystem
+        DiskId               = $DiskId
+        DiskIdType           = $DiskIdType
+        AccessPath           = $AccessPath
+        NoDefaultDriveLetter = $partition.NoDefaultDriveLetter
+        Size                 = $assignedPartition.Size
+        FSLabel              = $FSLabel
+        AllocationUnitSize   = $blockSize
+        FSFormat             = $fileSystem
     }
     $returnValue
 } # Get-TargetResource
