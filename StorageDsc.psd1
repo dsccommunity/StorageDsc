@@ -10,7 +10,7 @@
 # RootModule = ''
 
 # Version number of this module.
-moduleVersion = '4.3.0.0'
+moduleVersion = '4.4.0.0'
 
 # ID used to uniquely identify this module
 GUID = '00d73ca1-58b5-46b7-ac1a-5bfcf5814faf'
@@ -102,9 +102,13 @@ PrivateData = @{
         # IconUri = ''
 
         # ReleaseNotes of this module
-        ReleaseNotes = '- WaitForDisk:
-  - Added readonly-property isAvailable which shows the current state
-    of the disk as a boolean - fixes [Issue 158](https://github.com/PowerShell/StorageDsc/issues/158).
+        ReleaseNotes = '- Refactored module folder structure to move resource to root folder of
+  repository and remove test harness - fixes [Issue 169](https://github.com/PowerShell/StorageDsc/issues/169).
+- Updated Examples to support deployment to PowerShell Gallery scripts.
+- Removed limitation on using Pester 4.0.8 during AppVeyor CI.
+- Moved the Code of Conduct text out of the README.md and into a
+  CODE\_OF\_CONDUCT.md file.
+- Explicitly removed extra hidden files from release package
 
 '
 
@@ -119,6 +123,7 @@ PrivateData = @{
 # DefaultCommandPrefix = ''
 
 }
+
 
 
 
