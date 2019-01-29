@@ -62,7 +62,7 @@ try
                                 @{
                                     NodeName   = 'localhost'
                                     AccessPath = $accessPathA
-                                    DiskId     = [int]$disk.Number
+                                    DiskId     = $disk.Number
                                     DiskIdType = 'Number'
                                     FSLabel    = $FSLabelA
                                     Size       = 100MB
