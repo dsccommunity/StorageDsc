@@ -519,19 +519,20 @@ function Set-TargetResource
     } # if
 
     #get the current partition state for NoDefaultDriveLetter
-    $partition = $disk | Get-Partition -ErrorAction SilentlyContinue
+    $partition = $disk | Get-Partition |
+        Where-Object -Property AccessPaths -Contains -Value $AccessPath -ErrorAction SilentlyContinue
 
     if ($partition.NoDefaultDriveLetter -ne $NoDefaultDriveLetter)
     {
+        Write-Verbose -Message ( @(
+                "$($MyInvocation.MyCommand): "
+                "$($localizedData.NoDefaultDriveLetterMismatchMessage -f $NoDefaultDriveLetter)"
+            ) -join '' )
+
         # setting the partition property NoDefaultDriveLetter to True to prevent adding drive letter on reboot
         Set-Partition -PartitionNumber $partition.PartitionNumber `
             -DiskNumber $disk.Number `
             -NoDefaultDriveLetter $NoDefaultDriveLetter
-
-        Write-Verbose -Message ( @(
-                "$($MyInvocation.MyCommand): "
-                $($localizedData.SuccessfullyInitializedMessage -f $AccessPath)
-            ) -join '' )
     } # if
 
 } # Set-TargetResource
