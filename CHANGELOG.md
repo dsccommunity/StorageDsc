@@ -19,6 +19,7 @@
   When adding access paths the disks will no longer have
   drive letters automatically assigned on next reboot which is the desired
   behavior.
+  -whitespace deploy 1
 
   Fixes [Issue #145](https://github.com/PowerShell/StorageDsc/issues/145).
 
