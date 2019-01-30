@@ -546,6 +546,10 @@ try
                     -Verifiable
 
                 Mock `
+                    -CommandName Set-Partition `
+                    -Verifiable
+
+                Mock `
                     -CommandName Get-Volume `
                     -MockWith { $script:mockedVolumeUnformatted } `
                     -Verifiable
@@ -609,6 +613,10 @@ try
                 Mock `
                     -CommandName New-Partition `
                     -MockWith { $script:mockedPartitionNoAccess } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Set-Partition `
                     -Verifiable
 
                 Mock `
@@ -679,6 +687,10 @@ try
                     -Verifiable
 
                 Mock `
+                    -CommandName Set-Partition `
+                    -Verifiable
+
+                Mock `
                     -CommandName Get-Volume `
                     -MockWith { $script:mockedVolumeUnformatted } `
                     -Verifiable
@@ -743,6 +755,10 @@ try
                 Mock `
                     -CommandName New-Partition `
                     -MockWith { $script:mockedPartitionNoAccess } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Set-Partition `
                     -Verifiable
 
                 Mock `
@@ -816,6 +832,10 @@ try
                     -Verifiable
 
                 Mock `
+                    -CommandName Set-Partition `
+                    -Verifiable
+
+                Mock `
                     -CommandName Get-Volume `
                     -MockWith { $script:mockedVolumeUnformatted } `
                     -Verifiable
@@ -881,6 +901,10 @@ try
                     -Verifiable
 
                 Mock `
+                    -CommandName Set-Partition `
+                    -Verifiable
+
+                Mock `
                     -CommandName Get-Volume `
                     -MockWith { $script:mockedVolumeUnformatted } `
                     -Verifiable
@@ -940,6 +964,10 @@ try
                 Mock `
                     -CommandName New-Partition `
                     -MockWith { $script:mockedPartition } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Set-Partition `
                     -Verifiable
 
                 Mock `
