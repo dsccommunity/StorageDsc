@@ -125,7 +125,7 @@ function Get-TargetResource
         DiskId               = $DiskId
         DiskIdType           = $DiskIdType
         AccessPath           = $AccessPath
-        NoDefaultDriveLetter = $partition.NoDefaultDriveLetter
+        NoDefaultDriveLetter = $assignedPartition.NoDefaultDriveLetter
         Size                 = $assignedPartition.Size
         FSLabel              = $FSLabel
         AllocationUnitSize   = $blockSize
