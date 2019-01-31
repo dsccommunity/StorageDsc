@@ -33,6 +33,7 @@ try
         $script:testDiskUniqueId = 'TESTDISKUNIQUEID'
         $script:testDiskGptGuid = [guid]::NewGuid()
         $script:testDiskMbrGuid = '123456'
+        $script:NoDefaultDriveLetter = $true
 
         $script:mockedDisk0 = [pscustomobject] @{
             Number         = $script:testDiskNumber
@@ -1670,6 +1671,7 @@ try
                         $script:result = Test-TargetResource `
                             -DiskId $script:mockedDisk0.Number `
                             -AccessPath $script:testAccessPath `
+                            -NoDefaultDriveLetter $script:NoDefaultDriveLetter `
                             -AllocationUnitSize 4096 `
                             -Size 124 `
                             -Verbose
@@ -1724,6 +1726,7 @@ try
                         $script:result = Test-TargetResource `
                             -DiskId $script:mockedDisk0.Number `
                             -AccessPath $script:testAccessPath `
+                            -NoDefaultDriveLetter $script:NoDefaultDriveLetter `
                             -AllocationUnitSize 4097 `
                             -Verbose
                     } | Should -Not -Throw
@@ -1780,6 +1783,7 @@ try
                         $script:result = Test-TargetResource `
                             -DiskId $script:mockedDisk0.Number `
                             -AccessPath $script:testAccessPath `
+                            -NoDefaultDriveLetter $script:NoDefaultDriveLetter `
                             -FSFormat 'ReFS' `
                             -Verbose
                     } | Should -Not -Throw
@@ -1835,6 +1839,7 @@ try
                         $script:result = Test-TargetResource `
                             -DiskId $script:mockedDisk0.Number `
                             -AccessPath $script:testAccessPath `
+                            -NoDefaultDriveLetter $script:NoDefaultDriveLetter `
                             -FSLabel 'NewLabel' `
                             -Verbose
                     } | Should -Not -Throw
@@ -1890,6 +1895,7 @@ try
                         $script:result = Test-TargetResource `
                             -DiskId $script:mockedDisk0.Number `
                             -AccessPath $script:testAccessPath `
+                            -NoDefaultDriveLetter $script:NoDefaultDriveLetter `
                             -AllocationUnitSize 4096 `
                             -Size $script:mockedPartition.Size `
                             -FSFormat $script:mockedVolume.FileSystem `
