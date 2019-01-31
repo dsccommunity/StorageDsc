@@ -108,6 +108,7 @@ try
         $script:mockedPartitionNoAccess = [pscustomobject] @{
             AccessPaths     = @(
                 '\\?\Volume{2d313fdd-e4a4-4f31-9784-dad758e0030f}\'
+                $script:testAccessPath
             )
             Size            = $script:mockedPartitionSize
             PartitionNumber = 1
@@ -590,6 +591,7 @@ try
                     Assert-MockCalled -CommandName New-Partition -Times 1
                     Assert-MockCalled -CommandName Format-Volume -Times 1
                     Assert-MockCalled -CommandName Add-PartitionAccessPath -Times 1
+                    Assert-MockCalled -CommandName Set-Partition -Times 1
                 }
             }
 
@@ -662,6 +664,7 @@ try
                     Assert-MockCalled -CommandName New-Partition -Times 1
                     Assert-MockCalled -CommandName Format-Volume -Times 1
                     Assert-MockCalled -CommandName Add-PartitionAccessPath -Times 1
+                    Assert-MockCalled -CommandName Set-Partition -Times 1
                 }
             }
 
@@ -734,6 +737,8 @@ try
                     Assert-MockCalled -CommandName New-Partition -Times 1
                     Assert-MockCalled -CommandName Format-Volume -Times 1
                     Assert-MockCalled -CommandName Add-PartitionAccessPath -Times 1
+                    Assert-MockCalled -CommandName Set-Partition -Times 1
+
                 }
             }
 
@@ -804,6 +809,7 @@ try
                     Assert-MockCalled -CommandName New-Partition -Times 1
                     Assert-MockCalled -CommandName Format-Volume -Times 1
                     Assert-MockCalled -CommandName Add-PartitionAccessPath -Times 1
+                    Assert-MockCalled -CommandName Set-Partition -Times 1
                 }
             }
 
@@ -877,6 +883,7 @@ try
                     Assert-MockCalled -CommandName New-Partition -Times 1
                     Assert-MockCalled -CommandName Format-Volume -Times 1
                     Assert-MockCalled -CommandName Add-PartitionAccessPath -Times 1
+                    Assert-MockCalled -CommandName Set-Partition -Times 1
                 }
             }
 
@@ -947,6 +954,7 @@ try
                     Assert-MockCalled -CommandName New-Partition -Times 1
                     Assert-MockCalled -CommandName Format-Volume -Times 1
                     Assert-MockCalled -CommandName Add-PartitionAccessPath -Times 1
+                    Assert-MockCalled -CommandName Set-Partition -Times 1
                 }
             }
 
@@ -1015,6 +1023,7 @@ try
                     Assert-MockCalled -CommandName New-Partition -Times 1
                     Assert-MockCalled -CommandName Format-Volume -Times 1
                     Assert-MockCalled -CommandName Add-PartitionAccessPath -Times 1
+                    Assert-MockCalled -CommandName Set-Partition -Times 1
                 }
             }
 
@@ -1281,6 +1290,7 @@ try
                     Assert-MockCalled -CommandName New-Partition -Times 0
                     Assert-MockCalled -CommandName Format-Volume -Times 0
                     Assert-MockCalled -CommandName Add-PartitionAccessPath -Times 1
+                    Assert-MockCalled -CommandName Set-Partition -Times 1
                 }
             }
 
@@ -1339,6 +1349,7 @@ try
                     Assert-MockCalled -CommandName New-Partition -Times 0
                     Assert-MockCalled -CommandName Format-Volume -Times 0
                     Assert-MockCalled -CommandName Add-PartitionAccessPath -Times 1
+                    Assert-MockCalled -CommandName Set-Partition -Times 1
                 }
             }
 
