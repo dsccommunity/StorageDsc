@@ -112,6 +112,7 @@ try
             Size            = $script:mockedPartitionSize
             PartitionNumber = 1
             Type            = 'Basic'
+            NoDefaultDriveLetter = $script:NoDefaultDriveLetter
         }
 
         $script:mockedVolume = [pscustomobject] @{
@@ -589,7 +590,6 @@ try
                     Assert-MockCalled -CommandName New-Partition -Times 1
                     Assert-MockCalled -CommandName Format-Volume -Times 1
                     Assert-MockCalled -CommandName Add-PartitionAccessPath -Times 1
-                    Assert-MockCalled -CommandName Set-Partition -Times 1
                 }
             }
 
@@ -645,6 +645,7 @@ try
                             -DiskId $script:mockedDisk0Offline.UniqueId `
                             -DiskIdType 'UniqueId' `
                             -AccessPath $script:testAccessPath `
+                            -NoDefaultDriveLetter $script:NoDefaultDriveLetter `
                             -Verbose
                     } | Should -Not -Throw
                 }
@@ -661,7 +662,6 @@ try
                     Assert-MockCalled -CommandName New-Partition -Times 1
                     Assert-MockCalled -CommandName Format-Volume -Times 1
                     Assert-MockCalled -CommandName Add-PartitionAccessPath -Times 1
-                    Assert-MockCalled -CommandName Set-Partition -Times 1
                 }
             }
 
@@ -734,7 +734,6 @@ try
                     Assert-MockCalled -CommandName New-Partition -Times 1
                     Assert-MockCalled -CommandName Format-Volume -Times 1
                     Assert-MockCalled -CommandName Add-PartitionAccessPath -Times 1
-                    Assert-MockCalled -CommandName Set-Partition -Times 1
                 }
             }
 
@@ -805,7 +804,6 @@ try
                     Assert-MockCalled -CommandName New-Partition -Times 1
                     Assert-MockCalled -CommandName Format-Volume -Times 1
                     Assert-MockCalled -CommandName Add-PartitionAccessPath -Times 1
-                    Assert-MockCalled -CommandName Set-Partition -Times 1
                 }
             }
 
@@ -879,7 +877,6 @@ try
                     Assert-MockCalled -CommandName New-Partition -Times 1
                     Assert-MockCalled -CommandName Format-Volume -Times 1
                     Assert-MockCalled -CommandName Add-PartitionAccessPath -Times 1
-                    Assert-MockCalled -CommandName Set-Partition -Times 1
                 }
             }
 
@@ -950,7 +947,6 @@ try
                     Assert-MockCalled -CommandName New-Partition -Times 1
                     Assert-MockCalled -CommandName Format-Volume -Times 1
                     Assert-MockCalled -CommandName Add-PartitionAccessPath -Times 1
-                    Assert-MockCalled -CommandName Set-Partition -Times 1
                 }
             }
 
@@ -1002,6 +998,7 @@ try
                         Set-targetResource `
                             -DiskId $script:mockedDisk0.Number `
                             -AccessPath $script:testAccessPath `
+                            -NoDefaultDriveLetter $script:NoDefaultDriveLetter `
                             -Verbose
                     } | Should -Not -Throw
                 }
@@ -1018,7 +1015,6 @@ try
                     Assert-MockCalled -CommandName New-Partition -Times 1
                     Assert-MockCalled -CommandName Format-Volume -Times 1
                     Assert-MockCalled -CommandName Add-PartitionAccessPath -Times 1
-                    Assert-MockCalled -CommandName Set-Partition -Times 1
                 }
             }
 
