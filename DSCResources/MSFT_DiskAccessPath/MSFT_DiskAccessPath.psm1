@@ -526,7 +526,7 @@ function Set-TargetResource
     {
         Write-Verbose -Message ( @(
                 "$($MyInvocation.MyCommand): "
-                "$($localizedData.NoDefaultDriveLetterMismatchMessage -f $NoDefaultDriveLetter)"
+                "$($localizedData.NoDefaultDriveLetterMismatchMessage -f $partition.NoDefaultDriveLetter, $NoDefaultDriveLetter)"
             ) -join '' )
 
         # setting the partition property NoDefaultDriveLetter to True to prevent adding drive letter on reboot
