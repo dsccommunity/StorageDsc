@@ -101,13 +101,12 @@ try
             Size                 = $script:mockedPartitionSize
             PartitionNumber      = 1
             Type                 = 'Basic'
-            NoDefaultDriveLetter = $false
+            NoDefaultDriveLetter = $True
         }
 
         $script:mockedPartitionNoAccess = [pscustomobject] @{
             AccessPaths     = @(
                 '\\?\Volume{2d313fdd-e4a4-4f31-9784-dad758e0030f}\'
-                $script:testAccessPath
             )
             Size            = $script:mockedPartitionSize
             PartitionNumber = 1
@@ -1260,6 +1259,10 @@ try
                     -CommandName Add-PartitionAccessPath `
                     -Verifiable
 
+                Mock `
+                    -CommandName Set-Partition `
+                    -Verifiable
+
                 # mocks that should not be called
                 Mock -CommandName Set-Disk
                 Mock -CommandName Initialize-Disk
@@ -1318,6 +1321,10 @@ try
 
                 Mock `
                     -CommandName Add-PartitionAccessPath `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Set-Partition `
                     -Verifiable
 
                 # mocks that should not be called
