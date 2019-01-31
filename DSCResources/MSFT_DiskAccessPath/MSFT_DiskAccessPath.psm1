@@ -519,8 +519,8 @@ function Set-TargetResource
     } # if
 
     #get the current partition state for NoDefaultDriveLetter
-    $partition = $disk | Get-Partition |
-        Where-Object -Property AccessPaths -Contains -Value $AccessPath -ErrorAction SilentlyContinue
+    $assignedPartition = $partition |
+        Where-Object -Property AccessPaths -Contains -Value $AccessPath
 
     if ($partition.NoDefaultDriveLetter)
     {
@@ -528,11 +528,11 @@ function Set-TargetResource
         {
             Write-Verbose -Message ( @(
                     "$($MyInvocation.MyCommand): "
-                    "$($localizedData.NoDefaultDriveLetterMismatchMessage -f $partition.NoDefaultDriveLetter, $NoDefaultDriveLetter)"
+                    "$($localizedData.NoDefaultDriveLetterMismatchMessage -f $assignedPartition.NoDefaultDriveLetter, $NoDefaultDriveLetter)"
                 ) -join '' )
 
             # setting the partition property NoDefaultDriveLetter to True to prevent adding drive letter on reboot
-            Set-Partition -PartitionNumber $partition.PartitionNumber `
+            Set-Partition -PartitionNumber $assignedPartition.PartitionNumber `
                 -DiskNumber $disk.Number `
                 -NoDefaultDriveLetter $NoDefaultDriveLetter
         } # if
@@ -666,15 +666,7 @@ function Test-TargetResource
     # Get the partitions on the disk
     $partition = $disk | Get-Partition -ErrorAction SilentlyContinue
 
-    # Check if the partition NoDefaultDriveLetter parameter is correct
-    if ($partition.NoDefaultDriveLetter -ne $NoDefaultDriveLetter)
-    {
-        Write-Verbose -Message ( @(
-                "$($MyInvocation.MyCommand): "
-                $($localizedData.NoDefaultDriveLetterMismatchMessage -f $partition.NoDefaultDriveLetter, $NoDefaultDriveLetter)
-            ) -join '' )
-        return $false
-    } # if
+
 
     # Check if the disk has an existing partition assigned to the access path
     $assignedPartition = $partition |
@@ -685,6 +677,16 @@ function Test-TargetResource
         Write-Verbose -Message ( @(
                 "$($MyInvocation.MyCommand): "
                 $($localizedData.AccessPathNotFoundMessage -f $AccessPath)
+            ) -join '' )
+        return $false
+    } # if
+
+    # Check if the partition NoDefaultDriveLetter parameter is correct
+    if ($assignedPartition.NoDefaultDriveLetter -ne $NoDefaultDriveLetter)
+    {
+        Write-Verbose -Message ( @(
+                "$($MyInvocation.MyCommand): "
+                $($localizedData.NoDefaultDriveLetterMismatchMessage -f $assignedPartition.NoDefaultDriveLetter, $NoDefaultDriveLetter)
             ) -join '' )
         return $false
     } # if
