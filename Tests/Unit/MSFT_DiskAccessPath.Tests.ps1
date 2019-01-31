@@ -101,7 +101,7 @@ try
             Size                 = $script:mockedPartitionSize
             PartitionNumber      = 1
             Type                 = 'Basic'
-            NoDefaultDriveLetter = $false
+            NoDefaultDriveLetter = $true
         }
 
         $script:mockedPartitionNoAccess = [pscustomobject] @{
