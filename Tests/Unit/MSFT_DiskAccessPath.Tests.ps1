@@ -87,6 +87,7 @@ try
             IsOffline      = $false
             IsReadOnly     = $false
             PartitionStyle = 'Raw'
+            NoDefaultDriveLetter = $true
         }
 
         $script:mockedCim = [pscustomobject] @{BlockSize = 4096}
@@ -98,9 +99,10 @@ try
                 '\\?\Volume{2d313fdd-e4a4-4f31-9784-dad758e0030f}\'
                 $script:testAccessPath
             )
-            Size            = $script:mockedPartitionSize
-            PartitionNumber = 1
-            Type            = 'Basic'
+            Size                 = $script:mockedPartitionSize
+            PartitionNumber      = 1
+            Type                 = 'Basic'
+            NoDefaultDriveLetter = $script:NoDefaultDriveLetter
         }
 
         $script:mockedPartitionNoAccess = [pscustomobject] @{
