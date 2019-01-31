@@ -1207,6 +1207,7 @@ try
                         Set-targetResource `
                             -DiskId $script:mockedDisk0.Number `
                             -AccessPath $script:testAccessPath `
+                            -NoDefaultDriveLetter $script:NoDefaultDriveLetter `
                             -Verbose
                     } | Should -Not -Throw
                 }
@@ -1264,6 +1265,7 @@ try
                         Set-targetResource `
                             -DiskId $script:mockedDisk0.Number `
                             -AccessPath $script:testAccessPath `
+                            -NoDefaultDriveLetter $script:NoDefaultDriveLetter `
                             -Size $script:mockedPartitionSize `
                             -Verbose
                     } | Should -Not -Throw
@@ -1322,6 +1324,7 @@ try
                         Set-targetResource `
                             -DiskId $script:mockedDisk0.Number `
                             -AccessPath $script:testAccessPath `
+                            -NoDefaultDriveLetter $script:NoDefaultDriveLetter `
                             -Verbose
                     } | Should -Not -Throw
                 }
@@ -1380,6 +1383,7 @@ try
                         Set-targetResource `
                             -DiskId $script:mockedDisk0.Number `
                             -AccessPath $script:testAccessPath `
+                            -NoDefaultDriveLetter $script:NoDefaultDriveLetter `
                             -FSLabel 'NewLabel' `
                             -Verbose
                     } | Should -Not -Throw
