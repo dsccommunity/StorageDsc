@@ -671,7 +671,7 @@ function Test-TargetResource
     {
         Write-Verbose -Message ( @(
                 "$($MyInvocation.MyCommand): "
-                $($localizedData.NoDefaultDriveLetterMismatchMessage -f $NoDefaultDriveLetter)
+                $($localizedData.NoDefaultDriveLetterMismatchMessage -f $partition.NoDefaultDriveLetter, $NoDefaultDriveLetter)
             ) -join '' )
         return $false
     } # if
