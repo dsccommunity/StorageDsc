@@ -667,7 +667,6 @@ function Test-TargetResource
     $partition = $disk | Get-Partition -ErrorAction SilentlyContinue
 
     # Check if the partition NoDefaultDriveLetter parameter is correct
-
     if ($partition.NoDefaultDriveLetter -ne $NoDefaultDriveLetter)
     {
         Write-Verbose -Message ( @(

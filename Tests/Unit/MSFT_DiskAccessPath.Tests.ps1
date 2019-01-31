@@ -546,10 +546,6 @@ try
                     -Verifiable
 
                 Mock `
-                    -CommandName Set-Partition `
-                    -Verifiable
-
-                Mock `
                     -CommandName Get-Volume `
                     -MockWith { $script:mockedVolumeUnformatted } `
                     -Verifiable
@@ -560,6 +556,10 @@ try
 
                 Mock `
                     -CommandName Add-PartitionAccessPath `
+                    -Verifiable
+
+                    Mock `
+                    -CommandName Set-Partition `
                     -Verifiable
 
                 # mocks that should not be called
@@ -586,6 +586,7 @@ try
                     Assert-MockCalled -CommandName New-Partition -Times 1
                     Assert-MockCalled -CommandName Format-Volume -Times 1
                     Assert-MockCalled -CommandName Add-PartitionAccessPath -Times 1
+                    Assert-MockCalled -CommandName Set-Partition -Times 1
                 }
             }
 
@@ -616,10 +617,6 @@ try
                     -Verifiable
 
                 Mock `
-                    -CommandName Set-Partition `
-                    -Verifiable
-
-                Mock `
                     -CommandName Get-Volume `
                     -MockWith { $script:mockedVolumeUnformatted } `
                     -Verifiable
@@ -630,6 +627,10 @@ try
 
                 Mock `
                     -CommandName Add-PartitionAccessPath `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Set-Partition `
                     -Verifiable
 
                 # mocks that should not be called
@@ -657,6 +658,7 @@ try
                     Assert-MockCalled -CommandName New-Partition -Times 1
                     Assert-MockCalled -CommandName Format-Volume -Times 1
                     Assert-MockCalled -CommandName Add-PartitionAccessPath -Times 1
+                    Assert-MockCalled -CommandName Set-Partition -Times 1
                 }
             }
 
@@ -687,10 +689,6 @@ try
                     -Verifiable
 
                 Mock `
-                    -CommandName Set-Partition `
-                    -Verifiable
-
-                Mock `
                     -CommandName Get-Volume `
                     -MockWith { $script:mockedVolumeUnformatted } `
                     -Verifiable
@@ -702,6 +700,11 @@ try
                 Mock `
                     -CommandName Add-PartitionAccessPath `
                     -Verifiable
+
+                Mock `
+                    -CommandName Set-Partition `
+                    -Verifiable
+
 
                 # mocks that should not be called
                 Mock -CommandName Initialize-Disk
@@ -728,6 +731,7 @@ try
                     Assert-MockCalled -CommandName New-Partition -Times 1
                     Assert-MockCalled -CommandName Format-Volume -Times 1
                     Assert-MockCalled -CommandName Add-PartitionAccessPath -Times 1
+                    Assert-MockCalled -CommandName Set-Partition -Times 1
                 }
             }
 
@@ -798,6 +802,7 @@ try
                     Assert-MockCalled -CommandName New-Partition -Times 1
                     Assert-MockCalled -CommandName Format-Volume -Times 1
                     Assert-MockCalled -CommandName Add-PartitionAccessPath -Times 1
+                    Assert-MockCalled -CommandName Set-Partition -Times 1
                 }
             }
 
@@ -832,10 +837,6 @@ try
                     -Verifiable
 
                 Mock `
-                    -CommandName Set-Partition `
-                    -Verifiable
-
-                Mock `
                     -CommandName Get-Volume `
                     -MockWith { $script:mockedVolumeUnformatted } `
                     -Verifiable
@@ -846,6 +847,10 @@ try
 
                 Mock `
                     -CommandName Add-PartitionAccessPath `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Set-Partition `
                     -Verifiable
 
                 # mocks that should not be called
@@ -871,6 +876,7 @@ try
                     Assert-MockCalled -CommandName New-Partition -Times 1
                     Assert-MockCalled -CommandName Format-Volume -Times 1
                     Assert-MockCalled -CommandName Add-PartitionAccessPath -Times 1
+                    Assert-MockCalled -CommandName Set-Partition -Times 1
                 }
             }
 
@@ -901,10 +907,6 @@ try
                     -Verifiable
 
                 Mock `
-                    -CommandName Set-Partition `
-                    -Verifiable
-
-                Mock `
                     -CommandName Get-Volume `
                     -MockWith { $script:mockedVolumeUnformatted } `
                     -Verifiable
@@ -915,6 +917,10 @@ try
 
                 Mock `
                     -CommandName Add-PartitionAccessPath `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Set-Partition `
                     -Verifiable
 
                 # mocks that should not be called
@@ -941,6 +947,7 @@ try
                     Assert-MockCalled -CommandName New-Partition -Times 1
                     Assert-MockCalled -CommandName Format-Volume -Times 1
                     Assert-MockCalled -CommandName Add-PartitionAccessPath -Times 1
+                    Assert-MockCalled -CommandName Set-Partition -Times 1
                 }
             }
 
@@ -967,10 +974,6 @@ try
                     -Verifiable
 
                 Mock `
-                    -CommandName Set-Partition `
-                    -Verifiable
-
-                Mock `
                     -CommandName Get-Volume `
                     -MockWith { $script:mockedVolumeUnformatted } `
                     -Verifiable
@@ -981,6 +984,10 @@ try
 
                 Mock `
                     -CommandName Add-PartitionAccessPath `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Set-Partition `
                     -Verifiable
 
                 # mocks that should not be called
@@ -1008,6 +1015,7 @@ try
                     Assert-MockCalled -CommandName New-Partition -Times 1
                     Assert-MockCalled -CommandName Format-Volume -Times 1
                     Assert-MockCalled -CommandName Add-PartitionAccessPath -Times 1
+                    Assert-MockCalled -CommandName Set-Partition -Times 1
                 }
             }
 
