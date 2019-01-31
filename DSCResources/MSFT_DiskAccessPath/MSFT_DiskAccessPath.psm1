@@ -522,9 +522,9 @@ function Set-TargetResource
     $assignedPartition = $partition |
         Where-Object -Property AccessPaths -Contains -Value $AccessPath
 
-    if ($partition.NoDefaultDriveLetter)
+    if ($assignedPartition.NoDefaultDriveLetter)
     {
-        if ($partition.NoDefaultDriveLetter -ne $NoDefaultDriveLetter)
+        if ($assignedPartition.NoDefaultDriveLetter -ne $NoDefaultDriveLetter)
         {
             Write-Verbose -Message ( @(
                     "$($MyInvocation.MyCommand): "
