@@ -522,8 +522,6 @@ function Set-TargetResource
     $assignedPartition = $partition |
         Where-Object -Property AccessPaths -Contains -Value $AccessPath
 
-    if ($assignedPartition.NoDefaultDriveLetter)
-    {
         if ($assignedPartition.NoDefaultDriveLetter -ne $NoDefaultDriveLetter)
         {
             Write-Verbose -Message ( @(
@@ -536,7 +534,6 @@ function Set-TargetResource
                 -DiskNumber $disk.Number `
                 -NoDefaultDriveLetter $NoDefaultDriveLetter
         } # if
-    } # if
 
 } # Set-TargetResource
 
