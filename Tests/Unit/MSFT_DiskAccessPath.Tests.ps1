@@ -87,7 +87,6 @@ try
             IsOffline      = $false
             IsReadOnly     = $false
             PartitionStyle = 'Raw'
-            NoDefaultDriveLetter = $true
         }
 
         $script:mockedCim = [pscustomobject] @{BlockSize = 4096}
@@ -102,7 +101,7 @@ try
             Size                 = $script:mockedPartitionSize
             PartitionNumber      = 1
             Type                 = 'Basic'
-            NoDefaultDriveLetter = $script:NoDefaultDriveLetter
+            NoDefaultDriveLetter = $false
         }
 
         $script:mockedPartitionNoAccess = [pscustomobject] @{
@@ -113,7 +112,7 @@ try
             Size            = $script:mockedPartitionSize
             PartitionNumber = 1
             Type            = 'Basic'
-            NoDefaultDriveLetter = $script:NoDefaultDriveLetter
+            NoDefaultDriveLetter = $false
         }
 
         $script:mockedVolume = [pscustomobject] @{
@@ -565,6 +564,7 @@ try
 
                     Mock `
                     -CommandName Set-Partition `
+
                     -Verifiable
 
                 # mocks that should not be called
