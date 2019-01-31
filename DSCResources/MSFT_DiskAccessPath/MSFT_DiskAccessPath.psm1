@@ -424,7 +424,7 @@ function Set-TargetResource
         Write-Verbose -Message ( @(
                 "$($MyInvocation.MyCommand): "
                 $($localizedData.PartitionAlreadyAssignedMessage -f `
-                        $AccessPath, $partition.PartitionNumber)
+                        $AccessPath, $assignedPartition.PartitionNumber)
             ) -join '' )
 
         $assignAccessPath = $false
