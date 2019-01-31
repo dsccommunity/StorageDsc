@@ -564,7 +564,6 @@ try
 
                     Mock `
                     -CommandName Set-Partition `
-
                     -Verifiable
 
                 # mocks that should not be called
