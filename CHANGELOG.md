@@ -13,12 +13,12 @@
 - Explicitly removed extra hidden files from release package
 
 - Disk:
-  - Added a Start-Sleep -Seconds 3 after new-partition - fixes [Issue #85](https://github.com/PowerShell/StorageDsc/issues/85).
-  - The problem occurs when the partition is created and the format-volume
+  - Added a Start-Sleep -Seconds 3 after new-partition.
+    The problem occurs when the partition is created and the format-volume
     is attempted before the volume has completed.
-  - There appears to be no property to determine if the partition is
+    There appears to be no property to determine if the partition is
     sufficiently ready to format and it will often format as a raw volume when
-    the error occurs.
+    the error occurs - fixes [Issue #85](https://github.com/PowerShell/StorageDsc/issues/85).
 
 ## 4.3.0.0
 
