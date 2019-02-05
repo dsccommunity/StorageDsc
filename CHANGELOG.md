@@ -3,6 +3,14 @@
 ## Unreleased
 
 - Opt-in to Example publishing to PowerShell Gallery - fixes [Issue #186](https://github.com/PowerShell/StorageDsc/issues/186).
+- DiskAccessPath
+  Updated the resource to not assign a drive letter by default when adding
+  a disk access path. Adding a Set-Partition -NoDefaultDriveLetter
+  $NoDefaultDriveLetter block defaulting to true.
+  When adding access paths the disks will no longer have
+  drive letters automatically assigned on next reboot which is the desired
+  behavior.
+  Fixes [Issue #145](https://github.com/PowerShell/StorageDsc/issues/145).
 
 ## 4.4.0.0
 
@@ -13,15 +21,6 @@
 - Moved the Code of Conduct text out of the README.md and into a
   CODE\_OF\_CONDUCT.md file.
 - Explicitly removed extra hidden files from release package
-
-- DiskAccessPath
-  Updated the resource to not assign a drive letter by default when adding
-  a disk access path. Adding a Set-Partition -NoDefaultDriveLetter
-  $NoDefaultDriveLetter block defaulting to true.
-  When adding access paths the disks will no longer have
-  drive letters automatically assigned on next reboot which is the desired
-  behavior.
-  Fixes [Issue #145](https://github.com/PowerShell/StorageDsc/issues/145).
 
 ## 4.3.0.0
 
