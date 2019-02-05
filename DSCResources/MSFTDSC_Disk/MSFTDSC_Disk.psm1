@@ -446,7 +446,7 @@ function Set-TargetResource
             $timeAtStart = Get-Date
             $minimumTimeToWait = $timeAtStart + (New-Timespan -Second 3)
             $maximumTimeToWait = $timeAtStart + (New-Timespan -Second 30)
-            while ($partition.IsReadOnly -and (Get-Date) -lt $maximumTimeToWait -and (Get-Date) -lt $minimumTimeToWait)
+            while (($partition.IsReadOnly -and (Get-Date) -lt $maximumTimeToWait) -and ((Get-Date) -lt $minimumTimeToWait))
             {
                 Write-Verbose -Message ( @(
                         "$($MyInvocation.MyCommand): "
