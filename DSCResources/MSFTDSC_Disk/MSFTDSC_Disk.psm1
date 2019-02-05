@@ -436,6 +436,9 @@ function Set-TargetResource
                 $partitionParams['UseMaximumSize'] = $true
             } # if
 
+            # Create the partition.
+            $partition = $disk | New-Partition @partitionParams
+
             <#
                 After creating the partition it can take a few seconds for it to become writeable
                 Wait for up to 30 seconds for the parition to become writeable
