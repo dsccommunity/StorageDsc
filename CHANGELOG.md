@@ -13,7 +13,7 @@
 - Explicitly removed extra hidden files from release package
 
 - Disk:
-  - Added a Start-Sleep -Seconds 3 after new-partition.
+  - Added minimum timetowate of 3s after new-partition using the while loop.
     The problem occurs when the partition is created and the format-volume
     is attempted before the volume has completed.
     There appears to be no property to determine if the partition is
