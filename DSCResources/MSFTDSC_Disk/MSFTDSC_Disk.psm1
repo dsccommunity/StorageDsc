@@ -446,7 +446,7 @@ function Set-TargetResource
             $timeAtStart = Get-Date
             $minimumTimeToWait = $timeAtStart + (New-Timespan -Second 3)
             $maximumTimeToWait = $timeAtStart + (New-Timespan -Second 30)
-            while (($partition.IsReadOnly -and (Get-Date) -lt $maximumTimeToWait) -or ((Get-Date) -lt $minimumTimeToWait))
+            while (($partitionstate.IsReadOnly -and (Get-Date) -lt $maximumTimeToWait) -or ((Get-Date) -lt $minimumTimeToWait))
             {
                 Write-Verbose -Message ( @(
                         "$($MyInvocation.MyCommand): "
@@ -457,7 +457,7 @@ function Set-TargetResource
                 Start-Sleep -Seconds 1
 
                 # Pull the partition details again to check if it is readonly
-                $partition = $partition | Get-Partition
+                $partitionstate = $partition | Get-Partition
             } # while
         } # if
 
