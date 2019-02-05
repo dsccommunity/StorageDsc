@@ -821,7 +821,7 @@ try
                         -ParameterFilter { $DiskId -eq $script:mockedDisk0GptOffline.Number -and $DiskIdType -eq 'Number' }
                     Assert-MockCalled -CommandName Set-Disk -Exactly -Times 1
                     Assert-MockCalled -CommandName Initialize-Disk -Exactly -Times 0
-                    Assert-MockCalled -CommandName Get-Partition -Exactly -Times 1
+                    Assert-MockCalled -CommandName Get-Partition -Exactly -Times 4
                     Assert-MockCalled -CommandName Get-Volume -Exactly -Times 1
                     Assert-MockCalled -CommandName New-Partition -Exactly -Times 1 `
                         -ParameterFilter { $DriveLetter -eq $script:testDriveLetter }
@@ -886,7 +886,7 @@ try
                         -ParameterFilter { $DiskId -eq $script:mockedDisk0GptOffline.UniqueId -and $DiskIdType -eq 'UniqueId' }
                     Assert-MockCalled -CommandName Set-Disk -Exactly -Times 1
                     Assert-MockCalled -CommandName Initialize-Disk -Exactly -Times 0
-                    Assert-MockCalled -CommandName Get-Partition -Exactly -Times 1
+                    Assert-MockCalled -CommandName Get-Partition -Exactly -Times 4
                     Assert-MockCalled -CommandName Get-Volume -Exactly -Times 1
                     Assert-MockCalled -CommandName New-Partition -Exactly -Times 1 `
                         -ParameterFilter {
@@ -953,7 +953,7 @@ try
                         -ParameterFilter { $DiskId -eq $script:mockedDisk0GptOffline.Guid -and $DiskIdType -eq 'Guid' }
                     Assert-MockCalled -CommandName Set-Disk -Exactly -Times 1
                     Assert-MockCalled -CommandName Initialize-Disk -Exactly -Times 0
-                    Assert-MockCalled -CommandName Get-Partition -Exactly -Times 1
+                    Assert-MockCalled -CommandName Get-Partition -Exactly -Times 4
                     Assert-MockCalled -CommandName Get-Volume -Exactly -Times 1
                     Assert-MockCalled -CommandName New-Partition -Exactly -Times 1 `
                         -ParameterFilter {
@@ -1019,7 +1019,7 @@ try
                         -ParameterFilter $script:parameterFilter_MockedDisk0Number
                     Assert-MockCalled -CommandName Set-Disk -Exactly -Times 1
                     Assert-MockCalled -CommandName Initialize-Disk -Exactly -Times 0
-                    Assert-MockCalled -CommandName Get-Partition -Exactly -Times 1
+                    Assert-MockCalled -CommandName Get-Partition -Exactly -Times 4
                     Assert-MockCalled -CommandName Get-Volume -Exactly -Times 1
                     Assert-MockCalled -CommandName New-Partition -Exactly -Times 1 `
                         -ParameterFilter {
@@ -1086,7 +1086,7 @@ try
                         -ParameterFilter $script:parameterFilter_MockedDisk0Number
                     Assert-MockCalled -CommandName Set-Disk -Exactly -Times 1
                     Assert-MockCalled -CommandName Initialize-Disk -Exactly -Times 1
-                    Assert-MockCalled -CommandName Get-Partition -Exactly -Times 1
+                    Assert-MockCalled -CommandName Get-Partition -Exactly -Times 4
                     Assert-MockCalled -CommandName Get-Volume -Exactly -Times 1
                     Assert-MockCalled -CommandName New-Partition -Exactly -Times 1 `
                         -ParameterFilter {
@@ -1155,7 +1155,7 @@ try
                         -ParameterFilter $script:parameterFilter_MockedDisk0Number
                     Assert-MockCalled -CommandName Set-Disk -Exactly -Times 0
                     Assert-MockCalled -CommandName Initialize-Disk -Exactly -Times 1
-                    Assert-MockCalled -CommandName Get-Partition -Exactly -Times 1
+                    Assert-MockCalled -CommandName Get-Partition -Exactly -Times 4
                     Assert-MockCalled -CommandName Get-Volume -Exactly -Times 1
                     Assert-MockCalled -CommandName New-Partition -Exactly -Times 1 `
                         -ParameterFilter {
@@ -1218,7 +1218,7 @@ try
                         -ParameterFilter $script:parameterFilter_MockedDisk0Number
                     Assert-MockCalled -CommandName Set-Disk -Exactly -Times 0
                     Assert-MockCalled -CommandName Initialize-Disk -Exactly -Times 0
-                    Assert-MockCalled -CommandName Get-Partition -Exactly -Times 1
+                    Assert-MockCalled -CommandName Get-Partition -Exactly -Times 4
                     Assert-MockCalled -CommandName Get-Volume -Exactly -Times 1
                     Assert-MockCalled -CommandName New-Partition -Exactly -Times 1 `
                         -ParameterFilter {
@@ -1285,7 +1285,7 @@ try
                         -ParameterFilter $script:parameterFilter_MockedDisk0Number
                     Assert-MockCalled -CommandName Set-Disk -Exactly -Times 0
                     Assert-MockCalled -CommandName Initialize-Disk -Exactly -Times 0
-                    Assert-MockCalled -CommandName Get-Partition -Exactly -Times 4
+                    Assert-MockCalled -CommandName Get-Partition -Exactly -Times 31
                     Assert-MockCalled -CommandName Get-Volume -Exactly -Times 1
                     Assert-MockCalled -CommandName New-Partition -Exactly -Times 1 `
                         -ParameterFilter {
@@ -1535,7 +1535,7 @@ try
                         -ParameterFilter $script:parameterFilter_MockedDisk0Number
                     Assert-MockCalled -CommandName Set-Disk -Exactly -Times 0
                     Assert-MockCalled -CommandName Initialize-Disk -Exactly -Times 0
-                    Assert-MockCalled -CommandName Get-Partition -Exactly -Times 1
+                    Assert-MockCalled -CommandName Get-Partition -Exactly -Times 4
                     Assert-MockCalled -CommandName Get-Volume -Exactly -Times 1
                     Assert-MockCalled -CommandName New-Partition -Exactly -Times 1
                     Assert-MockCalled -CommandName Format-Volume -Exactly -Times 0
@@ -1699,7 +1699,7 @@ try
                     Assert-VerifiableMock
                     Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 1 `
                         -ParameterFilter $script:parameterFilter_MockedDisk0Number
-                    Assert-MockCalled -CommandName Get-Partition -Exactly -Times 1
+                    Assert-MockCalled -CommandName Get-Partition -Exactly -Times 4
                     Assert-MockCalled -CommandName New-Partition -Exactly -Times 1
                     Assert-MockCalled -CommandName Get-Volume -Exactly -Times 1
                     Assert-MockCalled -CommandName Set-Disk -Exactly -Times 0
