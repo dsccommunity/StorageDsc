@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Opt-in to Example publishing to PowerShell Gallery - fixes [Issue #186](https://github.com/PowerShell/StorageDsc/issues/186).
+
 ## 4.4.0.0
 
 - Refactored module folder structure to move resource to root folder of
