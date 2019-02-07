@@ -104,7 +104,7 @@ try
             NoDefaultDriveLetter = $true
         }
 
-        $script:mockedPartitionNDefaultDriveLetter = [pscustomobject] @{
+        $script:mockedPartitionNoDefaultDriveLetter = [pscustomobject] @{
             AccessPaths     = @(
                 '\\?\Volume{2d313fdd-e4a4-4f31-9784-dad758e0030f}\'
                 $script:testAccessPath
@@ -985,7 +985,7 @@ try
 
                 Mock `
                     -CommandName New-Partition `
-                    -MockWith { $script:mockedPartitionNDefaultDriveLetter } `
+                    -MockWith { $script:mockedPartitionNoDefaultDriveLetter } `
                     -Verifiable
 
                 Mock `
