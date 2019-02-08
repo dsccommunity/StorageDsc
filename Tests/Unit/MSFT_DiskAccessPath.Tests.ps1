@@ -1907,11 +1907,6 @@ try
                     -MockWith { $script:mockedPartitionNoDefaultDriveLetter } `
                     -Verifiable
 
-                Mock `
-                    -CommandName Get-Volume `
-                    -MockWith { $script:mockedVolume } `
-                    -Verifiable
-
                 $script:result = $null
 
                 It 'Should not throw an exception' {
