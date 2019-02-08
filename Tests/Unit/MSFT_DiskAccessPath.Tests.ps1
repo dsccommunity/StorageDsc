@@ -1935,8 +1935,6 @@ try
                     Assert-MockCalled -CommandName Get-DiskByIdentifier -Times 1 `
                         -ParameterFilter { $DiskId -eq $script:mockedDisk0.Number -and $DiskIdType -eq 'Number' }
                     Assert-MockCalled -CommandName Get-Partition -Times 1
-                    Assert-MockCalled -CommandName Get-Volume -Times 1
-                    Assert-MockCalled -CommandName Get-CimInstance -Times 1
                 }
             }
 
