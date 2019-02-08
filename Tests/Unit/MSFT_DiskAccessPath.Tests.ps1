@@ -1912,11 +1912,6 @@ try
                     -MockWith { $script:mockedVolume } `
                     -Verifiable
 
-                Mock `
-                    -CommandName Get-CimInstance `
-                    -MockWith { $script:mockedCim } `
-                    -Verifiable
-
                 $script:result = $null
 
                 It 'Should not throw an exception' {
