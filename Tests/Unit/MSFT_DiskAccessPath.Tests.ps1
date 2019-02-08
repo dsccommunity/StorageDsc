@@ -1889,6 +1889,62 @@ try
                 }
             }
 
+            Context 'Test mismatching NoDefaultDriveLetter using Disk Number' {
+                # verifiable (should be called) mocks
+                Mock `
+                    -CommandName Assert-AccessPathValid `
+                    -MockWith { $script:testAccessPath } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-DiskByIdentifier `
+                    -ParameterFilter { $DiskId -eq $script:mockedDisk0.Number -and $DiskIdType -eq 'Number' } `
+                    -MockWith { $script:mockedDisk0 } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-Partition `
+                    -MockWith { $script:mockedPartitionNoDefaultDriveLetter } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-Volume `
+                    -MockWith { $script:mockedVolume } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-CimInstance `
+                    -MockWith { $script:mockedCim } `
+                    -Verifiable
+
+                $script:result = $null
+
+                It 'Should not throw an exception' {
+                    {
+                        $script:result = Test-TargetResource `
+                            -DiskId $script:mockedDisk0.Number `
+                            -AccessPath $script:testAccessPath `
+                            -NoDefaultDriveLetter $script:NoDefaultDriveLetter `
+                            -FSLabel 'myLabel' `
+                            -Verbose
+                    } | Should -Not -Throw
+                }
+
+                It 'Should return false' {
+                    $script:result | Should -Be $false
+                }
+
+                It 'Should call the correct mocks' {
+                    Assert-VerifiableMock
+                    Assert-MockCalled -CommandName Assert-AccessPathValid -Times 1
+                    Assert-MockCalled -CommandName Get-DiskByIdentifier -Times 1 `
+                        -ParameterFilter { $DiskId -eq $script:mockedDisk0.Number -and $DiskIdType -eq 'Number' }
+                    Assert-MockCalled -CommandName Get-Partition -Times 1
+                    Assert-MockCalled -CommandName Get-Volume -Times 1
+                    Assert-MockCalled -CommandName Get-CimInstance -Times 1
+                }
+            }
+
             Context 'Test all disk properties matching using Disk Number' {
                 # verifiable (should be called) mocks
                 Mock `
