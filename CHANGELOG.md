@@ -12,14 +12,6 @@
   CODE\_OF\_CONDUCT.md file.
 - Explicitly removed extra hidden files from release package
 
-- Disk:
-  - Added minimum timetowate of 3s after new-partition using the while loop.
-    The problem occurs when the partition is created and the format-volume
-    is attempted before the volume has completed.
-    There appears to be no property to determine if the partition is
-    sufficiently ready to format and it will often format as a raw volume when
-    the error occurs - fixes [Issue #85](https://github.com/PowerShell/StorageDsc/issues/85).
-
 ## 4.3.0.0
 
 - WaitForDisk:
