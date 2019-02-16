@@ -3,25 +3,25 @@
     # RootModule = ''
 
     # Version number of this module.
-    moduleVersion     = '4.5.0.0'
+    moduleVersion        = '4.5.0.0'
 
     # ID used to uniquely identify this module
-    GUID              = '00d73ca1-58b5-46b7-ac1a-5bfcf5814faf'
+    GUID                 = '00d73ca1-58b5-46b7-ac1a-5bfcf5814faf'
 
     # Author of this module
-    Author            = 'Microsoft Corporation'
+    Author               = 'Microsoft Corporation'
 
     # Company or vendor of this module
-    CompanyName       = 'Microsoft Corporation'
+    CompanyName          = 'Microsoft Corporation'
 
     # Copyright statement for this module
-    Copyright         = '(c) Microsoft Corporation. All rights reserved.'
+    Copyright            = '(c) Microsoft Corporation. All rights reserved.'
 
     # Description of the functionality provided by this module
-    Description       = 'This module contains all resources related to the PowerShell Storage module, or pertaining to disk management.'
+    Description          = 'This module contains all resources related to the PowerShell Storage module, or pertaining to disk management.'
 
     # Minimum version of the Windows PowerShell engine required by this module
-    PowerShellVersion = '4.0'
+    PowerShellVersion    = '4.0'
 
     # Name of the Windows PowerShell host required by this module
     # PowerShellHostName = ''
@@ -57,16 +57,16 @@
     # NestedModules = @()
 
     # Functions to export from this module
-    FunctionsToExport = @()
+    FunctionsToExport    = @()
 
     # Cmdlets to export from this module
-    CmdletsToExport   = @()
+    CmdletsToExport      = @()
 
     # Variables to export from this module
-    VariablesToExport = @()
+    VariablesToExport    = @()
 
     # Aliases to export from this module
-    AliasesToExport   = @()
+    AliasesToExport      = @()
 
     # DSC resources to export from this module
     DscResourcesToExport = @(
@@ -85,7 +85,7 @@
     # FileList = @()
 
     # Private data to pass to the module specified in RootModule/ModuleToProcess. This may also contain a PSData hashtable with additional module metadata used by PowerShell.
-    PrivateData       = @{
+    PrivateData          = @{
 
         PSData = @{
 
