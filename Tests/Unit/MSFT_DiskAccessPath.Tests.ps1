@@ -532,7 +532,7 @@ try
 
         #region Function Set-TargetResource
         Describe 'MSFT_DiskAccessPath\Set-TargetResource' {
-            Context 'Offline GPT disk using Disk Number' {
+            Context 'Offline GPT disk using Disk Number with NoDefaultDriveLetter set to False' {
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Assert-AccessPathValid `
@@ -571,7 +571,7 @@ try
                     -CommandName Add-PartitionAccessPath `
                     -Verifiable
 
-                    Mock `
+                Mock `
                     -CommandName Set-Partition `
                     -Verifiable
 
@@ -603,7 +603,7 @@ try
                 }
             }
 
-            Context 'Offline GPT disk using Disk Unique Id' {
+            Context 'Offline GPT disk using Disk Unique Id with NoDefaultDriveLetter set to False' {
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Assert-AccessPathValid `
@@ -1187,7 +1187,7 @@ try
                 }
             }
 
-            Context 'Online GPT disk with partition/volume already assigned using Disk Number' {
+            Context 'Online GPT disk with partition/volume already assigned using Disk Number with NoDefaultDriveLetter set to False' {
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Assert-AccessPathValid `
@@ -1306,7 +1306,7 @@ try
                 }
             }
 
-            Context 'Online GPT disk containing matching partition but not assigned using Disk Number with no size parameter specified' {
+            Context 'Online GPT disk containing matching partition but not assigned using Disk Number with no size parameter specified with NoDefaultDriveLetter set to False' {
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Assert-AccessPathValid `
