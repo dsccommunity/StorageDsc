@@ -1346,7 +1346,7 @@ try
                         -ParameterFilter $script:parameterFilter_MockedDisk0Number
                     Assert-MockCalled -CommandName Set-Disk -Exactly -Times 0
                     Assert-MockCalled -CommandName Initialize-Disk -Exactly -Times 0
-                    Assert-MockCalled -CommandName Get-Partition -Exactly -Times 31
+                    Assert-MockCalled -CommandName Get-Partition -Exactly -Times 4
                     Assert-MockCalled -CommandName Get-Volume -Exactly -Times 1
                     Assert-MockCalled -CommandName New-Partition -Exactly -Times 1 `
                         -ParameterFilter {
