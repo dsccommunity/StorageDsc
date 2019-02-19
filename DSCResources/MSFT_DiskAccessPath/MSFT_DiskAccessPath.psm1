@@ -28,7 +28,7 @@ $localizedData = Get-LocalizedData `
     Specifies the access path folder to the assign the disk volume to
 
     .PARAMETER NoDefaultDriveLetter
-    Specifies the partition drive letter assignment behavior. Defaults to True.
+    Prevents a default drive letter from being assigned to a newly created partition. Defaults to True.
 
     .PARAMETER DiskId
     Specifies the disk identifier for the disk to modify.
@@ -142,7 +142,7 @@ function Get-TargetResource
     Specifies the access path folder to the assign the disk volume to
 
     .PARAMETER NoDefaultDriveLetter
-    Specifies the partition drive letter assignment behavior. Defaults to True.
+    Prevents a default drive letter from being assigned to a newly created partition. Defaults to True.
 
     .PARAMETER DiskId
     Specifies the disk identifier for the disk to modify.
@@ -518,7 +518,7 @@ function Set-TargetResource
             ) -join '' )
     } # if
 
-    #get the current partition state for NoDefaultDriveLetter
+    # Get the current partition state for NoDefaultDriveLetter
     $assignedPartition = $partition |
         Where-Object -Property AccessPaths -Contains -Value $AccessPath
 
@@ -529,12 +529,11 @@ function Set-TargetResource
                     "$($localizedData.NoDefaultDriveLetterMismatchMessage -f $assignedPartition.NoDefaultDriveLetter, $NoDefaultDriveLetter)"
                 ) -join '' )
 
-            # setting the partition property NoDefaultDriveLetter to True to prevent adding drive letter on reboot
+            # Setting the partition property NoDefaultDriveLetter to True to prevent adding drive letter on reboot
             Set-Partition -PartitionNumber $assignedPartition.PartitionNumber `
                 -DiskNumber $disk.Number `
                 -NoDefaultDriveLetter $NoDefaultDriveLetter
         } # if
-
 } # Set-TargetResource
 
 <#
@@ -545,7 +544,7 @@ function Set-TargetResource
     Specifies the access path folder to the assign the disk volume to
 
     .PARAMETER NoDefaultDriveLetter
-    Specifies the partition drive letter assignment behavior. Defaults to True.
+    Prevents a default drive letter from being assigned to a newly created partition. Defaults to True.
 
     .PARAMETER DiskId
     Specifies the disk identifier for the disk to modify.
@@ -662,8 +661,6 @@ function Test-TargetResource
 
     # Get the partitions on the disk
     $partition = $disk | Get-Partition -ErrorAction SilentlyContinue
-
-
 
     # Check if the disk has an existing partition assigned to the access path
     $assignedPartition = $partition |
