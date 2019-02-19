@@ -1354,7 +1354,7 @@ try
                     }
                     Assert-MockCalled -CommandName Format-Volume -Exactly -Times 0
                     Assert-MockCalled -CommandName Set-Volume -Exactly -Times 0
-                    Assert-MockCalled -CommandName Set-Partition -Exactly -Times 0
+                    Assert-MockCalled -CommandName Set-Partition -Exactly -Times 1
                 }
             }
 
