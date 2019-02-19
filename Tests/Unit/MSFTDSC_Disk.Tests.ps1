@@ -1325,17 +1325,13 @@ try
 
                 $startTime = Get-Date
 
-                $errorRecord = Get-InvalidOperationRecord `
-                    -Message ($LocalizedData.NewParitionIsReadOnlyError -f `
-                        'Number', $script:mockedDisk0Mbr.Number, $script:mockedPartitionNoDriveLetterReadOnly.PartitionNumber)
-
-                It 'Should throw NewParitionIsReadOnlyError' {
+                It 'Should not throw an exception' {
                     {
                         Set-TargetResource `
                             -DiskId $script:mockedDisk0Gpt.Number `
                             -Driveletter $script:testDriveLetter `
                             -Verbose
-                    } | Should -Throw $errorRecord
+                    } | Should -Not -Throw
                 }
 
                 $endTime = Get-Date
