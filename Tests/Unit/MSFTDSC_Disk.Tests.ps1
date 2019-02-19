@@ -1296,7 +1296,7 @@ try
                 }
             }
 
-            Context 'When online GPT disk with no partitions using Disk Number, partition is writeable' {
+            Context 'When online GPT disk with no partitions using Disk Number, partition is writable' {
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Get-DiskByIdentifier `
