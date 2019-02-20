@@ -27,6 +27,9 @@ $localizedData = Get-LocalizedData `
     .PARAMETER AccessPath
     Specifies the access path folder to the assign the disk volume to
 
+    .PARAMETER NoDefaultDriveLetter
+    Prevents a default drive letter from being assigned to a newly created partition. Defaults to True.
+
     .PARAMETER DiskId
     Specifies the disk identifier for the disk to modify.
 
@@ -54,6 +57,10 @@ function Get-TargetResource
         [Parameter(Mandatory = $true)]
         [System.String]
         $AccessPath,
+
+        [Parameter()]
+        [System.Boolean]
+        $NoDefaultDriveLetter = $true,
 
         [Parameter(Mandatory = $true)]
         [System.String]
@@ -115,13 +122,14 @@ function Get-TargetResource
             -ErrorAction SilentlyContinue).BlockSize
 
     $returnValue = @{
-        DiskId             = $DiskId
-        DiskIdType         = $DiskIdType
-        AccessPath         = $AccessPath
-        Size               = $assignedPartition.Size
-        FSLabel            = $FSLabel
-        AllocationUnitSize = $blockSize
-        FSFormat           = $fileSystem
+        DiskId               = $DiskId
+        DiskIdType           = $DiskIdType
+        AccessPath           = $AccessPath
+        NoDefaultDriveLetter = $assignedPartition.NoDefaultDriveLetter
+        Size                 = $assignedPartition.Size
+        FSLabel              = $FSLabel
+        AllocationUnitSize   = $blockSize
+        FSFormat             = $fileSystem
     }
     $returnValue
 } # Get-TargetResource
@@ -132,6 +140,9 @@ function Get-TargetResource
 
     .PARAMETER AccessPath
     Specifies the access path folder to the assign the disk volume to
+
+    .PARAMETER NoDefaultDriveLetter
+    Prevents a default drive letter from being assigned to a newly created partition. Defaults to True.
 
     .PARAMETER DiskId
     Specifies the disk identifier for the disk to modify.
@@ -161,6 +172,10 @@ function Set-TargetResource
         [Parameter(Mandatory = $true)]
         [System.String]
         $AccessPath,
+
+        [Parameter()]
+        [System.Boolean]
+        $NoDefaultDriveLetter = $true,
 
         [Parameter(Mandatory = $true)]
         [System.String]
@@ -409,7 +424,7 @@ function Set-TargetResource
         Write-Verbose -Message ( @(
                 "$($MyInvocation.MyCommand): "
                 $($localizedData.PartitionAlreadyAssignedMessage -f `
-                        $AccessPath, $partition.PartitionNumber)
+                        $AccessPath, $assignedPartition.PartitionNumber)
             ) -join '' )
 
         $assignAccessPath = $false
@@ -502,6 +517,23 @@ function Set-TargetResource
                 $($localizedData.SuccessfullyInitializedMessage -f $AccessPath)
             ) -join '' )
     } # if
+
+    # Get the current partition state for NoDefaultDriveLetter
+    $assignedPartition = $partition |
+        Where-Object -Property AccessPaths -Contains -Value $AccessPath
+
+        if ($assignedPartition.NoDefaultDriveLetter -ne $NoDefaultDriveLetter)
+        {
+            Write-Verbose -Message ( @(
+                    "$($MyInvocation.MyCommand): "
+                    "$($localizedData.NoDefaultDriveLetterMismatchMessage -f $assignedPartition.NoDefaultDriveLetter, $NoDefaultDriveLetter)"
+                ) -join '' )
+
+            # Setting the partition property NoDefaultDriveLetter to True to prevent adding drive letter on reboot
+            Set-Partition -PartitionNumber $assignedPartition.PartitionNumber `
+                -DiskNumber $disk.Number `
+                -NoDefaultDriveLetter $NoDefaultDriveLetter
+        } # if
 } # Set-TargetResource
 
 <#
@@ -510,6 +542,9 @@ function Set-TargetResource
 
     .PARAMETER AccessPath
     Specifies the access path folder to the assign the disk volume to
+
+    .PARAMETER NoDefaultDriveLetter
+    Prevents a default drive letter from being assigned to a newly created partition. Defaults to True.
 
     .PARAMETER DiskId
     Specifies the disk identifier for the disk to modify.
@@ -538,6 +573,10 @@ function Test-TargetResource
         [Parameter(Mandatory = $true)]
         [System.String]
         $AccessPath,
+
+        [Parameter()]
+        [System.Boolean]
+        $NoDefaultDriveLetter = $true,
 
         [Parameter(Mandatory = $true)]
         [System.String]
@@ -632,6 +671,16 @@ function Test-TargetResource
         Write-Verbose -Message ( @(
                 "$($MyInvocation.MyCommand): "
                 $($localizedData.AccessPathNotFoundMessage -f $AccessPath)
+            ) -join '' )
+        return $false
+    } # if
+
+    # Check if the partition NoDefaultDriveLetter parameter is correct
+    if ($assignedPartition.NoDefaultDriveLetter -ne $NoDefaultDriveLetter)
+    {
+        Write-Verbose -Message ( @(
+                "$($MyInvocation.MyCommand): "
+                $($localizedData.NoDefaultDriveLetterMismatchMessage -f $assignedPartition.NoDefaultDriveLetter, $NoDefaultDriveLetter)
             ) -join '' )
         return $false
     } # if
