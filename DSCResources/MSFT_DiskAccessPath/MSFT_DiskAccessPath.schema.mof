@@ -3,6 +3,7 @@
 class MSFT_DiskAccessPath : OMI_BaseResource
 {
     [Key, Description("Specifies the access path folder to the assign the disk volume to.")] String AccessPath;
+    [Write, Description("Specifies no automatic drive letter assignment to the partition: Defaults to True")] Boolean NoDefaultDriveLetter;
     [Required, Description("Specifies the disk identifier for the disk to modify.")] String DiskId;
     [Write, Description("Specifies the identifier type the DiskId contains. Defaults to Number."), ValueMap{"Number","UniqueId","Guid"}, Values{"Number","UniqueId","Guid"}] String DiskIdType;
     [Write, Description("Specifies the size of new volume.")] Uint64 Size;
