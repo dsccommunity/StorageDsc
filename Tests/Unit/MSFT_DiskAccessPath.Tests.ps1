@@ -33,6 +33,7 @@ try
         $script:testDiskUniqueId = 'TESTDISKUNIQUEID'
         $script:testDiskGptGuid = [guid]::NewGuid()
         $script:testDiskMbrGuid = '123456'
+        $script:NoDefaultDriveLetter = $true
 
         $script:mockedDisk0 = [pscustomobject] @{
             Number         = $script:testDiskNumber
@@ -97,11 +98,22 @@ try
                 '\\?\Volume{2d313fdd-e4a4-4f31-9784-dad758e0030f}\'
                 $script:testAccessPath
             )
-            Size            = $script:mockedPartitionSize
-            PartitionNumber = 1
-            Type            = 'Basic'
+            Size                 = $script:mockedPartitionSize
+            PartitionNumber      = 1
+            Type                 = 'Basic'
+            NoDefaultDriveLetter = $true
         }
 
+        $script:mockedPartitionNoDefaultDriveLetter = [pscustomobject] @{
+            AccessPaths     = @(
+                '\\?\Volume{2d313fdd-e4a4-4f31-9784-dad758e0030f}\'
+                $script:testAccessPath
+            )
+            Size                 = $script:mockedPartitionSize
+            PartitionNumber      = 1
+            Type                 = 'Basic'
+            NoDefaultDriveLetter = $false
+        }
         $script:mockedPartitionNoAccess = [pscustomobject] @{
             AccessPaths     = @(
                 '\\?\Volume{2d313fdd-e4a4-4f31-9784-dad758e0030f}\'
@@ -109,6 +121,7 @@ try
             Size            = $script:mockedPartitionSize
             PartitionNumber = 1
             Type            = 'Basic'
+            NoDefaultDriveLetter = $false
         }
 
         $script:mockedVolume = [pscustomobject] @{
@@ -519,7 +532,7 @@ try
 
         #region Function Set-TargetResource
         Describe 'MSFT_DiskAccessPath\Set-TargetResource' {
-            Context 'Offline GPT disk using Disk Number' {
+            Context 'Offline GPT disk using Disk Number with NoDefaultDriveLetter set to False' {
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Assert-AccessPathValid `
@@ -558,6 +571,10 @@ try
                     -CommandName Add-PartitionAccessPath `
                     -Verifiable
 
+                Mock `
+                    -CommandName Set-Partition `
+                    -Verifiable
+
                 # mocks that should not be called
                 Mock -CommandName Initialize-Disk
 
@@ -582,10 +599,11 @@ try
                     Assert-MockCalled -CommandName New-Partition -Times 1
                     Assert-MockCalled -CommandName Format-Volume -Times 1
                     Assert-MockCalled -CommandName Add-PartitionAccessPath -Times 1
+                    Assert-MockCalled -CommandName Set-Partition -Times 1
                 }
             }
 
-            Context 'Offline GPT disk using Disk Unique Id' {
+            Context 'Offline GPT disk using Disk Unique Id with NoDefaultDriveLetter set to False' {
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Assert-AccessPathValid `
@@ -624,6 +642,10 @@ try
                     -CommandName Add-PartitionAccessPath `
                     -Verifiable
 
+                Mock `
+                    -CommandName Set-Partition `
+                    -Verifiable
+
                 # mocks that should not be called
                 Mock -CommandName Initialize-Disk
 
@@ -633,6 +655,7 @@ try
                             -DiskId $script:mockedDisk0Offline.UniqueId `
                             -DiskIdType 'UniqueId' `
                             -AccessPath $script:testAccessPath `
+                            -NoDefaultDriveLetter $script:NoDefaultDriveLetter `
                             -Verbose
                     } | Should -Not -Throw
                 }
@@ -649,6 +672,7 @@ try
                     Assert-MockCalled -CommandName New-Partition -Times 1
                     Assert-MockCalled -CommandName Format-Volume -Times 1
                     Assert-MockCalled -CommandName Add-PartitionAccessPath -Times 1
+                    Assert-MockCalled -CommandName Set-Partition -Times 1
                 }
             }
 
@@ -691,6 +715,11 @@ try
                     -CommandName Add-PartitionAccessPath `
                     -Verifiable
 
+                Mock `
+                    -CommandName Set-Partition `
+                    -Verifiable
+
+
                 # mocks that should not be called
                 Mock -CommandName Initialize-Disk
 
@@ -716,6 +745,8 @@ try
                     Assert-MockCalled -CommandName New-Partition -Times 1
                     Assert-MockCalled -CommandName Format-Volume -Times 1
                     Assert-MockCalled -CommandName Add-PartitionAccessPath -Times 1
+                    Assert-MockCalled -CommandName Set-Partition -Times 1
+
                 }
             }
 
@@ -743,6 +774,10 @@ try
                 Mock `
                     -CommandName New-Partition `
                     -MockWith { $script:mockedPartitionNoAccess } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Set-Partition `
                     -Verifiable
 
                 Mock `
@@ -782,6 +817,7 @@ try
                     Assert-MockCalled -CommandName New-Partition -Times 1
                     Assert-MockCalled -CommandName Format-Volume -Times 1
                     Assert-MockCalled -CommandName Add-PartitionAccessPath -Times 1
+                    Assert-MockCalled -CommandName Set-Partition -Times 1
                 }
             }
 
@@ -828,6 +864,10 @@ try
                     -CommandName Add-PartitionAccessPath `
                     -Verifiable
 
+                Mock `
+                    -CommandName Set-Partition `
+                    -Verifiable
+
                 # mocks that should not be called
 
                 It 'Should not throw an exception' {
@@ -851,6 +891,7 @@ try
                     Assert-MockCalled -CommandName New-Partition -Times 1
                     Assert-MockCalled -CommandName Format-Volume -Times 1
                     Assert-MockCalled -CommandName Add-PartitionAccessPath -Times 1
+                    Assert-MockCalled -CommandName Set-Partition -Times 1
                 }
             }
 
@@ -893,6 +934,10 @@ try
                     -CommandName Add-PartitionAccessPath `
                     -Verifiable
 
+                Mock `
+                    -CommandName Set-Partition `
+                    -Verifiable
+
                 # mocks that should not be called
                 Mock -CommandName Set-Disk
 
@@ -917,6 +962,7 @@ try
                     Assert-MockCalled -CommandName New-Partition -Times 1
                     Assert-MockCalled -CommandName Format-Volume -Times 1
                     Assert-MockCalled -CommandName Add-PartitionAccessPath -Times 1
+                    Assert-MockCalled -CommandName Set-Partition -Times 1
                 }
             }
 
@@ -939,7 +985,7 @@ try
 
                 Mock `
                     -CommandName New-Partition `
-                    -MockWith { $script:mockedPartition } `
+                    -MockWith { $script:mockedPartitionNoDefaultDriveLetter } `
                     -Verifiable
 
                 Mock `
@@ -955,6 +1001,10 @@ try
                     -CommandName Add-PartitionAccessPath `
                     -Verifiable
 
+                Mock `
+                    -CommandName Set-Partition `
+                    -Verifiable
+
                 # mocks that should not be called
                 Mock -CommandName Set-Disk
                 Mock -CommandName Initialize-Disk
@@ -964,6 +1014,7 @@ try
                         Set-targetResource `
                             -DiskId $script:mockedDisk0.Number `
                             -AccessPath $script:testAccessPath `
+                            -NoDefaultDriveLetter $script:NoDefaultDriveLetter `
                             -Verbose
                     } | Should -Not -Throw
                 }
@@ -980,6 +1031,7 @@ try
                     Assert-MockCalled -CommandName New-Partition -Times 1
                     Assert-MockCalled -CommandName Format-Volume -Times 1
                     Assert-MockCalled -CommandName Add-PartitionAccessPath -Times 1
+                    Assert-MockCalled -CommandName Set-Partition -Times 1
                 }
             }
 
@@ -1135,7 +1187,7 @@ try
                 }
             }
 
-            Context 'Online GPT disk with partition/volume already assigned using Disk Number' {
+            Context 'Online GPT disk with partition/volume already assigned using Disk Number with NoDefaultDriveLetter set to False' {
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Assert-AccessPathValid `
@@ -1170,6 +1222,7 @@ try
                         Set-targetResource `
                             -DiskId $script:mockedDisk0.Number `
                             -AccessPath $script:testAccessPath `
+                            -NoDefaultDriveLetter $script:NoDefaultDriveLetter `
                             -Verbose
                     } | Should -Not -Throw
                 }
@@ -1216,6 +1269,10 @@ try
                     -CommandName Add-PartitionAccessPath `
                     -Verifiable
 
+                Mock `
+                    -CommandName Set-Partition `
+                    -Verifiable
+
                 # mocks that should not be called
                 Mock -CommandName Set-Disk
                 Mock -CommandName Initialize-Disk
@@ -1227,6 +1284,7 @@ try
                         Set-targetResource `
                             -DiskId $script:mockedDisk0.Number `
                             -AccessPath $script:testAccessPath `
+                            -NoDefaultDriveLetter $script:NoDefaultDriveLetter `
                             -Size $script:mockedPartitionSize `
                             -Verbose
                     } | Should -Not -Throw
@@ -1244,10 +1302,11 @@ try
                     Assert-MockCalled -CommandName New-Partition -Times 0
                     Assert-MockCalled -CommandName Format-Volume -Times 0
                     Assert-MockCalled -CommandName Add-PartitionAccessPath -Times 1
+                    Assert-MockCalled -CommandName Set-Partition -Times 1
                 }
             }
 
-            Context 'Online GPT disk containing matching partition but not assigned using Disk Number with no size parameter specified' {
+            Context 'Online GPT disk containing matching partition but not assigned using Disk Number with no size parameter specified with NoDefaultDriveLetter set to False' {
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Assert-AccessPathValid `
@@ -1274,6 +1333,10 @@ try
                     -CommandName Add-PartitionAccessPath `
                     -Verifiable
 
+                Mock `
+                    -CommandName Set-Partition `
+                    -Verifiable
+
                 # mocks that should not be called
                 Mock -CommandName Set-Disk
                 Mock -CommandName Initialize-Disk
@@ -1285,6 +1348,7 @@ try
                         Set-targetResource `
                             -DiskId $script:mockedDisk0.Number `
                             -AccessPath $script:testAccessPath `
+                            -NoDefaultDriveLetter $script:NoDefaultDriveLetter `
                             -Verbose
                     } | Should -Not -Throw
                 }
@@ -1301,6 +1365,7 @@ try
                     Assert-MockCalled -CommandName New-Partition -Times 0
                     Assert-MockCalled -CommandName Format-Volume -Times 0
                     Assert-MockCalled -CommandName Add-PartitionAccessPath -Times 1
+                    Assert-MockCalled -CommandName Set-Partition -Times 1
                 }
             }
 
@@ -1343,6 +1408,7 @@ try
                         Set-targetResource `
                             -DiskId $script:mockedDisk0.Number `
                             -AccessPath $script:testAccessPath `
+                            -NoDefaultDriveLetter $script:NoDefaultDriveLetter `
                             -FSLabel 'NewLabel' `
                             -Verbose
                     } | Should -Not -Throw
@@ -1634,6 +1700,7 @@ try
                         $script:result = Test-TargetResource `
                             -DiskId $script:mockedDisk0.Number `
                             -AccessPath $script:testAccessPath `
+                            -NoDefaultDriveLetter $script:NoDefaultDriveLetter `
                             -AllocationUnitSize 4096 `
                             -Size 124 `
                             -Verbose
@@ -1688,6 +1755,7 @@ try
                         $script:result = Test-TargetResource `
                             -DiskId $script:mockedDisk0.Number `
                             -AccessPath $script:testAccessPath `
+                            -NoDefaultDriveLetter $script:NoDefaultDriveLetter `
                             -AllocationUnitSize 4097 `
                             -Verbose
                     } | Should -Not -Throw
@@ -1744,6 +1812,7 @@ try
                         $script:result = Test-TargetResource `
                             -DiskId $script:mockedDisk0.Number `
                             -AccessPath $script:testAccessPath `
+                            -NoDefaultDriveLetter $script:NoDefaultDriveLetter `
                             -FSFormat 'ReFS' `
                             -Verbose
                     } | Should -Not -Throw
@@ -1799,6 +1868,7 @@ try
                         $script:result = Test-TargetResource `
                             -DiskId $script:mockedDisk0.Number `
                             -AccessPath $script:testAccessPath `
+                            -NoDefaultDriveLetter $script:NoDefaultDriveLetter `
                             -FSLabel 'NewLabel' `
                             -Verbose
                     } | Should -Not -Throw
@@ -1816,6 +1886,50 @@ try
                     Assert-MockCalled -CommandName Get-Partition -Times 1
                     Assert-MockCalled -CommandName Get-Volume -Times 1
                     Assert-MockCalled -CommandName Get-CimInstance -Times 1
+                }
+            }
+
+            Context 'Test mismatching NoDefaultDriveLetter using Disk Number' {
+                # verifiable (should be called) mocks
+                Mock `
+                    -CommandName Assert-AccessPathValid `
+                    -MockWith { $script:testAccessPath } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-DiskByIdentifier `
+                    -ParameterFilter { $DiskId -eq $script:mockedDisk0.Number -and $DiskIdType -eq 'Number' } `
+                    -MockWith { $script:mockedDisk0 } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-Partition `
+                    -MockWith { $script:mockedPartitionNoDefaultDriveLetter } `
+                    -Verifiable
+
+                $script:result = $null
+
+                It 'Should not throw an exception' {
+                    {
+                        $script:result = Test-TargetResource `
+                            -DiskId $script:mockedDisk0.Number `
+                            -AccessPath $script:testAccessPath `
+                            -NoDefaultDriveLetter $script:NoDefaultDriveLetter `
+                            -FSLabel 'myLabel' `
+                            -Verbose
+                    } | Should -Not -Throw
+                }
+
+                It 'Should return false' {
+                    $script:result | Should -Be $false
+                }
+
+                It 'Should call the correct mocks' {
+                    Assert-VerifiableMock
+                    Assert-MockCalled -CommandName Assert-AccessPathValid -Times 1
+                    Assert-MockCalled -CommandName Get-DiskByIdentifier -Times 1 `
+                        -ParameterFilter { $DiskId -eq $script:mockedDisk0.Number -and $DiskIdType -eq 'Number' }
+                    Assert-MockCalled -CommandName Get-Partition -Times 1
                 }
             }
 
@@ -1854,6 +1968,7 @@ try
                         $script:result = Test-TargetResource `
                             -DiskId $script:mockedDisk0.Number `
                             -AccessPath $script:testAccessPath `
+                            -NoDefaultDriveLetter $script:NoDefaultDriveLetter `
                             -AllocationUnitSize 4096 `
                             -Size $script:mockedPartition.Size `
                             -FSFormat $script:mockedVolume.FileSystem `
