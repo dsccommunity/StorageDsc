@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 4.5.0.0
+
 - Opt-in to Example publishing to PowerShell Gallery - fixes [Issue #186](https://github.com/PowerShell/StorageDsc/issues/186).
 - DiskAccessPath:
   - Updated the resource to not assign a drive letter by default when adding
