@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+- Added 'DscResourcesToExport' to manifest to improve information in
+  PowerShell Gallery and removed wildcards from 'FunctionsToExport',
+  'CmdletsToExport', 'VariablesToExport' and 'AliasesToExport' - fixes
+  [Issue #192](https://github.com/PowerShell/StorageDsc/issues/192).
+- Clean up module manifest to correct Author and Company - fixes
+  [Issue #191](https://github.com/PowerShell/StorageDsc/issues/191).
+
+## 4.5.0.0
+
 - Opt-in to Example publishing to PowerShell Gallery - fixes [Issue #186](https://github.com/PowerShell/StorageDsc/issues/186).
 - DiskAccessPath:
   - Updated the resource to not assign a drive letter by default when adding
