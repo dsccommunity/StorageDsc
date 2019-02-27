@@ -2667,7 +2667,8 @@ try
                     -MockWith {
                         return @{
                             SizeMin = 0
-                            SizeMax = $script:mockedPartition.Size + 1024
+                            # Adding >1MB, otherwise workaround for wrong SizeMax is triggered
+                            SizeMax = $script:mockedPartition.Size + 1.1MB
                         }
                     } `
                     -Verifiable
@@ -2761,6 +2762,59 @@ try
                     Assert-MockCalled -CommandName Get-PartitionSupportedSize -Exactly -Times 1
                     Assert-MockCalled -CommandName Get-Volume -Exactly -Times 0
                     Assert-MockCalled -CommandName Get-CimInstance -Exactly -Times 0
+                }
+            }
+
+            Context 'When testing matching partition size with AllowDestructive and without Size specified using Disk Number' {
+                # verifiable (should be called) mocks
+                Mock `
+                    -CommandName Get-DiskByIdentifier `
+                    -ParameterFilter $script:parameterFilter_MockedDisk0Number `
+                    -MockWith { $script:mockedDisk0Gpt } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-Partition `
+                    -MockWith { $script:mockedPartition } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-PartitionSupportedSize `
+                    -MockWith {
+                        return @{
+                            SizeMin = 0
+                            SizeMax = $script:mockedPartition.Size + 0.98MB
+                        }
+                    } `
+                    -Verifiable
+                Mock -CommandName Get-Volume -Verifiable
+                Mock -CommandName Get-CimInstance -Verifiable
+
+                $script:result = $null
+
+                It 'Should not throw an exception' {
+                    {
+                        $script:result = Test-TargetResource `
+                            -DiskId $script:mockedDisk0Gpt.Number `
+                            -DriveLetter $script:testDriveLetter `
+                            -AllocationUnitSize 4096 `
+                            -AllowDestructive $true `
+                            -Verbose
+                    } | Should -Not -Throw
+                }
+
+                It 'Should be true' {
+                    $script:result | Should -Be $true
+                }
+
+                It 'Should call the correct mocks' {
+                    Assert-VerifiableMock
+                    Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 1 `
+                        -ParameterFilter $script:parameterFilter_MockedDisk0Number
+                    Assert-MockCalled -CommandName Get-Partition -Exactly -Times 1
+                    Assert-MockCalled -CommandName Get-PartitionSupportedSize -Exactly -Times 1
+                    Assert-MockCalled -CommandName Get-Volume -Exactly -Times 1
+                    Assert-MockCalled -CommandName Get-CimInstance -Exactly -Times 1
                 }
             }
 
