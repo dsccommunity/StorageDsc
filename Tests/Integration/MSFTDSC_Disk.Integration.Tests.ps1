@@ -968,7 +968,6 @@ try
                                     DiskIdType     = 'Number'
                                     PartitionStyle = 'GPT'
                                     FSLabel        = $FSLabelA
-                                    Size           = 100MB
                                 }
                             )
                         }
