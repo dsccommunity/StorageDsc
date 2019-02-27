@@ -891,6 +891,117 @@ try
             }
         }
         #endregion
+
+        #region Integration Tests for size and maximum size
+        Context 'If maximum size is used, Test-TargetResource needs to report true eventhough Size and SizeMax are different.' {
+            BeforeAll {
+                # Create a VHD and attach it to the computer
+                $VHDPath = Join-Path -Path $TestDrive `
+                    -ChildPath 'TestDisk.vhd'
+                $null = New-VDisk -Path $VHDPath -SizeInMB 1024 -Initialize
+                $null = Mount-DiskImage -ImagePath $VHDPath -StorageType VHD -NoDriveLetter
+                $diskImage = Get-DiskImage -ImagePath $VHDPath
+                $disk = Get-Disk -Number $diskImage.Number
+                $FSLabelA = 'TestDiskA'
+                $FSLabelB = 'TestDiskB'
+
+                # Get a spare drive letter
+                $lastDrive = ((Get-Volume).DriveLetter | Sort-Object | Select-Object -Last 1)
+                $driveLetterA = [char](([int][char]$lastDrive) + 1)
+                $driveLetterB = [char](([int][char]$lastDrive) + 2)
+            }
+
+            Context "Using fixed size Disk Number $($disk.Number)" {
+                It 'Should compile and apply the MOF without throwing' {
+                    {
+                        # This is to pass to the Config
+                        $configData = @{
+                            AllNodes = @(
+                                @{
+                                    NodeName       = 'localhost'
+                                    DriveLetter    = $driveLetterA
+                                    DiskId         = $disk.Number
+                                    DiskIdType     = 'Number'
+                                    PartitionStyle = 'GPT'
+                                    FSLabel        = $FSLabelA
+                                    Size           = 100MB
+                                }
+                            )
+                        }
+
+                        & "$($script:DSCResourceName)_Config" `
+                            -OutputPath $TestDrive `
+                            -ConfigurationData $configData
+
+                        Start-DscConfiguration `
+                            -Path $TestDrive `
+                            -ComputerName localhost `
+                            -Wait `
+                            -Verbose `
+                            -Force `
+                            -ErrorAction Stop
+                    } | Should -Not -Throw
+                }
+
+                It 'Should be able to call Get-DscConfiguration without throwing' {
+                    { $script:currentConfiguration = Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
+                }
+
+                It 'Should have set the resource and size should match' {
+                    $current = $script:currentConfiguration | Where-Object -FilterScript {
+                        $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
+                    }
+                    $current.Size         | Should -Be 100MB
+                }
+            }
+
+            Context "Using maximum size for new volume on Disk Number $($disk.Number)" {
+                It 'Should compile and apply the MOF without throwing' {
+                    {
+                        # This is to pass to the Config
+                        $configData = @{
+                            AllNodes = @(
+                                @{
+                                    NodeName       = 'localhost'
+                                    DriveLetter    = $driveLetterA
+                                    DiskId         = $disk.Number
+                                    DiskIdType     = 'Number'
+                                    PartitionStyle = 'GPT'
+                                    FSLabel        = $FSLabelA
+                                    Size           = 100MB
+                                }
+                            )
+                        }
+
+                        & "$($script:DSCResourceName)_Config" `
+                            -OutputPath $TestDrive `
+                            -ConfigurationData $configData
+
+                        Start-DscConfiguration `
+                            -Path $TestDrive `
+                            -ComputerName localhost `
+                            -Wait `
+                            -Verbose `
+                            -Force `
+                            -ErrorAction Stop
+                    } | Should -Not -Throw
+                }
+
+                It 'Should be able to call Get-DscConfiguration without throwing' {
+                    { $script:currentConfiguration = Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
+                }
+
+                It 'Test-DscConfiguration should return True, indicating that partition size instead of SizeMax was used' {
+                    Test-DscConfiguration | Should -Be $true
+                }
+            }
+
+            AfterAll {
+                Dismount-DiskImage -ImagePath $VHDPath -StorageType VHD
+                Remove-Item -Path $VHDPath -Force
+            }
+        }
+        #endregion
     }
 }
 finally

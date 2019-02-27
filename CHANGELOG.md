@@ -10,6 +10,9 @@
   [Issue #191](https://github.com/PowerShell/StorageDsc/issues/191).
 - Correct unit tests for DiskAccessPath to test exact number of
   mocks called - fixes [Issue #199](https://github.com/PowerShell/StorageDsc/issues/199).
+- Maximum size calculation now uses workaround so that
+  Test-TargetResource works properly - workaround for
+  [Issue #181](https://github.com/PowerShell/StorageDsc/issues/181).
 
 ## 4.5.0.0
 

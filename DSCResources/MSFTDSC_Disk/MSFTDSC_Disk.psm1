@@ -816,7 +816,14 @@ function Test-TargetResource
     {
         $supportedSize = ($partition | Get-PartitionSupportedSize)
 
-        $Size = $supportedSize.SizeMax
+        $Size = if ($supportedSize.SizeMax - $partition.Size -lt 1MB)
+        {
+            $partition.Size
+        }
+        else
+        {
+            $supportedSize.SizeMax
+        }
     }
 
     if ($Size)
