@@ -29,7 +29,6 @@
 - Moved the Code of Conduct text out of the README.md and into a
   CODE\_OF\_CONDUCT.md file.
 - Explicitly removed extra hidden files from release package
-
 - Disk:
   - Added minimum timetowate of 3s after new-partition using the while loop.
     The problem occurs when the partition is created and the format-volume
