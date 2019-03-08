@@ -8,6 +8,8 @@
   [Issue #192](https://github.com/PowerShell/StorageDsc/issues/192).
 - Clean up module manifest to correct Author and Company - fixes
   [Issue #191](https://github.com/PowerShell/StorageDsc/issues/191).
+- Correct unit tests for DiskAccessPath to test exact number of
+  mocks called - fixes [Issue #199](https://github.com/PowerShell/StorageDsc/issues/199).
 
 ## 4.5.0.0
 
