@@ -2728,7 +2728,7 @@ try
                     -MockWith {
                         return @{
                             SizeMin = 0
-                            SizeMax = $script:mockedPartition.Size + 1024
+                            SizeMax = $script:mockedPartition.Size + 1.1mb
                         }
                     } `
                     -Verifiable
