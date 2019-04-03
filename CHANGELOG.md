@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 4.6.0.0
+
 - Fix example publish to PowerShell Gallery by adding `gallery_api`
   environment variable to `AppVeyor.yml` - fixes [Issue #202](https://github.com/PowerShell/StorageDsc/issues/202).
 - Added 'DscResourcesToExport' to manifest to improve information in
