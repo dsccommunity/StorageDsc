@@ -2,6 +2,26 @@
 
 ## Unreleased
 
+## 4.6.0.0
+
+- Fix example publish to PowerShell Gallery by adding `gallery_api`
+  environment variable to `AppVeyor.yml` - fixes [Issue #202](https://github.com/PowerShell/StorageDsc/issues/202).
+- Added 'DscResourcesToExport' to manifest to improve information in
+  PowerShell Gallery and removed wildcards from 'FunctionsToExport',
+  'CmdletsToExport', 'VariablesToExport' and 'AliasesToExport' - fixes
+  [Issue #192](https://github.com/PowerShell/StorageDsc/issues/192).
+- Clean up module manifest to correct Author and Company - fixes
+  [Issue #191](https://github.com/PowerShell/StorageDsc/issues/191).
+- Correct unit tests for DiskAccessPath to test exact number of
+  mocks called - fixes [Issue #199](https://github.com/PowerShell/StorageDsc/issues/199).
+- Disk:
+  - Added minimum timetowate of 3s after new-partition using the while loop.
+    The problem occurs when the partition is created and the format-volume
+    is attempted before the volume has completed.
+    There appears to be no property to determine if the partition is
+    sufficiently ready to format and it will often format as a raw volume when
+    the error occurs - fixes [Issue #85](https://github.com/PowerShell/StorageDsc/issues/85).
+
 ## 4.5.0.0
 
 - Opt-in to Example publishing to PowerShell Gallery - fixes [Issue #186](https://github.com/PowerShell/StorageDsc/issues/186).

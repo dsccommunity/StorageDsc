@@ -103,6 +103,7 @@ try
             Size            = $script:mockedPartitionSize
             PartitionNumber = 1
             Type            = 'Basic'
+            IsReadOnly      = $false
         }
 
         $script:mockedPartitionNoDriveLetterReadOnly = [pscustomobject] @{
@@ -821,7 +822,7 @@ try
                         -ParameterFilter { $DiskId -eq $script:mockedDisk0GptOffline.Number -and $DiskIdType -eq 'Number' }
                     Assert-MockCalled -CommandName Set-Disk -Exactly -Times 1
                     Assert-MockCalled -CommandName Initialize-Disk -Exactly -Times 0
-                    Assert-MockCalled -CommandName Get-Partition -Exactly -Times 1
+                    Assert-MockCalled -CommandName Get-Partition -Exactly -Times 4
                     Assert-MockCalled -CommandName Get-Volume -Exactly -Times 1
                     Assert-MockCalled -CommandName New-Partition -Exactly -Times 1 `
                         -ParameterFilter { $DriveLetter -eq $script:testDriveLetter }
@@ -886,7 +887,7 @@ try
                         -ParameterFilter { $DiskId -eq $script:mockedDisk0GptOffline.UniqueId -and $DiskIdType -eq 'UniqueId' }
                     Assert-MockCalled -CommandName Set-Disk -Exactly -Times 1
                     Assert-MockCalled -CommandName Initialize-Disk -Exactly -Times 0
-                    Assert-MockCalled -CommandName Get-Partition -Exactly -Times 1
+                    Assert-MockCalled -CommandName Get-Partition -Exactly -Times 4
                     Assert-MockCalled -CommandName Get-Volume -Exactly -Times 1
                     Assert-MockCalled -CommandName New-Partition -Exactly -Times 1 `
                         -ParameterFilter {
@@ -953,7 +954,7 @@ try
                         -ParameterFilter { $DiskId -eq $script:mockedDisk0GptOffline.Guid -and $DiskIdType -eq 'Guid' }
                     Assert-MockCalled -CommandName Set-Disk -Exactly -Times 1
                     Assert-MockCalled -CommandName Initialize-Disk -Exactly -Times 0
-                    Assert-MockCalled -CommandName Get-Partition -Exactly -Times 1
+                    Assert-MockCalled -CommandName Get-Partition -Exactly -Times 4
                     Assert-MockCalled -CommandName Get-Volume -Exactly -Times 1
                     Assert-MockCalled -CommandName New-Partition -Exactly -Times 1 `
                         -ParameterFilter {
@@ -1019,7 +1020,7 @@ try
                         -ParameterFilter $script:parameterFilter_MockedDisk0Number
                     Assert-MockCalled -CommandName Set-Disk -Exactly -Times 1
                     Assert-MockCalled -CommandName Initialize-Disk -Exactly -Times 0
-                    Assert-MockCalled -CommandName Get-Partition -Exactly -Times 1
+                    Assert-MockCalled -CommandName Get-Partition -Exactly -Times 4
                     Assert-MockCalled -CommandName Get-Volume -Exactly -Times 1
                     Assert-MockCalled -CommandName New-Partition -Exactly -Times 1 `
                         -ParameterFilter {
@@ -1086,7 +1087,7 @@ try
                         -ParameterFilter $script:parameterFilter_MockedDisk0Number
                     Assert-MockCalled -CommandName Set-Disk -Exactly -Times 1
                     Assert-MockCalled -CommandName Initialize-Disk -Exactly -Times 1
-                    Assert-MockCalled -CommandName Get-Partition -Exactly -Times 1
+                    Assert-MockCalled -CommandName Get-Partition -Exactly -Times 4
                     Assert-MockCalled -CommandName Get-Volume -Exactly -Times 1
                     Assert-MockCalled -CommandName New-Partition -Exactly -Times 1 `
                         -ParameterFilter {
@@ -1155,7 +1156,7 @@ try
                         -ParameterFilter $script:parameterFilter_MockedDisk0Number
                     Assert-MockCalled -CommandName Set-Disk -Exactly -Times 0
                     Assert-MockCalled -CommandName Initialize-Disk -Exactly -Times 1
-                    Assert-MockCalled -CommandName Get-Partition -Exactly -Times 1
+                    Assert-MockCalled -CommandName Get-Partition -Exactly -Times 4
                     Assert-MockCalled -CommandName Get-Volume -Exactly -Times 1
                     Assert-MockCalled -CommandName New-Partition -Exactly -Times 1 `
                         -ParameterFilter {
@@ -1218,7 +1219,7 @@ try
                         -ParameterFilter $script:parameterFilter_MockedDisk0Number
                     Assert-MockCalled -CommandName Set-Disk -Exactly -Times 0
                     Assert-MockCalled -CommandName Initialize-Disk -Exactly -Times 0
-                    Assert-MockCalled -CommandName Get-Partition -Exactly -Times 1
+                    Assert-MockCalled -CommandName Get-Partition -Exactly -Times 4
                     Assert-MockCalled -CommandName Get-Volume -Exactly -Times 1
                     Assert-MockCalled -CommandName New-Partition -Exactly -Times 1 `
                         -ParameterFilter {
@@ -1244,9 +1245,7 @@ try
 
                 Mock `
                     -CommandName New-Partition `
-                    -ParameterFilter {
-                    $DriveLetter -eq $script:testDriveLetter
-                } `
+                    -ParameterFilter {$DriveLetter -eq $script:testDriveLetter} `
                     -MockWith { $script:mockedPartitionNoDriveLetterReadOnly } `
                     -Verifiable
 
@@ -1294,6 +1293,68 @@ try
                     Assert-MockCalled -CommandName Format-Volume -Exactly -Times 0
                     Assert-MockCalled -CommandName Set-Volume -Exactly -Times 0
                     Assert-MockCalled -CommandName Set-Partition -Exactly -Times 0
+                }
+            }
+
+            Context 'When online GPT disk with no partitions using Disk Number, partition is writable' {
+                # verifiable (should be called) mocks
+                Mock `
+                    -CommandName Get-DiskByIdentifier `
+                    -ParameterFilter $script:parameterFilter_MockedDisk0Number `
+                    -MockWith { $script:mockedDisk0Gpt } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-Partition `
+                    -MockWith { $script:mockedPartitionNoDriveLetter } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName New-Partition `
+                    -ParameterFilter {$DriveLetter -eq $script:testDriveLetter} `
+                    -MockWith { $script:mockedPartitionNoDriveLetter } `
+                    -Verifiable
+
+                # mocks that should not be called
+                Mock -CommandName Set-Disk
+                Mock -CommandName Initialize-Disk
+                Mock -CommandName Set-Volume
+                Mock -CommandName Get-Volume
+                Mock -CommandName Format-Volume
+                Mock -CommandName Set-Partition
+
+                $startTime = Get-Date
+
+                It 'Should not throw an exception' {
+                    {
+                        Set-TargetResource `
+                            -DiskId $script:mockedDisk0Gpt.Number `
+                            -Driveletter $script:testDriveLetter `
+                            -Verbose
+                    } | Should -Not -Throw
+                }
+
+                $endTime = Get-Date
+
+                It 'Should take at least 3s' {
+                    ($endTime - $startTime).TotalSeconds | Should -BeGreaterThan 2
+                }
+
+                It 'Should call the correct mocks' {
+                    Assert-VerifiableMock
+                    Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 1 `
+                        -ParameterFilter $script:parameterFilter_MockedDisk0Number
+                    Assert-MockCalled -CommandName Set-Disk -Exactly -Times 0
+                    Assert-MockCalled -CommandName Initialize-Disk -Exactly -Times 0
+                    Assert-MockCalled -CommandName Get-Partition -Exactly -Times 4
+                    Assert-MockCalled -CommandName Get-Volume -Exactly -Times 2
+                    Assert-MockCalled -CommandName New-Partition -Exactly -Times 1 `
+                        -ParameterFilter {
+                        $DriveLetter -eq $script:testDriveLetter
+                    }
+                    Assert-MockCalled -CommandName Format-Volume -Exactly -Times 0
+                    Assert-MockCalled -CommandName Set-Volume -Exactly -Times 0
+                    Assert-MockCalled -CommandName Set-Partition -Exactly -Times 1
                 }
             }
 
@@ -1535,7 +1596,7 @@ try
                         -ParameterFilter $script:parameterFilter_MockedDisk0Number
                     Assert-MockCalled -CommandName Set-Disk -Exactly -Times 0
                     Assert-MockCalled -CommandName Initialize-Disk -Exactly -Times 0
-                    Assert-MockCalled -CommandName Get-Partition -Exactly -Times 1
+                    Assert-MockCalled -CommandName Get-Partition -Exactly -Times 4
                     Assert-MockCalled -CommandName Get-Volume -Exactly -Times 1
                     Assert-MockCalled -CommandName New-Partition -Exactly -Times 1
                     Assert-MockCalled -CommandName Format-Volume -Exactly -Times 0
@@ -1699,7 +1760,7 @@ try
                     Assert-VerifiableMock
                     Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 1 `
                         -ParameterFilter $script:parameterFilter_MockedDisk0Number
-                    Assert-MockCalled -CommandName Get-Partition -Exactly -Times 1
+                    Assert-MockCalled -CommandName Get-Partition -Exactly -Times 4
                     Assert-MockCalled -CommandName New-Partition -Exactly -Times 1
                     Assert-MockCalled -CommandName Get-Volume -Exactly -Times 1
                     Assert-MockCalled -CommandName Set-Disk -Exactly -Times 0
