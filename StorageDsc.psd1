@@ -3,7 +3,7 @@
     # RootModule = ''
 
     # Version number of this module.
-    moduleVersion = '4.6.0.0'
+    moduleVersion = '4.7.0.0'
 
     # ID used to uniquely identify this module
     GUID                 = '00d73ca1-58b5-46b7-ac1a-5bfcf5814faf'
@@ -102,23 +102,9 @@
             # IconUri = ''
 
             # ReleaseNotes of this module
-        ReleaseNotes = '- Fix example publish to PowerShell Gallery by adding `gallery_api`
-  environment variable to `AppVeyor.yml` - fixes [Issue 202](https://github.com/PowerShell/StorageDsc/issues/202).
-- Added "DscResourcesToExport" to manifest to improve information in
-  PowerShell Gallery and removed wildcards from "FunctionsToExport",
-  "CmdletsToExport", "VariablesToExport" and "AliasesToExport" - fixes
-  [Issue 192](https://github.com/PowerShell/StorageDsc/issues/192).
-- Clean up module manifest to correct Author and Company - fixes
-  [Issue 191](https://github.com/PowerShell/StorageDsc/issues/191).
-- Correct unit tests for DiskAccessPath to test exact number of
-  mocks called - fixes [Issue 199](https://github.com/PowerShell/StorageDsc/issues/199).
-- Disk:
-  - Added minimum timetowate of 3s after new-partition using the while loop.
-    The problem occurs when the partition is created and the format-volume
-    is attempted before the volume has completed.
-    There appears to be no property to determine if the partition is
-    sufficiently ready to format and it will often format as a raw volume when
-    the error occurs - fixes [Issue 85](https://github.com/PowerShell/StorageDsc/issues/85).
+        ReleaseNotes = '- DiskAccessPath:
+  - Added a Get-Partition to properly handle setting the NoDefaultDriveLetter
+    parameter - fixes [Issue 198](https://github.com/PowerShell/StorageDsc/pull/198).
 
 '
 
@@ -132,4 +118,5 @@
     # Default prefix for commands exported from this module. Override the default prefix using Import-Module -Prefix.
     # DefaultCommandPrefix = ''
 }
+
 

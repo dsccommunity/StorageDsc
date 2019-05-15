@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## 4.7.0.0
+
+- DiskAccessPath:
+  - Added a Get-Partition to properly handle setting the NoDefaultDriveLetter
+    parameter - fixes [Issue #198](https://github.com/PowerShell/StorageDsc/pull/198).
+
 ## 4.6.0.0
 
 - Fix example publish to PowerShell Gallery by adding `gallery_api`
