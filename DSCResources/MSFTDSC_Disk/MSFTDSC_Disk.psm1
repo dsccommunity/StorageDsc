@@ -544,13 +544,13 @@ function Set-TargetResource
         if ($FSLabel)
         {
             # Set the File System label on the new volume
-            $volParams["NewFileSystemLabel"] = $FSLabel
+            $volParams['NewFileSystemLabel'] = $FSLabel
         } # if
 
         if ($AllocationUnitSize)
         {
             # Set the Allocation Unit Size on the new volume
-            $volParams["AllocationUnitSize"] = $AllocationUnitSize
+            $volParams['AllocationUnitSize'] = $AllocationUnitSize
         } # if
 
         Write-Verbose -Message ( @(
