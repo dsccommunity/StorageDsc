@@ -102,7 +102,7 @@ function Get-TargetResource
 
     Write-Verbose -Message ( @(
             "$($MyInvocation.MyCommand): "
-            $($localizedData.GettingDiskMessage -f $DiskIdType, $DiskId, $DriveLetter)
+            $($script:localizedData.GettingDiskMessage -f $DiskIdType, $DiskId, $DriveLetter)
         ) -join '' )
 
     # Validate the DriveLetter parameter
@@ -225,7 +225,7 @@ function Set-TargetResource
 
     Write-Verbose -Message ( @(
             "$($MyInvocation.MyCommand): "
-            $($localizedData.SettingDiskMessage -f $DiskIdType, $DiskId, $DriveLetter)
+            $($script:localizedData.SettingDiskMessage -f $DiskIdType, $DiskId, $DriveLetter)
         ) -join '' )
 
     # Validate the DriveLetter parameter
@@ -241,7 +241,7 @@ function Set-TargetResource
         # Disk is offline, so bring it online
         Write-Verbose -Message ( @(
                 "$($MyInvocation.MyCommand): "
-                $($localizedData.SetDiskOnlineMessage -f $DiskIdType, $DiskId)
+                $($script:localizedData.SetDiskOnlineMessage -f $DiskIdType, $DiskId)
             ) -join '' )
 
         $disk | Set-Disk -IsOffline $false
@@ -252,7 +252,7 @@ function Set-TargetResource
         # Disk is read-only, so make it read/write
         Write-Verbose -Message ( @(
                 "$($MyInvocation.MyCommand): "
-                $($localizedData.SetDiskReadWriteMessage -f $DiskIdType, $DiskId)
+                $($script:localizedData.SetDiskReadWriteMessage -f $DiskIdType, $DiskId)
             ) -join '' )
 
         $disk | Set-Disk -IsReadOnly $false
@@ -260,14 +260,14 @@ function Set-TargetResource
 
     Write-Verbose -Message ( @(
             "$($MyInvocation.MyCommand): "
-            $($localizedData.CheckingDiskPartitionStyleMessage -f $DiskIdType, $DiskId)
+            $($script:localizedData.CheckingDiskPartitionStyleMessage -f $DiskIdType, $DiskId)
         ) -join '' )
 
     if ($AllowDestructive -and $ClearDisk -and $disk.PartitionStyle -ne 'RAW')
     {
         Write-Verbose -Message ( @(
                 "$($MyInvocation.MyCommand): "
-                $($localizedData.ClearingDiskMessage -f $DiskIdType, $DiskId)
+                $($script:localizedData.ClearingDiskMessage -f $DiskIdType, $DiskId)
             ) -join '' )
 
         $disk | Clear-Disk -RemoveData -RemoveOEM -Confirm:$true
@@ -282,7 +282,7 @@ function Set-TargetResource
     {
         Write-Verbose -Message ( @(
                 "$($MyInvocation.MyCommand): "
-                $($localizedData.InitializingDiskMessage -f $DiskIdType, $DiskId, $PartitionStyle)
+                $($script:localizedData.InitializingDiskMessage -f $DiskIdType, $DiskId, $PartitionStyle)
             ) -join '' )
 
         $disk | Initialize-Disk -PartitionStyle $PartitionStyle
@@ -294,7 +294,7 @@ function Set-TargetResource
             # The disk partition is already initialized with the correct partition style
             Write-Verbose -Message ( @(
                     "$($MyInvocation.MyCommand): "
-                    $($localizedData.DiskAlreadyInitializedMessage `
+                    $($script:localizedData.DiskAlreadyInitializedMessage `
                             -f $DiskIdType, $DiskId, $disk.PartitionStyle)
                 ) -join '' )
 
@@ -303,7 +303,7 @@ function Set-TargetResource
         {
             # This disk is initialized but with the incorrect partition style
             New-InvalidOperationException `
-                -Message ($localizedData.DiskInitializedWithWrongPartitionStyleError `
+                -Message ($script:localizedData.DiskInitializedWithWrongPartitionStyleError `
                     -f $DiskIdType, $DiskId, $disk.PartitionStyle, $PartitionStyle)
         }
     }
@@ -321,7 +321,7 @@ function Set-TargetResource
         # There is no partiton with this drive letter
         Write-Verbose -Message ( @(
                 "$($MyInvocation.MyCommand): "
-                $($localizedData.DriveNotFoundOnPartitionMessage `
+                $($script:localizedData.DriveNotFoundOnPartitionMessage `
                         -f $DiskIdType, $DiskId, $DriveLetter)
             ) -join '' )
 
@@ -339,13 +339,13 @@ function Set-TargetResource
                 if ($partition)
                 {
                     # A partition matching the required size was found
-                    Write-Verbose -Message ($localizedData.MatchingPartitionFoundMessage `
+                    Write-Verbose -Message ($script:localizedData.MatchingPartitionFoundMessage `
                             -f $DiskIdType, $DiskId, $partition.PartitionNumber)
                 }
                 else
                 {
                     # A partition matching the required size was not found
-                    Write-Verbose -Message ($localizedData.MatchingPartitionNotFoundMessage `
+                    Write-Verbose -Message ($script:localizedData.MatchingPartitionNotFoundMessage `
                             -f $DiskIdType, $DiskId)
                 } # if
             }
@@ -355,7 +355,7 @@ function Set-TargetResource
                     No size specified, so see if there is a partition that has a volume
                     matching the file system type that is not assigned to a drive letter.
                 #>
-                Write-Verbose -Message ($localizedData.MatchingPartitionNoSizeMessage `
+                Write-Verbose -Message ($script:localizedData.MatchingPartitionNoSizeMessage `
                         -f $DiskIdType, $DiskId)
 
                 $searchPartitions = $partition | Where-Object -FilterScript {
@@ -367,7 +367,7 @@ function Set-TargetResource
                 foreach ($searchPartition in $searchPartitions)
                 {
                     # Look for the volume in the partition.
-                    Write-Verbose -Message ($localizedData.SearchForVolumeMessage `
+                    Write-Verbose -Message ($script:localizedData.SearchForVolumeMessage `
                             -f $DiskIdType, $DiskId, $searchPartition.PartitionNumber, $FSFormat)
 
                     $searchVolumes = $searchPartition | Get-Volume
@@ -384,7 +384,7 @@ function Set-TargetResource
                         #>
                         $partition = $searchPartition
 
-                        Write-Verbose -Message ($localizedData.VolumeFoundMessage `
+                        Write-Verbose -Message ($script:localizedData.VolumeFoundMessage `
                                 -f $DiskIdType, $DiskId, $searchPartition.PartitionNumber, $FSFormat)
 
                         break
@@ -406,7 +406,7 @@ function Set-TargetResource
                 # Use only a specific size
                 Write-Verbose -Message ( @(
                         "$($MyInvocation.MyCommand): "
-                        $($localizedData.CreatingPartitionMessage `
+                        $($script:localizedData.CreatingPartitionMessage `
                                 -f $DiskIdType, $DiskId, $DriveLetter, "$($Size/1KB) KB")
                     ) -join '' )
 
@@ -417,7 +417,7 @@ function Set-TargetResource
                 # Use the entire disk
                 Write-Verbose -Message ( @(
                         "$($MyInvocation.MyCommand): "
-                        $($localizedData.CreatingPartitionMessage `
+                        $($script:localizedData.CreatingPartitionMessage `
                                 -f $DiskIdType, $DiskId, $DriveLetter, 'all free space')
                     ) -join '' )
 
@@ -440,7 +440,7 @@ function Set-TargetResource
             {
                 Write-Verbose -Message ( @(
                         "$($MyInvocation.MyCommand): "
-                        ($localizedData.NewPartitionIsReadOnlyMessage `
+                        ($script:localizedData.NewPartitionIsReadOnlyMessage `
                                 -f $DiskIdType, $DiskId, $partition.PartitionNumber)
                     ) -join '' )
 
@@ -455,7 +455,7 @@ function Set-TargetResource
         {
             # The partition is still readonly - throw an exception
             New-InvalidOperationException `
-                -Message ($localizedData.NewParitionIsReadOnlyError `
+                -Message ($script:localizedData.NewParitionIsReadOnlyError `
                     -f $DiskIdType, $DiskId, $partition.PartitionNumber)
         } # if
 
@@ -466,7 +466,7 @@ function Set-TargetResource
         # The disk already has a partition on it that is assigned to the Drive Letter
         Write-Verbose -Message ( @(
                 "$($MyInvocation.MyCommand): "
-                $($localizedData.PartitionAlreadyAssignedMessage `
+                $($script:localizedData.PartitionAlreadyAssignedMessage `
                         -f $DriveLetter, $assignedPartition.PartitionNumber)
             ) -join '' )
 
@@ -492,7 +492,7 @@ function Set-TargetResource
                 {
                     Write-Warning -Message ( @(
                             "$($MyInvocation.MyCommand): "
-                            $($localizedData.ResizeRefsNotPossibleMessage `
+                            $($script:localizedData.ResizeRefsNotPossibleMessage `
                                     -f $DriveLetter, $assignedPartition.Size, $Size)
                         ) -join '' )
 
@@ -501,7 +501,7 @@ function Set-TargetResource
                 {
                     Write-Verbose -Message ( @(
                             "$($MyInvocation.MyCommand): "
-                            $($localizedData.SizeMismatchCorrectionMessage `
+                            $($script:localizedData.SizeMismatchCorrectionMessage `
                                     -f $DriveLetter, $assignedPartition.Size, $Size)
                         ) -join '' )
 
@@ -509,7 +509,7 @@ function Set-TargetResource
                     {
                         New-InvalidArgumentException -Message ( @(
                                 "$($MyInvocation.MyCommand): "
-                                $($localizedData.FreeSpaceViolationError `
+                                $($script:localizedData.FreeSpaceViolationError `
                                         -f $DriveLetter, $assignedPartition.Size, $Size, $supportedSize.SizeMax)
                             ) -join '' ) -ArgumentName 'Size' -ErrorAction Stop
                     }
@@ -522,7 +522,7 @@ function Set-TargetResource
                 # A partition resize was required but is not allowed
                 Write-Warning -Message ( @(
                         "$($MyInvocation.MyCommand): "
-                        $($localizedData.ResizeNotAllowedMessage `
+                        $($script:localizedData.ResizeNotAllowedMessage `
                                 -f $DriveLetter, $assignedPartition.Size, $Size)
                     ) -join '' )
             }
@@ -555,7 +555,7 @@ function Set-TargetResource
 
         Write-Verbose -Message ( @(
                 "$($MyInvocation.MyCommand): "
-                $($localizedData.FormattingVolumeMessage -f $volParams.FileSystem)
+                $($script:localizedData.FormattingVolumeMessage -f $volParams.FileSystem)
             ) -join '' )
 
         # Format the volume
@@ -573,7 +573,7 @@ function Set-TargetResource
                 # The file system format does not match
                 Write-Verbose -Message ( @(
                         "$($MyInvocation.MyCommand): "
-                        $($localizedData.FileSystemFormatMismatch `
+                        $($script:localizedData.FileSystemFormatMismatch `
                                 -f $DriveLetter, $fileSystem, $FSFormat)
                     ) -join '' )
 
@@ -581,7 +581,7 @@ function Set-TargetResource
                 {
                     Write-Verbose -Message ( @(
                             "$($MyInvocation.MyCommand): "
-                            $($localizedData.VolumeFormatInProgressMessage `
+                            $($script:localizedData.VolumeFormatInProgressMessage `
                                     -f $DriveLetter, $fileSystem, $FSFormat)
                         ) -join '' )
 
@@ -609,7 +609,7 @@ function Set-TargetResource
                 # The volume lable needs to be changed because it is different.
                 Write-Verbose -Message ( @(
                         "$($MyInvocation.MyCommand): "
-                        $($localizedData.ChangingVolumeLabelMessage `
+                        $($script:localizedData.ChangingVolumeLabelMessage `
                                 -f $DriveLetter, $FSLabel)
                     ) -join '' )
 
@@ -625,7 +625,7 @@ function Set-TargetResource
 
         Write-Verbose -Message ( @(
                 "$($MyInvocation.MyCommand): "
-                $($localizedData.SuccessfullyInitializedMessage -f $DriveLetter)
+                $($script:localizedData.SuccessfullyInitializedMessage -f $DriveLetter)
             ) -join '' )
     } # if
 } # Set-TargetResource
@@ -717,7 +717,7 @@ function Test-TargetResource
 
     Write-Verbose -Message ( @(
             "$($MyInvocation.MyCommand): "
-            $($localizedData.TestingDiskMessage -f $DiskIdType, $DiskId, $DriveLetter)
+            $($script:localizedData.TestingDiskMessage -f $DiskIdType, $DiskId, $DriveLetter)
         ) -join '' )
 
     # Validate the DriveLetter parameter
@@ -725,7 +725,7 @@ function Test-TargetResource
 
     Write-Verbose -Message ( @(
             "$($MyInvocation.MyCommand): "
-            $($localizedData.CheckDiskInitializedMessage -f $DiskIdType, $DiskId)
+            $($script:localizedData.CheckDiskInitializedMessage -f $DiskIdType, $DiskId)
         ) -join '' )
 
     # Get the Disk using the identifiers supplied
@@ -737,7 +737,7 @@ function Test-TargetResource
     {
         Write-Verbose -Message ( @(
                 "$($MyInvocation.MyCommand): "
-                $($localizedData.DiskNotFoundMessage -f $DiskIdType, $DiskId)
+                $($script:localizedData.DiskNotFoundMessage -f $DiskIdType, $DiskId)
             ) -join '' )
 
         return $false
@@ -747,7 +747,7 @@ function Test-TargetResource
     {
         Write-Verbose -Message ( @(
                 "$($MyInvocation.MyCommand): "
-                $($localizedData.DiskNotOnlineMessage -f $DiskIdType, $DiskId)
+                $($script:localizedData.DiskNotOnlineMessage -f $DiskIdType, $DiskId)
             ) -join '' )
 
         return $false
@@ -757,7 +757,7 @@ function Test-TargetResource
     {
         Write-Verbose -Message ( @(
                 "$($MyInvocation.MyCommand): "
-                $($localizedData.DiskReadOnlyMessage `
+                $($script:localizedData.DiskReadOnlyMessage `
                         -f $DiskIdType, $DiskId)
             ) -join '' )
 
@@ -768,7 +768,7 @@ function Test-TargetResource
     {
         Write-Verbose -Message ( @(
                 "$($MyInvocation.MyCommand): "
-                $($localizedData.DiskPartitionStyleNotMatchMessage `
+                $($script:localizedData.DiskPartitionStyleNotMatchMessage `
                         -f $DiskIdType, $DiskId, $disk.PartitionStyle, $PartitionStyle)
             ) -join '' )
 
@@ -780,7 +780,7 @@ function Test-TargetResource
         {
             # This disk is initialized but with the incorrect partition style
             New-InvalidOperationException `
-                -Message ($localizedData.DiskInitializedWithWrongPartitionStyleError `
+                -Message ($script:localizedData.DiskInitializedWithWrongPartitionStyleError `
                     -f $DiskIdType, $DiskId, $disk.PartitionStyle, $PartitionStyle)
         }
     } # if
@@ -793,7 +793,7 @@ function Test-TargetResource
     {
         Write-Verbose -Message ( @(
                 "$($MyInvocation.MyCommand): "
-                $($localizedData.DriveLetterNotFoundMessage -f $DriveLetter)
+                $($script:localizedData.DriveLetterNotFoundMessage -f $DriveLetter)
             ) -join '' )
 
         return $false
@@ -816,7 +816,7 @@ function Test-TargetResource
             {
                 Write-Verbose -Message ( @(
                         "$($MyInvocation.MyCommand): "
-                        $($localizedData.SizeMismatchWithAllowDestructiveMessage `
+                        $($script:localizedData.SizeMismatchWithAllowDestructiveMessage `
                                 -f $DriveLetter, $Partition.Size, $Size)
                     ) -join '' )
 
@@ -826,7 +826,7 @@ function Test-TargetResource
             {
                 Write-Verbose -Message ( @(
                         "$($MyInvocation.MyCommand): "
-                        $($localizedData.SizeMismatchMessage `
+                        $($script:localizedData.SizeMismatchMessage `
                                 -f $DriveLetter, $Partition.Size, $Size)
                     ) -join '' )
             }
@@ -844,7 +844,7 @@ function Test-TargetResource
             # The allocation unit size mismatches
             Write-Verbose -Message ( @(
                     "$($MyInvocation.MyCommand): "
-                    $($localizedData.AllocationUnitSizeMismatchMessage `
+                    $($script:localizedData.AllocationUnitSizeMismatchMessage `
                             -f $DriveLetter, $($blockSize.BlockSize / 1KB), $($AllocationUnitSize / 1KB))
                 ) -join '' )
 
@@ -868,7 +868,7 @@ function Test-TargetResource
         {
             Write-Verbose -Message ( @(
                     "$($MyInvocation.MyCommand): "
-                    $($localizedData.FileSystemFormatMismatch `
+                    $($script:localizedData.FileSystemFormatMismatch `
                             -f $DriveLetter, $fileSystem, $FSFormat)
                 ) -join '' )
 
@@ -888,7 +888,7 @@ function Test-TargetResource
             # The assigned volume label is different and needs updating
             Write-Verbose -Message ( @(
                     "$($MyInvocation.MyCommand): "
-                    $($localizedData.DriveLabelMismatch `
+                    $($script:localizedData.DriveLabelMismatch `
                             -f $DriveLetter, $label, $FSLabel)
                 ) -join '' )
 

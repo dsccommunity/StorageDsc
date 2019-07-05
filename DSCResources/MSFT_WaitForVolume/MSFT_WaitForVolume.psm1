@@ -42,7 +42,7 @@ function Get-TargetResource
 
     Write-Verbose -Message ( @(
             "$($MyInvocation.MyCommand): "
-            $($localizedData.GettingWaitForVolumeStatusMessage -f $DriveLetter)
+            $($script:localizedData.GettingWaitForVolumeStatusMessage -f $DriveLetter)
         ) -join '' )
 
     # Validate the DriveLetter parameter
@@ -89,7 +89,7 @@ function Set-TargetResource
 
     Write-Verbose -Message ( @(
             "$($MyInvocation.MyCommand): "
-            $($localizedData.CheckingForVolumeStatusMessage -f $DriveLetter)
+            $($script:localizedData.CheckingForVolumeStatusMessage -f $DriveLetter)
         ) -join '' )
 
     # Validate the DriveLetter parameter
@@ -104,7 +104,7 @@ function Set-TargetResource
         {
             Write-Verbose -Message ( @(
                     "$($MyInvocation.MyCommand): "
-                    $($localizedData.VolumeFoundMessage -f $DriveLetter)
+                    $($script:localizedData.VolumeFoundMessage -f $DriveLetter)
                 ) -join '' )
 
             $volumeFound = $true
@@ -114,7 +114,7 @@ function Set-TargetResource
         {
             Write-Verbose -Message ( @(
                     "$($MyInvocation.MyCommand): "
-                    $($localizedData.VolumeNotFoundMessage -f $DriveLetter,$RetryIntervalSec)
+                    $($script:localizedData.VolumeNotFoundMessage -f $DriveLetter,$RetryIntervalSec)
                 ) -join '' )
 
             Start-Sleep -Seconds $RetryIntervalSec
@@ -128,7 +128,7 @@ function Set-TargetResource
     if (-not $volumeFound)
     {
         New-InvalidOperationException `
-            -Message $($localizedData.VolumeNotFoundAfterError -f $DriveLetter,$RetryCount)
+            -Message $($script:localizedData.VolumeNotFoundAfterError -f $DriveLetter,$RetryCount)
     } # if
 } # function Set-TargetResource
 
@@ -166,7 +166,7 @@ function Test-TargetResource
 
     Write-Verbose -Message ( @(
             "$($MyInvocation.MyCommand): "
-            $($localizedData.TestingWaitForVolumeStatusMessage -f $DriveLetter)
+            $($script:localizedData.TestingWaitForVolumeStatusMessage -f $DriveLetter)
         ) -join '' )
 
     # Validate the DriveLetter parameter
@@ -181,7 +181,7 @@ function Test-TargetResource
     {
         Write-Verbose -Message ( @(
                 "$($MyInvocation.MyCommand): "
-                $($localizedData.VolumeFoundMessage -f $DriveLetter)
+                $($script:localizedData.VolumeFoundMessage -f $DriveLetter)
             ) -join '' )
 
         return $true
@@ -189,7 +189,7 @@ function Test-TargetResource
 
     Write-Verbose -Message ( @(
             "$($MyInvocation.MyCommand): "
-            $($localizedData.VolumeNotFoundMessage -f $DriveLetter)
+            $($script:localizedData.VolumeNotFoundMessage -f $DriveLetter)
         ) -join '' )
 
     return $false

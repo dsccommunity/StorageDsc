@@ -52,7 +52,7 @@ function Get-TargetResource
 
     Write-Verbose -Message ( @(
             "$($MyInvocation.MyCommand): "
-            $($localizedData.GettingWaitForDiskStatusMessage -f $DiskIdType,$DiskId)
+            $($script:localizedData.GettingWaitForDiskStatusMessage -f $DiskIdType,$DiskId)
         ) -join '' )
 
     $returnValue = @{
@@ -106,7 +106,7 @@ function Set-TargetResource
 
     Write-Verbose -Message ( @(
             "$($MyInvocation.MyCommand): "
-            $($localizedData.CheckingForDiskStatusMessage -f $DiskIdType,$DiskId)
+            $($script:localizedData.CheckingForDiskStatusMessage -f $DiskIdType,$DiskId)
         ) -join '' )
 
     $diskFound = $false
@@ -123,7 +123,7 @@ function Set-TargetResource
         {
             Write-Verbose -Message ( @(
                     "$($MyInvocation.MyCommand): "
-                    $($localizedData.DiskFoundMessage -f $DiskIdType,$DiskId,$disk.FriendlyName)
+                    $($script:localizedData.DiskFoundMessage -f $DiskIdType,$DiskId,$disk.FriendlyName)
                 ) -join '' )
 
             $diskFound = $true
@@ -133,7 +133,7 @@ function Set-TargetResource
         {
             Write-Verbose -Message ( @(
                     "$($MyInvocation.MyCommand): "
-                    $($localizedData.DiskNotFoundMessage -f $DiskIdType,$DiskId,$RetryIntervalSec)
+                    $($script:localizedData.DiskNotFoundMessage -f $DiskIdType,$DiskId,$RetryIntervalSec)
                 ) -join '' )
 
             Start-Sleep -Seconds $RetryIntervalSec
@@ -143,7 +143,7 @@ function Set-TargetResource
     if (-not $diskFound)
     {
         New-InvalidOperationException `
-            -Message $($localizedData.DiskNotFoundAfterError -f $DiskIdType,$DiskId,$RetryCount)
+            -Message $($script:localizedData.DiskNotFoundAfterError -f $DiskIdType,$DiskId,$RetryCount)
     } # if
 } # function Set-TargetResource
 
@@ -189,7 +189,7 @@ function Test-TargetResource
 
     Write-Verbose -Message ( @(
             "$($MyInvocation.MyCommand): "
-            $($localizedData.CheckingForDiskStatusMessage -f $DiskIdType,$DiskId)
+            $($script:localizedData.CheckingForDiskStatusMessage -f $DiskIdType,$DiskId)
         ) -join '' )
 
     # Get the Disk using the identifiers supplied
@@ -201,7 +201,7 @@ function Test-TargetResource
     {
         Write-Verbose -Message ( @(
                 "$($MyInvocation.MyCommand): "
-                $($localizedData.DiskFoundMessage -f $DiskIdType,$DiskId,$disk.FriendlyName)
+                $($script:localizedData.DiskFoundMessage -f $DiskIdType,$DiskId,$disk.FriendlyName)
             ) -join '' )
 
         return $true
@@ -209,7 +209,7 @@ function Test-TargetResource
 
     Write-Verbose -Message ( @(
             "$($MyInvocation.MyCommand): "
-            $($localizedData.DiskNotFoundMessage -f $DiskIdType,$DiskId)
+            $($script:localizedData.DiskNotFoundMessage -f $DiskIdType,$DiskId)
         ) -join '' )
 
     return $false

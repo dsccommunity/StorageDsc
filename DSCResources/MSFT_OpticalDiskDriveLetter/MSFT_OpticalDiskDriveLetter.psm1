@@ -49,7 +49,7 @@ function Get-OpticalDiskDriveLetter
 
     Write-Verbose -Message ( @(
             "$($MyInvocation.MyCommand): "
-            $($localizedData.UsingGetCimInstanceToFetchDriveLetter -f $DiskId)
+            $($script:localizedData.UsingGetCimInstanceToFetchDriveLetter -f $DiskId)
         ) -join '' )
 
     # Get the optical disk matching the Id
@@ -88,7 +88,7 @@ function Get-OpticalDiskDriveLetter
 
                 Write-Verbose -Message ( @(
                         "$($MyInvocation.MyCommand): "
-                        $($localizedData.OpticalDiskNotAssignedDriveLetter -f $DiskId)
+                        $($script:localizedData.OpticalDiskNotAssignedDriveLetter -f $DiskId)
                     ) -join '' )
             }
             $deviceId = $opticalDisk.Drive
@@ -98,7 +98,7 @@ function Get-OpticalDiskDriveLetter
     if ($null -eq $driveLetter)
     {
         New-InvalidArgumentException `
-            -Message ($localizedData.NoOpticalDiskDriveError -f $DiskId) `
+            -Message ($script:localizedData.NoOpticalDiskDriveError -f $DiskId) `
             -ArgumentName 'DiskId'
     }
 
@@ -146,14 +146,14 @@ function Get-TargetResource
     {
         Write-Verbose -Message ( @(
                 "$($MyInvocation.MyCommand): "
-                $($localizedData.OpticalDiskNotAssignedDriveLetter -f $DiskId)
+                $($script:localizedData.OpticalDiskNotAssignedDriveLetter -f $DiskId)
             ) -join '' )
     }
     else
     {
         Write-Verbose -Message ( @(
                 "$($MyInvocation.MyCommand): "
-                $($localizedData.OpticalDiskAssignedDriveLetter -f $DiskId, $DriveLetter)
+                $($script:localizedData.OpticalDiskAssignedDriveLetter -f $DiskId, $DriveLetter)
             ) -join '' )
 
         $Ensure = 'Present'
@@ -236,7 +236,7 @@ function Set-TargetResource
     {
         Write-Verbose -Message ( @(
             "$($MyInvocation.MyCommand): "
-            $($localizedData.AttemptingToRemoveDriveLetter -f $diskId, $currentDriveLetter)
+            $($script:localizedData.AttemptingToRemoveDriveLetter -f $diskId, $currentDriveLetter)
         ) -join '' )
 
         $volume | Set-CimInstance -Property @{ DriveLetter = $null }
@@ -245,7 +245,7 @@ function Set-TargetResource
     {
         Write-Verbose -Message ( @(
             "$($MyInvocation.MyCommand): "
-            $($localizedData.AttemptingToSetDriveLetter -f $diskId, $currentDriveLetter, $DriveLetter)
+            $($script:localizedData.AttemptingToSetDriveLetter -f $diskId, $currentDriveLetter, $DriveLetter)
         ) -join '' )
 
         $volume | Set-CimInstance -Property @{ DriveLetter = $DriveLetter }
@@ -305,7 +305,7 @@ function Test-TargetResource
         {
             Write-Verbose -Message ( @(
                     "$($MyInvocation.MyCommand): "
-                    $($localizedData.DriveLetterDoesNotExistAndShouldNot -f $DiskId)
+                    $($script:localizedData.DriveLetterDoesNotExistAndShouldNot -f $DiskId)
                 ) -join '' )
         }
         else
@@ -313,7 +313,7 @@ function Test-TargetResource
             # The Drive Letter needs to be dismounted
             Write-Verbose -Message ( @(
                     "$($MyInvocation.MyCommand): "
-                    $($localizedData.DriveLetterExistsButShouldNot -f $DiskId, $currentDriveLetter)
+                    $($script:localizedData.DriveLetterExistsButShouldNot -f $DiskId, $currentDriveLetter)
                 ) -join '' )
 
             $desiredConfigurationMatch = $false
@@ -326,7 +326,7 @@ function Test-TargetResource
             # The optical disk drive letter is already set correctly
             Write-Verbose -Message ( @(
                     "$($MyInvocation.MyCommand): "
-                    $($localizedData.DriverLetterExistsAndIsCorrect -f $DiskId, $DriveLetter)
+                    $($script:localizedData.DriverLetterExistsAndIsCorrect -f $DiskId, $DriveLetter)
                 ) -join '' )
         }
         else
@@ -340,14 +340,14 @@ function Test-TargetResource
             {
                 # The desired drive letter is already assigned to another drive - can't proceed
                 New-InvalidOperationException `
-                    -Message $($localizedData.DriveLetterAssignedToAnotherDrive -f $DriveLetter)
+                    -Message $($script:localizedData.DriveLetterAssignedToAnotherDrive -f $DriveLetter)
             }
             else
             {
                 # The optical drive letter needs to be changed
                 Write-Verbose -Message ( @(
                         "$($MyInvocation.MyCommand): "
-                        $($localizedData.DriverLetterExistsAndIsNotCorrect -f $DiskId, $currentDriveLetter, $DriveLetter)
+                        $($script:localizedData.DriverLetterExistsAndIsNotCorrect -f $DiskId, $currentDriveLetter, $DriveLetter)
                     ) -join '' )
 
                 $desiredConfigurationMatch = $false
