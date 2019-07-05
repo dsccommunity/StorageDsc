@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+- Removed suppression of `PSUseShouldProcessForStateChangingFunctions` PSSA rule
+  because it is no longer required.
+- Combined all `StorageDsc.ResourceHelper` module functions into
+  `StorageDsc.Common` module and renamed to `StorageDsc.CommonHelper`
+  module.
+- Opted into Common Tests 'Common Tests - Validate Localization' -
+  fixes [Issue #206](https://github.com/PowerShell/StorageDsc/issues/206).
+- Refactored tests for `StorageDsc.Common` to meet latest standards.
+
 ## 4.7.0.0
 
 - DiskAccessPath:
