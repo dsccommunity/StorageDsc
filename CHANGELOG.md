@@ -10,6 +10,8 @@
 - Opted into Common Tests 'Common Tests - Validate Localization' -
   fixes [Issue #206](https://github.com/PowerShell/StorageDsc/issues/206).
 - Refactored tests for `StorageDsc.Common` to meet latest standards.
+- Minor style corrections.
+- Removed unused localization strings from resources.
 
 ## 4.7.0.0
 

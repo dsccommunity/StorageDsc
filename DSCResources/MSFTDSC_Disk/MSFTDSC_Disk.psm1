@@ -621,6 +621,11 @@ function Set-TargetResource
     # Assign the Drive Letter if it isn't assigned
     if ($assignDriveLetter -and ($partition.DriveLetter -ne $DriveLetter))
     {
+        Write-Verbose -Message ( @(
+                "$($MyInvocation.MyCommand): "
+                $($script:localizedData.AssigningDriveLetterMessage -f $DriveLetter)
+            ) -join '' )
+
         $null = $partition | Set-Partition -NewDriveLetter $DriveLetter
 
         Write-Verbose -Message ( @(

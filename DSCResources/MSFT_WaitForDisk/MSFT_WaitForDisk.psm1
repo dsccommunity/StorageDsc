@@ -111,7 +111,6 @@ function Set-TargetResource
 
     $diskFound = $false
 
-
     for ($count = 0; $count -lt $RetryCount; $count++)
     {
         # Get the Disk using the identifiers supplied
@@ -133,7 +132,7 @@ function Set-TargetResource
         {
             Write-Verbose -Message ( @(
                     "$($MyInvocation.MyCommand): "
-                    $($script:localizedData.DiskNotFoundMessage -f $DiskIdType,$DiskId,$RetryIntervalSec)
+                    $($script:localizedData.DiskNotFoundRetryingMessage -f $DiskIdType,$DiskId,$RetryIntervalSec)
                 ) -join '' )
 
             Start-Sleep -Seconds $RetryIntervalSec

@@ -114,7 +114,7 @@ function Set-TargetResource
         {
             Write-Verbose -Message ( @(
                     "$($MyInvocation.MyCommand): "
-                    $($script:localizedData.VolumeNotFoundMessage -f $DriveLetter,$RetryIntervalSec)
+                    $($script:localizedData.VolumeNotFoundRetryingMessage -f $DriveLetter,$RetryIntervalSec)
                 ) -join '' )
 
             Start-Sleep -Seconds $RetryIntervalSec
@@ -166,17 +166,20 @@ function Test-TargetResource
 
     Write-Verbose -Message ( @(
             "$($MyInvocation.MyCommand): "
-            $($script:localizedData.TestingWaitForVolumeStatusMessage -f $DriveLetter)
+            $($script:localizedData.CheckingForVolumeStatusMessage -f $DriveLetter)
         ) -join '' )
 
     # Validate the DriveLetter parameter
     $DriveLetter = Assert-DriveLetterValid -DriveLetter $DriveLetter
 
-    # This command forces a refresh of the PS Drive subsystem.
-    # So triggers any "missing" drives to show up.
+    <#
+        This command forces a refresh of the PS Drive subsystem.
+        So triggers any "missing" drives to show up.
+    #>
     $null = Get-PSDrive
 
     $volume = Get-Volume -DriveLetter $DriveLetter -ErrorAction SilentlyContinue
+
     if ($volume)
     {
         Write-Verbose -Message ( @(
