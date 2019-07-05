@@ -541,7 +541,7 @@ function Assert-DriveLetterValid
     {
         # DriveLetter format is invalid
         New-InvalidArgumentException `
-            -Message $($LocalizedData.InvalidDriveLetterFormatError -f $DriveLetter) `
+            -Message $($script:localizedData.InvalidDriveLetterFormatError -f $DriveLetter) `
             -ArgumentName 'DriveLetter'
     }
 
@@ -588,7 +588,7 @@ function Assert-AccessPathValid
     {
         # AccessPath is invalid
         New-InvalidArgumentException `
-            -Message $($LocalizedData.InvalidAccessPathError -f $AccessPath) `
+            -Message $($script:localizedData.InvalidAccessPathError -f $AccessPath) `
             -ArgumentName 'AccessPath'
     } # if
 
