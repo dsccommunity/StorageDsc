@@ -1,6 +1,6 @@
 $modulePath = Join-Path -Path (Split-Path -Path (Split-Path -Path $PSScriptRoot -Parent) -Parent) -ChildPath 'Modules'
 
-# Import the ADCS Deployment Resource Common Module.
+# Import the Storage Common Module.
 Import-Module -Name (Join-Path -Path $modulePath `
         -ChildPath (Join-Path -Path 'StorageDsc.Common' `
             -ChildPath 'StorageDsc.Common.psm1'))
