@@ -1,26 +1,12 @@
-# Suppressed as per PSSA Rule Severity guidelines for unit/integration tests:
-# https://github.com/PowerShell/DscResources/blob/master/PSSARuleSeverities.md
-[System.Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseShouldProcessForStateChangingFunctions', '')]
-param ()
-
 $modulePath = Join-Path -Path (Split-Path -Path (Split-Path -Path $PSScriptRoot -Parent) -Parent) -ChildPath 'Modules'
 
-$modulePath = Join-Path -Path (Split-Path -Path (Split-Path -Path $PSScriptRoot -Parent) -Parent) -ChildPath 'Modules'
-
-# Import the Storage Common Modules
+# Import the Storage Common Module.
 Import-Module -Name (Join-Path -Path $modulePath `
-                               -ChildPath (Join-Path -Path 'StorageDsc.Common' `
-                                                     -ChildPath 'StorageDsc.Common.psm1'))
+        -ChildPath (Join-Path -Path 'StorageDsc.Common' `
+            -ChildPath 'StorageDsc.Common.psm1'))
 
-# Import the Storage Resource Helper Module
-Import-Module -Name (Join-Path -Path $modulePath `
-                               -ChildPath (Join-Path -Path 'StorageDsc.ResourceHelper' `
-                                                     -ChildPath 'StorageDsc.ResourceHelper.psm1'))
-
-# Import Localization Strings
-$localizedData = Get-LocalizedData `
-    -ResourceName 'MSFT_MountImage' `
-    -ResourcePath (Split-Path -Parent $Script:MyInvocation.MyCommand.Path)
+# Import Localization Strings.
+$script:localizedData = Get-LocalizedData -ResourceName 'MSFT_MountImage'
 
 <#
     .SYNOPSIS
@@ -42,7 +28,7 @@ function Get-TargetResource
 
     Write-Verbose -Message ( @(
             "$($MyInvocation.MyCommand): "
-            $($localizedData.GettingMountedImageMessage `
+            $($script:localizedData.GettingMountedImageMessage `
                 -f $ImagePath)
         ) -join '' )
 
@@ -149,7 +135,7 @@ function Set-TargetResource
 
     Write-Verbose -Message ( @(
             "$($MyInvocation.MyCommand): "
-            $($localizedData.SettingMountedImageMessage `
+            $($script:localizedData.SettingMountedImageMessage `
                 -f $ImagePath)
         ) -join '' )
 
@@ -180,7 +166,7 @@ function Set-TargetResource
                 # The disk image is mounted to the wrong DriveLetter -remount disk
                 Write-Verbose -Message ( @(
                         "$($MyInvocation.MyCommand): "
-                        $($localizedData.DismountingImageMessage `
+                        $($script:localizedData.DismountingImageMessage `
                             -f $ImagePath,$currentState.DriveLetter)
                     ) -join '' )
 
@@ -199,7 +185,7 @@ function Set-TargetResource
                     # The access mode is wrong -remount disk
                     Write-Verbose -Message ( @(
                             "$($MyInvocation.MyCommand): "
-                            $($localizedData.DismountingImageMessage `
+                            $($script:localizedData.DismountingImageMessage `
                                 -f $ImagePath,$currentState.DriveLetter)
                         ) -join '' )
 
@@ -213,7 +199,7 @@ function Set-TargetResource
         {
         Write-Verbose -Message ( @(
                 "$($MyInvocation.MyCommand): "
-                $($localizedData.MountingImageMessage `
+                $($script:localizedData.MountingImageMessage `
                     -f $ImagePath,$normalizedDriveLetter)
             ) -join '' )
 
@@ -228,7 +214,7 @@ function Set-TargetResource
             # It is mounted so dismount it
             Write-Verbose -Message ( @(
                     "$($MyInvocation.MyCommand): "
-                    $($localizedData.DismountingImageMessage `
+                    $($script:localizedData.DismountingImageMessage `
                         -f $ImagePath,$currentState.DriveLetter)
                 ) -join '' )
 
@@ -288,7 +274,7 @@ function Test-TargetResource
 
     Write-Verbose -Message ( @(
             "$($MyInvocation.MyCommand): "
-            $($localizedData.TestingMountedImageMessage `
+            $($script:localizedData.TestingMountedImageMessage `
                 -f $DriveLetter)
         ) -join '' )
 
@@ -309,7 +295,7 @@ function Test-TargetResource
             # The disk image isn't mounted
             Write-Verbose -Message ( @(
                     "$($MyInvocation.MyCommand): "
-                    $($localizedData.ImageIsNotMountedButShouldBeMessage `
+                    $($script:localizedData.ImageIsNotMountedButShouldBeMessage `
                         -f $ImagePath,$normalizedDriveLetter)
                 ) -join '' )
             return $false
@@ -320,7 +306,7 @@ function Test-TargetResource
             # The disk image is mounted to the wrong DriveLetter
             Write-Verbose -Message ( @(
                     "$($MyInvocation.MyCommand): "
-                    $($localizedData.ImageIsMountedToTheWrongDriveLetterMessage `
+                    $($script:localizedData.ImageIsMountedToTheWrongDriveLetterMessage `
                         -f $ImagePath,$currentState.DriveLetter,$normalizedDriveLetter)
                 ) -join '' )
             return $false
@@ -335,7 +321,7 @@ function Test-TargetResource
                 {
                     Write-Verbose -Message ( @(
                             "$($MyInvocation.MyCommand): "
-                            $($localizedData.VHDAccessModeMismatchMessage `
+                            $($script:localizedData.VHDAccessModeMismatchMessage `
                                 -f $ImagePath,$normalizedDriveLetter,$currentState.Access,$Access)
                         ) -join '' )
                     return $false
@@ -346,7 +332,7 @@ function Test-TargetResource
         # The Disk Image is mounted to the expected Drive - nothing to change.
         Write-Verbose -Message ( @(
                 "$($MyInvocation.MyCommand): "
-                $($localizedData.ImageIsMountedAndShouldBeMessage `
+                $($script:localizedData.ImageIsMountedAndShouldBeMessage `
                     -f $ImagePath,$normalizedDriveLetter)
             ) -join '' )
     }
@@ -358,7 +344,7 @@ function Test-TargetResource
             # The disk image is mounted
             Write-Verbose -Message ( @(
                     "$($MyInvocation.MyCommand): "
-                    $($localizedData.ImageIsMountedButShouldNotBeMessage `
+                    $($script:localizedData.ImageIsMountedButShouldNotBeMessage `
                         -f $ImagePath,$currentState.DriveLetter)
                 ) -join '' )
             return $false
@@ -367,7 +353,7 @@ function Test-TargetResource
         # The image is not mounted and should not be
         Write-Verbose -Message ( @(
                 "$($MyInvocation.MyCommand): "
-                $($localizedData.ImageIsNotMountedAndShouldNotBeMessage `
+                $($script:localizedData.ImageIsNotMountedAndShouldNotBeMessage `
                     -f $ImagePath)
             ) -join '' )
     } # if
@@ -436,7 +422,7 @@ function Test-ParameterValid
         {
             # The DriveLetter should not be set if Ensure is Absent
             New-InvalidOperationException `
-                -Message ($localizedData.InvalidParameterSpecifiedError -f `
+                -Message ($script:localizedData.InvalidParameterSpecifiedError -f `
                     'Absent','DriveLetter')
         } # if
 
@@ -444,7 +430,7 @@ function Test-ParameterValid
         {
             # The StorageType should not be set if Ensure is Absent
             New-InvalidOperationException `
-                -Message ($localizedData.InvalidParameterSpecifiedError -f `
+                -Message ($script:localizedData.InvalidParameterSpecifiedError -f `
                     'Absent','StorageType')
         } # if
 
@@ -452,7 +438,7 @@ function Test-ParameterValid
         {
             # The Access should not be set if Ensure is Absent
             New-InvalidOperationException `
-                -Message ($localizedData.InvalidParameterSpecifiedError -f `
+                -Message ($script:localizedData.InvalidParameterSpecifiedError -f `
                     'Absent','Access')
         } # if
     }
@@ -462,7 +448,7 @@ function Test-ParameterValid
         {
             # The file specified by ImagePath should be found
             New-InvalidOperationException `
-                -Message ($localizedData.DiskImageFileNotFoundError -f `
+                -Message ($script:localizedData.DiskImageFileNotFoundError -f `
                     $ImagePath)
         } # if
 
@@ -475,7 +461,7 @@ function Test-ParameterValid
         {
             # Drive letter is not specified but Ensure is present.
             New-InvalidOperationException `
-                -Message ($localizedData.InvalidParameterNotSpecifiedError -f `
+                -Message ($script:localizedData.InvalidParameterNotSpecifiedError -f `
                     'Present','DriveLetter')
         } # if
     } # if
@@ -569,7 +555,7 @@ function Mount-DiskImageToLetter
     {
         Write-Verbose -Message ( @(
                 "$($MyInvocation.MyCommand): "
-                $($localizedData.ChangingImageDriveLetterMessage `
+                $($script:localizedData.ChangingImageDriveLetterMessage `
                     -f $ImagePath,$currentDriveLetter,$normalizedDriveLetter)
             ) -join '' )
 

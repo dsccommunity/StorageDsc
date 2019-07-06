@@ -9,8 +9,6 @@
     CreatingPartitionMessage = Creating partition on disk with {0} '{1}' using {2}.
     FormattingVolumeMessage = Formatting the volume as '{0}'.
     SuccessfullyInitializedMessage = Successfully initialized volume and assigned to access path '{0}'.
-    ChangingDriveLetterMessage = The volume already exists, changing access path '{0}' to '{1}'.
-    AssigningDriveLetterMessage = Assigning access path '{0}'.
     ChangingVolumeLabelMessage = Changing Volume assigned to access path '{0}' label to '{1}'.
     NewPartitionIsReadOnlyMessage = New partition '{1}' on disk with {0} '{1}' is readonly. Waiting for it to become writable.
     TestingDiskMessage = Testing disk with {0} '{1}' status for access path '{2}'.
