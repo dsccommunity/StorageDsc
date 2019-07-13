@@ -589,6 +589,12 @@ try
         }
 
         Describe 'MSFT_DiskAccessPath\Set-TargetResource' {
+            BeforeAll {
+                Mock `
+                    -CommandName Test-AccessPathInPSDrive `
+                    -Verifiable
+            }
+
             Context 'When using offline GPT disk with NoDefaultDriveLetter set to False specified by Disk Number ' {
                 # verifiable (should be called) mocks
                 Mock `
@@ -2048,6 +2054,137 @@ try
                     Assert-MockCalled -CommandName Get-Partition -Exactly -Times 1
                     Assert-MockCalled -CommandName Get-Volume -Exactly -Times 1
                     Assert-MockCalled -CommandName Get-CimInstance -Exactly -Times 1
+                }
+            }
+        }
+
+        Describe 'MSFT_DiskAccessPath\Test-AccessPathInPSDrive' {
+            $getPSDriveWithNameParameterFilter = {
+                $Name -eq $script:testAccessPath.Split(':')[0]
+            }
+            $getPSDriveWithoutNameParameterFilter = {
+                $null -eq $Name
+            }
+            $getPSDriveNoDrivesMock = {
+                throw 'Cannot find drive.'
+            }
+            $getPSDriveDriveFoundMock = {
+                @(
+                    [PSCustomObject] @{
+                        Name = 'C'
+                    }
+                )
+            }
+
+            Context 'When the access path is found' {
+                Mock `
+                    -CommandName Get-PSDrive `
+                    -MockWith $getPSDriveDriveFoundMock `
+                    -ParameterFilter $getPSDriveWithNameParameterFilter
+
+                Mock `
+                    -CommandName Get-PSDrive `
+                    -ParameterFilter $getPSDriveWithoutNameParameterFilter
+
+                $script:result = $null
+
+                It 'Should not throw an exception' {
+                    {
+                        $script:result = Test-AccessPathInPSDrive `
+                            -AccessPath $script:testAccessPath `
+                            -Verbose
+                    } | Should -Not -Throw
+                }
+
+                It 'Should return true' {
+                    $script:result | Should -Be $true
+                }
+
+                It 'Should call the correct mocks' {
+                    Assert-MockCalled `
+                        -CommandName Get-PSDrive `
+                        -ParameterFilter $getPSDriveWithNameParameterFilter `
+                        -Exactly -Times 1
+
+                    Assert-MockCalled `
+                        -CommandName Get-PSDrive `
+                        -ParameterFilter $getPSDriveWithoutNameParameterFilter `
+                        -Exactly -Times 0
+                }
+            }
+
+            Context 'When the access path is not found in the PSDrive list and not found after refresh' {
+                Mock `
+                    -CommandName Get-PSDrive `
+                    -MockWith $getPSDriveNoDrivesMock `
+                    -ParameterFilter $getPSDriveWithNameParameterFilter
+
+                Mock `
+                    -CommandName Get-PSDrive `
+                    -ParameterFilter $getPSDriveWithoutNameParameterFilter
+
+                $script:result = $null
+
+                It 'Should not throw an exception' {
+                    {
+                        $script:result = Test-AccessPathInPSDrive `
+                            -AccessPath $script:testAccessPath `
+                            -Verbose
+                    } | Should -Not -Throw
+                }
+
+                It 'Should return false' {
+                    $script:result | Should -Be $false
+                }
+
+                It 'Should call the correct mocks' {
+                    Assert-MockCalled `
+                        -CommandName Get-PSDrive `
+                        -ParameterFilter $getPSDriveWithNameParameterFilter `
+                        -Exactly -Times 1
+
+                    Assert-MockCalled `
+                        -CommandName Get-PSDrive `
+                        -ParameterFilter $getPSDriveWithoutNameParameterFilter `
+                        -Exactly -Times 1
+                }
+            }
+
+            Context 'When the access path is not found in the PSDrive list but is found after refresh' {
+                Mock `
+                    -CommandName Get-PSDrive `
+                    -MockWith $getPSDriveNoDrivesMock `
+                    -ParameterFilter $getPSDriveWithNameParameterFilter
+
+                Mock `
+                    -CommandName Get-PSDrive `
+                    -MockWith $getPSDriveDriveFoundMock `
+                    -ParameterFilter $getPSDriveWithoutNameParameterFilter
+
+                $script:result = $null
+
+                It 'Should not throw an exception' {
+                    {
+                        $script:result = Test-AccessPathInPSDrive `
+                            -AccessPath $script:testAccessPath `
+                            -Verbose
+                    } | Should -Not -Throw
+                }
+
+                It 'Should return true' {
+                    $script:result | Should -Be $true
+                }
+
+                It 'Should call the correct mocks' {
+                    Assert-MockCalled `
+                        -CommandName Get-PSDrive `
+                        -ParameterFilter $getPSDriveWithNameParameterFilter `
+                        -Exactly -Times 1
+
+                    Assert-MockCalled `
+                        -CommandName Get-PSDrive `
+                        -ParameterFilter $getPSDriveWithoutNameParameterFilter `
+                        -Exactly -Times 1
                 }
             }
         }

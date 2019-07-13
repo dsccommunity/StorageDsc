@@ -10,10 +10,10 @@ $script:localizedData = Get-LocalizedData -ResourceName 'MSFT_MountImage'
 
 <#
     .SYNOPSIS
-    Returns the current mount state of the VHD or ISO file.
+        Returns the current mount state of the VHD or ISO file.
 
     .PARAMETER ImagePath
-    Specifies the path of the VHD or ISO file.
+        Specifies the path of the VHD or ISO file.
 #>
 function Get-TargetResource
 {
@@ -85,22 +85,22 @@ function Get-TargetResource
 
 <#
     .SYNOPSIS
-    Mounts or dismounts the ISO or VHD.
+        Mounts or dismounts the ISO or VHD.
 
     .PARAMETER ImagePath
-    Specifies the path of the VHD or ISO file.
+        Specifies the path of the VHD or ISO file.
 
     .PARAMETER DriveLetter
-    Specifies the drive letter to mount this VHD or ISO to.
+        Specifies the drive letter to mount this VHD or ISO to.
 
     .PARAMETER StorageType
-    Specifies the storage type of a file. If the StorageType parameter is not specified, then the storage type is determined by file extension.
+        Specifies the storage type of a file. If the StorageType parameter is not specified, then the storage type is determined by file extension.
 
     .PARAMETER Access
-    Allows a VHD file to be mounted in read-only or read-write mode. ISO files are mounted in read-only mode regardless of what parameter value you provide.
+        Allows a VHD file to be mounted in read-only or read-write mode. ISO files are mounted in read-only mode regardless of what parameter value you provide.
 
     .PARAMETER Ensure
-    Determines whether the setting should be applied or removed.
+        Determines whether the setting should be applied or removed.
 #>
 function Set-TargetResource
 {
@@ -225,22 +225,24 @@ function Set-TargetResource
 
 <#
     .SYNOPSIS
-    Tests if the ISO or VHD file mount is in the correct state.
+        Tests if the ISO or VHD file mount is in the correct state.
 
     .PARAMETER ImagePath
-    Specifies the path of the VHD or ISO file.
+        Specifies the path of the VHD or ISO file.
 
     .PARAMETER DriveLetter
-    Specifies the drive letter to mount this VHD or ISO to.
+        Specifies the drive letter to mount this VHD or ISO to.
 
     .PARAMETER StorageType
-    Specifies the storage type of a file. If the StorageType parameter is not specified, then the storage type is determined by file extension.
+        Specifies the storage type of a file. If the StorageType parameter is not
+        specified, then the storage type is determined by file extension.
 
     .PARAMETER Access
-    Allows a VHD file to be mounted in read-only or read-write mode. ISO files are mounted in read-only mode regardless of what parameter value you provide.
+        Allows a VHD file to be mounted in read-only or read-write mode. ISO files
+        are mounted in read-only mode regardless of what parameter value you provide.
 
     .PARAMETER Ensure
-    Determines whether the setting should be applied or removed.
+        Determines whether the setting should be applied or removed.
 #>
 function Test-TargetResource
 {
@@ -364,27 +366,29 @@ function Test-TargetResource
 
 <#
     .SYNOPSIS
-    Validates that the parameters passed are valid. If the parameter combination
-    is invalid then an exception will be thrown. Also validates the DriveLetter
-    value that is passed is valid.
+        Validates that the parameters passed are valid. If the parameter combination
+        is invalid then an exception will be thrown. Also validates the DriveLetter
+        value that is passed is valid.
 
     .PARAMETER ImagePath
-    Specifies the path of the VHD or ISO file.
+        Specifies the path of the VHD or ISO file.
 
     .PARAMETER DriveLetter
-    Specifies the drive letter to mount this VHD or ISO to.
+        Specifies the drive letter to mount this VHD or ISO to.
 
     .PARAMETER StorageType
-    Specifies the storage type of a file. If the StorageType parameter is not specified, then the storage type is determined by file extension.
+        Specifies the storage type of a file. If the StorageType parameter is not
+        specified, then the storage type is determined by file extension.
 
     .PARAMETER Access
-    Allows a VHD file to be mounted in read-only or read-write mode. ISO files are mounted in read-only mode regardless of what parameter value you provide.
+        Allows a VHD file to be mounted in read-only or read-write mode. ISO files
+        are mounted in read-only mode regardless of what parameter value you provide.
 
     .PARAMETER Ensure
-    Determines whether the setting should be applied or removed.
+        Determines whether the setting should be applied or removed.
 
     .OUTPUTS
-    If ensure is present then returns a normalized array of Drive Letters.
+        If ensure is present then returns a normalized array of Drive Letters.
 #>
 function Test-ParameterValid
 {
@@ -469,19 +473,21 @@ function Test-ParameterValid
 
 <#
     .SYNOPSIS
-    Mounts a Disk Image to a specific Drive Letter.
+        Mounts a Disk Image to a specific Drive Letter.
 
     .PARAMETER ImagePath
-    Specifies the path of the VHD or ISO file.
+        Specifies the path of the VHD or ISO file.
 
     .PARAMETER DriveLetter
-    Specifies the drive letter to mount this VHD or ISO to.
+        Specifies the drive letter to mount this VHD or ISO to.
 
     .PARAMETER StorageType
-    Specifies the storage type of a file. If the StorageType parameter is not specified, then the storage type is determined by file extension.
+        Specifies the storage type of a file. If the StorageType parameter is not
+        specified, then the storage type is determined by file extension.
 
     .PARAMETER Access
-    Allows a VHD file to be mounted in read-only or read-write mode. ISO files are mounted in read-only mode regardless of what parameter value you provide.
+        Allows a VHD file to be mounted in read-only or read-write mode. ISO files
+        are mounted in read-only mode regardless of what parameter value you provide.
 #>
 function Mount-DiskImageToLetter
 {

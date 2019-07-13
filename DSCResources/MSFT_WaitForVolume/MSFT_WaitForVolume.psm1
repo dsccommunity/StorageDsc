@@ -10,16 +10,16 @@ $script:localizedData = Get-LocalizedData -ResourceName 'MSFT_WaitForVolume'
 
 <#
     .SYNOPSIS
-    Returns the current state of the wait for drive resource.
+        Returns the current state of the wait for drive resource.
 
     .PARAMETER DriveLetter
-    Specifies the name of the drive to wait for.
+        Specifies the name of the drive to wait for.
 
     .PARAMETER RetryIntervalSec
-    Specifies the number of seconds to wait for the drive to become available.
+        Specifies the number of seconds to wait for the drive to become available.
 
     .PARAMETER RetryCount
-    The number of times to loop the retry interval while waiting for the drive.
+        The number of times to loop the retry interval while waiting for the drive.
 #>
 function Get-TargetResource
 {
@@ -58,16 +58,16 @@ function Get-TargetResource
 
 <#
     .SYNOPSIS
-    Sets the current state of the wait for drive resource.
+        Sets the current state of the wait for drive resource.
 
     .PARAMETER DriveLetter
-    Specifies the name of the drive to wait for.
+        Specifies the name of the drive to wait for.
 
     .PARAMETER RetryIntervalSec
-    Specifies the number of seconds to wait for the drive to become available.
+        Specifies the number of seconds to wait for the drive to become available.
 
     .PARAMETER RetryCount
-    The number of times to loop the retry interval while waiting for the drive.
+        The number of times to loop the retry interval while waiting for the drive.
 #>
 function Set-TargetResource
 {
@@ -119,8 +119,10 @@ function Set-TargetResource
 
             Start-Sleep -Seconds $RetryIntervalSec
 
-            # This command forces a refresh of the PS Drive subsystem.
-            # So triggers any "missing" drives to show up.
+            <#
+                This command forces a refresh of the PS Drive subsystem.
+                So triggers any "missing" drives to show up.
+            #>
             $null = Get-PSDrive
         } # if
     } # for
@@ -134,16 +136,16 @@ function Set-TargetResource
 
 <#
     .SYNOPSIS
-    Tests the current state of the wait for drive resource.
+        Tests the current state of the wait for drive resource.
 
     .PARAMETER DriveLetter
-    Specifies the name of the drive to wait for.
+        Specifies the name of the drive to wait for.
 
     .PARAMETER RetryIntervalSec
-    Specifies the number of seconds to wait for the drive to become available.
+        Specifies the number of seconds to wait for the drive to become available.
 
     .PARAMETER RetryCount
-    The number of times to loop the retry interval while waiting for the drive.
+        The number of times to loop the retry interval while waiting for the drive.
 #>
 function Test-TargetResource
 {

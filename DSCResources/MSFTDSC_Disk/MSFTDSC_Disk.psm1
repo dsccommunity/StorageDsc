@@ -10,45 +10,45 @@ $script:localizedData = Get-LocalizedData -ResourceName 'MSFTDSC_Disk'
 
 <#
     .SYNOPSIS
-    Returns the current state of the Disk and Partition.
+        Returns the current state of the Disk and Partition.
 
     .PARAMETER DriveLetter
-    Specifies the preferred letter to assign to the disk volume.
+        Specifies the preferred letter to assign to the disk volume.
 
     .PARAMETER DiskId
-    Specifies the disk identifier for the disk to modify.
+        Specifies the disk identifier for the disk to modify.
 
     .PARAMETER DiskIdType
-    Specifies the identifier type the DiskId contains. Defaults to Number.
+        Specifies the identifier type the DiskId contains. Defaults to Number.
 
     .PARAMETER PartitionStyle
-    Specifies the partition style of the disk. Defaults to GPT.
-    This parameter is not used in Get-TargetResource.
+        Specifies the partition style of the disk. Defaults to GPT.
+        This parameter is not used in Get-TargetResource.
 
     .PARAMETER Size
-    Specifies the size of new volume (use all available space on disk if not provided).
-    This parameter is not used in Get-TargetResource.
+        Specifies the size of new volume (use all available space on disk if not provided).
+        This parameter is not used in Get-TargetResource.
 
     .PARAMETER FSLabel
-    Specifies the volume label to assign to the volume.
-    This parameter is not used in Get-TargetResource.
+        Specifies the volume label to assign to the volume.
+        This parameter is not used in Get-TargetResource.
 
     .PARAMETER AllocationUnitSize
-    Specifies the allocation unit size to use when formatting the volume.
-    This parameter is not used in Get-TargetResource.
+        Specifies the allocation unit size to use when formatting the volume.
+        This parameter is not used in Get-TargetResource.
 
     .PARAMETER FSFormat
-    Specifies the file system format of the new volume.
-    This parameter is not used in Get-TargetResource.
+        Specifies the file system format of the new volume.
+        This parameter is not used in Get-TargetResource.
 
     .PARAMETER AllowDestructive
-    Specifies if potentially destructive operations may occur.
-    This parameter is not used in Get-TargetResource.
+        Specifies if potentially destructive operations may occur.
+        This parameter is not used in Get-TargetResource.
 
     .PARAMETER ClearDisk
-    Specifies if the disks partition schema should be removed entirely, even if data and OEM
-    partitions are present. Only possible with AllowDestructive enabled.
-    This parameter is not used in Get-TargetResource.
+        Specifies if the disks partition schema should be removed entirely, even if data and OEM
+        partitions are present. Only possible with AllowDestructive enabled.
+        This parameter is not used in Get-TargetResource.
 #>
 function Get-TargetResource
 {
@@ -139,38 +139,38 @@ function Get-TargetResource
 
 <#
     .SYNOPSIS
-    Initializes the Disk and Partition and assigns the drive letter.
+        Initializes the Disk and Partition and assigns the drive letter.
 
     .PARAMETER DriveLetter
-    Specifies the preferred letter to assign to the disk volume.
+        Specifies the preferred letter to assign to the disk volume.
 
     .PARAMETER DiskId
-    Specifies the disk identifier for the disk to modify.
+        Specifies the disk identifier for the disk to modify.
 
     .PARAMETER DiskIdType
-    Specifies the identifier type the DiskId contains. Defaults to Number.
+        Specifies the identifier type the DiskId contains. Defaults to Number.
 
     .PARAMETER PartitionStyle
-    Specifies the partition style of the disk. Defaults to GPT.
+        Specifies the partition style of the disk. Defaults to GPT.
 
     .PARAMETER Size
-    Specifies the size of new volume. Leave empty to use the remaining free space.
+        Specifies the size of new volume. Leave empty to use the remaining free space.
 
     .PARAMETER FSLabel
-    Specifies the volume label to assign to the volume.
+        Specifies the volume label to assign to the volume.
 
     .PARAMETER AllocationUnitSize
-    Specifies the allocation unit size to use when formatting the volume.
+        Specifies the allocation unit size to use when formatting the volume.
 
     .PARAMETER FSFormat
-    Specifies the file system format of the new volume.
+        Specifies the file system format of the new volume.
 
     .PARAMETER AllowDestructive
-    Specifies if potentially destructive operations may occur.
+        Specifies if potentially destructive operations may occur.
 
     .PARAMETER ClearDisk
-    Specifies if the disks partition schema should be removed entirely, even if data and OEM
-    partitions are present. Only possible with AllowDestructive enabled.
+        Specifies if the disks partition schema should be removed entirely, even if data and OEM
+        partitions are present. Only possible with AllowDestructive enabled.
 #>
 function Set-TargetResource
 {
@@ -637,38 +637,38 @@ function Set-TargetResource
 
 <#
     .SYNOPSIS
-    Tests if the disk is initialized, the partion exists and the drive letter is assigned.
+        Tests if the disk is initialized, the partion exists and the drive letter is assigned.
 
     .PARAMETER DriveLetter
-    Specifies the preferred letter to assign to the disk volume.
+        Specifies the preferred letter to assign to the disk volume.
 
     .PARAMETER DiskId
-    Specifies the disk identifier for the disk to modify.
+        Specifies the disk identifier for the disk to modify.
 
     .PARAMETER DiskIdType
-    Specifies the identifier type the DiskId contains. Defaults to Number.
+        Specifies the identifier type the DiskId contains. Defaults to Number.
 
     .PARAMETER PartitionStyle
-    Specifies the partition style of the disk. Defaults to GPT.
+        Specifies the partition style of the disk. Defaults to GPT.
 
     .PARAMETER Size
-    Specifies the size of new volume. Leave empty to use the remaining free space.
+        Specifies the size of new volume. Leave empty to use the remaining free space.
 
     .PARAMETER FSLabel
-    Specifies the volume label to assign to the volume.
+        Specifies the volume label to assign to the volume.
 
     .PARAMETER AllocationUnitSize
-    Specifies the allocation unit size to use when formatting the volume.
+        Specifies the allocation unit size to use when formatting the volume.
 
     .PARAMETER FSFormat
-    Specifies the file system format of the new volume.
+        Specifies the file system format of the new volume.
 
     .PARAMETER AllowDestructive
-    Specifies if potentially destructive operations may occur.
+        Specifies if potentially destructive operations may occur.
 
     .PARAMETER ClearDisk
-    Specifies if the disks partition schema should be removed entirely, even if data and OEM
-    partitions are present. Only possible with AllowDestructive enabled.
+        Specifies if the disks partition schema should be removed entirely, even if data and OEM
+        partitions are present. Only possible with AllowDestructive enabled.
 #>
 function Test-TargetResource
 {

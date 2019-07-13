@@ -521,13 +521,13 @@ function Restart-ServiceIfExists
 
 <#
     .SYNOPSIS
-    Validates a Drive Letter, removing or adding the trailing colon if required.
+        Validates a Drive Letter, removing or adding the trailing colon if required.
 
     .PARAMETER DriveLetter
-    The Drive Letter string to validate.
+        The Drive Letter string to validate.
 
     .PARAMETER Colon
-    Will ensure the returned string will include or exclude a colon.
+        Will ensure the returned string will include or exclude a colon.
 #>
 function Assert-DriveLetterValid
 {
@@ -568,15 +568,15 @@ function Assert-DriveLetterValid
 
 <#
     .SYNOPSIS
-    Validates an Access Path, removing or adding the trailing slash if required.
-    If the Access Path does not exist or is not a folder then an exception will
-    be thrown.
+        Validates an Access Path, removing or adding the trailing slash if required.
+        If the Access Path does not exist or is not a folder then an exception will
+        be thrown.
 
     .PARAMETER AccessPath
-    The Access Path string to validate.
+        The Access Path string to validate.
 
     .PARAMETER Slash
-    Will ensure the returned path will include or exclude a slash.
+        Will ensure the returned path will include or exclude a slash.
 #>
 function Assert-AccessPathValid
 {
@@ -621,17 +621,16 @@ function Assert-AccessPathValid
     return $AccessPath
 } # end function Assert-AccessPathValid
 
-
 <#
     .SYNOPSIS
-    Retrieves a Disk object matching the disk Id and Id type
-    provided.
+        Retrieves a Disk object matching the disk Id and Id type
+        provided.
 
     .PARAMETER DiskId
-    Specifies the disk identifier for the disk to retrieve.
+        Specifies the disk identifier for the disk to retrieve.
 
     .PARAMETER DiskIdType
-    Specifies the identifier type the DiskId contains. Defaults to Number.
+        Specifies the identifier type the DiskId contains. Defaults to Number.
 #>
 function Get-DiskByIdentifier
 {
@@ -671,11 +670,11 @@ function Get-DiskByIdentifier
 
 <#
     .SYNOPSIS
-    Tests if any of the access paths from a partition are assigned
-    to a local path.
+        Tests if any of the access paths from a partition are assigned
+        to a local path.
 
     .PARAMETER AccessPath
-    Specifies the access paths that are assigned to the partition.
+        Specifies the access paths that are assigned to the partition.
 #>
 function Test-AccessPathAssignedToLocal
 {

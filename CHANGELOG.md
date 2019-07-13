@@ -11,6 +11,10 @@
 - Refactored tests for `StorageDsc.Common` to meet latest standards.
 - Minor style corrections.
 - Removed unused localization strings from resources.
+- DiskAccessPath:
+  - Added function to force refresh of disk subsystem at the start of
+    Set-TargetResource to prevent errors occuring when the disk access
+    path is already assigned - See [Issue 121](https://github.com/PowerShell/StorageDsc/issues/121)
 
 ## 4.7.0.0
 

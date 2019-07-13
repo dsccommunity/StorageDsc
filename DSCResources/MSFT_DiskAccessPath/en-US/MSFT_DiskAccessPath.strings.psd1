@@ -30,7 +30,10 @@
     VolumeFoundMessage = Found {3} volume not assigned to path on partition '{2}' disk with {0} '{1}'.
     MatchingPartitionFoundMessage = Disk with {0} '{1}' already contains paritions, and partition '{2}' matches required size.
     AccessPathNotFoundOnPartitionMessage = Disk with {0} '{1}' does not contain a partition assigned to access path '{2}'.
-
+    CheckingPSDriveMessage = Checking access path '{0}' is available as PSDrive '{1}'.
+    UnavailablePSDriveMessage = Access path '{0}' is unavailable as PSDrive '{1}', refreshing PSDrives list.
+    PSDriveFoundMessage = Access path '{0}' found as PSDrive '{1}'.
+    PSDriveNotFoundMessage = Access path '{0}' not found as PSDrive '{1}'.
     DiskAlreadyInitializedError = Disk with {0} '{1}' is already initialized with {2}.
     NewParitionIsReadOnlyError = New partition '{2}' on disk with {0} '{1}' did not become writable in the expected time.
 '@

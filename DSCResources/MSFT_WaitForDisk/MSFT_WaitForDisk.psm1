@@ -10,19 +10,19 @@ $script:localizedData = Get-LocalizedData -ResourceName 'MSFT_WaitForDisk'
 
 <#
     .SYNOPSIS
-    Returns the current state of the wait for disk resource.
+        Returns the current state of the wait for disk resource.
 
     .PARAMETER DiskId
-    Specifies the disk identifier for the disk to wait for.
+        Specifies the disk identifier for the disk to wait for.
 
     .PARAMETER DiskIdType
-    Specifies the identifier type the DiskId contains. Defaults to Number.
+        Specifies the identifier type the DiskId contains. Defaults to Number.
 
     .PARAMETER RetryIntervalSec
-    Specifies the number of seconds to wait for the disk to become available.
+        Specifies the number of seconds to wait for the disk to become available.
 
     .PARAMETER RetryCount
-    The number of times to loop the retry interval while waiting for the disk.
+        The number of times to loop the retry interval while waiting for the disk.
 #>
 function Get-TargetResource
 {
@@ -67,19 +67,19 @@ function Get-TargetResource
 
 <#
     .SYNOPSIS
-    Sets the current state of the wait for disk resource.
+        Sets the current state of the wait for disk resource.
 
     .PARAMETER DiskId
-    Specifies the disk identifier for the disk to wait for.
+        Specifies the disk identifier for the disk to wait for.
 
     .PARAMETER DiskIdType
-    Specifies the identifier type the DiskId contains. Defaults to Number.
+        Specifies the identifier type the DiskId contains. Defaults to Number.
 
     .PARAMETER RetryIntervalSec
-    Specifies the number of seconds to wait for the disk to become available.
+        Specifies the number of seconds to wait for the disk to become available.
 
     .PARAMETER RetryCount
-    The number of times to loop the retry interval while waiting for the disk.
+        The number of times to loop the retry interval while waiting for the disk.
 #>
 function Set-TargetResource
 {
@@ -148,19 +148,19 @@ function Set-TargetResource
 
 <#
     .SYNOPSIS
-    Tests the current state of the wait for disk resource.
+        Tests the current state of the wait for disk resource.
 
     .PARAMETER DiskId
-    Specifies the disk identifier for the disk to wait for.
+        Specifies the disk identifier for the disk to wait for.
 
     .PARAMETER DiskIdType
-    Specifies the identifier type the DiskId contains. Defaults to Number.
+        Specifies the identifier type the DiskId contains. Defaults to Number.
 
     .PARAMETER RetryIntervalSec
-    Specifies the number of seconds to wait for the disk to become available.
+        Specifies the number of seconds to wait for the disk to become available.
 
     .PARAMETER RetryCount
-    The number of times to loop the retry interval while waiting for the disk.
+        The number of times to loop the retry interval while waiting for the disk.
 #>
 function Test-TargetResource
 {
