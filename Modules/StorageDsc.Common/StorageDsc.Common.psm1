@@ -621,7 +621,6 @@ function Assert-AccessPathValid
     return $AccessPath
 } # end function Assert-AccessPathValid
 
-
 <#
     .SYNOPSIS
     Retrieves a Disk object matching the disk Id and Id type

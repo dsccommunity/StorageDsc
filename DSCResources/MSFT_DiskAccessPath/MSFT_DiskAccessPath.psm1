@@ -119,7 +119,8 @@ function Get-TargetResource
         AllocationUnitSize   = $blockSize
         FSFormat             = $fileSystem
     }
-    $returnValue
+
+    return $returnValue
 } # Get-TargetResource
 
 <#
@@ -196,6 +197,14 @@ function Set-TargetResource
             "$($MyInvocation.MyCommand): "
             $($script:localizedData.SettingDiskMessage -f $DiskIdType, $DiskId, $AccessPath)
         ) -join '' )
+
+    <#
+        This call is required to force a refresh of the list of drives in
+        the disk subsystem. If this refresh does not occur then the list of
+        disks may not be up-to-date, resulting in an error occuring when the
+        access path is mounted. The result of the test is not used and is discarded.
+    #>
+    $null = Test-AccessPathInPSDrive -AccessPath $AccessPath
 
     # Validate the AccessPath parameter adding a trailing slash
     $AccessPath = Assert-AccessPathValid -AccessPath $AccessPath -Slash
@@ -746,5 +755,62 @@ function Test-TargetResource
 
     return $true
 } # Test-TargetResource
+
+<#
+    .SYNOPSIS
+    Check access path is found in PSDrives.
+
+    .DESCRIPTION
+    Check if the access path is found in the list of PSDrives and if not
+    then forces a full refresh of the list and searches that.
+
+    .PARAMETER AccessPath
+    Specifies the access path folder.
+
+    .NOTES
+    The full refresh of PSDrive wihtout any parameters is required because
+    this is the only way to completely force a refresh of disks and other
+    related CIM objects.
+
+    If the refresh is not forced then there is a risk that the drive will
+    appear to not be mounted, causing an error when the resource attempts
+    to remount it.
+
+    See https://github.com/PowerShell/StorageDsc/issues/121
+#>
+function Test-AccessPathInPSDrive
+{
+    [CmdletBinding()]
+    param
+    (
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [System.String]
+        $AccessPath
+    )
+
+    try
+    {
+        $accessPathDisk = $AccessPath.Split(':')[0]
+        Write-Verbose -Message ( @(
+                "$($MyInvocation.MyCommand): "
+                $($localizedData.CheckingPSDriveMessage -f $AccessPath, $accessPathDisk)
+            ) -join '' )
+
+        $accessPathDrive = Get-PSDrive -Name $accessPathDisk -ErrorAction Stop
+    }
+    catch
+    {
+        Write-Verbose -Message ( @(
+                "$($MyInvocation.MyCommand): "
+                $($localizedData.UnavailablePSDriveMessage -f $AccessPath, $accessPathDisk)
+            ) -join '' )
+
+        $accessPathDrive = Get-PSDrive
+        $accessPathDrive = $accessPathDrive | Where-Object -Property Name -eq $accessPathDisk
+    }
+
+    return ($null -ne $accessPathDrive)
+} # Test-AccessPathInPSDrive
 
 Export-ModuleMember -Function *-TargetResource
