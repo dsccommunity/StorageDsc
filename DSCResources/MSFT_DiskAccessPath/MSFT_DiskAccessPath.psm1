@@ -10,31 +10,31 @@ $script:localizedData = Get-LocalizedData -ResourceName 'MSFT_DiskAccessPath'
 
 <#
     .SYNOPSIS
-    Returns the current state of the Disk and Partition.
+        Returns the current state of the Disk and Partition.
 
     .PARAMETER AccessPath
-    Specifies the access path folder to the assign the disk volume to
+        Specifies the access path folder to the assign the disk volume to
 
     .PARAMETER NoDefaultDriveLetter
-    Prevents a default drive letter from being assigned to a newly created partition. Defaults to True.
+        Prevents a default drive letter from being assigned to a newly created partition. Defaults to True.
 
     .PARAMETER DiskId
-    Specifies the disk identifier for the disk to modify.
+        Specifies the disk identifier for the disk to modify.
 
     .PARAMETER DiskIdType
-    Specifies the identifier type the DiskId contains. Defaults to Number.
+        Specifies the identifier type the DiskId contains. Defaults to Number.
 
     .PARAMETER Size
-    Specifies the size of new volume (use all available space on disk if not provided).
+        Specifies the size of new volume (use all available space on disk if not provided).
 
     .PARAMETER FSLabel
-    Specifies the volume label to assign to the volume.
+        Specifies the volume label to assign to the volume.
 
     .PARAMETER AllocationUnitSize
-    Specifies the allocation unit size to use when formatting the volume.
+        Specifies the allocation unit size to use when formatting the volume.
 
     .PARAMETER FSFormat
-    Specifies the file system format of the new volume.
+        Specifies the file system format of the new volume.
 #>
 function Get-TargetResource
 {
@@ -125,31 +125,31 @@ function Get-TargetResource
 
 <#
     .SYNOPSIS
-    Initializes the Disk and Partition and assigns the access path.
+        Initializes the Disk and Partition and assigns the access path.
 
     .PARAMETER AccessPath
-    Specifies the access path folder to the assign the disk volume to
+        Specifies the access path folder to the assign the disk volume to
 
     .PARAMETER NoDefaultDriveLetter
-    Prevents a default drive letter from being assigned to a newly created partition. Defaults to True.
+        Prevents a default drive letter from being assigned to a newly created partition. Defaults to True.
 
     .PARAMETER DiskId
-    Specifies the disk identifier for the disk to modify.
+        Specifies the disk identifier for the disk to modify.
 
     .PARAMETER DiskIdType
-    Specifies the identifier type the DiskId contains. Defaults to Number.
+        Specifies the identifier type the DiskId contains. Defaults to Number.
 
     .PARAMETER Size
-    Specifies the size of new volume (use all available space on disk if not provided).
+        Specifies the size of new volume (use all available space on disk if not provided).
 
     .PARAMETER FSLabel
-    Specifies the volume label to assign to the volume.
+        Specifies the volume label to assign to the volume.
 
     .PARAMETER AllocationUnitSize
-    Specifies the allocation unit size to use when formatting the volume.
+        Specifies the allocation unit size to use when formatting the volume.
 
     .PARAMETER FSFormat
-    Specifies the file system format of the new volume.
+        Specifies the file system format of the new volume.
 #>
 function Set-TargetResource
 {
@@ -538,31 +538,31 @@ function Set-TargetResource
 
 <#
     .SYNOPSIS
-    Tests if the disk is initialized, the partion exists and the access path is assigned.
+        Tests if the disk is initialized, the partion exists and the access path is assigned.
 
     .PARAMETER AccessPath
-    Specifies the access path folder to the assign the disk volume to
+        Specifies the access path folder to the assign the disk volume to
 
     .PARAMETER NoDefaultDriveLetter
-    Prevents a default drive letter from being assigned to a newly created partition. Defaults to True.
+        Prevents a default drive letter from being assigned to a newly created partition. Defaults to True.
 
     .PARAMETER DiskId
-    Specifies the disk identifier for the disk to modify.
+        Specifies the disk identifier for the disk to modify.
 
     .PARAMETER DiskIdType
-    Specifies the identifier type the DiskId contains. Defaults to Number.
+        Specifies the identifier type the DiskId contains. Defaults to Number.
 
     .PARAMETER Size
-    Specifies the size of new volume (use all available space on disk if not provided).
+        Specifies the size of new volume (use all available space on disk if not provided).
 
     .PARAMETER FSLabel
-    Specifies the volume label to assign to the volume.
+        Specifies the volume label to assign to the volume.
 
     .PARAMETER AllocationUnitSize
-    Specifies the allocation unit size to use when formatting the volume.
+        Specifies the allocation unit size to use when formatting the volume.
 
     .PARAMETER FSFormat
-    Specifies the file system format of the new volume.
+        Specifies the file system format of the new volume.
 #>
 function Test-TargetResource
 {
@@ -758,25 +758,25 @@ function Test-TargetResource
 
 <#
     .SYNOPSIS
-    Check access path is found in PSDrives.
+        Check access path is found in PSDrives.
 
     .DESCRIPTION
-    Check if the access path is found in the list of PSDrives and if not
-    then forces a full refresh of the list and searches that.
+        Check if the access path is found in the list of PSDrives and if not
+        then forces a full refresh of the list and searches that.
 
     .PARAMETER AccessPath
-    Specifies the access path folder.
+        Specifies the access path folder.
 
     .NOTES
-    The full refresh of PSDrive wihtout any parameters is required because
-    this is the only way to completely force a refresh of disks and other
-    related CIM objects.
+        The full refresh of PSDrive without any parameters is required because
+        this is the only way to completely force a refresh of disks and other
+        related CIM objects.
 
-    If the refresh is not forced then there is a risk that the drive will
-    appear to not be mounted, causing an error when the resource attempts
-    to remount it.
+        If the refresh is not forced then there is a risk that the drive will
+        appear to not be mounted, causing an error when the resource attempts
+        to remount it.
 
-    See https://github.com/PowerShell/StorageDsc/issues/121
+        See https://github.com/PowerShell/StorageDsc/issues/121
 #>
 function Test-AccessPathInPSDrive
 {
@@ -794,7 +794,7 @@ function Test-AccessPathInPSDrive
         $accessPathDisk = $AccessPath.Split(':')[0]
         Write-Verbose -Message ( @(
                 "$($MyInvocation.MyCommand): "
-                $($localizedData.CheckingPSDriveMessage -f $AccessPath, $accessPathDisk)
+                $($script:localizedData.CheckingPSDriveMessage -f $AccessPath, $accessPathDisk)
             ) -join '' )
 
         $accessPathDrive = Get-PSDrive -Name $accessPathDisk -ErrorAction Stop
@@ -803,14 +803,31 @@ function Test-AccessPathInPSDrive
     {
         Write-Verbose -Message ( @(
                 "$($MyInvocation.MyCommand): "
-                $($localizedData.UnavailablePSDriveMessage -f $AccessPath, $accessPathDisk)
+                $($script:localizedData.UnavailablePSDriveMessage -f $AccessPath, $accessPathDisk)
             ) -join '' )
 
         $accessPathDrive = Get-PSDrive
         $accessPathDrive = $accessPathDrive | Where-Object -Property Name -eq $accessPathDisk
     }
 
-    return ($null -ne $accessPathDrive)
+    $accessPathFound = ($null -ne $accessPathDrive)
+
+    if ($accessPathFound)
+    {
+        Write-Verbose -Message ( @(
+                "$($MyInvocation.MyCommand): "
+                $($script:localizedData.PSDriveFoundMessage -f $AccessPath, $accessPathDisk)
+            ) -join '' )
+    }
+    else
+    {
+        Write-Verbose -Message ( @(
+                "$($MyInvocation.MyCommand): "
+                $($script:localizedData.PSDriveNotFoundMessage -f $AccessPath, $accessPathDisk)
+            ) -join '' )
+    }
+
+    return $accessPathFound
 } # Test-AccessPathInPSDrive
 
 Export-ModuleMember -Function *-TargetResource
