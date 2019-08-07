@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 4.7.0.0
+
 - Removed suppression of `PSUseShouldProcessForStateChangingFunctions` PSSA rule
   because it is no longer required.
 - Combined all `StorageDsc.ResourceHelper` module functions into
