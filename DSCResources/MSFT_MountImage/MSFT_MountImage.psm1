@@ -1,33 +1,19 @@
-# Suppressed as per PSSA Rule Severity guidelines for unit/integration tests:
-# https://github.com/PowerShell/DscResources/blob/master/PSSARuleSeverities.md
-[System.Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseShouldProcessForStateChangingFunctions', '')]
-param ()
-
 $modulePath = Join-Path -Path (Split-Path -Path (Split-Path -Path $PSScriptRoot -Parent) -Parent) -ChildPath 'Modules'
 
-$modulePath = Join-Path -Path (Split-Path -Path (Split-Path -Path $PSScriptRoot -Parent) -Parent) -ChildPath 'Modules'
-
-# Import the Storage Common Modules
+# Import the Storage Common Module.
 Import-Module -Name (Join-Path -Path $modulePath `
-                               -ChildPath (Join-Path -Path 'StorageDsc.Common' `
-                                                     -ChildPath 'StorageDsc.Common.psm1'))
+        -ChildPath (Join-Path -Path 'StorageDsc.Common' `
+            -ChildPath 'StorageDsc.Common.psm1'))
 
-# Import the Storage Resource Helper Module
-Import-Module -Name (Join-Path -Path $modulePath `
-                               -ChildPath (Join-Path -Path 'StorageDsc.ResourceHelper' `
-                                                     -ChildPath 'StorageDsc.ResourceHelper.psm1'))
-
-# Import Localization Strings
-$localizedData = Get-LocalizedData `
-    -ResourceName 'MSFT_MountImage' `
-    -ResourcePath (Split-Path -Parent $Script:MyInvocation.MyCommand.Path)
+# Import Localization Strings.
+$script:localizedData = Get-LocalizedData -ResourceName 'MSFT_MountImage'
 
 <#
     .SYNOPSIS
-    Returns the current mount state of the VHD or ISO file.
+        Returns the current mount state of the VHD or ISO file.
 
     .PARAMETER ImagePath
-    Specifies the path of the VHD or ISO file.
+        Specifies the path of the VHD or ISO file.
 #>
 function Get-TargetResource
 {
@@ -42,7 +28,7 @@ function Get-TargetResource
 
     Write-Verbose -Message ( @(
             "$($MyInvocation.MyCommand): "
-            $($localizedData.GettingMountedImageMessage `
+            $($script:localizedData.GettingMountedImageMessage `
                 -f $ImagePath)
         ) -join '' )
 
@@ -99,22 +85,22 @@ function Get-TargetResource
 
 <#
     .SYNOPSIS
-    Mounts or dismounts the ISO or VHD.
+        Mounts or dismounts the ISO or VHD.
 
     .PARAMETER ImagePath
-    Specifies the path of the VHD or ISO file.
+        Specifies the path of the VHD or ISO file.
 
     .PARAMETER DriveLetter
-    Specifies the drive letter to mount this VHD or ISO to.
+        Specifies the drive letter to mount this VHD or ISO to.
 
     .PARAMETER StorageType
-    Specifies the storage type of a file. If the StorageType parameter is not specified, then the storage type is determined by file extension.
+        Specifies the storage type of a file. If the StorageType parameter is not specified, then the storage type is determined by file extension.
 
     .PARAMETER Access
-    Allows a VHD file to be mounted in read-only or read-write mode. ISO files are mounted in read-only mode regardless of what parameter value you provide.
+        Allows a VHD file to be mounted in read-only or read-write mode. ISO files are mounted in read-only mode regardless of what parameter value you provide.
 
     .PARAMETER Ensure
-    Determines whether the setting should be applied or removed.
+        Determines whether the setting should be applied or removed.
 #>
 function Set-TargetResource
 {
@@ -149,7 +135,7 @@ function Set-TargetResource
 
     Write-Verbose -Message ( @(
             "$($MyInvocation.MyCommand): "
-            $($localizedData.SettingMountedImageMessage `
+            $($script:localizedData.SettingMountedImageMessage `
                 -f $ImagePath)
         ) -join '' )
 
@@ -180,7 +166,7 @@ function Set-TargetResource
                 # The disk image is mounted to the wrong DriveLetter -remount disk
                 Write-Verbose -Message ( @(
                         "$($MyInvocation.MyCommand): "
-                        $($localizedData.DismountingImageMessage `
+                        $($script:localizedData.DismountingImageMessage `
                             -f $ImagePath,$currentState.DriveLetter)
                     ) -join '' )
 
@@ -199,7 +185,7 @@ function Set-TargetResource
                     # The access mode is wrong -remount disk
                     Write-Verbose -Message ( @(
                             "$($MyInvocation.MyCommand): "
-                            $($localizedData.DismountingImageMessage `
+                            $($script:localizedData.DismountingImageMessage `
                                 -f $ImagePath,$currentState.DriveLetter)
                         ) -join '' )
 
@@ -213,7 +199,7 @@ function Set-TargetResource
         {
         Write-Verbose -Message ( @(
                 "$($MyInvocation.MyCommand): "
-                $($localizedData.MountingImageMessage `
+                $($script:localizedData.MountingImageMessage `
                     -f $ImagePath,$normalizedDriveLetter)
             ) -join '' )
 
@@ -228,7 +214,7 @@ function Set-TargetResource
             # It is mounted so dismount it
             Write-Verbose -Message ( @(
                     "$($MyInvocation.MyCommand): "
-                    $($localizedData.DismountingImageMessage `
+                    $($script:localizedData.DismountingImageMessage `
                         -f $ImagePath,$currentState.DriveLetter)
                 ) -join '' )
 
@@ -239,22 +225,24 @@ function Set-TargetResource
 
 <#
     .SYNOPSIS
-    Tests if the ISO or VHD file mount is in the correct state.
+        Tests if the ISO or VHD file mount is in the correct state.
 
     .PARAMETER ImagePath
-    Specifies the path of the VHD or ISO file.
+        Specifies the path of the VHD or ISO file.
 
     .PARAMETER DriveLetter
-    Specifies the drive letter to mount this VHD or ISO to.
+        Specifies the drive letter to mount this VHD or ISO to.
 
     .PARAMETER StorageType
-    Specifies the storage type of a file. If the StorageType parameter is not specified, then the storage type is determined by file extension.
+        Specifies the storage type of a file. If the StorageType parameter is not
+        specified, then the storage type is determined by file extension.
 
     .PARAMETER Access
-    Allows a VHD file to be mounted in read-only or read-write mode. ISO files are mounted in read-only mode regardless of what parameter value you provide.
+        Allows a VHD file to be mounted in read-only or read-write mode. ISO files
+        are mounted in read-only mode regardless of what parameter value you provide.
 
     .PARAMETER Ensure
-    Determines whether the setting should be applied or removed.
+        Determines whether the setting should be applied or removed.
 #>
 function Test-TargetResource
 {
@@ -288,7 +276,7 @@ function Test-TargetResource
 
     Write-Verbose -Message ( @(
             "$($MyInvocation.MyCommand): "
-            $($localizedData.TestingMountedImageMessage `
+            $($script:localizedData.TestingMountedImageMessage `
                 -f $DriveLetter)
         ) -join '' )
 
@@ -309,7 +297,7 @@ function Test-TargetResource
             # The disk image isn't mounted
             Write-Verbose -Message ( @(
                     "$($MyInvocation.MyCommand): "
-                    $($localizedData.ImageIsNotMountedButShouldBeMessage `
+                    $($script:localizedData.ImageIsNotMountedButShouldBeMessage `
                         -f $ImagePath,$normalizedDriveLetter)
                 ) -join '' )
             return $false
@@ -320,7 +308,7 @@ function Test-TargetResource
             # The disk image is mounted to the wrong DriveLetter
             Write-Verbose -Message ( @(
                     "$($MyInvocation.MyCommand): "
-                    $($localizedData.ImageIsMountedToTheWrongDriveLetterMessage `
+                    $($script:localizedData.ImageIsMountedToTheWrongDriveLetterMessage `
                         -f $ImagePath,$currentState.DriveLetter,$normalizedDriveLetter)
                 ) -join '' )
             return $false
@@ -335,7 +323,7 @@ function Test-TargetResource
                 {
                     Write-Verbose -Message ( @(
                             "$($MyInvocation.MyCommand): "
-                            $($localizedData.VHDAccessModeMismatchMessage `
+                            $($script:localizedData.VHDAccessModeMismatchMessage `
                                 -f $ImagePath,$normalizedDriveLetter,$currentState.Access,$Access)
                         ) -join '' )
                     return $false
@@ -346,7 +334,7 @@ function Test-TargetResource
         # The Disk Image is mounted to the expected Drive - nothing to change.
         Write-Verbose -Message ( @(
                 "$($MyInvocation.MyCommand): "
-                $($localizedData.ImageIsMountedAndShouldBeMessage `
+                $($script:localizedData.ImageIsMountedAndShouldBeMessage `
                     -f $ImagePath,$normalizedDriveLetter)
             ) -join '' )
     }
@@ -358,7 +346,7 @@ function Test-TargetResource
             # The disk image is mounted
             Write-Verbose -Message ( @(
                     "$($MyInvocation.MyCommand): "
-                    $($localizedData.ImageIsMountedButShouldNotBeMessage `
+                    $($script:localizedData.ImageIsMountedButShouldNotBeMessage `
                         -f $ImagePath,$currentState.DriveLetter)
                 ) -join '' )
             return $false
@@ -367,7 +355,7 @@ function Test-TargetResource
         # The image is not mounted and should not be
         Write-Verbose -Message ( @(
                 "$($MyInvocation.MyCommand): "
-                $($localizedData.ImageIsNotMountedAndShouldNotBeMessage `
+                $($script:localizedData.ImageIsNotMountedAndShouldNotBeMessage `
                     -f $ImagePath)
             ) -join '' )
     } # if
@@ -378,27 +366,29 @@ function Test-TargetResource
 
 <#
     .SYNOPSIS
-    Validates that the parameters passed are valid. If the parameter combination
-    is invalid then an exception will be thrown. Also validates the DriveLetter
-    value that is passed is valid.
+        Validates that the parameters passed are valid. If the parameter combination
+        is invalid then an exception will be thrown. Also validates the DriveLetter
+        value that is passed is valid.
 
     .PARAMETER ImagePath
-    Specifies the path of the VHD or ISO file.
+        Specifies the path of the VHD or ISO file.
 
     .PARAMETER DriveLetter
-    Specifies the drive letter to mount this VHD or ISO to.
+        Specifies the drive letter to mount this VHD or ISO to.
 
     .PARAMETER StorageType
-    Specifies the storage type of a file. If the StorageType parameter is not specified, then the storage type is determined by file extension.
+        Specifies the storage type of a file. If the StorageType parameter is not
+        specified, then the storage type is determined by file extension.
 
     .PARAMETER Access
-    Allows a VHD file to be mounted in read-only or read-write mode. ISO files are mounted in read-only mode regardless of what parameter value you provide.
+        Allows a VHD file to be mounted in read-only or read-write mode. ISO files
+        are mounted in read-only mode regardless of what parameter value you provide.
 
     .PARAMETER Ensure
-    Determines whether the setting should be applied or removed.
+        Determines whether the setting should be applied or removed.
 
     .OUTPUTS
-    If ensure is present then returns a normalized array of Drive Letters.
+        If ensure is present then returns a normalized array of Drive Letters.
 #>
 function Test-ParameterValid
 {
@@ -436,7 +426,7 @@ function Test-ParameterValid
         {
             # The DriveLetter should not be set if Ensure is Absent
             New-InvalidOperationException `
-                -Message ($localizedData.InvalidParameterSpecifiedError -f `
+                -Message ($script:localizedData.InvalidParameterSpecifiedError -f `
                     'Absent','DriveLetter')
         } # if
 
@@ -444,7 +434,7 @@ function Test-ParameterValid
         {
             # The StorageType should not be set if Ensure is Absent
             New-InvalidOperationException `
-                -Message ($localizedData.InvalidParameterSpecifiedError -f `
+                -Message ($script:localizedData.InvalidParameterSpecifiedError -f `
                     'Absent','StorageType')
         } # if
 
@@ -452,7 +442,7 @@ function Test-ParameterValid
         {
             # The Access should not be set if Ensure is Absent
             New-InvalidOperationException `
-                -Message ($localizedData.InvalidParameterSpecifiedError -f `
+                -Message ($script:localizedData.InvalidParameterSpecifiedError -f `
                     'Absent','Access')
         } # if
     }
@@ -462,7 +452,7 @@ function Test-ParameterValid
         {
             # The file specified by ImagePath should be found
             New-InvalidOperationException `
-                -Message ($localizedData.DiskImageFileNotFoundError -f `
+                -Message ($script:localizedData.DiskImageFileNotFoundError -f `
                     $ImagePath)
         } # if
 
@@ -475,7 +465,7 @@ function Test-ParameterValid
         {
             # Drive letter is not specified but Ensure is present.
             New-InvalidOperationException `
-                -Message ($localizedData.InvalidParameterNotSpecifiedError -f `
+                -Message ($script:localizedData.InvalidParameterNotSpecifiedError -f `
                     'Present','DriveLetter')
         } # if
     } # if
@@ -483,19 +473,21 @@ function Test-ParameterValid
 
 <#
     .SYNOPSIS
-    Mounts a Disk Image to a specific Drive Letter.
+        Mounts a Disk Image to a specific Drive Letter.
 
     .PARAMETER ImagePath
-    Specifies the path of the VHD or ISO file.
+        Specifies the path of the VHD or ISO file.
 
     .PARAMETER DriveLetter
-    Specifies the drive letter to mount this VHD or ISO to.
+        Specifies the drive letter to mount this VHD or ISO to.
 
     .PARAMETER StorageType
-    Specifies the storage type of a file. If the StorageType parameter is not specified, then the storage type is determined by file extension.
+        Specifies the storage type of a file. If the StorageType parameter is not
+        specified, then the storage type is determined by file extension.
 
     .PARAMETER Access
-    Allows a VHD file to be mounted in read-only or read-write mode. ISO files are mounted in read-only mode regardless of what parameter value you provide.
+        Allows a VHD file to be mounted in read-only or read-write mode. ISO files
+        are mounted in read-only mode regardless of what parameter value you provide.
 #>
 function Mount-DiskImageToLetter
 {
@@ -569,7 +561,7 @@ function Mount-DiskImageToLetter
     {
         Write-Verbose -Message ( @(
                 "$($MyInvocation.MyCommand): "
-                $($localizedData.ChangingImageDriveLetterMessage `
+                $($script:localizedData.ChangingImageDriveLetterMessage `
                     -f $ImagePath,$currentDriveLetter,$normalizedDriveLetter)
             ) -join '' )
 
