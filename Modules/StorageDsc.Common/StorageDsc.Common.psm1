@@ -643,26 +643,26 @@ function Get-DiskByIdentifier
         $DiskId,
 
         [Parameter()]
-        [ValidateSet('Number','UniqueId','Guid')]
+        [ValidateSet('Number','UniqueId','Guid','Location')]
         [System.String]
         $DiskIdType = 'Number'
     )
 
-    if ($DiskIdType -eq 'Guid')
-    {
-        # The Disk Id requested uses a Guid so have to get all disks and filter
-        $disk = Get-Disk -ErrorAction SilentlyContinue |
-            Where-Object -Property Guid -EQ $DiskId
-    }
-    else
-    {
-        $diskIdParameter = @{
-            $DiskIdType = $DiskId
-        }
+    switch -regex ($DiskIdType) {
+        "Number|UniqueId" { # for filters supported by the Get-Disk CmdLet
+            $diskIdParameter = @{
+                $DiskIdType = $DiskId
+            }
 
-        $disk = Get-Disk `
-            @diskIdParameter `
-            -ErrorAction SilentlyContinue
+            $disk = Get-Disk `
+                @diskIdParameter `
+                -ErrorAction SilentlyContinue
+            break
+        }
+        default { # for filters requiring Where-Object
+            $disk = Get-Disk -ErrorAction SilentlyContinue |
+            Where-Object -Property $DiskIdType -EQ $DiskId
+        }
     }
 
     return $disk
