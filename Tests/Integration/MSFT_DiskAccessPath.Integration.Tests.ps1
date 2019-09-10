@@ -653,8 +653,11 @@ try
             BeforeAll {
                 # Create a VHD and attach it to the computer
                 $VHDPath = Join-Path -Path $TestDrive `
-                    -ChildPath 'TestDisk.Location.vhd'
-                $null = New-VDisk -Path $VHDPath -SizeInMB 1024
+                    -ChildPath 'TestDisk.vhd'
+                $null = New-VDisk -Path $VHDPath -SizeInMB 1024 -Initialize
+                if (-not (Test-Path $VHDPath)) {
+                    throw "Unable to find $VHDPath"
+                }
                 $null = Mount-DiskImage -ImagePath $VHDPath -StorageType VHD -NoDriveLetter
                 $diskImage = Get-DiskImage -ImagePath $VHDPath
                 $disk = Get-Disk -Number $diskImage.Number
