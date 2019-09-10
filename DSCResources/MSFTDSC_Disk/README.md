@@ -10,8 +10,8 @@ The _DiskId_ value can be a _Disk Number_, _Unique Id_,  _Guid_ or _Location_.
 it has been shown to change between reboots in some environments.
 It is recommended to use the _Unique Id_ if possible.**
 
-The _Disk Number_, _Unique Id_, _Guid_ and _Location_ can be identified for a disk by using the
-PowerShell command:
+The _Disk Number_, _Unique Id_, _Guid_ and _Location_ can be identified for a
+disk by using the PowerShell command:
 
 ```powershell
 Get-Disk | Select-Object -Property FriendlyName,DiskNumber,UniqueId,Guid,Location
