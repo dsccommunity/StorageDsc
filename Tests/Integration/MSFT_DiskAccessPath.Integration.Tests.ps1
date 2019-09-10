@@ -658,9 +658,6 @@ try
                 $null = Mount-DiskImage -ImagePath $VHDPath -StorageType VHD -NoDriveLetter
                 $diskImage = Get-DiskImage -ImagePath $VHDPath
                 $disk = Get-Disk -Number $diskImage.Number
-                if (!$disk) {
-                    throw "Disk $VHDPath not found"
-                }
                 $FSLabelA = 'TestDiskA'
                 $FSLabelB = 'TestDiskB'
 
@@ -678,7 +675,7 @@ try
                 } # if
             }
 
-            Context "Create first volume on Disk Location $VHDPath" {
+            Context "Create first volume on Disk Location $($disk.Location)" {
                 It 'Should compile and apply the MOF without throwing' {
                     {
                         # This is to pass to the Config
@@ -687,7 +684,7 @@ try
                                 @{
                                     NodeName   = 'localhost'
                                     AccessPath = $accessPathA
-                                    DiskId     = $VHDPath
+                                    DiskId     = $disk.Location
                                     DiskIdType = 'Location'
                                     FSLabel    = $FSLabelA
                                     Size       = 100MB
@@ -717,7 +714,7 @@ try
                     $current = Get-DscConfiguration | Where-Object {
                         $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
                     }
-                    $current.DiskId           | Should -Be $VHDPath
+                    $current.DiskId           | Should -Be $disk.Location
                     $current.AccessPath       | Should -Be "$($accessPathA)\"
                     $current.FSLabel          | Should -Be $FSLabelA
                     $current.Size             | Should -Be 100MB
@@ -738,7 +735,7 @@ try
                 -AccessPath $accessPathA `
                 -ErrorAction SilentlyContinue
 
-            Context "Remount first volume on Disk Location $VHDPath" {
+            Context "Remount first volume on Disk Location $($disk.Location)" {
                 It 'Should compile and apply the MOF without throwing' {
                     {
                         # This is to pass to the Config
@@ -747,7 +744,7 @@ try
                                 @{
                                     NodeName   = 'localhost'
                                     AccessPath = $accessPathA
-                                    DiskId     = $VHDPath
+                                    DiskId     = $disk.Location
                                     DiskIdType = 'Location'
                                     FSLabel    = $FSLabelA
                                     Size       = 100MB
@@ -777,7 +774,7 @@ try
                     $current = Get-DscConfiguration | Where-Object {
                         $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
                     }
-                    $current.DiskId           | Should -Be $VHDPath
+                    $current.DiskId           | Should -Be $($disk.Location)
                     $current.AccessPath       | Should -Be "$($accessPathA)\"
                     $current.FSLabel          | Should -Be $FSLabelA
                     $current.Size             | Should -Be 100MB
@@ -788,7 +785,7 @@ try
                     Get-Content -Path $testFilePath -Raw | Should -Be 'Test'
                 }
 
-                Context "Create second volume on Disk Location $VHDPath" {
+                Context "Create second volume on Disk Location$($disk.Location)" {
                     It 'Should compile and apply the MOF without throwing' {
                         {
                             # This is to pass to the Config
@@ -797,7 +794,7 @@ try
                                     @{
                                         NodeName   = 'localhost'
                                         AccessPath = $accessPathB
-                                        DiskId     = $VHDPath
+                                        DiskId     = $($disk.Location)
                                         DiskIdType = 'Location'
                                         FSLabel    = $FSLabelB
                                     }
@@ -826,7 +823,7 @@ try
                         $current = Get-DscConfiguration | Where-Object {
                             $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
                         }
-                        $current.DiskId           | Should -Be $VHDPath
+                        $current.DiskId           | Should -Be $($disk.Location)
                         $current.AccessPath       | Should -Be "$($accessPathB)\"
                         $current.FSLabel          | Should -Be $FSLabelB
                         $current.Size             | Should -Be 935198720
