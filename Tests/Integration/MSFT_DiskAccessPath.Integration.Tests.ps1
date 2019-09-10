@@ -675,7 +675,7 @@ try
                 } # if
             }
 
-            Context "Create first volume on Disk Location $($disk.Location)" {
+            Context "Create first volume on Disk Location $VHDPath" {
                 It 'Should compile and apply the MOF without throwing' {
                     {
                         # This is to pass to the Config
@@ -684,7 +684,7 @@ try
                                 @{
                                     NodeName   = 'localhost'
                                     AccessPath = $accessPathA
-                                    DiskId     = $disk.Location
+                                    DiskId     = $VHDPath
                                     DiskIdType = 'Location'
                                     FSLabel    = $FSLabelA
                                     Size       = 100MB
@@ -714,7 +714,7 @@ try
                     $current = Get-DscConfiguration | Where-Object {
                         $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
                     }
-                    $current.DiskId           | Should -Be $disk.Location
+                    $current.DiskId           | Should -Be $VHDPath
                     $current.AccessPath       | Should -Be "$($accessPathA)\"
                     $current.FSLabel          | Should -Be $FSLabelA
                     $current.Size             | Should -Be 100MB
@@ -735,7 +735,7 @@ try
                 -AccessPath $accessPathA `
                 -ErrorAction SilentlyContinue
 
-            Context "Remount first volume on Disk Location $($disk.Location)" {
+            Context "Remount first volume on Disk Location $VHDPath" {
                 It 'Should compile and apply the MOF without throwing' {
                     {
                         # This is to pass to the Config
@@ -744,7 +744,7 @@ try
                                 @{
                                     NodeName   = 'localhost'
                                     AccessPath = $accessPathA
-                                    DiskId     = $disk.Location
+                                    DiskId     = $VHDPath
                                     DiskIdType = 'Location'
                                     FSLabel    = $FSLabelA
                                     Size       = 100MB
@@ -774,7 +774,7 @@ try
                     $current = Get-DscConfiguration | Where-Object {
                         $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
                     }
-                    $current.DiskId           | Should -Be $disk.Location
+                    $current.DiskId           | Should -Be $VHDPath
                     $current.AccessPath       | Should -Be "$($accessPathA)\"
                     $current.FSLabel          | Should -Be $FSLabelA
                     $current.Size             | Should -Be 100MB
@@ -785,7 +785,7 @@ try
                     Get-Content -Path $testFilePath -Raw | Should -Be 'Test'
                 }
 
-                Context "Create second volume on Disk Location $($disk.Location)" {
+                Context "Create second volume on Disk Location $VHDPath" {
                     It 'Should compile and apply the MOF without throwing' {
                         {
                             # This is to pass to the Config
@@ -794,7 +794,7 @@ try
                                     @{
                                         NodeName   = 'localhost'
                                         AccessPath = $accessPathB
-                                        DiskId     = $disk.Location
+                                        DiskId     = $VHDPath
                                         DiskIdType = 'Location'
                                         FSLabel    = $FSLabelB
                                     }
@@ -823,7 +823,7 @@ try
                         $current = Get-DscConfiguration | Where-Object {
                             $_.ConfigurationName -eq "$($script:DSCResourceName)_Config"
                         }
-                        $current.DiskId           | Should -Be $disk.Location
+                        $current.DiskId           | Should -Be $VHDPath
                         $current.AccessPath       | Should -Be "$($accessPathB)\"
                         $current.FSLabel          | Should -Be $FSLabelB
                         $current.Size             | Should -Be 935198720
