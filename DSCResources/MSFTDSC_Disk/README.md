@@ -40,3 +40,7 @@ The 'defragsvc' service should be stopped and set to manual start up to prevent
 this error. Use the `Service` resource in either the 'xPSDesiredStateConfgiuration'
 or 'PSDSCResources' resource module to set the 'defragsvc' service is always
 stopped and set to manual start up.
+
+The _Location_ for a disk may be `null` for some types of disk,
+e.g. file-based virtual disks. Physical disks or Virtual disks provided via a
+hypervisor or other hardware virtualization platform should not be affected.

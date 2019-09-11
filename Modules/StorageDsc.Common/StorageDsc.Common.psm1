@@ -648,8 +648,10 @@ function Get-DiskByIdentifier
         $DiskIdType = 'Number'
     )
 
-    switch -regex ($DiskIdType) {
-        "Number|UniqueId" { # for filters supported by the Get-Disk CmdLet
+    switch -regex ($DiskIdType)
+    {
+        'Number|UniqueId' # for filters supported by the Get-Disk CmdLet
+        {
             $diskIdParameter = @{
                 $DiskIdType = $DiskId
             }
@@ -659,9 +661,11 @@ function Get-DiskByIdentifier
                 -ErrorAction SilentlyContinue
             break
         }
-        default { # for filters requiring Where-Object
+
+        default # for filters requiring Where-Object
+        {
             $disk = Get-Disk -ErrorAction SilentlyContinue |
-            Where-Object -Property $DiskIdType -EQ $DiskId
+                    Where-Object -Property $DiskIdType -EQ $DiskId
         }
     }
 

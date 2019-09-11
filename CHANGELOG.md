@@ -2,8 +2,15 @@
 
 ## Unreleased
 
-- Added `Location` as a possible value for `DiskIdType`. This will select the
-  disk based on the `Location` property returned by `Get-Disk`
+- Disk:
+  - Added `Location` as a possible value for `DiskIdType`. This will select the
+    disk based on the `Location` property returned by `Get-Disk`
+- DiskAccessPath:
+  - Added `Location` as a possible value for `DiskIdType`. This will select the
+    disk based on the `Location` property returned by `Get-Disk`
+- WaitForDisk:
+  - Added `Location` as a possible value for `DiskIdType`. This will select the
+    disk based on the `Location` property returned by `Get-Disk`
 
 ## 4.8.0.0
 

@@ -20,3 +20,9 @@ Get-Disk | Select-Object -Property FriendlyName,DiskNumber,UniqueId,Guid,Locatio
 Note: The _Guid_ for a disk is only assigned once the partition table for the disk
 has been created (e.g. the disk has been initialized). Therefore to use this method
 of disk selection the disk must have been initialized by some other method.
+
+## Known Issues
+
+The _Location_ for a disk may be `null` for some types of disk,
+e.g. file-based virtual disks. Physical disks or Virtual disks provided via a
+hypervisor or other hardware virtualization platform should not be affected.
