@@ -480,7 +480,20 @@ function Set-TargetResource
         #>
         if (-not ($PSBoundParameters.ContainsKey('Size')))
         {
-            $Size = $supportedSize.SizeMax
+            <#
+                If the difference in size between the supported partition size
+                and the current partition size is less than 1MB then set the
+                required partition size to the current size. This will prevent
+                the partition from being resized.
+            #>
+            if (($supportedSize.SizeMax - $partition.Size) -lt 1MB)
+            {
+                $Size = $partition.Size
+            }
+            else
+            {
+                $Size = $supportedSize.SizeMax
+            }
         }
 
         if ($assignedPartition.Size -ne $Size)
