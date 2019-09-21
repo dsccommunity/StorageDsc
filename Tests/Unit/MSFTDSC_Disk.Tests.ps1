@@ -2766,7 +2766,7 @@ try
                 }
             }
 
-            Context 'When testing matching partition size with AllowDestructive and without Size specified using Disk Number' {
+            Context 'When testing matching partition size with a less than 1MB difference in desired size and with AllowDestructive and without Size specified using Disk Number' {
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Get-DiskByIdentifier `
@@ -2784,7 +2784,7 @@ try
                     -MockWith {
                         return @{
                             SizeMin = 0
-                            SizeMax = $script:mockedPartition.Size
+                            SizeMax = $script:mockedPartition.Size + 0.98MB
                         }
                     } `
                     -Verifiable

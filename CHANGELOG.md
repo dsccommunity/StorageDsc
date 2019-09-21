@@ -5,15 +5,15 @@
 - Disk:
   - Added `Location` as a possible value for `DiskIdType`. This will select the
     disk based on the `Location` property returned by `Get-Disk`
+  - Maximum size calculation now uses workaround so that
+    Test-TargetResource works properly - workaround for
+    [Issue #181](https://github.com/PowerShell/StorageDsc/issues/181).
 - DiskAccessPath:
   - Added `Location` as a possible value for `DiskIdType`. This will select the
     disk based on the `Location` property returned by `Get-Disk`
 - WaitForDisk:
   - Added `Location` as a possible value for `DiskIdType`. This will select the
     disk based on the `Location` property returned by `Get-Disk`
-- Maximum size calculation now uses workaround so that
-  Test-TargetResource works properly - workaround for
-  [Issue #181](https://github.com/PowerShell/StorageDsc/issues/181).
 
 ## 4.8.0.0
 
