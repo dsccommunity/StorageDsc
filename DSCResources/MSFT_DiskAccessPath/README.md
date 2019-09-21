@@ -23,6 +23,8 @@ of disk selection the disk must have been initialized by some other method.
 
 ## Known Issues
 
+### Null Location
+
 The _Location_ for a disk may be `null` for some types of disk,
 e.g. file-based virtual disks. Physical disks or Virtual disks provided via a
 hypervisor or other hardware virtualization platform should not be affected.
