@@ -55,4 +55,5 @@ On some disks the _maximum supported partition size_ may differ from the actual
 size of a partition created when specifying the maximum size. This difference
 in reported size is always less than **1MB**, so if the reported _maximum supported
 partition size_ is less than **1MB** then the partition will be considered to be
-in the correct state.
+in the correct state. This is a work around for [this issue](https://windowsserver.uservoice.com/forums/301869-powershell/suggestions/36967870-get-partitionsupportedsize-and-msft-partition-clas)
+that has been reported on user voice and also discussed in [issue #181](https://github.com/PowerShell/StorageDsc/issues/181).
