@@ -809,7 +809,21 @@ function Test-TargetResource
     {
         $supportedSize = ($partition | Get-PartitionSupportedSize)
 
-        $Size = $supportedSize.SizeMax
+        <#
+            If the difference in size between the supported partition size
+            and the current partition size is less than 1MB then set the
+            desired partition size to the current size. This will prevent
+            any size difference less than 1MB from trying to contiuously
+            resize. See https://github.com/PowerShell/StorageDsc/issues/181
+        #>
+        if (($supportedSize.SizeMax - $partition.Size) -lt 1MB)
+        {
+            $Size = $partition.Size
+        }
+        else
+        {
+            $Size = $supportedSize.SizeMax
+        }
     }
 
     if ($Size)

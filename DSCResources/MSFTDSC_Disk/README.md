@@ -25,6 +25,8 @@ table for the disk has been created.
 
 ## Known Issues
 
+### Defragsvc Conflict
+
 The 'defragsvc' service ('Optimize Drives') may cause the following errors when
 enabled with this resource. The following error may occur when testing the state
 of the resource:
@@ -41,6 +43,17 @@ this error. Use the `Service` resource in either the 'xPSDesiredStateConfgiurati
 or 'PSDSCResources' resource module to set the 'defragsvc' service is always
 stopped and set to manual start up.
 
+### Null Location
+
 The _Location_ for a disk may be `null` for some types of disk,
 e.g. file-based virtual disks. Physical disks or Virtual disks provided via a
 hypervisor or other hardware virtualization platform should not be affected.
+
+### Maximum Supported Partition Size
+
+On some disks the _maximum supported partition size_ may differ from the actual
+size of a partition created when specifying the maximum size. This difference
+in reported size is always less than **1MB**, so if the reported _maximum supported
+partition size_ is less than **1MB** then the partition will be considered to be
+in the correct state. This is a work around for [this issue](https://windowsserver.uservoice.com/forums/301869-powershell/suggestions/36967870-get-partitionsupportedsize-and-msft-partition-clas)
+that has been reported on user voice and also discussed in [issue #181](https://github.com/PowerShell/StorageDsc/issues/181).
