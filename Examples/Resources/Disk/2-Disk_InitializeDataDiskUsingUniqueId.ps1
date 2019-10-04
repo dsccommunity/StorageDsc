@@ -43,7 +43,7 @@ Configuration Disk_InitializeDataDiskUsingUniqueId
              DiskId = '5E1E50A401000000001517FFFF0AEB84' # Disk 2
              DiskIdType = 'UniqueId'
              DriveLetter = 'G'
-             Size = 10GB
+             Size = 10737418240
              DependsOn = '[WaitForDisk]Disk2'
         }
 
@@ -69,7 +69,7 @@ Configuration Disk_InitializeDataDiskUsingUniqueId
              DiskId = '5E1E50A4010000000029AB39450AC9A5' # Disk 3
              DiskIdType = 'UniqueId'
              DriveLetter = 'S'
-             Size = 100GB
+             Size = 107374182400
              FSFormat = 'ReFS'
              AllocationUnitSize = 64KB
              DependsOn = '[WaitForDisk]Disk3'
