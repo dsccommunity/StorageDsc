@@ -8,6 +8,8 @@
   - Maximum size calculation now uses workaround so that
     Test-TargetResource works properly - workaround for
     [Issue #181](https://github.com/PowerShell/StorageDsc/issues/181).
+  - Updated example with size as a number and without unit of measurement like GB or MB.
+    [Issue #214](https://github.com/PowerShell/StorageDsc/issues/214).
 - DiskAccessPath:
   - Added `Location` as a possible value for `DiskIdType`. This will select the
     disk based on the `Location` property returned by `Get-Disk`
