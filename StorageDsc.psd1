@@ -3,7 +3,7 @@
     # RootModule = ''
 
     # Version number of this module.
-    moduleVersion = '4.8.0.0'
+    moduleVersion = '4.9.0.0'
 
     # ID used to uniquely identify this module
     GUID                 = '00d73ca1-58b5-46b7-ac1a-5bfcf5814faf'
@@ -102,19 +102,18 @@
             # IconUri = ''
 
             # ReleaseNotes of this module
-        ReleaseNotes = '- Removed suppression of `PSUseShouldProcessForStateChangingFunctions` PSSA rule
-  because it is no longer required.
-- Combined all `StorageDsc.ResourceHelper` module functions into
-  `StorageDsc.Common` module and removed `StorageDsc.ResourceHelper`.
-- Opted into Common Tests "Common Tests - Validate Localization" -
-  fixes [Issue 206](https://github.com/PowerShell/StorageDsc/issues/206).
-- Refactored tests for `StorageDsc.Common` to meet latest standards.
-- Minor style corrections.
-- Removed unused localization strings from resources.
+        ReleaseNotes = '- Disk:
+  - Added `Location` as a possible value for `DiskIdType`. This will select the
+    disk based on the `Location` property returned by `Get-Disk`
+  - Maximum size calculation now uses workaround so that
+    Test-TargetResource works properly - workaround for
+    [Issue 181](https://github.com/PowerShell/StorageDsc/issues/181).
 - DiskAccessPath:
-  - Added function to force refresh of disk subsystem at the start of
-    Set-TargetResource to prevent errors occuring when the disk access
-    path is already assigned - See [Issue 121](https://github.com/PowerShell/StorageDsc/issues/121)
+  - Added `Location` as a possible value for `DiskIdType`. This will select the
+    disk based on the `Location` property returned by `Get-Disk`
+- WaitForDisk:
+  - Added `Location` as a possible value for `DiskIdType`. This will select the
+    disk based on the `Location` property returned by `Get-Disk`
 
 '
 
@@ -128,6 +127,7 @@
     # Default prefix for commands exported from this module. Override the default prefix using Import-Module -Prefix.
     # DefaultCommandPrefix = ''
 }
+
 
 
 
