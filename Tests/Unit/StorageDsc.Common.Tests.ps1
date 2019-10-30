@@ -695,11 +695,13 @@ InModuleScope 'StorageDsc.Common' {
             $testDiskNumber = 10
             $testDiskUniqueId = 'DiskUniqueId'
             $testDiskGuid = [Guid]::NewGuid().ToString()
+            $testDiskLocation = 'Integrated : Adapter 0 : Port 0 : Target 0 : LUN 10'
 
             $mockedDisk = [pscustomobject] @{
                 Number   = $testDiskNumber
                 UniqueId = $testDiskUniqueId
                 Guid     = $testDiskGuid
+                Location = $testDiskLocation
             }
         }
 
@@ -822,6 +824,47 @@ InModuleScope 'StorageDsc.Common' {
 
             It "Should return Disk with Disk Guid $testDiskGuid" {
                 Get-DiskByIdentifier -DiskId $testDiskGuid -DiskIdType 'Guid' | Should -BeNullOrEmpty
+            }
+
+            It 'Should call expected mocks' {
+                Assert-VerifiableMock
+                Assert-MockCalled `
+                    -CommandName Get-Disk `
+                    -ModuleName StorageDsc.Common `
+                    -Exactly `
+                    -Times 1
+            }
+        }
+
+        Context 'Disk exists that matches the specified Disk Location' {
+            Mock `
+                -CommandName Get-Disk `
+                -MockWith { $mockedDisk } `
+                -ModuleName StorageDsc.Common `
+                -Verifiable
+
+            It "Should return Disk with Disk Location '$testDiskLocation'" {
+                (Get-DiskByIdentifier -DiskId $testDiskLocation -DiskIdType 'Location').Location | Should -Be $testDiskLocation
+            }
+
+            It 'Should call expected mocks' {
+                Assert-VerifiableMock
+                Assert-MockCalled `
+                    -CommandName Get-Disk `
+                    -ModuleName StorageDsc.Common `
+                    -Exactly `
+                    -Times 1
+            }
+        }
+
+        Context 'Disk does not exist that matches the specified Disk Location' {
+            Mock `
+                -CommandName Get-Disk `
+                -ModuleName StorageDsc.Common `
+                -Verifiable
+
+            It "Should return Disk with Disk Location '$testDiskLocation'" {
+                Get-DiskByIdentifier -DiskId $testDiskLocation -DiskIdType 'Location' | Should -BeNullOrEmpty
             }
 
             It 'Should call expected mocks' {
