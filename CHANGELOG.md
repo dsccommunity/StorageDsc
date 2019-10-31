@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 4.9.0.0
+
 - Disk:
   - Added `Location` as a possible value for `DiskIdType`. This will select the
     disk based on the `Location` property returned by `Get-Disk`
