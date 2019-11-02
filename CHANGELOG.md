@@ -3,6 +3,12 @@
 ## Unreleased
 
 - Disk:
+  - Updated example with size as a number in bytes and without unit of measurement
+    like GB or MB. [Issue #214](https://github.com/PowerShell/StorageDsc/pull/214)
+
+## 4.9.0.0
+
+- Disk:
   - Added `Location` as a possible value for `DiskIdType`. This will select the
     disk based on the `Location` property returned by `Get-Disk`
   - Maximum size calculation now uses workaround so that

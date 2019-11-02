@@ -40,7 +40,7 @@ Configuration Disk_InitializeDataDisk
         {
              DiskId = 2
              DriveLetter = 'G'
-             Size = 10GB
+             Size = 10737418240
              DependsOn = '[WaitForDisk]Disk2'
         }
 
@@ -63,7 +63,7 @@ Configuration Disk_InitializeDataDisk
         {
              DiskId = 3
              DriveLetter = 'S'
-             Size = 100GB
+             Size = 107374182400
              FSFormat = 'ReFS'
              AllocationUnitSize = 64KB
              DependsOn = '[WaitForDisk]Disk3'
