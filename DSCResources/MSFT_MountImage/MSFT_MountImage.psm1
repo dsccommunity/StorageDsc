@@ -518,10 +518,15 @@ function Mount-DiskImageToLetter
     $normalizedDriveLetter = Assert-DriveLetterValid -DriveLetter $DriveLetter
 
     # Mount the Diskimage
-    $mountParams = @{ ImagePath = $ImagePath }
+    $mountParams = @{
+        ImagePath = $ImagePath
+    }
+
     if ($PSBoundParameters.ContainsKey('Access'))
     {
-        $mountParams += @{ Access = $Access }
+        $mountParams += @{
+            Access = $Access
+        }
     }  # if
     $null = Mount-DiskImage @mountParams
 
@@ -572,11 +577,15 @@ function Mount-DiskImageToLetter
             DeviceId in the ObjectId string to match volumes.
         #>
         $cimVolume = Get-CimInstance -ClassName Win32_Volume |
-            Where-Object -FilterScript { $volume.ObjectId.IndexOf($_.DeviceId) -ne -1 }
+            Where-Object -FilterScript {
+                $volume.ObjectId.IndexOf($_.DeviceId) -ne -1
+            }
 
         Set-CimInstance `
             -InputObject $cimVolume `
-            -Property @{ DriveLetter = "$($normalizedDriveLetter):" }
+            -Property @{
+                DriveLetter = "$($normalizedDriveLetter):"
+            }
     } # if
 } # Mount-DiskImageToLetter
 

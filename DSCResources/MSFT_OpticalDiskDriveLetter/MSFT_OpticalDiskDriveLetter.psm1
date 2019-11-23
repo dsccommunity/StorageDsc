@@ -239,7 +239,9 @@ function Set-TargetResource
             $($script:localizedData.AttemptingToRemoveDriveLetter -f $diskId, $currentDriveLetter)
         ) -join '' )
 
-        $volume | Set-CimInstance -Property @{ DriveLetter = $null }
+        $volume | Set-CimInstance -Property @{
+            DriveLetter = $null
+        }
     }
     else
     {
@@ -248,7 +250,9 @@ function Set-TargetResource
             $($script:localizedData.AttemptingToSetDriveLetter -f $diskId, $currentDriveLetter, $DriveLetter)
         ) -join '' )
 
-        $volume | Set-CimInstance -Property @{ DriveLetter = $DriveLetter }
+        $volume | Set-CimInstance -Property @{
+            DriveLetter = $DriveLetter
+        }
     }
 } # Set-TargetResource
 
