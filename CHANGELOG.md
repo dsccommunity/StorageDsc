@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Fixed hash table style violations - fixes [Issue #219](https://github.com/PowerShell/StorageDsc/issues/219).
+
 ## 4.9.0.0
 
 - Disk:
