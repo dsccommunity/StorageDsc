@@ -28,7 +28,6 @@ configuration MountImage_DismountISO
     MountImage ISO
     {
         ImagePath = 'c:\Sources\SQL.iso'
-        DriveLetter = 'S'
         Ensure = 'Absent'
     }
 }
