@@ -3,6 +3,7 @@
 ## Unreleased
 
 - Fixed hash table style violations - fixes [Issue #219](https://github.com/PowerShell/StorageDsc/issues/219).
+- Updated [MountImage_DismountISO](https://github.com/dsccommunity/StorageDsc/blob/dev/Examples/Resources/MountImage/1-MountImage_DismountISO.ps1) to correct error - fixes [Issue #221](https://github.com/dsccommunity/StorageDsc/issues/221)
 
 ## 4.9.0.0
 
