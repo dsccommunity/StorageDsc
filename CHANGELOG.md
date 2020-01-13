@@ -3,6 +3,9 @@
 ## Unreleased
 
 - Fixed hash table style violations - fixes [Issue #219](https://github.com/PowerShell/StorageDsc/issues/219).
+- Disk:
+  - Updated example with size as a number in bytes and without unit of measurement
+    like GB or MB. [Issue #214](https://github.com/PowerShell/StorageDsc/pull/214)
 
 ## 4.9.0.0
 
