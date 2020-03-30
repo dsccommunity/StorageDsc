@@ -1,5 +1,32 @@
 # StorageDsc
 
+[![Build Status](https://dev.azure.com/dsccommunity/StorageDsc/_apis/build/status/dsccommunity.StorageDsc?branchName=master)](https://dev.azure.com/dsccommunity/StorageDsc/_build/latest?definitionId=18&branchName=master)
+![Code Coverage](https://img.shields.io/azure-devops/coverage/dsccommunity/StorageDsc/18/master)
+[![Azure DevOps tests](https://img.shields.io/azure-devops/tests/dsccommunity/StorageDsc/18/master)](https://dsccommunity.visualstudio.com/StorageDsc/_test/analytics?definitionId=18&contextType=build)
+[![PowerShell Gallery (with prereleases)](https://img.shields.io/powershellgallery/vpre/StorageDsc?label=StorageDsc%20Preview)](https://www.powershellgallery.com/packages/StorageDsc/)
+[![PowerShell Gallery](https://img.shields.io/powershellgallery/v/StorageDsc?label=StorageDsc)](https://www.powershellgallery.com/packages/StorageDsc/)
+
+## Code of Conduct
+
+This project has adopted [this code of conduct](CODE_OF_CONDUCT.md).
+
+## Releases
+
+For each merge to the branch `master` a preview release will be
+deployed to [PowerShell Gallery](https://www.powershellgallery.com/).
+Periodically a release version tag will be pushed which will deploy a
+full release to [PowerShell Gallery](https://www.powershellgallery.com/).
+
+## Contributing
+
+Please check out common DSC Community [contributing guidelines](https://dsccommunity.org/guidelines/contributing).
+
+## Change log
+
+A full list of changes in each version can be found in the [change log](CHANGELOG.md).
+
+## Resources
+
 The **StorageDsc** module contains the following resources:
 
 - **MountImage**: used to mount or unmount an ISO/VHD disk image. It can be
@@ -17,27 +44,4 @@ This project has adopted [this code of conduct](CODE_OF_CONDUCT.md).
 ## Documentation and Examples
 
 For a full list of resources in StorageDsc and examples on their use, check out
-the [StorageDsc wiki](https://github.com/PowerShell/StorageDsc/wiki).
-
-## Branches
-
-### master
-
-[![Build status](https://ci.appveyor.com/api/projects/status/1j95juvceu39ekm7/branch/master?svg=true)](https://ci.appveyor.com/project/PowerShell/StorageDsc/branch/master)
-[![codecov](https://codecov.io/gh/PowerShell/StorageDsc/branch/master/graph/badge.svg)](https://codecov.io/gh/PowerShell/StorageDsc/branch/master)
-
-This is the branch containing the latest release - no contributions should be made
-directly to this branch.
-
-### dev
-
-[![Build status](https://ci.appveyor.com/api/projects/status/1j95juvceu39ekm7/branch/dev?svg=true)](https://ci.appveyor.com/project/PowerShell/StorageDsc/branch/dev)
-[![codecov](https://codecov.io/gh/PowerShell/StorageDsc/branch/dev/graph/badge.svg)](https://codecov.io/gh/PowerShell/StorageDsc/branch/dev)
-
-This is the development branch to which contributions should be proposed by contributors
-as pull requests. This development branch will periodically be merged to the master
-branch, and be released to [PowerShell Gallery](https://www.powershellgallery.com/).
-
-## Contributing
-
-Please check out common DSC Resources [contributing guidelines](https://github.com/PowerShell/DscResource.Kit/blob/master/CONTRIBUTING.md).
+the [StorageDsc wiki](https://github.com/dsccommunity/StorageDsc/wiki).
