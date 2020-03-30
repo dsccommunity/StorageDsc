@@ -1,4 +1,4 @@
-configuration MSFT_MountImage_Dismount_Config {
+configuration DSC_MountImage_Dismount_Config {
 
     Import-DscResource -ModuleName StorageDsc
 

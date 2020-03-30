@@ -603,7 +603,7 @@ function Assert-AccessPathValid
     } # if
 
     # Remove or Add the trailing slash
-    if($AccessPath.EndsWith('\'))
+    if ($AccessPath.EndsWith('\'))
     {
         if (-not $Slash)
         {

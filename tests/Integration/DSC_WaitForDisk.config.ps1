@@ -1,4 +1,4 @@
-configuration MSFT_WaitForDisk_Config {
+configuration DSC_WaitForDisk_Config {
     Import-DscResource -ModuleName StorageDsc
     node localhost {
         WaitForDisk Integration_Test {

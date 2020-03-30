@@ -310,7 +310,7 @@ try
             )
         }
 
-        Describe 'MSFTDSC_Disk\Get-TargetResource' {
+        Describe 'DSC_Disk\Get-TargetResource' {
             Context 'When online GPT disk with a partition/volume and correct Drive Letter assigned using Disk Number' {
                 # verifiable (should be called) mocks
                 Mock `
@@ -768,7 +768,7 @@ try
             }
         }
 
-        Describe 'MSFTDSC_Disk\Set-TargetResource' {
+        Describe 'DSC_Disk\Set-TargetResource' {
             Context 'When offline GPT disk using Disk Number' {
                 # verifiable (should be called) mocks
                 Mock `
@@ -2192,7 +2192,7 @@ try
             }
         }
 
-        Describe 'MSFTDSC_Disk\Test-TargetResource' {
+        Describe 'DSC_Disk\Test-TargetResource' {
             Mock `
                 -CommandName Get-CimInstance `
                 -MockWith { $script:mockedCim }

@@ -64,7 +64,7 @@ try
             RetryCount       = 20
         }
 
-        Describe "MSFT_WaitForDisk\Get-TargetResource" {
+        Describe 'DSC_WaitForDisk\Get-TargetResource' {
 
             Mock `
             -CommandName Test-TargetResource `
@@ -177,7 +177,7 @@ try
             }
         }
 
-        Describe 'MSFT_WaitForDisk\Set-TargetResource' {
+        Describe 'DSC_WaitForDisk\Set-TargetResource' {
             Mock -CommandName Start-Sleep
 
             Context "Disk Number $testDiskNumber is ready" {
@@ -307,7 +307,7 @@ try
             }
         }
 
-        Describe 'MSFT_WaitForDisk\Test-TargetResource' {
+        Describe 'DSC_WaitForDisk\Test-TargetResource' {
             Context "Disk Number $testDiskNumber is ready" {
                 Mock `
                     -CommandName Get-DiskByIdentifier `

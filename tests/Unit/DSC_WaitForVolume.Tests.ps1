@@ -41,7 +41,7 @@ try
             RetryCount       = 20
         }
 
-        Describe "MSFT_WaitForVolume\Get-TargetResource" {
+        Describe 'DSC_WaitForVolume\Get-TargetResource' {
             $resource = Get-TargetResource @driveCParameters -Verbose
             It "DriveLetter Should Be $($driveCParameters.DriveLetter)" {
                 $resource.DriveLetter | Should -Be $driveCParameters.DriveLetter
@@ -60,7 +60,7 @@ try
             }
         }
 
-        Describe 'MSFT_WaitForVolume\Set-TargetResource' {
+        Describe 'DSC_WaitForVolume\Set-TargetResource' {
             Mock Start-Sleep
             Mock Get-PSDrive
 
@@ -98,7 +98,7 @@ try
             }
         }
 
-        Describe 'MSFT_WaitForVolume\Test-TargetResource' {
+        Describe 'DSC_WaitForVolume\Test-TargetResource' {
             Mock Get-PSDrive
 
             Context 'drive C is ready' {

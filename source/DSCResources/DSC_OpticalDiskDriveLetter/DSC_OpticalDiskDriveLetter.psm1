@@ -6,7 +6,7 @@ Import-Module -Name (Join-Path -Path $modulePath `
             -ChildPath 'StorageDsc.Common.psm1'))
 
 # Import Localization Strings.
-$script:localizedData = Get-LocalizedData -ResourceName 'MSFT_OpticalDiskDriveLetter'
+$script:localizedData = Get-LocalizedData -ResourceName 'DSC_OpticalDiskDriveLetter'
 
 <#
     .SYNOPSIS

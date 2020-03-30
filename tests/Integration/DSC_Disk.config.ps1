@@ -1,4 +1,4 @@
-configuration MSFTDSC_Disk_Config {
+configuration DSC_Disk_Config {
 
     Import-DscResource -ModuleName StorageDsc
 
@@ -29,7 +29,7 @@ configuration MSFTDSC_Disk_Config {
     }
 }
 
-configuration MSFTDSC_Disk_ConfigAllowDestructive {
+configuration DSC_Disk_ConfigAllowDestructive {
 
     Import-DscResource -ModuleName StorageDsc
 
@@ -64,7 +64,7 @@ configuration MSFTDSC_Disk_ConfigAllowDestructive {
     }
 }
 
-configuration MSFTDSC_Disk_ConfigClearDisk {
+configuration DSC_Disk_ConfigClearDisk {
 
     Import-DscResource -ModuleName StorageDsc
 

@@ -4,7 +4,7 @@ $TestWaitForVolume = @{
     RetryCount       = 2
 }
 
-configuration MSFT_WaitForVolume_Config {
+configuration DSC_WaitForVolume_Config {
     Import-DscResource -ModuleName StorageDsc
     node localhost {
         WaitForVolume Integration_Test {

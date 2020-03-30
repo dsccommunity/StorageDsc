@@ -1,6 +1,6 @@
 #region HEADER
 $script:dscModuleName = 'StorageDsc'
-$script:dscResourceName = 'MSFT_WaitForVolume'
+$script:dscResourceName = 'DSC_WaitForVolume'
 
 try
 {

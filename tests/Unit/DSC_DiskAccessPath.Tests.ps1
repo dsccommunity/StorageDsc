@@ -324,7 +324,7 @@ try
             )
         }
 
-        Describe 'MSFT_DiskAccessPath\Get-TargetResource' {
+        Describe 'DSC_DiskAccessPath\Get-TargetResource' {
             Context 'When using online GPT disk with a partition/volume and correct Access Path assigned specified by Disk Number' {
                 # verifiable (should be called) mocks
                 Mock `
@@ -592,7 +592,7 @@ try
             }
         }
 
-        Describe 'MSFT_DiskAccessPath\Set-TargetResource' {
+        Describe 'DSC_DiskAccessPath\Set-TargetResource' {
             BeforeAll {
                 Mock `
                     -CommandName Test-AccessPathInPSDrive `
@@ -1498,7 +1498,7 @@ try
             }
         }
 
-        Describe 'MSFT_DiskAccessPath\Test-TargetResource' {
+        Describe 'DSC_DiskAccessPath\Test-TargetResource' {
             Mock `
                 -CommandName Get-CimInstance `
                 -MockWith { $script:mockedCim }
@@ -2062,7 +2062,7 @@ try
             }
         }
 
-        Describe 'MSFT_DiskAccessPath\Test-AccessPathInPSDrive' {
+        Describe 'DSC_DiskAccessPath\Test-AccessPathInPSDrive' {
             $getPSDriveWithNameParameterFilter = {
                 $Name -eq $script:testAccessPath.Split(':')[0]
             }

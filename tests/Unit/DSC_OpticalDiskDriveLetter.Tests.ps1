@@ -1,5 +1,5 @@
 $script:dscModuleName = 'StorageDsc'
-$script:dscResourceName = 'MSFT_OpticalDiskDriveLetter'
+$script:dscResourceName = 'DSC_OpticalDiskDriveLetter'
 
 function Invoke-TestSetup
 {
@@ -106,7 +106,7 @@ try
             )
         }
 
-        Describe 'MSFT_xOpticalDiskDriveLetter\Get-OpticalDiskDriveLetter' {
+        Describe 'DSC_xOpticalDiskDriveLetter\Get-OpticalDiskDriveLetter' {
             Context 'Single optical disk drive present and assigned a drive letter' {
                 Mock `
                     -CommandName Get-CimInstance `
@@ -245,7 +245,7 @@ try
             }
         }
 
-        Describe 'MSFT_OpticalDiskDriveLetter\Get-TargetResource' {
+        Describe 'DSC_OpticalDiskDriveLetter\Get-TargetResource' {
             Context 'Optical disk drive present with correct drive letter' {
                 Mock `
                     -CommandName Get-CimInstance `
@@ -366,7 +366,7 @@ try
             }
         }
 
-        Describe 'MSFT_OpticalDiskDriveLetter\Set-TargetResource' {
+        Describe 'DSC_OpticalDiskDriveLetter\Set-TargetResource' {
             Context 'Optical disk drive exists with the correct drive letter' {
                 Mock `
                     -CommandName Get-CimInstance `
@@ -546,7 +546,7 @@ try
             }
         }
 
-        Describe 'MSFT_OpticalDiskDriveLetter\Test-TargetResource' {
+        Describe 'DSC_OpticalDiskDriveLetter\Test-TargetResource' {
             Context 'Optical drive exists and is assigned expected drive letter' {
                 Mock `
                     -CommandName Get-CimInstance `

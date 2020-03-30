@@ -1,6 +1,6 @@
 #region HEADER
 $script:dscModuleName = 'StorageDsc'
-$script:dscResourceName = 'MSFT_WaitForDisk'
+$script:dscResourceName = 'DSC_WaitForDisk'
 
 try
 {

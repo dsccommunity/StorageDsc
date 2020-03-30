@@ -1,4 +1,4 @@
-configuration MSFT_DiskAccessPath_Config {
+configuration DSC_DiskAccessPath_Config {
 
     Import-DscResource -ModuleName StorageDsc
 

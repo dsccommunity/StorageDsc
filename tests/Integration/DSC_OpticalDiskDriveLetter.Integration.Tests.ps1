@@ -1,6 +1,6 @@
 #region HEADER
 $script:dscModuleName = 'StorageDsc'
-$script:dscResourceName = 'MSFT_OpticalDiskDriveLetter'
+$script:dscResourceName = 'DSC_OpticalDiskDriveLetter'
 
 try
 {

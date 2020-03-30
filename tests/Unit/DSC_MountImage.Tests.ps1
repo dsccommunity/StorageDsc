@@ -202,7 +202,7 @@ try
         }
 
 
-        Describe 'MSFT_MountImage\Get-TargetResource' {
+        Describe 'DSC_MountImage\Get-TargetResource' {
             <#
                 These functions are required to be able to mock functions where
                 values are passed in via the pipeline.
@@ -413,7 +413,7 @@ try
             }
         }
 
-        Describe 'MSFT_MountImage\Set-TargetResource' {
+        Describe 'DSC_MountImage\Set-TargetResource' {
             Mock `
                 -CommandName Test-ParameterValid `
                 -MockWith { $true } `
@@ -603,7 +603,7 @@ try
             }
         }
 
-        Describe 'MSFT_MountImage\Test-TargetResource' {
+        Describe 'DSC_MountImage\Test-TargetResource' {
             Mock `
                 -CommandName Test-ParameterValid `
                 -MockWith { $true } `
@@ -735,7 +735,7 @@ try
             }
         }
 
-        Describe 'MSFT_MountImage\Test-ParameterValid' {
+        Describe 'DSC_MountImage\Test-ParameterValid' {
             Context 'DriveLetter passed, ensure is Absent' {
                 It 'Should throw InvalidParameterSpecifiedError exception' {
                     $errorRecord = Get-InvalidOperationRecord `
@@ -850,7 +850,7 @@ try
 
         }
 
-        Describe 'MSFT_MountImage\Mount-DiskImageToLetter' {
+        Describe 'DSC_MountImage\Mount-DiskImageToLetter' {
             <#
                 These functions are required to be able to mock functions where
                 values are passed in via the pipeline.
