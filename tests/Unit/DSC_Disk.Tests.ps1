@@ -1284,7 +1284,14 @@ try
                         -ParameterFilter $script:parameterFilter_MockedDisk0Number
                     Assert-MockCalled -CommandName Set-Disk -Exactly -Times 0
                     Assert-MockCalled -CommandName Initialize-Disk -Exactly -Times 0
-                    Assert-MockCalled -CommandName Get-Partition -Times 29
+                    <#
+                        Get-Partition will be called multiple times, but depending on
+                        performance of the call to Get-Partition, it may be called a
+                        different number of times.
+                        E.g. on Azure DevOps agents running Windows Server 2016 it is
+                        called at least 28 times.
+                    #>
+                    Assert-MockCalled -CommandName Get-Partition -Times 28
                     Assert-MockCalled -CommandName Get-Volume -Exactly -Times 1
                     Assert-MockCalled -CommandName New-Partition -Exactly -Times 1 `
                         -ParameterFilter {
