@@ -42,8 +42,8 @@ try
     $driveLetter = [char](([int][char]$lastDrive) + 1)
 
     # Change drive letter of the optical drive
-    $ConfigFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:dscResourceName).config.ps1"
-    . $ConfigFile -Verbose -ErrorAction Stop
+    $configFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:dscResourceName).config.ps1"
+    . $configFile -Verbose -ErrorAction Stop
 
     Describe "$($script:dscResourceName)_Integration" {
         # Dismount the optical disk from a drive letter

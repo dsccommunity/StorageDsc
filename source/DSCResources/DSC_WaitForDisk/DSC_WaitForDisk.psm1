@@ -62,6 +62,7 @@ function Get-TargetResource
         RetryCount       = $RetryCount
         IsAvailable      = $isAvailable
     }
+
     return $returnValue
 } # function Get-TargetResource
 

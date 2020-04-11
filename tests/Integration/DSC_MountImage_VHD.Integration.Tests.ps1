@@ -49,8 +49,8 @@ try
     }
 
     # Mount VHD
-    $ConfigFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:dscResourceName)_mount.config.ps1"
-    . $ConfigFile -Verbose -ErrorAction Stop
+    $configFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:dscResourceName)_mount.config.ps1"
+    . $configFile -Verbose -ErrorAction Stop
 
     Describe "$($script:dscResourceName)_MountVHD_Integration" {
         Context 'Mount an VHDX and assign a Drive Letter' {
@@ -82,8 +82,8 @@ try
     }
 
     # Dismount VHD
-    $ConfigFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:dscResourceName)_dismount.config.ps1"
-    . $ConfigFile -Verbose -ErrorAction Stop
+    $configFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:dscResourceName)_dismount.config.ps1"
+    . $configFile -Verbose -ErrorAction Stop
 
     Describe "$($script:dscResourceName)_DismountVHD_Integration" {
         Context 'Dismount a previously mounted ISO' {

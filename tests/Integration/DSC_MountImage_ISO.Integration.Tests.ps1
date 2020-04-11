@@ -54,8 +54,8 @@ try
     }
 
     # Mount ISO
-    $ConfigFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:dscResourceName)_mount.config.ps1"
-    . $ConfigFile -Verbose -ErrorAction Stop
+    $configFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:dscResourceName)_mount.config.ps1"
+    . $configFile -Verbose -ErrorAction Stop
 
     Describe "$($script:dscResourceName)_MountISO_Integration" {
         Context 'Mount an ISO and assign a Drive Letter' {
@@ -87,8 +87,8 @@ try
     }
 
     # Dismount ISO
-    $ConfigFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:dscResourceName)_dismount.config.ps1"
-    . $ConfigFile -Verbose -ErrorAction Stop
+    $configFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:dscResourceName)_dismount.config.ps1"
+    . $configFile -Verbose -ErrorAction Stop
 
     Describe "$($script:dscResourceName)_DismountISO_Integration" {
         Context 'Dismount a previously mounted ISO' {

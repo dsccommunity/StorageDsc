@@ -21,8 +21,8 @@ Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath '..\TestHelpers\Co
 
 try
 {
-    $ConfigFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:dscResourceName).config.ps1"
-    . $ConfigFile -Verbose -ErrorAction Stop
+    $configFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:dscResourceName).config.ps1"
+    . $configFile -Verbose -ErrorAction Stop
 
     Describe "$($script:dscResourceName)_Integration" {
         # Identify a disk to use for tests
@@ -59,7 +59,7 @@ try
                 $current = Get-DscConfiguration | Where-Object {
                     $_.ConfigurationName -eq "$($script:dscResourceName)_Config"
                 }
-                $current.DiskId           | Should -Be $Disk.Number
+                $current.DiskId           | Should -Be $disk.Number
                 $current.RetryIntervalSec | Should -Be 1
                 $current.RetryCount       | Should -Be 5
                 $current.IsAvailable      | Should -Be $true
@@ -97,7 +97,7 @@ try
                 $current = Get-DscConfiguration | Where-Object {
                     $_.ConfigurationName -eq "$($script:dscResourceName)_Config"
                 }
-                $current.DiskId           | Should -Be $Disk.UniqueId
+                $current.DiskId           | Should -Be $disk.UniqueId
                 $current.RetryIntervalSec | Should -Be 1
                 $current.RetryCount       | Should -Be 5
                 $current.IsAvailable      | Should -Be $true
@@ -135,7 +135,7 @@ try
                 $current = Get-DscConfiguration | Where-Object {
                     $_.ConfigurationName -eq "$($script:dscResourceName)_Config"
                 }
-                $current.DiskId           | Should -Be $Disk.Guid
+                $current.DiskId           | Should -Be $disk.Guid
                 $current.RetryIntervalSec | Should -Be 1
                 $current.RetryCount       | Should -Be 5
                 $current.IsAvailable      | Should -Be $true
