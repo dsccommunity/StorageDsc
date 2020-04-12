@@ -17,3 +17,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated to use continuous delivery pattern using Azure DevOps - Fixes
   [Issue #225](https://github.com/dsccommunity/StorageDsc/issues/225).
 - Updated Examples and Module Manifest to be DSC Community from Microsoft.
+- Added Integration tests on Windows Server 2019.
+- WaitForVolume:
+  - Improved unit tests to use virtual disk instead of physical disk.
