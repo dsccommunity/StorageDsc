@@ -25,8 +25,15 @@ try
     . $configFile -Verbose -ErrorAction Stop
 
     Describe "$($script:dscResourceName)_Integration" {
-        # Identify a disk to use for tests
-        $disk = Get-Disk | Select-Object -First 1
+        BeforeAll {
+            # Create a VHD and attach it to the computer
+            $VHDPath = Join-Path -Path $TestDrive `
+                -ChildPath 'TestDisk.vhd'
+            $null = New-VDisk -Path $VHDPath -SizeInMB 1024 -Initialize
+            $null = Mount-DiskImage -ImagePath $VHDPath -StorageType VHD -NoDriveLetter
+            $diskImage = Get-DiskImage -ImagePath $VHDPath
+            $disk = Get-Disk -Number $diskImage.Number
+        }
 
         Context 'Wait for a Disk using Disk Number' {
             It 'Should compile and apply the MOF without throwing' {
@@ -140,6 +147,11 @@ try
                 $current.RetryCount       | Should -Be 5
                 $current.IsAvailable      | Should -Be $true
             }
+        }
+
+        AfterAll {
+            Dismount-DiskImage -ImagePath $VHDPath -StorageType VHD
+            Remove-Item -Path $VHDPath -Force
         }
     }
 }
