@@ -536,7 +536,7 @@ function Set-TargetResource
     if ($volume.FileSystem -eq '')
     {
         # The volume is not formatted
-        $volParams = @{
+        $formatVolumeParameters = @{
             FileSystem = $FSFormat
             Confirm    = $false
         }
@@ -544,22 +544,22 @@ function Set-TargetResource
         if ($FSLabel)
         {
             # Set the File System label on the new volume
-            $volParams['NewFileSystemLabel'] = $FSLabel
+            $formatVolumeParameters['NewFileSystemLabel'] = $FSLabel
         } # if
 
         if ($AllocationUnitSize)
         {
             # Set the Allocation Unit Size on the new volume
-            $volParams['AllocationUnitSize'] = $AllocationUnitSize
+            $formatVolumeParameters['AllocationUnitSize'] = $AllocationUnitSize
         } # if
 
         Write-Verbose -Message ( @(
                 "$($MyInvocation.MyCommand): "
-                $($script:localizedData.FormattingVolumeMessage -f $volParams.FileSystem)
+                $($script:localizedData.FormattingVolumeMessage -f $formatVolumeParameters.FileSystem)
             ) -join '' )
 
         # Format the volume
-        $volume = $partition | Format-Volume @VolParams
+        $volume = $partition | Format-Volume @formatVolumeParameters
     }
     else
     {

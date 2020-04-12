@@ -530,7 +530,7 @@ try
                                     PartitionStyle = 'GPT'
                                     FSLabel        = $FSLabelA
                                     Size           = 900MB
-                                    FSFormat       = 'ReFS'
+                                    FSFormat       = 'NTFS' # 'ReFS'
                                 }
                             )
                         }
@@ -562,7 +562,7 @@ try
                     $current.PartitionStyle | Should -Be 'GPT'
                     $current.FSLabel        | Should -Be $FSLabelA
                     $current.Size           | Should -Be 900MB
-                    $current.FSFormat       | Should -Be 'ReFS'
+                    $current.FSFormat       | Should -Be 'NTFS' # 'ReFS'
                 }
             }
 
