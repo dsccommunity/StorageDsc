@@ -6,7 +6,6 @@
     It is up to the user or mechanism running these tests to put a valid 'test.iso'
     into this folder.
 #>
-#region HEADER
 $script:dscModuleName = 'StorageDsc'
 $script:dscResourceName = 'DSC_MountImage'
 

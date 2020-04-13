@@ -1,4 +1,3 @@
-#region HEADER
 $script:dscModuleName = 'StorageDsc'
 $script:dscResourceName = 'DSC_DiskAccessPath'
 
