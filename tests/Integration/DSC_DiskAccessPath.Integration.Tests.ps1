@@ -201,7 +201,15 @@ try
                         $current.DiskId           | Should -Be $disk.Number
                         $current.AccessPath       | Should -Be "$($accessPathB)\"
                         $current.FSLabel          | Should -Be $FSLabelB
-                        $current.Size             | Should -Be 935198720
+                        <#
+                            The size of the volume differs depending on OS.
+                            - Windows Server 2016: 935198720
+                            - Windows Server 2019: 952041472
+
+                            The reason for this difference is not known, but Get-PartitionSupportedSize
+                            does return correct and expected values for each OS.
+                        #>
+                        $current.Size             | Should -BeIn @(935198720, 952041472)
                     }
                 }
             }
@@ -406,7 +414,15 @@ try
                         $current.DiskId           | Should -Be $disk.UniqueId
                         $current.AccessPath       | Should -Be "$($accessPathB)\"
                         $current.FSLabel          | Should -Be $FSLabelB
-                        $current.Size             | Should -Be 935198720
+                        <#
+                            The size of the volume differs depending on OS.
+                            - Windows Server 2016: 935198720
+                            - Windows Server 2019: 952041472
+
+                            The reason for this difference is not known, but Get-PartitionSupportedSize
+                            does return correct and expected values for each OS.
+                        #>
+                        $current.Size             | Should -BeIn @(935198720, 952041472)
                     }
                 }
             }
@@ -612,7 +628,15 @@ try
                         $current.DiskId           | Should -Be $disk.Guid
                         $current.AccessPath       | Should -Be "$($accessPathB)\"
                         $current.FSLabel          | Should -Be $FSLabelB
-                        $current.Size             | Should -Be 935198720
+                        <#
+                            The size of the volume differs depending on OS.
+                            - Windows Server 2016: 935198720
+                            - Windows Server 2019: 952041472
+
+                            The reason for this difference is not known, but Get-PartitionSupportedSize
+                            does return correct and expected values for each OS.
+                        #>
+                        $current.Size             | Should -Be @(935198720, 952041472)
                     }
                 }
             }

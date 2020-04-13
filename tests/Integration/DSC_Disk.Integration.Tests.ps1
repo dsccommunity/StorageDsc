@@ -135,7 +135,7 @@ try
                     $current.FSLabel        | Should -Be $FSLabelB
                     $current.PartitionStyle | Should -Be 'GPT'
                     <#
-                        The Size of the 2nd volume differs depending on OS.
+                        The size of the volume differs depending on OS.
                         - Windows Server 2016: 935198720
                         - Windows Server 2019: 952041472
 
@@ -282,7 +282,7 @@ try
                     $current.FSLabel        | Should -Be $FSLabelA
                     $current.FSFormat       | Should -Be 'NTFS'
                     <#
-                        The Size of the 2nd volume differs depending on OS.
+                        The size of the volume differs depending on OS.
                         - Windows Server 2016: 1040104960
                         - Windows Server 2019: 1056947712
 
@@ -625,7 +625,15 @@ try
                     $current.PartitionStyle | Should -Be 'GPT'
                     $current.DriveLetter    | Should -Be $driveLetterB
                     $current.FSLabel        | Should -Be $FSLabelB
-                    $current.Size           | Should -Be 96337920
+                    <#
+                        The size of the volume differs depending on OS.
+                        - Windows Server 2016: 96337920
+                        - Windows Server 2019: 113180672
+
+                        The reason for this difference is not known, but Get-PartitionSupportedSize
+                        does return correct and expected values for each OS.
+                    #>
+                    $current.Size           | Should -BeIn @(96337920,113180672)
                 }
             }
 
@@ -757,7 +765,15 @@ try
                     $current.PartitionStyle | Should -Be 'GPT'
                     $current.DriveLetter    | Should -Be $driveLetterB
                     $current.FSLabel        | Should -Be $FSLabelB
-                    $current.Size           | Should -Be 935198720
+                    <#
+                        The size of the volume differs depending on OS.
+                        - Windows Server 2016: 935198720
+                        - Windows Server 2019: 952041472
+
+                        The reason for this difference is not known, but Get-PartitionSupportedSize
+                        does return correct and expected values for each OS.
+                    #>
+                    $current.Size           | Should -BeIn @(935198720, 952041472)
                 }
             }
 
