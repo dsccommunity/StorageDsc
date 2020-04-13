@@ -57,3 +57,12 @@ in reported size is always less than **1MB**, so if the reported _maximum suppor
 partition size_ is less than **1MB** then the partition will be considered to be
 in the correct state. This is a work around for [this issue](https://windowsserver.uservoice.com/forums/301869-powershell/suggestions/36967870-get-partitionsupportedsize-and-msft-partition-clas)
 that has been reported on user voice and also discussed in [issue #181](https://github.com/dsccommunity/StorageDsc/issues/181).
+
+### ReFS on Windows Server 2019
+
+On Windows Server 2019 (build 17763 and above), `Format-Volume` throws an
+'Invalid Parameter' exception when called with `ReFS` as the `FileSystem`
+parameter. This results in an 'Invalid Parameter' exception being thrown
+in the `Set` in the 'Disk' resource.
+There is currently no known work around for this issue. It is being tracked
+in [issue #227](https://github.com/dsccommunity/StorageDsc/issues/227).

@@ -517,6 +517,22 @@ try
             }
 
             Context "When resizing the first volume on Disk Unique Id $($disk.UniqueId) and allowing the disk to be cleared" {
+                <#
+                    There is an issue with Format-Volume that occurs when formatting a volume
+                    with ReFS in Windows Server 2019 (build 17763 and above). Therefore on
+                    Windows Server 2019 the integration tests will use NTFS only.
+
+                    See Issue #227: https://github.com/dsccommunity/StorageDsc/issues/227
+                #>
+                if ((Get-CimInstance -ClassName WIN32_OperatingSystem).BuildNumber -ge 17763)
+                {
+                    $FSFormat = 'NTFS'
+                }
+                else
+                {
+                    $FSFormat = 'ReFS'
+                }
+
                 It 'should compile and apply the MOF without throwing' {
                     {
                         # This is to pass to the Config
@@ -530,7 +546,7 @@ try
                                     PartitionStyle = 'GPT'
                                     FSLabel        = $FSLabelA
                                     Size           = 900MB
-                                    FSFormat       = 'NTFS' # 'ReFS'
+                                    FSFormat       = $FSFormat
                                 }
                             )
                         }
@@ -562,7 +578,7 @@ try
                     $current.PartitionStyle | Should -Be 'GPT'
                     $current.FSLabel        | Should -Be $FSLabelA
                     $current.Size           | Should -Be 900MB
-                    $current.FSFormat       | Should -Be 'NTFS' # 'ReFS'
+                    $current.FSFormat       | Should -Be $FSFormat
                 }
             }
 
