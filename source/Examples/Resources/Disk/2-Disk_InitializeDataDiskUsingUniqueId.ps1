@@ -1,9 +1,9 @@
 <#PSScriptInfo
 .VERSION 1.0.0
 .GUID 56cbc9fc-4168-4662-9dec-12addcfb82da
-.AUTHOR Microsoft Corporation
-.COMPANYNAME Microsoft Corporation
-.COPYRIGHT
+.AUTHOR DSC Community
+.COMPANYNAME DSC Community
+.COPYRIGHT Copyright the DSC Community contributors. All rights reserved.
 .TAGS DSCConfiguration
 .LICENSEURI https://github.com/dsccommunity/StorageDsc/blob/master/LICENSE
 .PROJECTURI https://github.com/dsccommunity/StorageDsc
