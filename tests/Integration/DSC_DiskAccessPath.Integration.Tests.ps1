@@ -636,7 +636,7 @@ try
                             The reason for this difference is not known, but Get-PartitionSupportedSize
                             does return correct and expected values for each OS.
                         #>
-                        $current.Size             | Should -Be @(935198720, 952041472)
+                        $current.Size             | Should -BeIn @(935198720, 952041472)
                     }
                 }
             }
