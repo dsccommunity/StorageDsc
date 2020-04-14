@@ -2,14 +2,9 @@
 *.user
 *.coverage
 .vs
+.vscode
 .psproj
 .sln
-DscResource.Tests
-DscResource.Tests/*
-Modules/StorageDsc/DscResource.Tests
-Modules/StorageDsc/DscResource.Tests/*
-node_modules
-node_modules/*
 markdownissues.txt
-TestResults.xml
-Tests/Integration/test.iso
+output/
+
