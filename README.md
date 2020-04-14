@@ -1,8 +1,8 @@
 # StorageDsc
 
-[![Build Status](https://dev.azure.com/dsccommunity/StorageDsc/_apis/build/status/dsccommunity.StorageDsc?branchName=master)](https://dev.azure.com/dsccommunity/StorageDsc/_build/latest?definitionId=18&branchName=master)
-![Code Coverage](https://img.shields.io/azure-devops/coverage/dsccommunity/StorageDsc/18/master)
-[![Azure DevOps tests](https://img.shields.io/azure-devops/tests/dsccommunity/StorageDsc/18/master)](https://dsccommunity.visualstudio.com/StorageDsc/_test/analytics?definitionId=18&contextType=build)
+[![Build Status](https://dev.azure.com/dsccommunity/StorageDsc/_apis/build/status/dsccommunity.StorageDsc?branchName=master)](https://dev.azure.com/dsccommunity/StorageDsc/_build/latest?definitionId=30&branchName=master)
+![Code Coverage](https://img.shields.io/azure-devops/coverage/dsccommunity/StorageDsc/30/master)
+[![Azure DevOps tests](https://img.shields.io/azure-devops/tests/dsccommunity/StorageDsc/30/master)](https://dsccommunity.visualstudio.com/StorageDsc/_test/analytics?definitionId=30&contextType=build)
 [![PowerShell Gallery (with prereleases)](https://img.shields.io/powershellgallery/vpre/StorageDsc?label=StorageDsc%20Preview)](https://www.powershellgallery.com/packages/StorageDsc/)
 [![PowerShell Gallery](https://img.shields.io/powershellgallery/v/StorageDsc?label=StorageDsc)](https://www.powershellgallery.com/packages/StorageDsc/)
 
