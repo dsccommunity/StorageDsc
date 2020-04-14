@@ -24,3 +24,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Added `Invalid Parameter` exception being reported when ReFS volumes are
     used with Windows Server 2019 as a known issue to README.MD - fixes
     [Issue #227](https://github.com/dsccommunity/StorageDsc/issues/227).
+- Updated build badges in README.md.
