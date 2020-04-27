@@ -178,7 +178,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Deleted xStorage folder under StorageDsc/Modules
   - See [Issue 129](https://github.com/dsccommunity/xStorage/issues/129)
 
-## [3.4.0.0] - 2018-01-01
+## [3.4.0.0] - 2017-12-20
 
 ### Changed
 
@@ -192,7 +192,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Fix bug when size not specified and disk partitioned and
     formatted but not assigned to path - See [Issue 103](https://github.com/dsccommunity/xStorage/issues/103).
 
-## [3.3.0.0] - 2018-01-01
+## [3.3.0.0] - 2017-11-15
 
 ### Changed
 
@@ -222,7 +222,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   execution - fixes [Issue #118](https://github.com/dsccommunity/xStorage/issues/118).
 - Updated tests to meet Pester V4 guidelines - fixes [Issue #120](https://github.com/dsccommunity/xStorage/issues/120).
 
-## [3.2.0.0] - 2018-01-01
+## [3.2.0.0] - 2017-07-12
 
 ### Changed
 
@@ -239,7 +239,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - xMountImage:
   - Fix error when mounting VHD on Windows Server 2012 R2 - See [Issue 105](https://github.com/dsccommunity/xStorage/issues/105)
 
-## [3.1.0.0] - 2018-01-01
+## [3.1.0.0] - 2017-06-01
 
 ### Changed
 
@@ -247,7 +247,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Prevented ResourceHelper and Common module cmdlets from being exported to resolve
   conflicts with other resource modules.
 
-## [3.0.0.0] - 2018-01-01
+## [3.0.0.0] - 2017-05-31
 
 ### Changed
 
@@ -287,7 +287,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Added DiskIdType parameter to enable specifying the type
     of identifer the DiskId parameter contains - See [Issue 81](https://github.com/dsccommunity/xStorage/issues/81).
 
-## [2.9.0.0] - 2018-01-01
+## [2.9.0.0] - 2016-12-14
 
 ### Changed
 
@@ -316,7 +316,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - xDisk:
   - Improve timeout loop.
 
-## [2.8.0.0] - 2018-01-01
+## [2.8.0.0] - 2016-11-02
 
 ### Changed
 
@@ -363,19 +363,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Added new resource.
   - Added support for changing/setting volume label.
 
-## [2.7.0.0] - 2018-01-01
+## [2.7.0.0] - 2016-09-21
 
 ### Changed
 
 - Converted appveyor.yml to install Pester from PSGallery instead of from Chocolatey.
 
-## [2.6.0.0] - 2018-01-01
+## [2.6.0.0] - 2016-05-18
 
 ### Changed
 
 - MSFT_xDisk: Replaced Get-WmiObject with Get-CimInstance
 
-## [2.5.0.0] - 2018-01-01
+## [2.5.0.0] - 2016-03-31
 
 ### Changed
 
@@ -386,39 +386,39 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - added unit test for new volume with out existing partition for MSFT_xDisk.psm1
 - Fixed error propagation
 
-## [2.4.0.0] - 2018-01-01
+## [2.4.0.0] - 2016-02-03
 
 ### Changed
 
 - Fixed bug where AllocationUnitSize was not used
 
-## [2.3.0.0] - 2018-01-01
+## [2.3.0.0] - 2015-12-03
 
 ### Changed
 
 - Added support for `AllocationUnitSize` in `xDisk`.
 
-## [2.2.0.0] - 2018-01-01
+## [2.2.0.0] - 2015-10-22
 
 ### Changed
 
 - Updated documentation: changed parameter name Count to RetryCount in
   xWaitForDisk resource
 
-## [2.1.0.0] - 2018-01-01
+## [2.1.0.0] - 2015-09-11
 
 ### Changed
 
 - Fixed encoding
 
-## [2.0.0.0] - 2018-01-01
+## [2.0.0.0] - 2015-07-24
 
 ### Changed
 
 - Breaking change: Added support for following properties: DriveLetter, Size,
   FSLabel. DriveLetter is a new key property.
 
-## [1.0.0.0] - 2018-01-01
+## [1.0.0.0] - 2015-06-17
 
 ### Changed
 
