@@ -28,6 +28,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Change Azure DevOps Pipeline definition to include `source/*` - Fixes [Issue #231](https://github.com/dsccommunity/StorageDsc/issues/231).
 - Updated pipeline to use `latest` version of `ModuleBuilder` - Fixes [Issue #231](https://github.com/dsccommunity/StorageDsc/issues/231).
 - Merge `HISTORIC_CHANGELOG.md` into `CHANGELOG.md` - Fixes [Issue #232](https://github.com/dsccommunity/StorageDsc/issues/232).
+- OpticalDiskDriveLetter:
+  - Suppress exception when requested optical disk drive does not exist
+    and Ensure is set to `Absent` - Fixes [Issue #194](https://github.com/dsccommunity/StorageDsc/issues/194).
 
 ## [4.9.0.0] - 2019-10-30
 

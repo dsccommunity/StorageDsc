@@ -61,8 +61,6 @@ function Get-OpticalDiskDriveLetter
         )
     }
 
-    $deviceId = ''
-
     if ($opticalDisks)
     {
         <#
@@ -91,15 +89,18 @@ function Get-OpticalDiskDriveLetter
                         $($script:localizedData.OpticalDiskNotAssignedDriveLetter -f $DiskId)
                     ) -join '' )
             }
+
             $deviceId = $opticalDisk.Drive
         }
     }
 
-    if ($null -eq $driveLetter)
+    if ([System.String]::IsNullOrEmpty($deviceId))
     {
-        New-InvalidArgumentException `
-            -Message ($script:localizedData.NoOpticalDiskDriveError -f $DiskId) `
-            -ArgumentName 'DiskId'
+        # The requested optical drive does not exist in the system
+        Write-Verbose -Message ( @(
+                "$($MyInvocation.MyCommand): "
+                $($script:localizedData.OpticalDiskDriveDoesNotExist -f $DiskId)
+            ) -join '' )
     }
 
     return @{
@@ -140,26 +141,34 @@ function Get-TargetResource
 
     # Get the drive letter assigned to the optical disk
     $currentDriveInfo = Get-OpticalDiskDriveLetter -DiskId $DiskId
-    $currentDriveLetter = $currentDriveInfo.DriveLetter
 
-    if ([System.String]::IsNullOrWhiteSpace($currentDriveLetter))
+    if ([System.String]::IsNullOrEmpty($currentDriveInfo.DeviceId))
     {
-        Write-Verbose -Message ( @(
-                "$($MyInvocation.MyCommand): "
-                $($script:localizedData.OpticalDiskNotAssignedDriveLetter -f $DiskId)
-            ) -join '' )
+        $currentDriveLetter = ''
     }
     else
     {
-        Write-Verbose -Message ( @(
-                "$($MyInvocation.MyCommand): "
-                $($script:localizedData.OpticalDiskAssignedDriveLetter -f $DiskId, $DriveLetter)
-            ) -join '' )
+        $currentDriveLetter = $currentDriveInfo.DriveLetter
 
-        $Ensure = 'Present'
+        if ([System.String]::IsNullOrWhiteSpace($currentDriveLetter))
+        {
+            Write-Verbose -Message ( @(
+                    "$($MyInvocation.MyCommand): "
+                    $($script:localizedData.OpticalDiskNotAssignedDriveLetter -f $DiskId)
+                ) -join '' )
+        }
+        else
+        {
+            Write-Verbose -Message ( @(
+                    "$($MyInvocation.MyCommand): "
+                    $($script:localizedData.OpticalDiskAssignedDriveLetter -f $DiskId, $DriveLetter)
+                ) -join '' )
+
+            $ensure = 'Present'
+        }
     }
 
-    $returnValue += @{
+    $returnValue = @{
         DiskId      = $DiskId
         DriveLetter = $currentDriveLetter
         Ensure      = $ensure
@@ -234,13 +243,16 @@ function Set-TargetResource
     # Does the Drive Letter need to be added or removed
     if ($Ensure -eq 'Absent')
     {
-        Write-Verbose -Message ( @(
-            "$($MyInvocation.MyCommand): "
-            $($script:localizedData.AttemptingToRemoveDriveLetter -f $diskId, $currentDriveLetter)
-        ) -join '' )
+        if (-not [System.String]::IsNullOrEmpty($currentDriveInfo.DeviceId))
+        {
+            Write-Verbose -Message ( @(
+                "$($MyInvocation.MyCommand): "
+                $($script:localizedData.AttemptingToRemoveDriveLetter -f $diskId, $currentDriveLetter)
+            ) -join '' )
 
-        $volume | Set-CimInstance -Property @{
-            DriveLetter = $null
+            $volume | Set-CimInstance -Property @{
+                DriveLetter = $null
+            }
         }
     }
     else
@@ -304,27 +316,38 @@ function Test-TargetResource
 
     if ($Ensure -eq 'Absent')
     {
-        # The Drive Letter should be absent from the optical disk
-        if ([System.String]::IsNullOrWhiteSpace($currentDriveLetter))
+        if (-not [System.String]::IsNullOrEmpty($currentDriveInfo.DeviceId))
         {
-            Write-Verbose -Message ( @(
-                    "$($MyInvocation.MyCommand): "
-                    $($script:localizedData.DriveLetterDoesNotExistAndShouldNot -f $DiskId)
-                ) -join '' )
-        }
-        else
-        {
-            # The Drive Letter needs to be dismounted
-            Write-Verbose -Message ( @(
-                    "$($MyInvocation.MyCommand): "
-                    $($script:localizedData.DriveLetterExistsButShouldNot -f $DiskId, $currentDriveLetter)
-                ) -join '' )
+            # The Drive Letter should be absent from the optical disk
+            if ([System.String]::IsNullOrWhiteSpace($currentDriveLetter))
+            {
+                Write-Verbose -Message ( @(
+                        "$($MyInvocation.MyCommand): "
+                        $($script:localizedData.DriveLetterDoesNotExistAndShouldNot -f $DiskId)
+                    ) -join '' )
+            }
+            else
+            {
+                # The Drive Letter needs to be dismounted
+                Write-Verbose -Message ( @(
+                        "$($MyInvocation.MyCommand): "
+                        $($script:localizedData.DriveLetterExistsButShouldNot -f $DiskId, $currentDriveLetter)
+                    ) -join '' )
 
-            $desiredConfigurationMatch = $false
+                $desiredConfigurationMatch = $false
+            }
         }
     }
     else
     {
+        # Throw an exception if the desired optical disk does not exist
+        if ([System.String]::IsNullOrEmpty($currentDriveInfo.DeviceId))
+        {
+            New-InvalidArgumentException `
+                -Message ($script:localizedData.NoOpticalDiskDriveError -f $DiskId) `
+                -ArgumentName 'DiskId'
+        }
+
         if ($currentDriveLetter -eq $DriveLetter)
         {
             # The optical disk drive letter is already set correctly
