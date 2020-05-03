@@ -20,6 +20,7 @@ Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath '..\TestHelpers\Co
 
 try
 {
+    # Locate an optical disk in the system to use for testing
     $opticalDisk = Get-CimInstance -ClassName Win32_CDROMDrive |
         Where-Object -FilterScript {
         -not (
@@ -173,6 +174,48 @@ try
                 }
                 $current.DiskId           | Should -Be 1
                 $current.DriveLetter      | Should -Be ''
+            }
+        }
+
+        Context 'Assign a Drive Letter to an optical drive that does not exist' {
+            It 'Should compile and apply the MOF without throwing' {
+                {
+                    # This is to pass to the Config
+                    $configData = @{
+                        AllNodes = @(
+                            @{
+                                NodeName    = 'localhost'
+                                DiskId      = 2
+                                DriveLetter = $driveLetter
+                                Ensure      = 'Present'
+                            }
+                        )
+                    }
+
+                    & "$($script:dscResourceName)_Config" `
+                        -OutputPath $TestDrive `
+                        -ConfigurationData $configData
+
+                    Start-DscConfiguration `
+                        -Path $TestDrive `
+                        -ComputerName localhost `
+                        -Wait `
+                        -Verbose `
+                        -Force `
+                        -ErrorAction Stop
+                } | Should -Not -Throw
+            }
+
+            It 'Should be able to call Get-DscConfiguration without throwing' {
+                { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
+            }
+
+            It 'Should have set the resource and all the parameters should match' {
+                $current = Get-DscConfiguration | Where-Object -FilterScript {
+                    $_.ConfigurationName -eq "$($script:dscResourceName)_Config"
+                }
+                $current.DiskId           | Should -Be 2
+                $current.DriveLetter      | Should -BeNullOrEmpty
             }
         }
     }
