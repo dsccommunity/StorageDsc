@@ -9,7 +9,7 @@
 
     InvokeBuild                 = 'latest'
     PSScriptAnalyzer            = 'latest'
-    Pester                      = 'latest'
+    Pester                      = '4.10.1'
     Plaster                     = 'latest'
     ModuleBuilder               = 'latest'
     ChangelogManagement         = 'latest'
@@ -18,5 +18,6 @@
     'DscResource.Test'          = 'latest'
     'DscResource.AnalyzerRules' = 'latest'
     'DscResource.DocGenerator'  = 'latest'
+    'DscResource.Common'        = 'latest'
     xDscResourceDesigner        = 'latest'
 }
