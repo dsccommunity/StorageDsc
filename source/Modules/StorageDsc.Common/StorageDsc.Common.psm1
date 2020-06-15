@@ -222,8 +222,6 @@ function Test-AccessPathAssignedToLocal
     return $accessPathAssigned
 } # end function Test-AccessPathLocal
 
-$script:localizedData = Get-LocalizedData -ResourceName 'StorageDsc.Common' -ScriptRoot $PSScriptRoot
-
 Export-ModuleMember -Function @(
     'Restart-ServiceIfExists',
     'Assert-DriveLetterValid',
