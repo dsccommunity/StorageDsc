@@ -47,7 +47,9 @@ try
 
     Describe "$($script:dscResourceName)_Integration" {
         # Dismount the optical disk from a drive letter
-        $volume | Set-CimInstance -Property @{ DriveLetter = $null }
+        $volume | Set-CimInstance -Property @{
+            DriveLetter = $null
+        }
 
         Context 'Assign a Drive Letter to an optical drive that is not mounted' {
             It 'Should compile and apply the MOF without throwing' {
@@ -176,48 +178,6 @@ try
                 $current.DriveLetter      | Should -Be ''
             }
         }
-
-        Context 'Assign a Drive Letter to an optical drive that does not exist' {
-            It 'Should compile and apply the MOF without throwing' {
-                {
-                    # This is to pass to the Config
-                    $configData = @{
-                        AllNodes = @(
-                            @{
-                                NodeName    = 'localhost'
-                                DiskId      = 2
-                                DriveLetter = $driveLetter
-                                Ensure      = 'Present'
-                            }
-                        )
-                    }
-
-                    & "$($script:dscResourceName)_Config" `
-                        -OutputPath $TestDrive `
-                        -ConfigurationData $configData
-
-                    Start-DscConfiguration `
-                        -Path $TestDrive `
-                        -ComputerName localhost `
-                        -Wait `
-                        -Verbose `
-                        -Force `
-                        -ErrorAction Stop
-                } | Should -Not -Throw
-            }
-
-            It 'Should be able to call Get-DscConfiguration without throwing' {
-                { Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
-            }
-
-            It 'Should have set the resource and all the parameters should match' {
-                $current = Get-DscConfiguration | Where-Object -FilterScript {
-                    $_.ConfigurationName -eq "$($script:dscResourceName)_Config"
-                }
-                $current.DiskId           | Should -Be 2
-                $current.DriveLetter      | Should -BeNullOrEmpty
-            }
-        }
     }
 }
 finally
@@ -227,6 +187,8 @@ finally
     # Mount the optical disk back to where it was
     if ($volume)
     {
-        $volume | Set-CimInstance -Property @{ DriveLetter = $currentDriveLetter }
+        $volume | Set-CimInstance -Property @{
+            DriveLetter = $currentDriveLetter
+        }
     }
 }
