@@ -12,6 +12,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated to use the common module _DscResource.Common_ - Fixes [Issue #234](https://github.com/dsccommunity/StorageDsc/issues/234).
 - Pin `Pester` module to 4.10.1 because Pester 5.0 is missing code
   coverage - Fixes [Issue #238](https://github.com/dsccommunity/StorageDsc/issues/238).
+- OpticalDiskDriveLetter:
+  - Removed integration test that tests when a disk is not in the
+    system as it is not a useful test, does not work correctly
+    and is covered by unit tests - Fixes [Issue #240](https://github.com/dsccommunity/StorageDsc/issues/240).
 
 ## [5.0.0] - 2020-05-05
 
