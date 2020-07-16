@@ -16,6 +16,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Removed integration test that tests when a disk is not in the
     system as it is not a useful test, does not work correctly
     and is covered by unit tests - Fixes [Issue #240](https://github.com/dsccommunity/StorageDsc/issues/240).
+- StorageDsc
+  - Automatically publish documentation to GitHub Wiki - Fixes [Issue #241](https://github.com/dsccommunity/StorageDsc/issues/241).
 
 ## [5.0.0] - 2020-05-05
 
