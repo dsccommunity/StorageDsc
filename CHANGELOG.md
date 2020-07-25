@@ -19,6 +19,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - StorageDsc
   - Automatically publish documentation to GitHub Wiki - Fixes [Issue #241](https://github.com/dsccommunity/StorageDsc/issues/241).
 
+### Fixed
+
+- Disk:
+  - Fix bug when multiple partitions with the same drive letter are
+    reported by the disk subsystem - Fixes [Issue #210](https://github.com/dsccommunity/StorageDsc/issues/210).
+
 ## [5.0.0] - 2020-05-05
 
 ### Changed
