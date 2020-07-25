@@ -91,7 +91,9 @@ try
             PartitionStyle = 'GPT'
         }
 
-        $script:mockedCim = [pscustomobject] @{BlockSize = 4096}
+        $script:mockedCim = [pscustomobject] @{
+            BlockSize = 4096
+        }
 
         $script:mockedPartitionSize = 1GB
 
@@ -101,6 +103,25 @@ try
             PartitionNumber = 1
             Type            = 'Basic'
         }
+
+        <#
+            This condition seems to occur in some systems where the
+            same partition is reported twice with the same drive letter.
+        #>
+        $script:mockedPartitionMultiple = @(
+            [pscustomobject] @{
+                DriveLetter     = [System.Char] $script:testDriveLetter
+                Size            = $script:mockedPartitionSize
+                PartitionNumber = 1
+                Type            = 'Basic'
+            },
+            [pscustomobject] @{
+                DriveLetter     = [System.Char] $script:testDriveLetter
+                Size            = $script:mockedPartitionSize
+                PartitionNumber = 1
+                Type            = 'Basic'
+            }
+        )
 
         $script:mockedPartitionNoDriveLetter = [pscustomobject] @{
             DriveLetter     = [System.Char] $null
@@ -158,10 +179,12 @@ try
                 [Parameter(ValueFromPipeline)]
                 $InputObject,
 
-                [Boolean]
+                [Parameter()]
+                [System.Boolean]
                 $IsOffline,
 
-                [Boolean]
+                [Parameter()]
+                [System.Boolean]
                 $IsReadOnly
             )
         }
@@ -174,7 +197,8 @@ try
                 [Parameter(ValueFromPipeline)]
                 $InputObject,
 
-                [String]
+                [Parameter()]
+                [System.String]
                 $PartitionStyle
             )
         }
@@ -187,13 +211,16 @@ try
                 [Parameter(ValueFromPipeline)]
                 $Disk,
 
-                [String]
+                [Parameter()]
+                [System.String]
                 $DriveLetter,
 
-                [Uint32]
+                [Parameter()]
+                [System.UInt32]
                 $DiskNumber,
 
-                [Uint32]
+                [Parameter()]
+                [System.UInt32]
                 $PartitionNumber
             )
         }
@@ -206,13 +233,16 @@ try
                 [Parameter(ValueFromPipeline)]
                 $Disk,
 
-                [String]
+                [Parameter()]
+                [System.String]
                 $DriveLetter,
 
-                [Boolean]
+                [Parameter()]
+                [System.Boolean]
                 $UseMaximumSize,
 
-                [UInt64]
+                [Parameter()]
+                [System.UInt64]
                 $Size
             )
         }
@@ -225,10 +255,12 @@ try
                 [Parameter(ValueFromPipeline)]
                 $Disk,
 
-                [String]
+                [Parameter()]
+                [System.String]
                 $DriveLetter,
 
-                [String]
+                [Parameter()]
+                [System.String]
                 $NewDriveLetter
             )
         }
@@ -241,7 +273,8 @@ try
                 [Parameter(ValueFromPipeline)]
                 $Partition,
 
-                [String]
+                [Parameter()]
+                [System.String]
                 $DriveLetter
             )
         }
@@ -254,7 +287,8 @@ try
                 [Parameter(ValueFromPipeline)]
                 $InputObject,
 
-                [String]
+                [Parameter()]
+                [System.String]
                 $NewFileSystemLabel
             )
         }
@@ -267,21 +301,27 @@ try
                 [Parameter(ValueFromPipeline)]
                 $Partition,
 
-                [String]
+                [Parameter()]
+                [System.String]
                 $DriveLetter,
 
-                [String]
+                [Parameter()]
+                [System.String]
                 $FileSystem,
 
-                [Boolean]
+                [Parameter()]
+                [System.Boolean]
                 $Confirm,
 
-                [String]
+                [Parameter()]
+                [System.String]
                 $NewFileSystemLabel,
 
-                [Uint32]
+                [Parameter()]
+                [System.UInt32]
                 $AllocationUnitSize,
 
+                [Parameter()]
                 [Switch]
                 $Force
             )
@@ -292,7 +332,7 @@ try
             param
             (
                 [Parameter(ValueFromPipeline = $true)]
-                [String]
+                [System.String]
                 $DriveLetter
             )
         }
@@ -302,10 +342,11 @@ try
             param
             (
                 [Parameter(ValueFromPipeline = $true)]
-                [String]
+                [System.String]
                 $DriveLetter,
 
-                [UInt64]
+                [Parameter()]
+                [System.UInt64]
                 $Size
             )
         }
@@ -327,6 +368,72 @@ try
                 Mock `
                     -CommandName Get-Partition `
                     -MockWith { $script:mockedPartition } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-Volume `
+                    -MockWith { $script:mockedVolume } `
+                    -Verifiable
+
+                $resource = Get-TargetResource `
+                    -DiskId $script:mockedDisk0Gpt.Number `
+                    -DriveLetter $script:testDriveLetter `
+                    -Verbose
+
+                It "Should return DiskId $($script:mockedDisk0Gpt.Number)" {
+                    $resource.DiskId | Should -Be $script:mockedDisk0Gpt.Number
+                }
+
+                It "Should return PartitionStyle $($script:mockedDisk0Gpt.PartitionStyle)" {
+                    $resource.PartitionStyle | Should -Be $script:mockedDisk0Gpt.PartitionStyle
+                }
+
+                It "Should return DriveLetter $($script:testDriveLetter)" {
+                    $resource.DriveLetter | Should -Be $script:testDriveLetter
+                }
+
+                It "Should return size $($script:mockedPartition.Size)" {
+                    $resource.Size | Should -Be $script:mockedPartition.Size
+                }
+
+                It "Should return FSLabel $($script:mockedVolume.FileSystemLabel)" {
+                    $resource.FSLabel | Should -Be $script:mockedVolume.FileSystemLabel
+                }
+
+                It "Should return AllocationUnitSize $($script:mockedCim.BlockSize)" {
+                    $resource.AllocationUnitSize | Should -Be $script:mockedCim.BlockSize
+                }
+
+                It "Should return FSFormat $($script:mockedVolume.FileSystem)" {
+                    $resource.FSFormat | Should -Be $script:mockedVolume.FileSystem
+                }
+
+                It 'Should call the correct mocks' {
+                    Assert-VerifiableMock
+                    Assert-MockCalled -CommandName Get-CimInstance -Exactly 1
+                    Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly 1 `
+                        -ParameterFilter $script:parameterFilter_MockedDisk0Number
+                    Assert-MockCalled -CommandName Get-Partition -Exactly 1
+                    Assert-MockCalled -CommandName Get-Volume -Exactly 1
+                }
+            }
+
+            Context 'When online GPT disk with a partition/volume and correct Drive Letter assigned using Disk Number with partition reported twice' {
+                # verifiable (should be called) mocks
+                Mock `
+                    -CommandName Get-CimInstance `
+                    -MockWith { $script:mockedCim } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-DiskByIdentifier `
+                    -ParameterFilter $script:parameterFilter_MockedDisk0Number `
+                    -MockWith { $script:mockedDisk0Gpt } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-Partition `
+                    -MockWith { $script:mockedPartitionMultiple } `
                     -Verifiable
 
                 Mock `
@@ -2665,6 +2772,67 @@ try
                 Mock `
                     -CommandName Get-Partition `
                     -MockWith { $script:mockedPartition } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-PartitionSupportedSize `
+                    -MockWith {
+                        return @{
+                            SizeMin = 0
+                            # Adding >1MB, otherwise workaround for wrong SizeMax is triggered
+                            SizeMax = $script:mockedPartition.Size + 1.1MB
+                        }
+                    } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-Volume `
+                    -MockWith { $script:mockedVolume } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-CimInstance `
+                    -MockWith { $script:mockedCim } `
+                    -Verifiable
+
+                $script:result = $null
+
+                It 'Should not throw an exception' {
+                    {
+                        $script:result = Test-TargetResource `
+                            -DiskId $script:mockedDisk0Gpt.Number `
+                            -DriveLetter $script:testDriveLetter `
+                            -AllocationUnitSize 4096 `
+                            -Verbose
+                    } | Should -Not -Throw
+                }
+
+                It 'Should be true' {
+                    $script:result | Should -Be $true
+                }
+
+                It 'Should call the correct mocks' {
+                    Assert-VerifiableMock
+                    Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 1 `
+                        -ParameterFilter $script:parameterFilter_MockedDisk0Number
+                    Assert-MockCalled -CommandName Get-Partition -Exactly -Times 1
+                    Assert-MockCalled -CommandName Get-PartitionSupportedSize -Exactly -Times 1
+                    Assert-MockCalled -CommandName Get-Volume -Exactly -Times 1
+                    Assert-MockCalled -CommandName Get-CimInstance -Exactly -Times 1
+                }
+            }
+
+            Context 'When testing mismatching partition size without Size specified using Disk Number with partition reported twice' {
+                # verifiable (should be called) mocks
+                Mock `
+                    -CommandName Get-DiskByIdentifier `
+                    -ParameterFilter $script:parameterFilter_MockedDisk0Number `
+                    -MockWith { $script:mockedDisk0Gpt } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-Partition `
+                    -MockWith { $script:mockedPartitionMultiple } `
                     -Verifiable
 
                 Mock `

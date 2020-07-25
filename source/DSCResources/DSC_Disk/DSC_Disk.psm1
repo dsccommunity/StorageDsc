@@ -117,7 +117,7 @@ function Get-TargetResource
 
     $partition = Get-Partition `
         -DriveLetter $DriveLetter `
-        -ErrorAction SilentlyContinue
+        -ErrorAction SilentlyContinue | Select-Object -First 1
 
     $volume = Get-Volume `
         -DriveLetter $DriveLetter `
@@ -794,7 +794,7 @@ function Test-TargetResource
 
     $partition = Get-Partition `
         -DriveLetter $DriveLetter `
-        -ErrorAction SilentlyContinue
+        -ErrorAction SilentlyContinue | Select-Object -First 1
 
     if ($partition.DriveLetter -ne $DriveLetter)
     {
