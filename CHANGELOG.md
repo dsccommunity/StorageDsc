@@ -5,6 +5,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.0.1] - 2020-08-03
+
 ### Changed
 
 - Fixed build failures caused by changes in `ModuleBuilder` module v1.7.0
