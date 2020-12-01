@@ -5,6 +5,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- MountImage:
+  - Corrected example `1-MountImage_DismountISO.ps1` for dismounting
+    ISO - Fixes [Issue #221](https://github.com/dsccommunity/StorageDsc/issues/221).
+
 ## [5.0.1] - 2020-08-03
 
 ### Changed
