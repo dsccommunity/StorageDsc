@@ -19,7 +19,8 @@
 
 <#
     .DESCRIPTION
-        This configuration will unmount an ISO file that is mounted in S:.
+        This configuration will unmount the ISO file 'c:\Sources\SQL.iso'
+        if mounted as a drive.
 #>
 configuration MountImage_DismountISO
 {
