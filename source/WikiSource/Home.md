@@ -32,4 +32,4 @@ Get-DscResource -Module StorageDsc
 
 ## Change Log
 
-A full list of changes in each version can be found in the [change log](https://github.com/dsccommunity/StorageDsc/blob/master/CHANGELOG.md).
+A full list of changes in each version can be found in the [change log](https://github.com/dsccommunity/StorageDsc/blob/main/CHANGELOG.md).

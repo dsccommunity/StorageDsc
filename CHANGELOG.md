@@ -5,6 +5,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Renamed `master` branch to `main` - Fixes [Issue #250](https://github.com/dsccommunity/StorageDsc/issues/250).
+
 ### Fixed
 
 - MountImage:

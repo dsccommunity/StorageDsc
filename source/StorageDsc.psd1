@@ -55,7 +55,7 @@
             Tags         = @('DesiredStateConfiguration', 'DSC', 'DSCResource', 'Disk', 'Storage', 'Partition', 'Volume')
 
             # A URL to the license for this module.
-            LicenseUri   = 'https://github.com/dsccommunity/StorageDsc/blob/master/LICENSE'
+            LicenseUri   = 'https://github.com/dsccommunity/StorageDsc/blob/main/LICENSE'
 
             # A URL to the main website for this project.
             ProjectUri   = 'https://github.com/dsccommunity/StorageDsc'
