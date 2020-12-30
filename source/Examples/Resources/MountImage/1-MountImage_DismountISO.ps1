@@ -1,5 +1,5 @@
 <#PSScriptInfo
-.VERSION 1.0.0
+.VERSION 1.1.0
 .GUID 12106838-fad0-44c7-b49f-51bfe7109135
 .AUTHOR DSC Community
 .COMPANYNAME DSC Community
@@ -19,7 +19,8 @@
 
 <#
     .DESCRIPTION
-        This configuration will unmount an ISO file that is mounted in S:.
+        This configuration will unmount the ISO file 'c:\Sources\SQL.iso'
+        if mounted as a drive.
 #>
 configuration MountImage_DismountISO
 {
@@ -28,7 +29,6 @@ configuration MountImage_DismountISO
     MountImage ISO
     {
         ImagePath = 'c:\Sources\SQL.iso'
-        DriveLetter = 'S'
         Ensure = 'Absent'
     }
 }
