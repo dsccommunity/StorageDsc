@@ -64,6 +64,8 @@ Pester:
     - tests/Unit
   ExcludeTag:
   Tag:
+  CodeCoverageOutputFile: JaCoCo_coverage.xml
+  CodeCoverageOutputFileEncoding: ascii
   CodeCoverageThreshold: 70
 
 DscTest:
