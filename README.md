@@ -6,7 +6,6 @@
 [![PowerShell Gallery (with prereleases)](https://img.shields.io/powershellgallery/vpre/StorageDsc?label=StorageDsc%20Preview)](https://www.powershellgallery.com/packages/StorageDsc/)
 [![PowerShell Gallery](https://img.shields.io/powershellgallery/v/StorageDsc?label=StorageDsc)](https://www.powershellgallery.com/packages/StorageDsc/)
 [![codecov](https://codecov.io/gh/dsccommunity/StorageDsc/branch/main/graph/badge.svg)](https://codecov.io/gh/dsccommunity/StorageDsc)
-![Azure DevOps coverage (branch)](https://img.shields.io/azure-devops/coverage/dsccommunity/StorageDsc/14/main)
 
 ## Code of Conduct
 
