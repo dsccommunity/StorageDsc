@@ -4,7 +4,7 @@ class DSC_Disk : OMI_BaseResource
 {
     [Key, Description("Specifies the identifier for which disk to modify.")] String DriveLetter;
     [Required, Description("Specifies the disk identifier for the disk to modify.")] String DiskId;
-    [Write, Description("Specifies the identifier type the DiskId contains. Defaults to Number."), ValueMap{"Number","UniqueId","Guid","Location"}, Values{"Number","UniqueId","Guid","Location"}] String DiskIdType;
+    [Write, Description("Specifies the identifier type the DiskId contains. Defaults to Number."), ValueMap{"Number","UniqueId","Guid","Location","SerialNumber"}, Values{"Number","UniqueId","Guid","Location","SerialNumber"}] String DiskIdType;
     [Write, Description("Specifies the partition style of the disk. Defaults to GPT."), ValueMap{"MBR","GPT"}, Values{"MBR","GPT"}] String PartitionStyle;
     [Write, Description("Specifies the size of new volume. Leave empty to use the remaining free space.")] Uint64 Size;
     [Write, Description("Define volume label if required.")] String FSLabel;
