@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   Azure Pipelines - Fixes [Issue #255](https://github.com/dsccommunity/StorageDsc/issues/255).
 - Updated build to use `Sampler.GitHubTasks` - Fixes [Issue #254](https://github.com/dsccommunity/StorageDsc/issues/254).
 - Updated pipeline tasks to latest pattern.
+- Added serial number as disk identifier to Disk, DiskAccessPath and WaitForDisk resources - Fixes [Issue #259](https://github.com/dsccommunity/StorageDsc/issues/259).
 
 ### Fixed
 
