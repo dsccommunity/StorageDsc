@@ -12,6 +12,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   Azure Pipelines - Fixes [Issue #255](https://github.com/dsccommunity/StorageDsc/issues/255).
 - Updated build to use `Sampler.GitHubTasks` - Fixes [Issue #254](https://github.com/dsccommunity/StorageDsc/issues/254).
 - Updated pipeline tasks to latest pattern.
+- Updated .github issue templates to standard - Fixes [Issue #263](https://github.com/dsccommunity/StorageDsc/issues/263).
+- Added Create_ChangeLog_GitHub_PR task to publish stage of build pipeline.
+- Added SECURITY.md.
+- Updated pipeline Deploy_Module anb Code_Coverage jobs to use ubuntu-latest
+  images - Fixes [Issue #262](https://github.com/dsccommunity/StorageDsc/issues/262).
+- Updated pipeline unit tests and integration tests to use Windows Server 2019 and
+  Windows Server 2022 images - Fixes [Issue #262](https://github.com/dsccommunity/StorageDsc/issues/262).
 
 ### Fixed
 
@@ -19,6 +26,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Corrected example `1-MountImage_DismountISO.ps1` for dismounting
     ISO - Fixes [Issue #221](https://github.com/dsccommunity/StorageDsc/issues/221).
 - Updated `GitVersion.yml` to latest pattern - Fixes [Issue #252](https://github.com/dsccommunity/StorageDsc/issues/252).
+- Fixed pipeline by replacing the GitVersion task in the `azure-pipelines.yml`
+  with a script.
 
 ## [5.0.1] - 2020-08-03
 
