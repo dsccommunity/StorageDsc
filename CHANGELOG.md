@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   images - Fixes [Issue #262](https://github.com/dsccommunity/StorageDsc/issues/262).
 - Updated pipeline unit tests and integration tests to use Windows Server 2019 and
   Windows Server 2022 images - Fixes [Issue #262](https://github.com/dsccommunity/StorageDsc/issues/262).
+- Added support to use disk FriendlyName as a disk identifer - Fixes [Issue #268](https://github.com/dsccommunity/StorageDsc/issues/268).
 
 ### Fixed
 
