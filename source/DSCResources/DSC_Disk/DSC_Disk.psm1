@@ -67,7 +67,7 @@ function Get-TargetResource
         $DiskId,
 
         [Parameter()]
-        [ValidateSet('Number', 'UniqueId', 'Guid', 'Location')]
+        [ValidateSet('Number', 'UniqueId', 'Guid', 'Location', 'FriendlyName')]
         [System.String]
         $DiskIdType = 'Number',
 
@@ -190,7 +190,7 @@ function Set-TargetResource
         $DiskId,
 
         [Parameter()]
-        [ValidateSet('Number', 'UniqueId', 'Guid', 'Location')]
+        [ValidateSet('Number', 'UniqueId', 'Guid', 'Location', 'FriendlyName')]
         [System.String]
         $DiskIdType = 'Number',
 
@@ -687,7 +687,7 @@ function Test-TargetResource
         $DiskId,
 
         [Parameter()]
-        [ValidateSet('Number', 'UniqueId', 'Guid', 'Location')]
+        [ValidateSet('Number', 'UniqueId', 'Guid', 'Location', 'FriendlyName')]
         [System.String]
         $DiskIdType = 'Number',
 
