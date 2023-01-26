@@ -859,6 +859,210 @@ try
             }
         }
 
+        Context 'When partitioning and formatting a newly provisioned disk using SerialNumber with two volumes and assigning Drive Letters' {
+            BeforeAll {
+                # Create a VHD and attach it to the computer
+                $VHDPath = Join-Path -Path $TestDrive `
+                    -ChildPath 'TestDisk.vhd'
+                $null = New-VDisk -Path $VHDPath -SizeInMB 1024
+                $null = Mount-DiskImage -ImagePath $VHDPath -StorageType VHD -NoDriveLetter
+                $diskImage = Get-DiskImage -ImagePath $VHDPath
+                $disk = Get-Disk -Number $diskImage.Number
+                $FSLabelA = 'TestDiskA'
+                $FSLabelB = 'TestDiskB'
+
+                # Get a spare drive letter
+                $lastDrive = ((Get-Volume).DriveLetter | Sort-Object | Select-Object -Last 1)
+                $driveLetterA = [char](([int][char]$lastDrive) + 1)
+                $driveLetterB = [char](([int][char]$lastDrive) + 2)
+            }
+
+            Context "When creating the first volume on Disk Serial Number $($disk.SerialNumber)" {
+                It 'Should compile and apply the MOF without throwing' {
+                    {
+                        # This is to pass to the Config
+                        $configData = @{
+                            AllNodes = @(
+                                @{
+                                    NodeName       = 'localhost'
+                                    DriveLetter    = $driveLetterA
+                                    DiskId         = $disk.SerialNumber
+                                    DiskIdType     = 'SerialNumber'
+                                    PartitionStyle = 'GPT'
+                                    FSLabel        = $FSLabelA
+                                    Size           = 100MB
+                                }
+                            )
+                        }
+
+                        & "$($script:dscResourceName)_Config" `
+                            -OutputPath $TestDrive `
+                            -ConfigurationData $configData
+
+                        Start-DscConfiguration `
+                            -Path $TestDrive `
+                            -ComputerName localhost `
+                            -Wait `
+                            -Verbose `
+                            -Force `
+                            -ErrorAction Stop
+                    } | Should -Not -Throw
+                }
+
+                It 'Should be able to call Get-DscConfiguration without throwing' {
+                    { $script:currentConfiguration = Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
+                }
+
+                It 'Should have set the resource and all the parameters should match' {
+                    $current = $script:currentConfiguration | Where-Object -FilterScript {
+                        $_.ConfigurationName -eq "$($script:dscResourceName)_Config"
+                    }
+                    $current.DiskId         | Should -Be $disk.SerialNumber
+                    $current.DriveLetter    | Should -Be $driveLetterA
+                    $current.PartitionStyle | Should -Be 'GPT'
+                    $current.FSLabel        | Should -Be $FSLabelA
+                    $current.Size           | Should -Be 100MB
+                }
+            }
+
+            Context "When resizing the first volume on Disk Serial Number $($disk.SerialNumber) and allowing the disk to be cleared" {
+                <#
+                    There is an issue with Format-Volume that occurs when formatting a volume
+                    with ReFS in Windows Server 2019 (build 17763 and above). Therefore on
+                    Windows Server 2019 the integration tests will use NTFS only.
+                    See Issue #227: https://github.com/dsccommunity/StorageDsc/issues/227
+                #>
+                if ((Get-CimInstance -ClassName WIN32_OperatingSystem).BuildNumber -ge 17763)
+                {
+                    $FSFormat = 'NTFS'
+                }
+                else
+                {
+                    $FSFormat = 'ReFS'
+                }
+
+                It 'Should compile and apply the MOF without throwing' {
+                    {
+                        # This is to pass to the Config
+                        $configData = @{
+                            AllNodes = @(
+                                @{
+                                    NodeName       = 'localhost'
+                                    DriveLetter    = $driveLetterA
+                                    DiskId         = $disk.SerialNumber
+                                    DiskIdType     = 'SerialNumber'
+                                    PartitionStyle = 'GPT'
+                                    FSLabel        = $FSLabelA
+                                    Size           = 900MB
+                                    FSFormat       = $FSFormat
+                                }
+                            )
+                        }
+
+                        & "$($script:dscResourceName)_ConfigClearDisk" `
+                            -OutputPath $TestDrive `
+                            -ConfigurationData $configData
+
+                        Start-DscConfiguration `
+                            -Path $TestDrive `
+                            -ComputerName localhost `
+                            -Wait `
+                            -Verbose `
+                            -Force `
+                            -ErrorAction Stop
+                    } | Should -Not -Throw
+                }
+
+                It 'Should be able to call Get-DscConfiguration without throwing' {
+                    { $script:currentConfiguration = Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
+                }
+
+                It 'Should have set the resource and all the parameters should match' {
+                    $current = $script:currentConfiguration | Where-Object -FilterScript {
+                        $_.ConfigurationName -eq "$($script:dscResourceName)_ConfigClearDisk"
+                    }
+                    $current.DiskId         | Should -Be $disk.SerialNumber
+                    $current.DriveLetter    | Should -Be $driveLetterA
+                    $current.PartitionStyle | Should -Be 'GPT'
+                    $current.FSLabel        | Should -Be $FSLabelA
+                    $current.Size           | Should -Be 900MB
+                    $current.FSFormat       | Should -Be $FSFormat
+                }
+            }
+
+            Context "When creating second volume on Disk Serial Number $($disk.SerialNumber)" {
+                It 'Should compile and apply the MOF without throwing' {
+                    {
+                        # This is to pass to the Config
+                        $configData = @{
+                            AllNodes = @(
+                                @{
+                                    NodeName       = 'localhost'
+                                    DriveLetter    = $driveLetterB
+                                    DiskId         = $disk.SerialNumber
+                                    DiskIdType     = 'SerialNumber'
+                                    PartitionStyle = 'GPT'
+                                    FSLabel        = $FSLabelB
+                                }
+                            )
+                        }
+
+                        & "$($script:dscResourceName)_Config" `
+                            -OutputPath $TestDrive `
+                            -ConfigurationData $configData
+
+                        Start-DscConfiguration `
+                            -Path $TestDrive `
+                            -ComputerName localhost `
+                            -Wait `
+                            -Verbose `
+                            -Force `
+                            -ErrorAction Stop
+                    } | Should -Not -Throw
+                }
+
+                It 'Should be able to call Get-DscConfiguration without throwing' {
+                    { $script:currentConfiguration = Get-DscConfiguration -Verbose -ErrorAction Stop } | Should -Not -Throw
+                }
+
+                It 'Should have set the resource and all the parameters should match' {
+                    $current = $script:currentConfiguration | Where-Object -FilterScript {
+                        $_.ConfigurationName -eq "$($script:dscResourceName)_Config"
+                    }
+                    $current.DiskId         | Should -Be $disk.SerialNumber
+                    $current.PartitionStyle | Should -Be 'GPT'
+                    $current.DriveLetter    | Should -Be $driveLetterB
+                    $current.FSLabel        | Should -Be $FSLabelB
+                    <#
+                        The size of the volume differs depending on OS.
+                        - Windows Server 2016: 96337920
+                        - Windows Server 2019: 113180672
+                        The reason for this difference is not known, but Get-PartitionSupportedSize
+                        does return correct and expected values for each OS.
+                    #>
+                    $current.Size           | Should -BeIn @(96337920,113180672)
+                }
+            }
+
+            # A system partition will have been added to the disk as well as the 2 test partitions
+            It 'Should have 3 partitions on disk' {
+                ($disk | Get-Partition).Count | Should -Be 3
+            }
+
+            It "Should have attached drive $driveLetterA" {
+                Get-PSDrive -Name $driveLetterA -ErrorAction SilentlyContinue | Should -Not -BeNullOrEmpty
+            }
+
+            It "Should have attached drive $driveLetterB" {
+                Get-PSDrive -Name $driveLetterB -ErrorAction SilentlyContinue | Should -Not -BeNullOrEmpty
+            }
+
+            AfterAll {
+                $null = Dismount-DiskImage -ImagePath $VHDPath -StorageType VHD
+                $null = Remove-Item -Path $VHDPath -Force
+            }
+        }
+
         Context 'When partitioning and formating a newly provisioned disk using Guid with two volumes and assign Drive Letters' {
             BeforeAll {
                 # Create a VHD and attach it to the computer

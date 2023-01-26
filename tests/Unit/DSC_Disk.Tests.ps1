@@ -36,12 +36,14 @@ try
         $script:testDiskNumber = 1
         $script:testDiskUniqueId = 'TESTDISKUNIQUEID'
         $script:testDiskFriendlyName = 'TESTDISKFRIENDLYNAME'
+        $script:testDiskSerialNumber = 'TESTDISKSERIALNUMBER'
         $script:testDiskGptGuid = [guid]::NewGuid()
 
         $script:mockedDisk0Gpt = [pscustomobject] @{
             Number         = $script:testDiskNumber
             UniqueId       = $script:testDiskUniqueId
             FriendlyName   = $script:testDiskFriendlyName
+            SerialNumber   = $script:testDiskSerialNumber
             Guid           = $script:testDiskGptGuid
             IsOffline      = $false
             IsReadOnly     = $false
@@ -52,6 +54,7 @@ try
             Number         = $script:testDiskNumber
             UniqueId       = $script:testDiskUniqueId
             FriendlyName   = $script:testDiskFriendlyName
+            SerialNumber   = $script:testDiskSerialNumber
             Guid           = ''
             IsOffline      = $false
             IsReadOnly     = $false
@@ -62,6 +65,7 @@ try
             Number         = $script:testDiskNumber
             UniqueId       = $script:testDiskUniqueId
             FriendlyName   = $script:testDiskFriendlyName
+            SerialNumber   = $script:testDiskSerialNumber
             Guid           = ''
             IsOffline      = $false
             IsReadOnly     = $false
@@ -72,6 +76,7 @@ try
             Number         = $script:testDiskNumber
             UniqueId       = $script:testDiskUniqueId
             FriendlyName   = $script:testDiskFriendlyName
+            SerialNumber   = $script:testDiskSerialNumber
             Guid           = $script:testDiskGptGuid
             IsOffline      = $true
             IsReadOnly     = $false
@@ -82,6 +87,7 @@ try
             Number         = $script:testDiskNumber
             UniqueId       = $script:testDiskUniqueId
             FriendlyName   = $script:testDiskFriendlyName
+            SerialNumber   = $script:testDiskSerialNumber
             Guid           = ''
             IsOffline      = $true
             IsReadOnly     = $false
@@ -92,6 +98,7 @@ try
             Number         = $script:testDiskNumber
             UniqueId       = $script:testDiskUniqueId
             FriendlyName   = $script:testDiskFriendlyName
+            SerialNumber   = $script:testDiskSerialNumber
             Guid           = $script:testDiskGptGuid
             IsOffline      = $false
             IsReadOnly     = $true
@@ -659,6 +666,73 @@ try
                 }
             }
 
+            Context 'When online GPT disk with a partition/volume and correct Drive Letter assigned using Disk Serial Number' {
+                # verifiable (should be called) mocks
+                Mock `
+                    -CommandName Get-CimInstance `
+                    -MockWith { $script:mockedCim } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-DiskByIdentifier `
+                    -ParameterFilter { $DiskId -eq $script:mockedDisk0Gpt.SerialNumber -and $DiskIdType -eq 'SerialNumber' } `
+                    -MockWith { $script:mockedDisk0Gpt } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-Partition `
+                    -MockWith { $script:mockedPartition } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-Volume `
+                    -MockWith { $script:mockedVolume } `
+                    -Verifiable
+
+                $resource = Get-TargetResource `
+                    -DiskId $script:mockedDisk0Gpt.SerialNumber `
+                    -DiskIdType 'SerialNumber' `
+                    -DriveLetter $script:testDriveLetter `
+                    -Verbose
+
+                It "Should return DiskId $($script:mockedDisk0Gpt.SerialNumber)" {
+                    $resource.DiskId | Should -Be $script:mockedDisk0Gpt.SerialNumber
+                }
+
+                It "Should return PartitionStyle $($script:mockedDisk0Gpt.PartitionStyle)" {
+                    $resource.PartitionStyle | Should -Be $script:mockedDisk0Gpt.PartitionStyle
+                }
+
+                It "Should return DriveLetter $($script:testDriveLetter)" {
+                    $resource.DriveLetter | Should -Be $script:testDriveLetter
+                }
+
+                It "Should return size $($script:mockedPartition.Size)" {
+                    $resource.Size | Should -Be $script:mockedPartition.Size
+                }
+
+                It "Should return FSLabel $($script:mockedVolume.FileSystemLabel)" {
+                    $resource.FSLabel | Should -Be $script:mockedVolume.FileSystemLabel
+                }
+
+                It "Should return AllocationUnitSize $($script:mockedCim.BlockSize)" {
+                    $resource.AllocationUnitSize | Should -Be $script:mockedCim.BlockSize
+                }
+
+                It "Should return FSFormat $($script:mockedVolume.FileSystem)" {
+                    $resource.FSFormat | Should -Be $script:mockedVolume.FileSystem
+                }
+
+                It 'Should call the correct mocks' {
+                    Assert-VerifiableMock
+                    Assert-MockCalled -CommandName Get-CimInstance -Exactly 1
+                    Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly 1 `
+                        -ParameterFilter { $DiskId -eq $script:mockedDisk0Gpt.SerialNumber -and $DiskIdType -eq 'SerialNumber' }
+                    Assert-MockCalled -CommandName Get-Partition -Exactly 1
+                    Assert-MockCalled -CommandName Get-Volume -Exactly 1
+                }
+            }
+
             Context 'When online GPT disk with a partition/volume and correct Drive Letter assigned using Disk Guid' {
                 # verifiable (should be called) mocks
                 Mock `
@@ -1167,6 +1241,73 @@ try
                     Assert-VerifiableMock
                     Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 1 `
                         -ParameterFilter { $DiskId -eq $script:mockedDisk0GptOffline.FriendlyName -and $DiskIdType -eq 'FriendlyName' }
+                    Assert-MockCalled -CommandName Set-Disk -Exactly -Times 1
+                    Assert-MockCalled -CommandName Initialize-Disk -Exactly -Times 0
+                    Assert-MockCalled -CommandName Get-Partition -Exactly -Times 4
+                    Assert-MockCalled -CommandName Get-Volume -Exactly -Times 1
+                    Assert-MockCalled -CommandName New-Partition -Exactly -Times 1 `
+                        -ParameterFilter {
+                        $DriveLetter -eq $script:testDriveLetter
+                    }
+                    Assert-MockCalled -CommandName Format-Volume -Exactly -Times 1
+                    Assert-MockCalled -CommandName Set-Partition -Exactly -Times 1
+                }
+            }
+
+            Context 'When offline GPT disk using Disk Serial Number' {
+                # verifiable (should be called) mocks
+                Mock `
+                    -CommandName Get-DiskByIdentifier `
+                    -ParameterFilter { $DiskId -eq $script:mockedDisk0GptOffline.SerialNumber -and $DiskIdType -eq 'SerialNumber' } `
+                    -MockWith { $script:mockedDisk0GptOffline } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Set-Disk `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-Partition `
+                    -Verifiable
+
+                Mock `
+                    -CommandName New-Partition `
+                    -ParameterFilter {
+                    $DriveLetter -eq $script:testDriveLetter
+                } `
+                    -MockWith { $script:mockedPartitionNoDriveLetter } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-Volume `
+                    -MockWith { $script:mockedVolumeUnformatted } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Format-Volume `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Set-Partition `
+                    -Verifiable
+
+                # mocks that should not be called
+                Mock -CommandName Initialize-Disk
+
+                It 'Should not throw an exception' {
+                    {
+                        Set-TargetResource `
+                            -DiskId $script:mockedDisk0GptOffline.SerialNumber `
+                            -DiskIdType 'SerialNumber' `
+                            -Driveletter $script:testDriveLetter `
+                            -Verbose
+                    } | Should -Not -Throw
+                }
+
+                It 'Should call the correct mocks' {
+                    Assert-VerifiableMock
+                    Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 1 `
+                        -ParameterFilter { $DiskId -eq $script:mockedDisk0GptOffline.SerialNumber -and $DiskIdType -eq 'SerialNumber' }
                     Assert-MockCalled -CommandName Set-Disk -Exactly -Times 1
                     Assert-MockCalled -CommandName Initialize-Disk -Exactly -Times 0
                     Assert-MockCalled -CommandName Get-Partition -Exactly -Times 4
@@ -2640,6 +2781,46 @@ try
                     Assert-VerifiableMock
                     Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 1 `
                         -ParameterFilter { $DiskId -eq $script:mockedDisk0GptOffline.FriendlyName -and $DiskIdType -eq 'FriendlyName' }
+                    Assert-MockCalled -CommandName Get-Partition -Exactly -Times 0
+                    Assert-MockCalled -CommandName Get-Volume -Exactly -Times 0
+                    Assert-MockCalled -CommandName Get-CimInstance -Exactly -Times 0
+                }
+            }
+
+            Context 'When testing disk offline using Serial Number' {
+                # verifiable (should be called) mocks
+                Mock `
+                    -CommandName Get-DiskByIdentifier `
+                    -ParameterFilter { $DiskId -eq $script:mockedDisk0Gpt.SerialNumber -and $DiskIdType -eq 'SerialNumber' } `
+                    -MockWith { $script:mockedDisk0GptOffline } `
+                    -Verifiable
+
+                # mocks that should not be called
+                Mock -CommandName Get-Volume
+                Mock -CommandName Get-Partition
+                Mock -CommandName Get-CimInstance
+
+                $script:result = $null
+
+                It 'Should not throw an exception' {
+                    {
+                        $script:result = Test-TargetResource `
+                            -DiskId $script:mockedDisk0GptOffline.SerialNumber `
+                            -DiskIdType 'SerialNumber' `
+                            -DriveLetter $script:testDriveLetter `
+                            -AllocationUnitSize 4096 `
+                            -Verbose
+                    } | Should -Not -Throw
+                }
+
+                It 'Should be false' {
+                    $script:result | Should -Be $false
+                }
+
+                It 'Should call the correct mocks' {
+                    Assert-VerifiableMock
+                    Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 1 `
+                        -ParameterFilter { $DiskId -eq $script:mockedDisk0GptOffline.SerialNumber -and $DiskIdType -eq 'SerialNumber' }
                     Assert-MockCalled -CommandName Get-Partition -Exactly -Times 0
                     Assert-MockCalled -CommandName Get-Volume -Exactly -Times 0
                     Assert-MockCalled -CommandName Get-CimInstance -Exactly -Times 0
