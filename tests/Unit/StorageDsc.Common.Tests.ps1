@@ -36,7 +36,11 @@ InModuleScope $script:subModuleName {
 
             [Parameter()]
             [System.String]
-            $UniqueId
+            $UniqueId,
+
+            [Parameter()]
+            [System.String]
+            $FriendlyName
         )
     }
 
@@ -300,14 +304,15 @@ InModuleScope $script:subModuleName {
             }
         }
 
-        Context 'Disk exists that matches the specified Disk FriendlyName' {
+        Context 'Disk exists that matches the specified Disk Friendly Name' {
             Mock `
                 -CommandName Get-Disk `
                 -MockWith { $mockedDisk } `
                 -ModuleName StorageDsc.Common `
+                -ParameterFilter { $FriendlyName -eq $testDiskFriendlyName } `
                 -Verifiable
 
-            It "Should return Disk with Disk FriendlyName $testDiskFriendlyName" {
+            It "Should return Disk with Disk Friendly Name $testDiskFriendlyName" {
                 (Get-DiskByIdentifier -DiskId $testDiskFriendlyName -DiskIdType 'FriendlyName').FriendlyName | Should -Be $testDiskFriendlyName
             }
 
@@ -316,18 +321,20 @@ InModuleScope $script:subModuleName {
                 Assert-MockCalled `
                     -CommandName Get-Disk `
                     -ModuleName StorageDsc.Common `
+                    -ParameterFilter { $FriendlyName -eq $testDiskFriendlyName } `
                     -Exactly `
                     -Times 1
             }
         }
 
-        Context 'Disk does not exist that matches the specified Disk FriendlyName' {
+        Context 'Disk does not exist that matches the specified Disk Friendly Name' {
             Mock `
                 -CommandName Get-Disk `
                 -ModuleName StorageDsc.Common `
+                -ParameterFilter { $FriendlyName -eq $testDiskFriendlyName } `
                 -Verifiable
 
-            It "Should return Disk with Disk FriendlyName $testDiskFriendlyName" {
+            It "Should return Disk with Disk Friendly Name $testDiskFriendlyName" {
                 Get-DiskByIdentifier -DiskId $testDiskFriendlyName -DiskIdType 'FriendlyName' | Should -BeNullOrEmpty
             }
 
@@ -336,6 +343,7 @@ InModuleScope $script:subModuleName {
                 Assert-MockCalled `
                     -CommandName Get-Disk `
                     -ModuleName StorageDsc.Common `
+                    -ParameterFilter { $FriendlyName -eq $testDiskFriendlyName } `
                     -Exactly `
                     -Times 1
             }
