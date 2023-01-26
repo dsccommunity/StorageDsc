@@ -358,6 +358,40 @@ try
             )
         }
 
+        function Clear-Disk
+        {
+            [CmdletBinding()]
+            param
+            (
+                [Parameter(ValueFromPipeline)]
+                $Disk,
+
+                [Parameter()]
+                [System.UInt32]
+                $Number,
+
+                [Parameter()]
+                [System.String]
+                $UniqueID,
+
+                [Parameter()]
+                [System.String]
+                $FriendlyName,
+
+                [Parameter()]
+                [System.Boolean]
+                $Confirm,
+
+                [Parameter()]
+                [Switch]
+                $RemoveData,
+
+                [Parameter()]
+                [Switch]
+                $RemoveOEM
+            )
+        }
+
         Describe 'DSC_Disk\Get-TargetResource' {
             Context 'When online GPT disk with a partition/volume and correct Drive Letter assigned using Disk Number' {
                 # verifiable (should be called) mocks
@@ -2444,6 +2478,7 @@ try
                     Assert-MockCalled -CommandName Format-Volume -Exactly -Times 0
                     Assert-MockCalled -CommandName Set-Partition -Exactly -Times 0
                     Assert-MockCalled -CommandName Set-Volume -Exactly -Times 1
+                    Assert-MockCalled -CommandName Clear-Disk -Exactly -Times 1
                 }
             }
         }

@@ -272,7 +272,7 @@ function Set-TargetResource
                 $($script:localizedData.ClearingDiskMessage -f $DiskIdType, $DiskId)
             ) -join '' )
 
-        Clear-Disk -InputObject $disk -RemoveData -RemoveOEM -Confirm:$false
+        $disk | Clear-Disk -RemoveData -RemoveOEM -Confirm:$false
 
         # Requery the disk
         $disk = Get-DiskByIdentifier `

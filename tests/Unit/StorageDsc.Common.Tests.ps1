@@ -197,14 +197,16 @@ InModuleScope $script:subModuleName {
         BeforeAll {
             $testDiskNumber = 10
             $testDiskUniqueId = 'DiskUniqueId'
+            $testDiskFriendlyName = 'DiskFriendlyName'
             $testDiskGuid = [Guid]::NewGuid().ToString()
             $testDiskLocation = 'Integrated : Adapter 0 : Port 0 : Target 0 : LUN 10'
 
             $mockedDisk = [pscustomobject] @{
-                Number   = $testDiskNumber
-                UniqueId = $testDiskUniqueId
-                Guid     = $testDiskGuid
-                Location = $testDiskLocation
+                Number       = $testDiskNumber
+                UniqueId     = $testDiskUniqueId
+                FriendlyName = $testDiskFriendlyName
+                Guid         = $testDiskGuid
+                Location     = $testDiskLocation
             }
         }
 
@@ -293,6 +295,47 @@ InModuleScope $script:subModuleName {
                     -CommandName Get-Disk `
                     -ModuleName StorageDsc.Common `
                     -ParameterFilter { $UniqueId -eq $testDiskUniqueId } `
+                    -Exactly `
+                    -Times 1
+            }
+        }
+
+        Context 'Disk exists that matches the specified Disk FriendlyName' {
+            Mock `
+                -CommandName Get-Disk `
+                -MockWith { $mockedDisk } `
+                -ModuleName StorageDsc.Common `
+                -Verifiable
+
+            It "Should return Disk with Disk FriendlyName $testDiskFriendlyName" {
+                (Get-DiskByIdentifier -DiskId $testDiskFriendlyName -DiskIdType 'FriendlyName').FriendlyName | Should -Be $testDiskFriendlyName
+            }
+
+            It 'Should call expected mocks' {
+                Assert-VerifiableMock
+                Assert-MockCalled `
+                    -CommandName Get-Disk `
+                    -ModuleName StorageDsc.Common `
+                    -Exactly `
+                    -Times 1
+            }
+        }
+
+        Context 'Disk does not exist that matches the specified Disk FriendlyName' {
+            Mock `
+                -CommandName Get-Disk `
+                -ModuleName StorageDsc.Common `
+                -Verifiable
+
+            It "Should return Disk with Disk FriendlyName $testDiskFriendlyName" {
+                Get-DiskByIdentifier -DiskId $testDiskFriendlyName -DiskIdType 'FriendlyName' | Should -BeNullOrEmpty
+            }
+
+            It 'Should call expected mocks' {
+                Assert-VerifiableMock
+                Assert-MockCalled `
+                    -CommandName Get-Disk `
+                    -ModuleName StorageDsc.Common `
                     -Exactly `
                     -Times 1
             }
