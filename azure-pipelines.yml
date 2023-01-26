@@ -24,7 +24,7 @@ stages:
       - job: Package_Module
         displayName: 'Package Module'
         pool:
-          vmImage: 'ubuntu-latest'
+          vmImage: 'ubuntu-20.04'
         steps:
           - pwsh: |
               dotnet tool install --global GitVersion.Tool

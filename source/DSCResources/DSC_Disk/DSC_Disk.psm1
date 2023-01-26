@@ -67,7 +67,7 @@ function Get-TargetResource
         $DiskId,
 
         [Parameter()]
-        [ValidateSet('Number', 'UniqueId', 'Guid', 'Location')]
+        [ValidateSet('Number', 'UniqueId', 'Guid', 'Location', 'FriendlyName')]
         [System.String]
         $DiskIdType = 'Number',
 
@@ -190,7 +190,7 @@ function Set-TargetResource
         $DiskId,
 
         [Parameter()]
-        [ValidateSet('Number', 'UniqueId', 'Guid', 'Location')]
+        [ValidateSet('Number', 'UniqueId', 'Guid', 'Location', 'FriendlyName')]
         [System.String]
         $DiskIdType = 'Number',
 
@@ -272,7 +272,7 @@ function Set-TargetResource
                 $($script:localizedData.ClearingDiskMessage -f $DiskIdType, $DiskId)
             ) -join '' )
 
-        $disk | Clear-Disk -RemoveData -RemoveOEM -Confirm:$true
+        $disk | Clear-Disk -RemoveData -RemoveOEM -Confirm:$false
 
         # Requery the disk
         $disk = Get-DiskByIdentifier `
@@ -687,7 +687,7 @@ function Test-TargetResource
         $DiskId,
 
         [Parameter()]
-        [ValidateSet('Number', 'UniqueId', 'Guid', 'Location')]
+        [ValidateSet('Number', 'UniqueId', 'Guid', 'Location', 'FriendlyName')]
         [System.String]
         $DiskIdType = 'Number',
 

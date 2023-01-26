@@ -3,13 +3,13 @@
 This resource is used to wait for a disk to become available.
 The disk to wait for is selected by specifying the _DiskId_ and optionally
 _DiskIdType_.
-The _DiskId_ value can be a _Disk Number_, _Unique Id_, _Guid_ or _Location_.
+The _DiskId_ value can be a _Disk Number_, _Unique Id_, _Guid_, _Location_ or _FriendlyName_.
 
 **Important: The _Disk Number_ is not a reliable method of selecting a disk because
 it has been shown to change between reboots in some environments.
 It is recommended to use the _Unique Id_ if possible.**
 
-The _Disk Number_, _Unique Id_, _Guid_ and _Location_ can be identified for a
+The _Disk Number_, _Unique Id_, _Guid_, _Location_ and _FriendlyName_ can be identified for a
 disk by using the PowerShell command:
 
 ```powershell

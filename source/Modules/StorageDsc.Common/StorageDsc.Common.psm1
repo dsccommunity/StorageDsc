@@ -160,14 +160,14 @@ function Get-DiskByIdentifier
         $DiskId,
 
         [Parameter()]
-        [ValidateSet('Number','UniqueId','Guid','Location')]
+        [ValidateSet('Number','UniqueId','Guid','Location','FriendlyName')]
         [System.String]
         $DiskIdType = 'Number'
     )
 
     switch -regex ($DiskIdType)
     {
-        'Number|UniqueId' # for filters supported by the Get-Disk CmdLet
+        'Number|UniqueId|FriendlyName' # for filters supported by the Get-Disk CmdLet
         {
             $diskIdParameter = @{
                 $DiskIdType = $DiskId
