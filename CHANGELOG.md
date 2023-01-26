@@ -22,6 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added support to use disk FriendlyName as a disk identifer - Fixes [Issue #268](https://github.com/dsccommunity/StorageDsc/issues/268).
 - Pin Azure build agent vmImage to ubuntu-20.04  - Fixes [Issue #270] (https://github.com/dsccommunity/StorageDsc/issues/270).
 - Remove confirmation prompt when Clear-Disk is called
+- Refactored Clear-Disk call to pass $disk as an input object and add mock verification test
 
 ### Fixed
 
