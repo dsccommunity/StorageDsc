@@ -859,7 +859,7 @@ try
             }
         }
 
-        if ($false) # These serial number integration tests can be ran locally with modications
+        if ($false) # These serial number integration tests can be ran locally with modifications
         {
             Context 'When partitioning and formatting a newly provisioned disk using SerialNumber with two volumes and assigning Drive Letters' {
                 BeforeAll {
