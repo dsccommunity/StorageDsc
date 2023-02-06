@@ -33,8 +33,6 @@ The **StorageDsc** module contains the following resources:
 - **MountImage**: used to mount or unmount an ISO/VHD disk image. It can be
     mounted as read-only (ISO, VHD, VHDx) or read/write (VHD, VHDx).
 - **Disk**: used to initialize, format and mount the partition as a drive letter.
-    NOTE: Integration tests are not ran for Get-DiskByIdentifier when SerialNumber
-    is used since the virtual disk being created does not have a serial number.
 - **DiskAccessPath**: used to initialize, format and mount the partition to a
     folder access path.
 - **OpticalDiskDriveLetter**: used to change the drive letter of an optical

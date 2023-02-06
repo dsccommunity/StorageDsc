@@ -23,6 +23,10 @@ identifier for disks with `GPT` partition table format. If the disk is `RAW`
 be used. This is because the _Guid_ for a disk is only assigned once the partition
 table for the disk has been created.
 
+# Testing
+Note: Integration tests are not run for the Disk resource when SerialNumber
+is used since the virtual disk that is created does not have a serial number.
+
 ## Known Issues
 
 ### Defragsvc Conflict
