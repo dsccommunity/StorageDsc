@@ -4,17 +4,17 @@ The resource is used to initialize, format and mount the partition/volume as a d
 letter.
 The disk to add the partition/volume to is selected by specifying the _DiskId_ and
 optionally _DiskIdType_.
-The _DiskId_ value can be a _Disk Number_, _Unique Id_,  _Guid_, _Location_ or _FriendlyName_.
+The _DiskId_ value can be a _Disk Number_, _Unique Id_,  _Guid_, _Location_, _FriendlyName_ or _SerialNumber_.
 
 **Important: The _Disk Number_ is not a reliable method of selecting a disk because
 it has been shown to change between reboots in some environments.
 It is recommended to use the _Unique Id_ if possible.**
 
-The _Disk Number_, _Unique Id_, _Guid_, _Location_ and _FriendlyName_ can be identified for a
+The _Disk Number_, _Unique Id_, _Guid_, _Location_, _FriendlyName_ and _SerialNumber_ can be identified for a
 disk by using the PowerShell command:
 
 ```powershell
-Get-Disk | Select-Object -Property FriendlyName,DiskNumber,UniqueId,Guid,Location
+Get-Disk | Select-Object -Property FriendlyName,DiskNumber,UniqueId,Guid,Location,SerialNumber
 ```
 
 Note: The _Guid_ identifier method of specifying disks is only supported as an
@@ -22,6 +22,10 @@ identifier for disks with `GPT` partition table format. If the disk is `RAW`
 (e.g. the disk has been initialized) then the _Guid_ identifier method can not
 be used. This is because the _Guid_ for a disk is only assigned once the partition
 table for the disk has been created.
+
+# Testing
+Note: Integration tests are not run for the Disk resource when SerialNumber
+is used since the virtual disk that is created does not have a serial number.
 
 ## Known Issues
 

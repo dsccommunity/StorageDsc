@@ -40,7 +40,11 @@ InModuleScope $script:subModuleName {
 
             [Parameter()]
             [System.String]
-            $FriendlyName
+            $FriendlyName,
+
+            [Parameter()]
+            [System.String]
+            $SerialNumber
         )
     }
 
@@ -202,6 +206,7 @@ InModuleScope $script:subModuleName {
             $testDiskNumber = 10
             $testDiskUniqueId = 'DiskUniqueId'
             $testDiskFriendlyName = 'DiskFriendlyName'
+            $testDiskSerialNumber = 'DiskSerialNumber'
             $testDiskGuid = [Guid]::NewGuid().ToString()
             $testDiskLocation = 'Integrated : Adapter 0 : Port 0 : Target 0 : LUN 10'
 
@@ -209,6 +214,7 @@ InModuleScope $script:subModuleName {
                 Number       = $testDiskNumber
                 UniqueId     = $testDiskUniqueId
                 FriendlyName = $testDiskFriendlyName
+                SerialNumber = $testDiskSerialNumber
                 Guid         = $testDiskGuid
                 Location     = $testDiskLocation
             }
@@ -344,6 +350,51 @@ InModuleScope $script:subModuleName {
                     -CommandName Get-Disk `
                     -ModuleName StorageDsc.Common `
                     -ParameterFilter { $FriendlyName -eq $testDiskFriendlyName } `
+                    -Exactly `
+                    -Times 1
+            }
+        }
+
+        Context 'Disk exists that matches the specified Disk Serial Number' {
+            Mock `
+                -CommandName Get-Disk `
+                -MockWith { $mockedDisk } `
+                -ModuleName StorageDsc.Common `
+                -ParameterFilter { $SerialNumber -eq $testDiskSerialNumber } `
+                -Verifiable
+
+            It "Should return Disk with Disk Serial Number $testDiskSerialNumber" {
+                (Get-DiskByIdentifier -DiskId $testDiskSerialNumber -DiskIdType 'SerialNumber').SerialNumber | Should -Be $testDiskSerialNumber
+            }
+
+            It 'Should call expected mocks' {
+                Assert-VerifiableMock
+                Assert-MockCalled `
+                    -CommandName Get-Disk `
+                    -ModuleName StorageDsc.Common `
+                    -ParameterFilter { $SerialNumber -eq $testDiskSerialNumber } `
+                    -Exactly `
+                    -Times 1
+            }
+        }
+
+        Context 'Disk does not exist that matches the specified Disk Serial Number' {
+            Mock `
+                -CommandName Get-Disk `
+                -ModuleName StorageDsc.Common `
+                -ParameterFilter { $SerialNumber -eq $testDiskSerialNumber } `
+                -Verifiable
+
+            It "Should return Disk with Disk Serial Number $testDiskSerialNumber" {
+                Get-DiskByIdentifier -DiskId $testDiskSerialNumber -DiskIdType 'SerialNumber' | Should -BeNullOrEmpty
+            }
+
+            It 'Should call expected mocks' {
+                Assert-VerifiableMock
+                Assert-MockCalled `
+                    -CommandName Get-Disk `
+                    -ModuleName StorageDsc.Common `
+                    -ParameterFilter { $SerialNumber -eq $testDiskSerialNumber } `
                     -Exactly `
                     -Times 1
             }

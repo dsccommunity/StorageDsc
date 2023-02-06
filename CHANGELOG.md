@@ -23,6 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Pin Azure build agent vmImage to ubuntu-20.04  - Fixes [Issue #270] (https://github.com/dsccommunity/StorageDsc/issues/270).
 - Remove confirmation prompt when Clear-Disk is called.
 - Add mock Clear-Disk function and verification tests.
+- Added support to use disk SerialNumber as a disk identifer - Fixes [Issue #259](https://github.com/dsccommunity/StorageDsc/issues/259).
 
 ### Fixed
 
