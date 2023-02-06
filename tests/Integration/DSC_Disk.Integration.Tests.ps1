@@ -859,7 +859,12 @@ try
             }
         }
 
-        if ($false) # These serial number integration tests can be ran locally with modifications
+<#
+    Integration tests are disabled for the Disk resource when being tested with 'DiskIdType' set to 'SerialNumber'
+    because the Virtual Disk VHD that is created always has a blank SerialNumber.
+    To test manually, use a physical/logical disk that has a SerialNumber.
+#>
+        if ($false)
         {
             Context 'When partitioning and formatting a newly provisioned disk using SerialNumber with two volumes and assigning Drive Letters' {
                 BeforeAll {
