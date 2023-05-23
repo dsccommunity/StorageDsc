@@ -5,6 +5,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- Added support for changing optical disk drive letter on Windows Server 2022 - Fixes [Issue #274](https://github.com/dsccommunity/StorageDsc/issues/274)
+
 ## [5.1.0] - 2023-02-22
 
 ### Changed

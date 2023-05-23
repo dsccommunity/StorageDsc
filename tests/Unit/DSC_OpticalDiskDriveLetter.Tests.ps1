@@ -92,6 +92,17 @@ try
             Id          = 'W:'
         }
 
+        $script:mockedOSPreServer2022 = [pscustomobject] @{
+            BuildNumber = 17763
+        }
+
+        $script:mockedOSServer2022 = [pscustomobject] @{
+            BuildNumber = 20348
+        }
+
+        $script:opticalDeviceIdMaxLengthPreServer2022 = 10
+        $script:opticalDeviceIdMaxLengthServer2022 = 20
+
         function Set-CimInstance
         {
             Param
@@ -104,6 +115,60 @@ try
                 [hashtable]
                 $Property
             )
+        }
+
+        Describe 'DSC_xOpticalDiskDriveLetter\Get-OpticalDeviceIdMaxLength' {
+            Context 'When OS is pre Windows Server 2022' {
+                Mock `
+                    -CommandName Get-CimInstance `
+                    -ParameterFilter {
+                    $ClassName -eq 'WIN32_OperatingSystem'
+                } `
+                    -MockWith {
+                    $script:mockedOSPreServer2022
+                } `
+                    -Verifiable
+
+                It 'Should not throw an exception' {
+                    {
+                        $script:result = Get-OpticalDeviceIdMaxLength
+                    } | Should -Not -Throw
+                }
+
+                It "Optical DeviceId max length should be $($script:opticalDeviceIdMaxLengthPreServer2022)" {
+                    $script:result | Should -Be $script:opticalDeviceIdMaxLengthPreServer2022
+                }
+
+                It 'Should call all the Get mocks' {
+                    Assert-VerifiableMock
+                }
+            }
+
+            Context 'When OS is Windows Server 2022' {
+                Mock `
+                    -CommandName Get-CimInstance `
+                    -ParameterFilter {
+                    $ClassName -eq 'WIN32_OperatingSystem'
+                } `
+                    -MockWith {
+                    $script:mockedOSServer2022
+                } `
+                    -Verifiable
+
+                It 'Should not throw an exception' {
+                    {
+                        $script:result = Get-OpticalDeviceIdMaxLength
+                    } | Should -Not -Throw
+                }
+
+                It "Optical DeviceId max length should be $($script:opticalDeviceIdMaxLengthServer2022)" {
+                    $script:result | Should -Be $script:opticalDeviceIdMaxLengthServer2022
+                }
+
+                It 'Should call all the Get mocks' {
+                    Assert-VerifiableMock
+                }
+            }
         }
 
         Describe 'DSC_xOpticalDiskDriveLetter\Get-OpticalDiskDriveLetter' {
