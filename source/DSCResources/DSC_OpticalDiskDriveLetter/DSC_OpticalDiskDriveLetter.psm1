@@ -12,6 +12,37 @@ $script:localizedData = Get-LocalizedData -DefaultUICulture 'en-US'
 
 <#
     .SYNOPSIS
+        This helper function returns the expected max length of the Win32_CDROMDrive
+        DeviceId, based on the BuildId of the operating system.
+
+    .NOTES
+        Pre Windows Server 2022 the expected max length is 10,
+        from Windows Server 2022 onwards this is 20.
+#>
+function Get-OpticalDeviceIdMaxLength
+{
+    [CmdletBinding()]
+    [OutputType([System.Int32])]
+    param ()
+
+    Write-Verbose -Message ( @(
+            "$($MyInvocation.MyCommand): "
+            $($script:localizedData.UsingGetCimInstanceToFetchDeviceIdMaxLength -f $DiskId)
+        ) -join '' )
+
+    if ((Get-CimInstance -ClassName WIN32_OperatingSystem).BuildNumber -ge 20348)
+    {
+        $Length = 20
+    }
+    else
+    {
+        $Length = 10
+    }
+    return $Length
+}
+
+<#
+    .SYNOPSIS
         This helper function returns a hashtable containing the current
         drive letter assigned to the optical disk in the system matching
         the disk number.
@@ -59,7 +90,7 @@ function Get-OpticalDiskDriveLetter
         Where-Object -FilterScript {
         -not (
             $_.Caption -eq 'Microsoft Virtual DVD-ROM' -and
-            ($_.DeviceID.Split('\')[-1]).Length -gt 10
+            ($_.DeviceID.Split('\')[-1]).Length -gt (Get-OpticalDeviceIdMaxLength)
         )
     }
 

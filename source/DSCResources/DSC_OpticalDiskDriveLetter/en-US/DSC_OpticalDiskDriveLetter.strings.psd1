@@ -1,4 +1,5 @@
 ConvertFrom-StringData @'
+    UsingGetCimInstanceToFetchDeviceIdMaxLength = Using Get-CimInstance to get the expected max length of optical disk {0}'s DeviceId.
     UsingGetCimInstanceToFetchDriveLetter = Using Get-CimInstance to get the drive letter of optical disk {0} in the system.
     OpticalDiskAssignedDriveLetter = The optical disk {0} is currently assigned drive letter '{1}'.
     OpticalDiskNotAssignedDriveLetter = The optical disk {0} is not currently assigned a drive letter.
