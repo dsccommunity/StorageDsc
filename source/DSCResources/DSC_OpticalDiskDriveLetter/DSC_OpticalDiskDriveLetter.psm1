@@ -22,7 +22,8 @@ $script:localizedData = Get-LocalizedData -DefaultUICulture 'en-US'
 function Get-OpticalDeviceIdMaxLength
 {
     [CmdletBinding()]
-    param()
+    [OutputType([System.Int32])]
+    param ()
 
     Write-Verbose -Message ( @(
             "$($MyInvocation.MyCommand): "
