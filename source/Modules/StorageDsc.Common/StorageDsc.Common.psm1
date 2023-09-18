@@ -222,10 +222,42 @@ function Test-AccessPathAssignedToLocal
     return $accessPathAssigned
 } # end function Test-AccessPathLocal
 
+<#
+    .SYNOPSIS
+        Converts numeric representation of bytes e.g 10737418240 to its string representation
+        10gb. Only Mb, Gb and Tb are supported.
+
+    .PARAMETER Size
+        Size in bytes
+#>
+function ConvertFrom-Bytes
+{
+    [CmdletBinding()]
+    [OutputType([System.String])]
+    param
+    (
+        [Parameter(Mandatory = $true)]
+        [System.UInt64]
+        $Size
+    )
+
+    if ($Size -lt 1GB)
+    {
+        return ($Size / 1MB).ToString("0.00MB")
+    }
+    elseif ($Size -lt 1TB)
+    {
+        return ($Size / 1GB).ToString("0.00GB")
+    }
+
+    return ($Size / 1TB).ToString("0.00TB")
+} # end function ConvertFrom-Bytes
+
 Export-ModuleMember -Function @(
     'Restart-ServiceIfExists',
     'Assert-DriveLetterValid',
     'Assert-AccessPathValid',
     'Get-DiskByIdentifier',
-    'Test-AccessPathAssignedToLocal'
+    'Test-AccessPathAssignedToLocal',
+    'ConvertFrom-Bytes'
 )
