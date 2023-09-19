@@ -55,6 +55,10 @@ $script:localizedData = Get-LocalizedData -DefaultUICulture 'en-US'
     .PARAMETER DevDrive
         Specifies if the volume should be formatted as a Dev Drive.
         This parameter is not used in Get-TargetResource.
+
+    .PARAMETER UseUnallocatedSpace
+        Specifies that a new partition and volume should be formatted onto unallocated space on the disk.
+        This parameter is not used in Get-TargetResource.
 #>
 function Get-TargetResource
 {
@@ -107,7 +111,11 @@ function Get-TargetResource
 
         [Parameter()]
         [System.Boolean]
-        $DevDrive
+        $DevDrive,
+
+        [Parameter()]
+        [System.Boolean]
+        $UseUnallocatedSpace
     )
 
     Write-Verbose -Message ( @(
@@ -136,14 +144,16 @@ function Get-TargetResource
             -ErrorAction SilentlyContinue).BlockSize
 
     return @{
-        DiskId             = $DiskId
-        DiskIdType         = $DiskIdType
-        DriveLetter        = $partition.DriveLetter
-        PartitionStyle     = $disk.PartitionStyle
-        Size               = $partition.Size
-        FSLabel            = $volume.FileSystemLabel
-        AllocationUnitSize = $blockSize
-        FSFormat           = $volume.FileSystem
+        DiskId              = $DiskId
+        DiskIdType          = $DiskIdType
+        DriveLetter         = $partition.DriveLetter
+        PartitionStyle      = $disk.PartitionStyle
+        Size                = $partition.Size
+        FSLabel             = $volume.FileSystemLabel
+        AllocationUnitSize  = $blockSize
+        FSFormat            = $volume.FileSystem
+        DevDrive            = $DevDrive
+        UseUnallocatedSpace = $UseUnallocatedSpace
     }
 } # Get-TargetResource
 
@@ -184,6 +194,9 @@ function Get-TargetResource
 
     .PARAMETER DevDrive
         Specifies if the volume should be formatted as a Dev Drive.
+
+    .PARAMETER UseUnallocatedSpace
+        Specifies that a new partition and volume should be formatted onto unallocated space on the disk.
 #>
 function Set-TargetResource
 {
@@ -237,7 +250,11 @@ function Set-TargetResource
 
         [Parameter()]
         [System.Boolean]
-        $DevDrive
+        $DevDrive,
+
+        [Parameter()]
+        [System.Boolean]
+        $UseUnallocatedSpace
     )
 
     Write-Verbose -Message ( @(
@@ -410,8 +427,11 @@ function Set-TargetResource
             } # if
         } # if
 
-        # Do we need to create a new partition?
-        if (-not $partition)
+        <#
+            Create a new partition when there are no partitions matching user input or if the user has
+            advised us that they want to create a new partition and volume on the disks unallocated space.
+        #>
+        if (-not $partition -bor $UseUnallocatedSpace)
         {
             # Attempt to create a new partition
             $partitionParams = @{
@@ -699,6 +719,9 @@ function Set-TargetResource
 
     .PARAMETER DevDrive
         Specifies if the volume should be formatted as a Dev Drive.
+
+    .PARAMETER UseUnallocatedSpace
+        Specifies that a new partition and volume should be formatted onto unallocated space on the disk.
 #>
 function Test-TargetResource
 {
@@ -751,7 +774,11 @@ function Test-TargetResource
 
         [Parameter()]
         [System.Boolean]
-        $DevDrive
+        $DevDrive,
+
+        [Parameter()]
+        [System.Boolean]
+        $UseUnallocatedSpace
     )
 
     Write-Verbose -Message ( @(
@@ -953,6 +980,7 @@ function Test-TargetResource
     {
         Assert-DevDriveFeatureAvailable
         Assert-DevDriveFormatOnReFsFileSystemOnly -FSFormat $FSFormat
+        Assert-DevDriveSizeMeetsMinimumRequirement -Size $Size
     }
 
     return $true

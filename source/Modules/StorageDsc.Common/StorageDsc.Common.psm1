@@ -258,38 +258,46 @@ function Assert-DevDriveFeatureAvailable
 '@
 
     Add-Type -TypeDefinition $DevDriveDefinitions
+    Write-Verbose -Message ($script:localizedData.CheckingDevDriveEnablementMessage)
 
     $IsApiSetImplemented = [DevDrive.DevDriveHelper]::IsApiSetImplemented("api-ms-win-core-sysinfo-l1-2-6")
-
     if ($IsApiSetImplemented)
     {
-        switch ([DevDrive.DevDriveHelper]::GetDeveloperDriveEnablementState())
+        try
         {
-            ([DevDrive.DEVELOPER_DRIVE_ENABLEMENT_STATE]::DeveloperDriveEnablementStateError)
+            switch ([DevDrive.DevDriveHelper]::GetDeveloperDriveEnablementState())
             {
-                throw $script:localizedData.DevDriveEnablementUnknownError;
+                ([DevDrive.DEVELOPER_DRIVE_ENABLEMENT_STATE]::DeveloperDriveEnablementStateError)
+                {
+                    throw $script:localizedData.DevDriveEnablementUnknownError
+                }
+                ([DevDrive.DEVELOPER_DRIVE_ENABLEMENT_STATE]::DeveloperDriveDisabledBySystemPolicy)
+                {
+                    throw $script:localizedData.DevDriveDisabledBySystemPolicyError
+                }
+                ([DevDrive.DEVELOPER_DRIVE_ENABLEMENT_STATE]::DeveloperDriveDisabledByGroupPolicy)
+                {
+                    throw $script:localizedData.DevDriveDisabledByGroupPolicyError
+                }
+                ([DevDrive.DEVELOPER_DRIVE_ENABLEMENT_STATE]::DeveloperDriveEnabled)
+                {
+                    Write-Verbose -Message ($script:localizedData.DevDriveEnabledMessage)
+                    return
+                }
+                Default
+                {
+                    throw $script:localizedData.DevDriveEnablementUnknownError
+                }
             }
-            ([DevDrive.DEVELOPER_DRIVE_ENABLEMENT_STATE]::DeveloperDriveDisabledBySystemPolicy)
-            {
-                throw $script:localizedData.DevDriveDisabledBySystemPolicyError;
-            }
-            ([DevDrive.DEVELOPER_DRIVE_ENABLEMENT_STATE]::DeveloperDriveDisabledByGroupPolicy)
-            {
-                throw $script:localizedData.DevDriveDisabledByGroupPolicyError;
-            }
-            ([DevDrive.DEVELOPER_DRIVE_ENABLEMENT_STATE]::DeveloperDriveEnabled)
-            {
-                return;
-            }
-            Default {
-                throw $script:localizedData.DevDriveEnablementUnknownError;
-            }
+        }
+        catch [System.EntryPointNotFoundException] # function may not exist in some versions of Windows in the above dll
+        {
+            Write-Error $_.Exception.Message
         }
     }
 
-    # If apiset isn't implemented we should throw since the feature isn't available here.
-    throw $script:localizedData.DevDriveFeatureNotImplementedError;
-
+    # If apiset isn't implemented or we get the EntryPointNotFoundException we should throw since the feature isn't available here.
+    throw $script:localizedData.DevDriveFeatureNotImplementedError
 } # end function Assert-DevDriveFeatureAvailable
 
 <#
@@ -302,7 +310,6 @@ function Assert-DevDriveFeatureAvailable
 function Assert-DevDriveFormatOnReFsFileSystemOnly
 {
     [CmdletBinding()]
-    [OutputType([System.Boolean])]
     param
     (
         [Parameter(Mandatory = $true)]
@@ -313,13 +320,40 @@ function Assert-DevDriveFormatOnReFsFileSystemOnly
 
     if ($FSFormat -ne 'ReFS')
     {
-
         New-InvalidArgumentException `
             -Message $($script:localizedData.DevDriveOnlyAvailableForReFsError -f 'ReFS', $FSFormat) `
             -ArgumentName 'FSFormat'
     }
 
 } # end function Assert-DevDriveFormatOnReFsFileSystemOnly
+
+<#
+    .SYNOPSIS
+        Validates that the user entered a size greater than the minimum for Dev Drive volumes.
+        (The minimum is 50 Gb)
+
+    .PARAMETER FSFormat
+        Specifies the size the user wants to create the Dev Drive with.
+#>
+function Assert-DevDriveSizeMeetsMinimumRequirement
+{
+    [CmdletBinding()]
+    param
+    (
+        [Parameter(Mandatory = $true)]
+        [System.UInt64]
+        $Size
+    )
+
+    # 50 Gb is the minimum size for Dev Drive volumes
+    if ($Size -lt 50Gb)
+    {
+        New-InvalidArgumentException `
+            -Message $($script:localizedData.DevDriveMinimumSizeError) `
+            -ArgumentName 'Size'
+    }
+
+} # end function Assert-DevDriveSizeMeetsMinimumRequirement
 
 Export-ModuleMember -Function @(
     'Restart-ServiceIfExists',
@@ -328,5 +362,6 @@ Export-ModuleMember -Function @(
     'Get-DiskByIdentifier',
     'Test-AccessPathAssignedToLocal',
     'Assert-DevDriveFeatureAvailable',
-    'Assert-DevDriveFormatOnReFsFileSystemOnly'
+    'Assert-DevDriveFormatOnReFsFileSystemOnly',
+    'Assert-DevDriveSizeMeetsMinimumRequirement'
 )

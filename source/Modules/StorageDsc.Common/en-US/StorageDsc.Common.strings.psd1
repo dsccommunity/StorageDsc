@@ -7,4 +7,8 @@ ConvertFrom-StringData @'
     DevDriveEnablementUnknownError = Unable to get Dev Drive enablement status.
     DevDriveDisabledBySystemPolicyError = Dev Drive feature disabled due to system policy.
     DevDriveDisabledByGroupPolicyError =  Dev Drive feature disabled due to group policy.
+    DevDriveEnabledMessage = Dev Drive feature is enabled on this system.
+    CheckingDevDriveEnablementMessage = Checking if the Dev Drive feature is available and enabled on the system.
+    DevDriveFeatureNotImplementedError = Dev Drive feature is not implemented on this system.
+    DevDriveMinimumSizeError = Dev Drive volumes must be 50Gb or more in size.
 '@
