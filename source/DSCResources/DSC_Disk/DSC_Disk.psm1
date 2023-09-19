@@ -952,7 +952,7 @@ function Test-TargetResource
     if ($PSBoundParameters.ContainsKey('DevDrive'))
     {
         Assert-DevDriveFeatureAvailable
-        Assert-DevDriveFormatOnReFsFileSystemOnly $FSFormat
+        Assert-DevDriveFormatOnReFsFileSystemOnly -FSFormat $FSFormat
     }
 
     return $true
