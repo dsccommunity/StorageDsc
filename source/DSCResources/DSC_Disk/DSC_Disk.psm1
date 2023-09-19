@@ -51,6 +51,10 @@ $script:localizedData = Get-LocalizedData -DefaultUICulture 'en-US'
         Specifies if the disks partition schema should be removed entirely, even if data and OEM
         partitions are present. Only possible with AllowDestructive enabled.
         This parameter is not used in Get-TargetResource.
+
+    .PARAMETER DevDrive
+        Specifies if the volume should be formatted as a Dev Drive.
+        This parameter is not used in Get-TargetResource.
 #>
 function Get-TargetResource
 {
@@ -99,7 +103,11 @@ function Get-TargetResource
 
         [Parameter()]
         [System.Boolean]
-        $ClearDisk
+        $ClearDisk,
+
+        [Parameter()]
+        [System.Boolean]
+        $DevDrive
     )
 
     Write-Verbose -Message ( @(
@@ -173,6 +181,9 @@ function Get-TargetResource
     .PARAMETER ClearDisk
         Specifies if the disks partition schema should be removed entirely, even if data and OEM
         partitions are present. Only possible with AllowDestructive enabled.
+
+    .PARAMETER DevDrive
+        Specifies if the volume should be formatted as a Dev Drive.
 #>
 function Set-TargetResource
 {
@@ -222,7 +233,11 @@ function Set-TargetResource
 
         [Parameter()]
         [System.Boolean]
-        $ClearDisk
+        $ClearDisk,
+
+        [Parameter()]
+        [System.Boolean]
+        $DevDrive
     )
 
     Write-Verbose -Message ( @(
@@ -560,6 +575,11 @@ function Set-TargetResource
                 $($script:localizedData.FormattingVolumeMessage -f $formatVolumeParameters.FileSystem)
             ) -join '' )
 
+        if ($DevDrive)
+        {
+            $formatVolumeParameters['DevDrive'] = $DevDrive
+        }
+
         # Format the volume
         $volume = $partition | Format-Volume @formatVolumeParameters
     }
@@ -595,6 +615,11 @@ function Set-TargetResource
                     if ($PSBoundParameters.ContainsKey('AllocationUnitSize'))
                     {
                         $formatParam.Add('AllocationUnitSize', $AllocationUnitSize)
+                    }
+
+                    if ($PSBoundParameters.ContainsKey('DevDrive'))
+                    {
+                        $formatParam.Add('DevDrive', $DevDrive)
                     }
 
                     $Volume | Format-Volume @formatParam
@@ -671,6 +696,9 @@ function Set-TargetResource
     .PARAMETER ClearDisk
         Specifies if the disks partition schema should be removed entirely, even if data and OEM
         partitions are present. Only possible with AllowDestructive enabled.
+
+    .PARAMETER DevDrive
+        Specifies if the volume should be formatted as a Dev Drive.
 #>
 function Test-TargetResource
 {
@@ -719,7 +747,11 @@ function Test-TargetResource
 
         [Parameter()]
         [System.Boolean]
-        $ClearDisk
+        $ClearDisk,
+
+        [Parameter()]
+        [System.Boolean]
+        $DevDrive
     )
 
     Write-Verbose -Message ( @(
@@ -916,6 +948,12 @@ function Test-TargetResource
             return $false
         } # if
     } # if
+
+    if ($PSBoundParameters.ContainsKey('DevDrive'))
+    {
+        Assert-DevDriveFeatureAvailable
+        Assert-DevDriveFormatOnReFsFileSystemOnly $FSFormat
+    }
 
     return $true
 } # Test-TargetResource

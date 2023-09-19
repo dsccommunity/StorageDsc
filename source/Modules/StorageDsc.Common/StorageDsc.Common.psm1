@@ -222,10 +222,111 @@ function Test-AccessPathAssignedToLocal
     return $accessPathAssigned
 } # end function Test-AccessPathLocal
 
+<#
+    .SYNOPSIS
+        Validates whether the Dev Drive feature is available and enabled on the system.
+#>
+function Assert-DevDriveFeatureAvailable
+{
+    [CmdletBinding()]
+    [OutputType([System.Void])]
+    param
+    ()
+
+    $DevDriveDefinitions = @'
+        using  System.Runtime.InteropServices;
+        namespace  DevDrive
+        {
+            public enum DEVELOPER_DRIVE_ENABLEMENT_STATE
+            {
+                DeveloperDriveEnablementStateError = 0,
+                DeveloperDriveEnabled = 1,
+                DeveloperDriveDisabledBySystemPolicy = 2,
+                DeveloperDriveDisabledByGroupPolicy = 3,
+            }
+
+            public class DevDriveHelper
+            {
+                [DllImport("api-ms-win-core-apiquery-l2-1-0.dll", ExactSpelling = true)]
+                [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
+                public static extern bool IsApiSetImplemented(string Contract);
+
+                [DllImport("api-ms-win-core-sysinfo-l1-2-6.dll")]
+                public static extern DEVELOPER_DRIVE_ENABLEMENT_STATE GetDeveloperDriveEnablementState();
+            }
+        }
+'@
+
+    Add-Type -TypeDefinition $DevDriveDefinitions
+
+    $IsApiSetImplemented = [DevDrive.DevDriveHelper]::IsApiSetImplemented("api-ms-win-core-sysinfo-l1-2-6")
+
+    if ($IsApiSetImplemented)
+    {
+        switch ([DevDrive.DevDriveHelper]::GetDeveloperDriveEnablementState())
+        {
+            ([DevDrive.DEVELOPER_DRIVE_ENABLEMENT_STATE]::DeveloperDriveEnablementStateError)
+            {
+                throw $script:localizedData.DevDriveEnablementUnknownError;
+            }
+            ([DevDrive.DEVELOPER_DRIVE_ENABLEMENT_STATE]::DeveloperDriveDisabledBySystemPolicy)
+            {
+                throw $script:localizedData.DevDriveDisabledBySystemPolicyError;
+            }
+            ([DevDrive.DEVELOPER_DRIVE_ENABLEMENT_STATE]::DeveloperDriveDisabledByGroupPolicy)
+            {
+                throw $script:localizedData.DevDriveDisabledByGroupPolicyError;
+            }
+            ([DevDrive.DEVELOPER_DRIVE_ENABLEMENT_STATE]::DeveloperDriveEnabled)
+            {
+                return;
+            }
+            Default {
+                throw $script:localizedData.DevDriveEnablementUnknownError;
+            }
+        }
+    }
+
+    # If apiset isn't implemented we should throw since the feature isn't available here.
+    throw $script:localizedData.DevDriveFeatureNotImplementedError;
+
+} # end function Assert-DevDriveFeatureAvailable
+
+<#
+    .SYNOPSIS
+        Validates that ReFs is supplied when attempting to format a volume as a Dev Drive.
+
+    .PARAMETER FSFormat
+        Specifies the file system format of the new volume.
+#>
+function Assert-DevDriveFormatOnReFsFileSystemOnly
+{
+    [CmdletBinding()]
+    [OutputType([System.Boolean])]
+    param
+    (
+        [Parameter(Mandatory = $true)]
+        [ValidateSet('NTFS', 'ReFS')]
+        [System.String]
+        $FSFormat
+    )
+
+    if ($FSFormat -ne 'ReFS')
+    {
+
+        New-InvalidArgumentException `
+            -Message $($script:localizedData.DevDriveOnlyAvailableForReFsError -f 'ReFS', $FSFormat) `
+            -ArgumentName 'FSFormat'
+    }
+
+} # end function Assert-DevDriveFormatOnReFsFileSystemOnly
+
 Export-ModuleMember -Function @(
     'Restart-ServiceIfExists',
     'Assert-DriveLetterValid',
     'Assert-AccessPathValid',
     'Get-DiskByIdentifier',
-    'Test-AccessPathAssignedToLocal'
+    'Test-AccessPathAssignedToLocal',
+    'Assert-DevDriveFeatureAvailable',
+    'Assert-DevDriveFormatOnReFsFileSystemOnly'
 )
