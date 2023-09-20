@@ -38,10 +38,12 @@ function Get-TargetResource
     param
     (
         [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
         [String]
         $FolderPath,
 
         [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
         [String]
         $FileName,
 
@@ -60,14 +62,17 @@ function Get-TargetResource
         $DiskType = 'dynamic'
     )
 
+    $FolderPath = Assert-AccessPathValid -AccessPath $FolderPath -Slash
     $virtDiskPath = $($FolderPath + $FileName + "." +  $DiskFormat)
     Write-Verbose -Message ( @(
             "$($MyInvocation.MyCommand): "
             $($script:localizedData.GettingVirtualDiskMessage -f $virtDiskPath)
         ) -join '' )
 
-    # Validate DiskFormat values. Minimum value for GPT is around ~10MB and the maximum value for
-    # the vhd format in 2040GB. Maximum for vhdx is 64TB
+    <#
+        Validate DiskFormat values. Minimum value for GPT is around ~10MB and the maximum value for
+        the vhd format in 2040GB. Maximum for vhdx is 64TB
+    #>
     $isVhdxFormat = $DiskFormat -eq 'vhdx'
     if (( -not $isVhdxFormat -and ($DiskSize -lt 10MB -bor $DiskSize -gt 2040GB)) -bor
         ($IsVhdxFormat -and ($DiskSize -lt 10MB -bor $DiskSize -gt 64TB)))
@@ -77,8 +82,9 @@ function Get-TargetResource
             $script:localizedData.VhdxFormatDiskSizeInvalidMessage :
             $script:localizedData.VhdFormatDiskSizeInvalidMessage
 
-        New-InvalidOperationException `
-            -Message $($InvalidSizeMsg -f $DiskSizeString)
+        New-InvalidArgumentException `
+            -Message $($InvalidSizeMsg -f $DiskSizeString) `
+            -ArgumentName 'DiskSize'
     }
 
     # Get the virtual disk using its location on the system
@@ -117,10 +123,12 @@ function Set-TargetResource
     param
     (
         [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
         [String]
         $FolderPath,
 
         [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
         [String]
         $FileName,
 
@@ -140,7 +148,7 @@ function Set-TargetResource
     )
 
     # Validate the FolderPath parameter
-    $FolderPath = Assert-AccessPathValid $FolderPath
+    $FolderPath = Assert-AccessPathValid -AccessPath $FolderPath -Slash
     $fullPathToVirtualDisk = $FolderPath + $FileName + "." + $DiskFormat
 
     # Create and attach virtual disk if it doesn't exist
@@ -194,10 +202,12 @@ function Test-TargetResource
     param
     (
         [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
         [String]
         $FolderPath,
 
         [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
         [String]
         $FileName,
 
@@ -216,7 +226,7 @@ function Test-TargetResource
         $DiskType = 'dynamic'
     )
     # Validate the FolderPath parameter
-    $FolderPath = Assert-AccessPathValid $FolderPath
+    $FolderPath = Assert-AccessPathValid -AccessPath $FolderPath -Slash
     $fullPathToVirtualDisk = $FolderPath + $FileName + "." + $DiskFormat
     Write-Verbose -Message ( @(
             "$($MyInvocation.MyCommand): "

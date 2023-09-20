@@ -336,9 +336,11 @@ function Add-SimpleVirtualDisk
         $providerSpecificFlags = 0 # No Provider-specific flag
         $result = 0
 
-        # Some builds of Windows may not have the ATTACH_VIRTUAL_DISK_FLAG_AT_BOOT flag. So we attempt to attach the virtual
-        # disk with the flag first. If this fails we attach the virtual disk without the flag. The flag allows the
-        # virtual disk to be attached by the system at boot time.
+        <#
+            Some builds of Windows may not have the ATTACH_VIRTUAL_DISK_FLAG_AT_BOOT flag. So we attempt to attach the virtual
+            disk with the flag first. If this fails we attach the virtual disk without the flag. The flag allows the
+            virtual disk to be attached by the system at boot time.
+        #>
         for ($attempts = 0; $attempts -lt 2; $attempts++)
         {
             if ($attempts -eq 0)
