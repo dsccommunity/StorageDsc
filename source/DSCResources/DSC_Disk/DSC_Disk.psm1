@@ -789,6 +789,14 @@ function Test-TargetResource
     # Validate the DriveLetter parameter
     $DriveLetter = Assert-DriveLetterValid -DriveLetter $DriveLetter
 
+    # Check Dev Drive requirements if DevDrive parameter supplied
+    if ($PSBoundParameters.ContainsKey('DevDrive'))
+    {
+        Assert-DevDriveFeatureAvailable
+        Assert-DevDriveFormatOnReFsFileSystemOnly -FSFormat $FSFormat
+        Assert-DevDriveSizeMeetsMinimumRequirement -Size $Size
+    }
+
     Write-Verbose -Message ( @(
             "$($MyInvocation.MyCommand): "
             $($script:localizedData.CheckDiskInitializedMessage -f $DiskIdType, $DiskId)
@@ -975,13 +983,6 @@ function Test-TargetResource
             return $false
         } # if
     } # if
-
-    if ($PSBoundParameters.ContainsKey('DevDrive'))
-    {
-        Assert-DevDriveFeatureAvailable
-        Assert-DevDriveFormatOnReFsFileSystemOnly -FSFormat $FSFormat
-        Assert-DevDriveSizeMeetsMinimumRequirement -Size $Size
-    }
 
     return $true
 } # Test-TargetResource
