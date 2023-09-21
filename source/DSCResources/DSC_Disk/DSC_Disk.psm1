@@ -428,8 +428,10 @@ function Set-TargetResource
         } # if
 
         <#
-            Create a new partition when there are no partitions matching user input or if the user has
-            advised us that they want to create a new partition and volume on the disks unallocated space.
+            There are two instances when we attempt to create a new partition:
+            1. When there are no partitions matching the drive letter the user entered.
+            2. When the user has advised us that they want to create a new partition on the disk's
+               unallocated space, regardless of whether there is one that matches the $size parameter already.
         #>
         if (-not $partition -bor $UseUnallocatedSpace)
         {
