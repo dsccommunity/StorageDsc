@@ -25,6 +25,17 @@ Import-Module $script:subModuleFile -Force -ErrorAction Stop
 Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath '..\TestHelpers\CommonTestHelper.psm1')
 
 InModuleScope $script:subModuleName {
+
+    $script:mockedSizesForDevDriveScenario = [pscustomobject] @{
+        UserDesired0Gb = 0Gb
+        UserDesired10Gb = 10Gb
+        UserDesired50Gb = 50Gb
+        CurrentDiskFreeSpace40Gb = 40Gb
+        CurrentDiskFreeSpace50Gb = 50Gb
+    }
+
+    $script:mockedDiskNumber = 1
+
     function Get-Disk
     {
         [CmdletBinding()]
@@ -678,29 +689,46 @@ InModuleScope $script:subModuleName {
             It 'Should throw invalid argument error if UserDesiredSize less than 50Gb' {
                 {
                     Assert-DevDriveSizeMeetsMinimumRequirement `
-                        -UserDesiredSize 10Gb `
-                        -CurrentDiskFreeSpace 50Gb `
-                        -DiskNumber 1 `
+                        -UserDesiredSize $mockedSizesForDevDriveScenario.UserDesired10Gb `
                         -Verbose
                 } | Should -Throw $errorRecord
             }
         }
 
-        Context 'Testing Exception thrown in Assert-DevDriveSizeMeetsMinimumRequirement when disk free space less than users desired size' {
+        Context 'Testing Exception thrown in Assert-DiskHasEnoughSpaceToCreateDevDrive when disk free space less than users desired size' {
             # verifiable (should be called) mocks
 
+            $userDesiredSizeInGb = [Math]::Round($mockedSizesForDevDriveScenario.UserDesired50Gb / 1GB, 2)
+            $currentDiskFreeSpaceInGb = [Math]::Round($mockedSizesForDevDriveScenario.CurrentDiskFreeSpace40Gb / 1GB, 2)
             $errorRecord = Get-InvalidArgumentRecord `
-                -Message $($script:localizedData.DevDriveNotEnoughSpaceToCreateDevDriveError -f 1, 50Gb, 40Gb) `
+                -Message $($script:localizedData.DevDriveNotEnoughSpaceToCreateDevDriveError -f `
+                    $mockedDiskNumber, `
+                    $userDesiredSizeInGb, `
+                    $currentDiskFreeSpaceInGb) `
                 -ArgumentName 'UserDesiredSize'
 
             It 'Should throw invalid argument error if UserDesiredSize greater than CurrentDiskFreeSpace' {
                 {
-                    Assert-DevDriveSizeMeetsMinimumRequirement `
-                        -UserDesiredSize 50Gb `
-                        -CurrentDiskFreeSpace 40Gb `
-                        -DiskNumber 1 `
+                    Assert-DiskHasEnoughSpaceToCreateDevDrive `
+                        -UserDesiredSize $mockedSizesForDevDriveScenario.UserDesired50Gb `
+                        -CurrentDiskFreeSpace $mockedSizesForDevDriveScenario.CurrentDiskFreeSpace40Gb `
+                        -DiskNumber $mockedDiskNumber `
                         -Verbose
                 } | Should -Throw $errorRecord
+            }
+        }
+
+        Context 'Testing Exception not thrown in Assert-DiskHasEnoughSpaceToCreateDevDrive when disk free space greater than or equal to users desired size' {
+            # verifiable (should be called) mocks
+
+            It 'Should not throw invalid argument error if CurrentDiskFreeSpace greater than or equal to UserDesiredSize' {
+                {
+                    Assert-DiskHasEnoughSpaceToCreateDevDrive `
+                        -UserDesiredSize $mockedSizesForDevDriveScenario.UserDesired50Gb `
+                        -CurrentDiskFreeSpace $mockedSizesForDevDriveScenario.CurrentDiskFreeSpace50Gb `
+                        -DiskNumber $mockedDiskNumber `
+                        -Verbose
+                } | Should -Not -Throw
             }
         }
 
@@ -710,9 +738,7 @@ InModuleScope $script:subModuleName {
             It 'Should not throw invalid argument error if UserDesiredSize greater than or equal to 50 Gb' {
                 {
                     Assert-DevDriveSizeMeetsMinimumRequirement `
-                        -UserDesiredSize 50Gb `
-                        -CurrentDiskFreeSpace 50Gb `
-                        -DiskNumber 1 `
+                        -UserDesiredSize $mockedSizesForDevDriveScenario.UserDesired50Gb `
                         -Verbose
                 } | Should -Not -Throw
             }
@@ -721,12 +747,10 @@ InModuleScope $script:subModuleName {
         Context 'Testing Exception not thrown in Assert-DevDriveSizeMeetsMinimumRequirement when UserDesiredSize is 0' {
             # verifiable (should be called) mocks
 
-            It 'Should not throw invalid argument error if CurrentDiskFreeSpace greater than or equal to 50 Gb' {
+            It 'Should not throw invalid argument error if UserDesiredSize is 0' {
                 {
                     Assert-DevDriveSizeMeetsMinimumRequirement `
-                        -UserDesiredSize 0Gb `
-                        -CurrentDiskFreeSpace 50Gb `
-                        -DiskNumber 1 `
+                        -UserDesiredSize $mockedSizesForDevDriveScenario.UserDesired0Gb `
                         -Verbose
                 } | Should -Not -Throw
             }

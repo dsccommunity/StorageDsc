@@ -250,7 +250,6 @@ function Get-DevDriveWin32HelperScript
         [DllImport("api-ms-win-core-sysinfo-l1-2-6.dll")]
         public static extern DEVELOPER_DRIVE_ENABLEMENT_STATE GetDeveloperDriveEnablementState();
 
-
 '@
     if (([System.Management.Automation.PSTypeName]'DevDrive.DevDriveHelper').Type)
     {
@@ -389,16 +388,18 @@ function Assert-DevDriveFormatOnReFsFileSystemOnly
 
 <#
     .SYNOPSIS
-        Validates that the user entered a size greater than the minimum for Dev Drive volumes.
-        (The minimum is 50 Gb)
+        Validates that the user has enough space on the disk to create a Dev Drive volume.
 
     .PARAMETER UserDesiredSize
         Specifies the size the user wants to create the Dev Drive volume with.
 
     .PARAMETER CurrentDiskFreeSpace
-        Specifies the maximum free space that can be used to create a partition on the disk with
+        Specifies the maximum free space that can be used to create a partition on the disk with.
+
+    .PARAMETER DiskNumber
+        Specifies the the disk number the user what to create the Dev Drive volume inside.
 #>
-function Assert-DevDriveSizeMeetsMinimumRequirement
+function Assert-DiskHasEnoughSpaceToCreateDevDrive
 {
     [CmdletBinding()]
     param
@@ -408,7 +409,7 @@ function Assert-DevDriveSizeMeetsMinimumRequirement
         $UserDesiredSize,
 
         [Parameter(Mandatory = $true)]
-        [System.String]
+        [System.UInt64]
         $CurrentDiskFreeSpace,
 
         [Parameter(Mandatory = $true)]
@@ -418,20 +419,47 @@ function Assert-DevDriveSizeMeetsMinimumRequirement
 
     <#
         50 Gb is the minimum size for Dev Drive volumes. When size is 0 the user wants to use all
-        the available space on the disk
+        the available space on the disk so we will check if they have at least 50 Gb of space available.
     #>
-    if ($UserDesiredSize -eq 0 -bor $UserDesiredSize -ge 50Gb)
+    $minimumSizeForDevDriveVolumes = 50Gb
+    $UserDesiredSize = ($UserDesiredSize) ? $UserDesiredSize : $minimumSizeForDevDriveVolumes
+    if ($UserDesiredSize -gt $CurrentDiskFreeSpace)
     {
-        if ($UserDesiredSize -gt $CurrentDiskFreeSpace)
-        {
-            New-InvalidArgumentException `
-                -Message $($script:localizedData.DevDriveNotEnoughSpaceToCreateDevDriveError -f `
-                    $DiskNumber, $UserDesiredSize, $CurrentDiskFreeSpace) `
-                    -ArgumentName 'UserDesiredSize'
-        }
-
+        $DesiredSizeInGb = [Math]::Round($UserDesiredSize / 1GB, 2)
+        $CurrentDiskFreeSpaceInGb = [Math]::Round($CurrentDiskFreeSpace / 1GB, 2)
+        New-InvalidArgumentException `
+            -Message $($script:localizedData.DevDriveNotEnoughSpaceToCreateDevDriveError -f `
+                $DiskNumber, $DesiredSizeInGb, $CurrentDiskFreeSpaceInGb) `
+                -ArgumentName 'UserDesiredSize'
     }
-    elseif ($UserDesiredSize -lt 50Gb)
+} # end function Assert-DiskHasEnoughSpaceToCreateDevDrive
+
+<#
+    .SYNOPSIS
+        Validates that the user entered a size greater than the minimum for Dev Drive volumes.
+        (The minimum is 50 Gb)
+
+    .PARAMETER UserDesiredSize
+        Specifies the size the user wants to create the Dev Drive volume with.
+
+#>
+function Assert-DevDriveSizeMeetsMinimumRequirement
+{
+    [CmdletBinding()]
+    param
+    (
+        [Parameter(Mandatory = $true)]
+        [System.UInt64]
+        $UserDesiredSize
+
+    )
+
+    <#
+        50 Gb is the minimum size for Dev Drive volumes. When UserDesiredSize is provided
+        This means the user wants to create a Dev Drive volume using all the available space
+        on the disk. We cover this case in Assert-DiskHasEnoughSpaceToCreateDevDrive
+    #>
+    if ($UserDesiredSize -and $UserDesiredSize -lt 50Gb)
     {
         New-InvalidArgumentException `
             -Message $($script:localizedData.DevDriveMinimumSizeError) `
@@ -451,5 +479,6 @@ Export-ModuleMember -Function @(
     'Assert-DevDriveSizeMeetsMinimumRequirement',
     'Get-DevDriveWin32HelperScript',
     'Get-IsApiSetImplemented',
-    'Get-DeveloperDriveEnablementState'
+    'Get-DeveloperDriveEnablementState',
+    'Assert-DiskHasEnoughSpaceToCreateDevDrive'
 )

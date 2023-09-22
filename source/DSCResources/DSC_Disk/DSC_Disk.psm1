@@ -811,18 +811,27 @@ function Test-TargetResource
         return $false
     } # if
 
-    # Check Dev Drive requirements if DevDrive parameter supplied
+    # Check Dev Drive feature is enabled and that the user inputted ReFS as the file system.
     if ($PSBoundParameters.ContainsKey('DevDrive'))
     {
         Assert-DevDriveFeatureAvailable
         Assert-DevDriveFormatOnReFsFileSystemOnly -FSFormat $FSFormat
 
-        # Get largest contiguous free space that is possible to create a partition with
-        $CurrentDiskFreeSpace = [Math]::Round($disk.LargestFreeExtent / 1GB, 2)
-        Assert-DevDriveSizeMeetsMinimumRequirement `
-            -UserDesiredSize $Size `
-            -CurrentDiskFreeSpace $CurrentDiskFreeSpace `
-            -DiskNumber $Disk.Number
+        $tempPartition = Get-Partition `
+            -DriveLetter $DriveLetter `
+            -ErrorAction SilentlyContinue | Select-Object -First 1
+
+        # User is attempting to create a new Dev Drive volume in a new partition
+        if ($null -eq $tempPartition)
+        {
+            # Get largest contiguous free space that is possible to create a partition with
+            Assert-DiskHasEnoughSpaceToCreateDevDrive `
+                -UserDesiredSize $Size `
+                -CurrentDiskFreeSpace $disk.LargestFreeExtent `
+                -DiskNumber $Disk.Number
+        }
+
+        Assert-DevDriveSizeMeetsMinimumRequirement -UserDesiredSize $Size
     }
 
     if ($disk.IsOffline)
