@@ -40,7 +40,7 @@ Configuration Disk_InitializeDiskWithADevDrive
         # Will create a Dev Drive of 50Gb requiring the disk to have 50Gb of unallocated space.
         Disk DevDriveVolume1
         {
-            DiskId = ‘5E1E50A401000000001517FFFF0AEB84’
+            DiskId = '5E1E50A401000000001517FFFF0AEB84'
             DiskIdType = 'UniqueId'
             DriveLetter = 'E'
             FSFormat = 'ReFS'
@@ -57,7 +57,7 @@ Configuration Disk_InitializeDiskWithADevDrive
           #>
         Disk DevDriveVolume2
         {
-            DiskId = ‘5E1E50A401000000001517FFFF0AEB84’
+            DiskId = '5E1E50A401000000001517FFFF0AEB84'
             DiskIdType = 'UniqueId'
             DriveLetter = 'F'
             FSFormat = 'ReFS'
