@@ -421,8 +421,11 @@ function Assert-DiskHasEnoughSpaceToCreateDevDrive
         50 Gb is the minimum size for Dev Drive volumes. When size is 0 the user wants to use all
         the available space on the disk so we will check if they have at least 50 Gb of space available.
     #>
-    $minimumSizeForDevDriveVolumes = 50Gb
-    $UserDesiredSize = ($UserDesiredSize) ? $UserDesiredSize : $minimumSizeForDevDriveVolumes
+    if (-not $UserDesiredSize)
+    {
+        $UserDesiredSize = 50Gb
+    }
+
     if ($UserDesiredSize -gt $CurrentDiskFreeSpace)
     {
         $DesiredSizeInGb = [Math]::Round($UserDesiredSize / 1GB, 2)
