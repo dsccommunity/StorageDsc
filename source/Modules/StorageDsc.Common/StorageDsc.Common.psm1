@@ -224,6 +224,90 @@ function Test-AccessPathAssignedToLocal
 
 <#
     .SYNOPSIS
+        Returns C# code that will be used to call Dev Drive related Win32 apis
+#>
+function Get-DevDriveWin32HelperScript
+{
+    [OutputType([System.Type])]
+    [CmdletBinding()]
+    param
+    ()
+
+    $DevDriveHelperDefinitions =  @'
+
+        public enum DEVELOPER_DRIVE_ENABLEMENT_STATE
+        {
+            DeveloperDriveEnablementStateError = 0,
+            DeveloperDriveEnabled = 1,
+            DeveloperDriveDisabledBySystemPolicy = 2,
+            DeveloperDriveDisabledByGroupPolicy = 3,
+        }
+
+        [DllImport("api-ms-win-core-apiquery-l2-1-0.dll", ExactSpelling = true)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
+        public static extern bool IsApiSetImplemented(string Contract);
+
+        [DllImport("api-ms-win-core-sysinfo-l1-2-6.dll")]
+        public static extern DEVELOPER_DRIVE_ENABLEMENT_STATE GetDeveloperDriveEnablementState();
+
+
+'@
+    if (([System.Management.Automation.PSTypeName]'DevDrive.DevDriveHelper').Type)
+    {
+        $script:DevDriveWin32Helper = ([System.Management.Automation.PSTypeName]'DevDrive.DevDriveHelper').Type
+    }
+    else
+    {
+        $script:DevDriveWin32Helper = Add-Type `
+            -Namespace 'DevDrive' `
+            -Name 'DevDriveHelper' `
+            -MemberDefinition $DevDriveHelperDefinitions
+    }
+
+    return $script:DevDriveWin32Helper
+
+} # end function Get-DevDriveWin32HelperScript
+
+<#
+    .SYNOPSIS
+        Invokes win32 IsApiSetImplemented function
+
+    .PARAMETER AccessPath
+        Specifies the contract string for the dll that houses the win32 function
+#>
+Function Get-IsApiSetImplemented {
+
+    [CmdletBinding()]
+    Param
+    (
+        [Parameter(Mandatory=$True)]
+        [ValidateNotNullOrEmpty()]
+        [OutputType([System.Boolean])]
+        [String]
+        $Contract
+    )
+
+    $helper = Get-DevDriveWin32HelperScript
+    return $helper::IsApiSetImplemented($Contract)
+} # end function Get-IsApiSetImplemented
+
+<#
+    .SYNOPSIS
+        Invokes win32 GetDeveloperDriveEnablementState function
+#>
+Function Get-DeveloperDriveEnablementState {
+
+    [CmdletBinding()]
+    [OutputType([System.Enum])]
+    Param
+    ()
+
+    $helper = Get-DevDriveWin32HelperScript
+    return $helper::GetDeveloperDriveEnablementState()
+} # end function Get-DeveloperDriveEnablementState
+
+<#
+    .SYNOPSIS
         Validates whether the Dev Drive feature is available and enabled on the system.
 #>
 function Assert-DevDriveFeatureAvailable
@@ -233,53 +317,30 @@ function Assert-DevDriveFeatureAvailable
     param
     ()
 
-    $DevDriveDefinitions = @'
-        using  System.Runtime.InteropServices;
-        namespace  DevDrive
-        {
-            public enum DEVELOPER_DRIVE_ENABLEMENT_STATE
-            {
-                DeveloperDriveEnablementStateError = 0,
-                DeveloperDriveEnabled = 1,
-                DeveloperDriveDisabledBySystemPolicy = 2,
-                DeveloperDriveDisabledByGroupPolicy = 3,
-            }
-
-            public class DevDriveHelper
-            {
-                [DllImport("api-ms-win-core-apiquery-l2-1-0.dll", ExactSpelling = true)]
-                [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
-                public static extern bool IsApiSetImplemented(string Contract);
-
-                [DllImport("api-ms-win-core-sysinfo-l1-2-6.dll")]
-                public static extern DEVELOPER_DRIVE_ENABLEMENT_STATE GetDeveloperDriveEnablementState();
-            }
-        }
-'@
-
-    Add-Type -TypeDefinition $DevDriveDefinitions
+    $devDriveHelper = Get-DevDriveWin32HelperScript
     Write-Verbose -Message ($script:localizedData.CheckingDevDriveEnablementMessage)
 
-    $IsApiSetImplemented = [DevDrive.DevDriveHelper]::IsApiSetImplemented("api-ms-win-core-sysinfo-l1-2-6")
+    $IsApiSetImplemented = Get-IsApiSetImplemented("api-ms-win-core-sysinfo-l1-2-6")
+    $DevDriveEnablementType = [DevDrive.DevDriveHelper+DEVELOPER_DRIVE_ENABLEMENT_STATE]
     if ($IsApiSetImplemented)
     {
         try
         {
-            switch ([DevDrive.DevDriveHelper]::GetDeveloperDriveEnablementState())
+            switch (Get-DeveloperDriveEnablementState)
             {
-                ([DevDrive.DEVELOPER_DRIVE_ENABLEMENT_STATE]::DeveloperDriveEnablementStateError)
+                ($DevDriveEnablementType::DeveloperDriveEnablementStateError)
                 {
                     throw $script:localizedData.DevDriveEnablementUnknownError
                 }
-                ([DevDrive.DEVELOPER_DRIVE_ENABLEMENT_STATE]::DeveloperDriveDisabledBySystemPolicy)
+                ($DevDriveEnablementType::DeveloperDriveDisabledBySystemPolicy)
                 {
                     throw $script:localizedData.DevDriveDisabledBySystemPolicyError
                 }
-                ([DevDrive.DEVELOPER_DRIVE_ENABLEMENT_STATE]::DeveloperDriveDisabledByGroupPolicy)
+                ($DevDriveEnablementType::DeveloperDriveDisabledByGroupPolicy)
                 {
                     throw $script:localizedData.DevDriveDisabledByGroupPolicyError
                 }
-                ([DevDrive.DEVELOPER_DRIVE_ENABLEMENT_STATE]::DeveloperDriveEnabled)
+                ($DevDriveEnablementType::DeveloperDriveEnabled)
                 {
                     Write-Verbose -Message ($script:localizedData.DevDriveEnabledMessage)
                     return
@@ -313,7 +374,6 @@ function Assert-DevDriveFormatOnReFsFileSystemOnly
     param
     (
         [Parameter(Mandatory = $true)]
-        [ValidateSet('NTFS', 'ReFS')]
         [System.String]
         $FSFormat
     )
@@ -363,5 +423,8 @@ Export-ModuleMember -Function @(
     'Test-AccessPathAssignedToLocal',
     'Assert-DevDriveFeatureAvailable',
     'Assert-DevDriveFormatOnReFsFileSystemOnly',
-    'Assert-DevDriveSizeMeetsMinimumRequirement'
+    'Assert-DevDriveSizeMeetsMinimumRequirement',
+    'Get-DevDriveWin32HelperScript',
+    'Get-IsApiSetImplemented',
+    'Get-DeveloperDriveEnablementState'
 )

@@ -11,4 +11,5 @@ ConvertFrom-StringData @'
     CheckingDevDriveEnablementMessage = Checking if the Dev Drive feature is available and enabled on the system.
     DevDriveFeatureNotImplementedError = Dev Drive feature is not implemented on this system.
     DevDriveMinimumSizeError = Dev Drive volumes must be 50Gb or more in size.
+    DevDriveOnlyAvailableForReFsError = "Only 'ReFS' is supported for Dev Drive volumes."
 '@

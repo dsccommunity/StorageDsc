@@ -511,5 +511,185 @@ InModuleScope $script:subModuleName {
                     -AccessPath @('\\?\Volume{905551f3-33a5-421d-ac24-c993fbfb3184}\', '\\?\Volume{99cf0194-ac45-4a23-b36e-3e458158a63e}\') | Should -Be $false
             }
         }
+
+        Context 'Testing Dev Drive enablement when dev drive feature not implemented' {
+            # verifiable (should be called) mocks
+
+            Mock `
+                -CommandName Get-IsApiSetImplemented `
+                -MockWith { return $false } `
+                -ModuleName StorageDsc.Common `
+                -Verifiable
+
+            It 'Should throw with DevDriveFeatureNotImplementedError' {
+                {
+                    Assert-DevDriveFeatureAvailable -Verbose
+                } | Should -Throw -ExpectedMessage $LocalizedData.DevDriveFeatureNotImplementedError
+            }
+
+            It 'Should call the correct mocks' {
+                Assert-VerifiableMock
+                Assert-MockCalled -CommandName Get-IsApiSetImplemented -Exactly -Times 1
+            }
+        }
+
+        Context 'Testing Dev Drive enablement when dev drive feature is disabled by group policy' {
+            # verifiable (should be called) mocks
+            Get-DevDriveWin32HelperScript
+            $DevDriveEnablementType = [DevDrive.DevDriveHelper+DEVELOPER_DRIVE_ENABLEMENT_STATE]
+
+            Mock `
+                -CommandName Get-IsApiSetImplemented `
+                -MockWith { return $true } `
+                -ModuleName StorageDsc.Common `
+                -Verifiable
+
+            Mock `
+                -CommandName Get-DeveloperDriveEnablementState `
+                -MockWith { return $DevDriveEnablementType::DeveloperDriveDisabledByGroupPolicy } `
+                -ModuleName StorageDsc.Common `
+                -Verifiable
+
+            It 'Should throw with DevDriveDisabledByGroupPolicyError' {
+                {
+                    Assert-DevDriveFeatureAvailable -Verbose
+                } | Should  -Throw -ExpectedMessage $LocalizedData.DevDriveDisabledByGroupPolicyError
+            }
+
+            It 'Should call the correct mocks' {
+                Assert-VerifiableMock
+                Assert-MockCalled -CommandName Get-IsApiSetImplemented -Exactly -Times 1
+                Assert-MockCalled -CommandName Get-DeveloperDriveEnablementState -Exactly -Times 1
+            }
+        }
+
+        Context 'Testing Dev Drive enablement when dev drive feature is disabled by system policy' {
+            # verifiable (should be called) mocks
+            Mock `
+                -CommandName Get-IsApiSetImplemented `
+                -MockWith { return $true } `
+                -ModuleName StorageDsc.Common `
+                -Verifiable
+
+            Mock `
+                -CommandName Get-DeveloperDriveEnablementState `
+                -MockWith { return $DevDriveEnablementType::DeveloperDriveDisabledBySystemPolicy } `
+                -ModuleName StorageDsc.Common `
+                -Verifiable
+
+            It 'Should throw with DeveloperDriveDisabledBySystemPolicy' {
+                {
+                    Assert-DevDriveFeatureAvailable -Verbose
+                } | Should  -Throw -ExpectedMessage $LocalizedData.DeveloperDriveDisabledBySystemPolicy
+            }
+
+            It 'Should call the correct mocks' {
+                Assert-VerifiableMock
+                Assert-MockCalled -CommandName Get-IsApiSetImplemented -Exactly -Times 1
+                Assert-MockCalled -CommandName Get-DeveloperDriveEnablementState -Exactly -Times 1
+            }
+        }
+
+        Context 'Testing Dev Drive enablement when enablement state is unknown' {
+            # verifiable (should be called) mocks
+            Mock `
+                -CommandName Get-IsApiSetImplemented `
+                -MockWith { return $true } `
+                -ModuleName StorageDsc.Common `
+                -Verifiable
+
+            Mock `
+                -CommandName Get-DeveloperDriveEnablementState `
+                -MockWith { return $DevDriveEnablementType::DeveloperDriveEnablementStateError } `
+                -ModuleName StorageDsc.Common `
+                -Verifiable
+
+            It 'Should throw with DevDriveEnablementUnknownError' {
+                {
+                    Assert-DevDriveFeatureAvailable -Verbose
+                } | Should  -Throw -ExpectedMessage $LocalizedData.DevDriveEnablementUnknownError
+            }
+
+            It 'Should call the correct mocks' {
+                Assert-VerifiableMock
+                Assert-MockCalled -CommandName Get-IsApiSetImplemented -Exactly -Times 1
+                Assert-MockCalled -CommandName Get-DeveloperDriveEnablementState -Exactly -Times 1
+            }
+        }
+
+        Context 'Testing Dev Drive enablement when enablement state is set to enabled' {
+            # verifiable (should be called) mocks
+            Mock `
+                -CommandName Get-IsApiSetImplemented `
+                -MockWith { return $true } `
+                -ModuleName StorageDsc.Common `
+                -Verifiable
+
+            Mock `
+                -CommandName Get-DeveloperDriveEnablementState `
+                -MockWith { return $DevDriveEnablementType::DeveloperDriveEnabled } `
+                -ModuleName StorageDsc.Common `
+                -Verifiable
+
+            It 'Should not throw' {
+                {
+                    Assert-DevDriveFeatureAvailable -Verbose
+                } | Should -Not -Throw
+            }
+
+            It 'Should call the correct mocks' {
+                Assert-VerifiableMock
+                Assert-MockCalled -CommandName Get-IsApiSetImplemented -Exactly -Times 1
+                Assert-MockCalled -CommandName Get-DeveloperDriveEnablementState -Exactly -Times 1
+            }
+        }
+
+        Context 'Testing that only ReFS file system allowed in Assert-DevDriveFormatOnReFsFileSystemOnly ' {
+            # verifiable (should be called) mocks
+
+            $errorRecord = Get-InvalidArgumentRecord `
+                -Message ($script:localizedData.DevDriveOnlyAvailableForReFsError ) `
+                -ArgumentName 'FSFormat'
+
+            It 'Should throw invalid argument error if a filesystem other than ReFS is passed in' {
+                {
+                    Assert-DevDriveFormatOnReFsFileSystemOnly -FSFormat "test" -Verbose
+                } | Should -Throw $errorRecord
+            }
+        }
+
+        Context 'Testing Exception not thrown in Assert-DevDriveFormatOnReFsFileSystemOnly when ReFS file system passed in' {
+            # verifiable (should be called) mocks
+
+            It 'Should not throw invalid argument error if ReFS filesystem is passed in' {
+                {
+                    Assert-DevDriveFormatOnReFsFileSystemOnly -FSFormat "ReFS" -Verbose
+                } | Should -Not -Throw
+            }
+        }
+
+        Context 'Testing Exception thrown in Assert-DevDriveSizeMeetsMinimumRequirement when size does not meet the minimum size for Dev Drives' {
+            # verifiable (should be called) mocks
+
+            $errorRecord = Get-InvalidArgumentRecord `
+                -Message $($script:localizedData.DevDriveMinimumSizeError) `
+                -ArgumentName 'Size'
+
+            It 'Should throw invalid argument error if size less than 50Gb' {
+                {
+                    Assert-DevDriveSizeMeetsMinimumRequirement -Size 40Gb -Verbose
+                } | Should -Throw $errorRecord
+            }
+        }
+
+        Context 'Testing Exception not thrown in Assert-DevDriveSizeMeetsMinimumRequirement when size does meet the minimum size for Dev Drives' {
+            # verifiable (should be called) mocks
+
+            It 'Should not throw invalid argument error if size greater than or equal to 50 Gb' {
+                {
+                    Assert-DevDriveSizeMeetsMinimumRequirement -Size 50Gb -Verbose
+                } | Should -Not -Throw
+            }
+        }
     }
 }

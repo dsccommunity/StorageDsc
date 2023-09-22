@@ -33,6 +33,7 @@ try
 {
     InModuleScope $script:dscResourceName {
         $script:testDriveLetter = 'G'
+        $script:testDriveLetterH = 'H'
         $script:testDiskNumber = 1
         $script:testDiskUniqueId = 'TESTDISKUNIQUEID'
         $script:testDiskFriendlyName = 'TESTDISKFRIENDLYNAME'
@@ -105,6 +106,18 @@ try
             PartitionStyle = 'GPT'
         }
 
+        $script:mockedDisk0GptForDevDrive = [pscustomobject] @{
+            Number         = $script:testDiskNumber
+            UniqueId       = $script:testDiskUniqueId
+            FriendlyName   = $script:testDiskFriendlyName
+            SerialNumber   = $script:testDiskSerialNumber
+            Guid           = $script:testDiskGptGuid
+            IsOffline      = $false
+            IsReadOnly     = $false
+            PartitionStyle = 'GPT'
+            Size           = 100Gb
+        }
+
         $script:mockedCim = [pscustomobject] @{
             BlockSize = 4096
         }
@@ -114,6 +127,24 @@ try
         $script:mockedPartition = [pscustomobject] @{
             DriveLetter     = [System.Char] $script:testDriveLetter
             Size            = $script:mockedPartitionSize
+            PartitionNumber = 1
+            Type            = 'Basic'
+        }
+
+        $script:mockedPartitionSize40Gb = 40GB
+
+        $script:mockedPartitionSize50Gb = 50GB
+
+        $script:mockedPartitionWithGDriveletter = [pscustomobject] @{
+            DriveLetter     = [System.Char] $script:testDriveLetter
+            Size            = $script:mockedPartitionSize50Gb
+            PartitionNumber = 1
+            Type            = 'Basic'
+        }
+
+        $script:mockedPartitionWithHDriveLetter = [pscustomobject] @{
+            DriveLetter     = [System.Char] $script:testDriveLetterH
+            Size            = $script:mockedPartitionSize50Gb
             PartitionNumber = 1
             Type            = 'Basic'
         }
@@ -140,6 +171,14 @@ try
         $script:mockedPartitionNoDriveLetter = [pscustomobject] @{
             DriveLetter     = [System.Char] $null
             Size            = $script:mockedPartitionSize
+            PartitionNumber = 1
+            Type            = 'Basic'
+            IsReadOnly      = $false
+        }
+
+        $script:mockedPartitionNoDriveLetter50Gb = [pscustomobject] @{
+            DriveLetter     = [System.Char] $null
+            Size            = $script:mockedPartitionSize50Gb
             PartitionNumber = 1
             Type            = 'Basic'
             IsReadOnly      = $false
@@ -337,7 +376,11 @@ try
 
                 [Parameter()]
                 [Switch]
-                $Force
+                $Force,
+
+                [Parameter()]
+                [System.Boolean]
+                $DevDrive
             )
         }
 
@@ -397,6 +440,25 @@ try
                 [Switch]
                 $RemoveOEM
             )
+        }
+
+        Function Get-IsApiSetImplemented {
+
+            [CmdletBinding()]
+            Param
+            (
+                [OutputType([System.Boolean])]
+                [String]
+                $Contract
+            )
+        }
+
+        Function Get-DeveloperDriveEnablementState {
+
+            [CmdletBinding()]
+            [OutputType([System.Enum])]
+            Param
+            ()
         }
 
         Describe 'DSC_Disk\Get-TargetResource' {
@@ -2620,6 +2682,148 @@ try
                     Assert-MockCalled -CommandName Set-Partition -Exactly -Times 0
                     Assert-MockCalled -CommandName Set-Volume -Exactly -Times 1
                     Assert-MockCalled -CommandName Clear-Disk -Exactly -Times 1
+                }
+            }
+
+            Context 'When Dev Drive flag enabled with online GPT disk with no partitions format volume is called with Dev Drive flag' {
+                # verifiable (should be called) mocks
+                Mock `
+                    -CommandName Get-DiskByIdentifier `
+                    -ParameterFilter $script:parameterFilter_MockedDisk0Number `
+                    -MockWith { $script:mockedDisk0GptForDevDrive } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-Partition `
+                    -Verifiable
+
+                Mock `
+                    -CommandName New-Partition `
+                    -ParameterFilter {
+                    $DriveLetter -eq $script:testDriveLetter
+                } `
+                    -MockWith { $script:mockedPartitionNoDriveLetter } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-Volume `
+                    -MockWith { $script:mockedVolumeUnformatted } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Format-Volume `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Set-Partition `
+                    -Verifiable
+
+                # mocks that should not be called
+                Mock -CommandName Set-Disk
+                Mock -CommandName Initialize-Disk
+
+                It 'Should not throw an exception' {
+                    {
+                        Set-TargetResource `
+                            -DiskId $script:mockedDisk0Gpt.Number `
+                            -Driveletter $script:testDriveLetter `
+                            -Size $script:mockedPartitionSize `
+                            -FSLabel 'NewLabel' `
+                            -FSFormat 'ReFS' `
+                            -DevDrive $true `
+                            -Verbose
+                    } | Should -Not -Throw
+                }
+
+                It 'Should call the correct mocks' {
+                    Assert-VerifiableMock
+                    Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 1 `
+                        -ParameterFilter $script:parameterFilter_MockedDisk0Number
+                    Assert-MockCalled -CommandName Set-Disk -Exactly -Times 0
+                    Assert-MockCalled -CommandName Initialize-Disk -Exactly -Times 0
+                    Assert-MockCalled -CommandName Get-Partition -Exactly -Times 4
+                    Assert-MockCalled -CommandName Get-Volume -Exactly -Times 1
+                    Assert-MockCalled -CommandName New-Partition -Exactly -Times 1 `
+                        -ParameterFilter {
+                        $DriveLetter -eq $script:testDriveLetter
+                    }
+                    Assert-MockCalled -CommandName Format-Volume -Exactly -Times 1 `
+                        -ParameterFilter {
+                        $DevDrive -eq $true
+                    }
+                    Assert-MockCalled -CommandName Set-Partition -Exactly -Times 1
+                }
+            }
+
+            Context 'When the user explicitly wants to create a new drive on unallocated space regardless of if there are partitions that match its size. ' {
+                # verifiable (should be called) mocks
+                Mock `
+                    -CommandName Get-DiskByIdentifier `
+                    -ParameterFilter $script:parameterFilter_MockedDisk0Number `
+                    -MockWith { $script:mockedDisk0GptForDevDrive } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-Partition `
+                    -MockWith { $script:mockedPartitionWithGDriveletter } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName New-Partition `
+                    -ParameterFilter {
+                    $DriveLetter -eq $script:testDriveLetterH
+                } `
+                    -MockWith { $script:mockedPartitionNoDriveLetter50Gb } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-Volume `
+                    -MockWith { $script:mockedVolumeUnformatted } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Format-Volume `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Set-Partition `
+                    -Verifiable
+
+                # mocks that should not be called
+                Mock -CommandName Set-Disk
+                Mock -CommandName Initialize-Disk
+
+                It 'Should not throw an exception' {
+                    {
+                        Set-TargetResource `
+                            -DiskId $script:mockedDisk0Gpt.Number `
+                            -Driveletter $script:testDriveLetterH `
+                            -Size $script:mockedPartitionSize50Gb `
+                            -FSLabel 'NewLabel' `
+                            -FSFormat 'ReFS' `
+                            -DevDrive $true `
+                            -UseUnallocatedSpace $true `
+                            -Verbose
+                    } | Should -Not -Throw
+                }
+
+                It 'Should call the correct mocks' {
+                    Assert-VerifiableMock
+                    Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 1 `
+                        -ParameterFilter $script:parameterFilter_MockedDisk0Number
+                    Assert-MockCalled -CommandName Set-Disk -Exactly -Times 0
+                    Assert-MockCalled -CommandName Initialize-Disk -Exactly -Times 0
+                    Assert-MockCalled -CommandName Get-Partition -Exactly -Times 4
+                    Assert-MockCalled -CommandName Get-Volume -Exactly -Times 1
+                    Assert-MockCalled -CommandName New-Partition -Exactly -Times 1 `
+                        -ParameterFilter {
+                        $DriveLetter -eq $script:testDriveLetterH
+                    }
+                    Assert-MockCalled -CommandName Format-Volume -Exactly -Times 1 `
+                        -ParameterFilter {
+                        $DevDrive -eq $true
+                    }
+                    Assert-MockCalled -CommandName Set-Partition -Exactly -Times 1
                 }
             }
         }
