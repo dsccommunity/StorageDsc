@@ -791,14 +791,6 @@ function Test-TargetResource
     # Validate the DriveLetter parameter
     $DriveLetter = Assert-DriveLetterValid -DriveLetter $DriveLetter
 
-    # Check Dev Drive requirements if DevDrive parameter supplied
-    if ($PSBoundParameters.ContainsKey('DevDrive'))
-    {
-        Assert-DevDriveFeatureAvailable
-        Assert-DevDriveFormatOnReFsFileSystemOnly -FSFormat $FSFormat
-        Assert-DevDriveSizeMeetsMinimumRequirement -Size $Size
-    }
-
     Write-Verbose -Message ( @(
             "$($MyInvocation.MyCommand): "
             $($script:localizedData.CheckDiskInitializedMessage -f $DiskIdType, $DiskId)
@@ -818,6 +810,20 @@ function Test-TargetResource
 
         return $false
     } # if
+
+    # Check Dev Drive requirements if DevDrive parameter supplied
+    if ($PSBoundParameters.ContainsKey('DevDrive'))
+    {
+        Assert-DevDriveFeatureAvailable
+        Assert-DevDriveFormatOnReFsFileSystemOnly -FSFormat $FSFormat
+
+        # Get largest contiguous free space that is possible to create a partition with
+        $CurrentDiskFreeSpace = [Math]::Round($disk.LargestFreeExtent / 1GB, 2)
+        Assert-DevDriveSizeMeetsMinimumRequirement `
+            -UserDesiredSize $Size `
+            -CurrentDiskFreeSpace $CurrentDiskFreeSpace `
+            -DiskNumber $Disk.Number
+    }
 
     if ($disk.IsOffline)
     {

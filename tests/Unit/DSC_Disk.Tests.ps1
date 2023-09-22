@@ -2755,7 +2755,7 @@ try
                 }
             }
 
-            Context 'When the user explicitly wants to create a new drive on unallocated space regardless of if there are partitions that match its size. ' {
+            Context 'When the user explicitly wants to create a new drive on unallocated space regardless of whether there is a partition that matches the size parameter or not. ' {
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Get-DiskByIdentifier `

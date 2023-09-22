@@ -553,7 +553,7 @@ InModuleScope $script:subModuleName {
             It 'Should throw with DevDriveDisabledByGroupPolicyError' {
                 {
                     Assert-DevDriveFeatureAvailable -Verbose
-                } | Should  -Throw -ExpectedMessage $LocalizedData.DevDriveDisabledByGroupPolicyError
+                } | Should -Throw -ExpectedMessage $LocalizedData.DevDriveDisabledByGroupPolicyError
             }
 
             It 'Should call the correct mocks' {
@@ -580,7 +580,7 @@ InModuleScope $script:subModuleName {
             It 'Should throw with DeveloperDriveDisabledBySystemPolicy' {
                 {
                     Assert-DevDriveFeatureAvailable -Verbose
-                } | Should  -Throw -ExpectedMessage $LocalizedData.DeveloperDriveDisabledBySystemPolicy
+                } | Should -Throw -ExpectedMessage $LocalizedData.DeveloperDriveDisabledBySystemPolicy
             }
 
             It 'Should call the correct mocks' {
@@ -607,7 +607,7 @@ InModuleScope $script:subModuleName {
             It 'Should throw with DevDriveEnablementUnknownError' {
                 {
                     Assert-DevDriveFeatureAvailable -Verbose
-                } | Should  -Throw -ExpectedMessage $LocalizedData.DevDriveEnablementUnknownError
+                } | Should -Throw -ExpectedMessage $LocalizedData.DevDriveEnablementUnknownError
             }
 
             It 'Should call the correct mocks' {
@@ -668,26 +668,66 @@ InModuleScope $script:subModuleName {
             }
         }
 
-        Context 'Testing Exception thrown in Assert-DevDriveSizeMeetsMinimumRequirement when size does not meet the minimum size for Dev Drives' {
+        Context 'Testing Exception thrown in Assert-DevDriveSizeMeetsMinimumRequirement when UserDesiredSize does not meet the minimum size for Dev Drives' {
             # verifiable (should be called) mocks
 
             $errorRecord = Get-InvalidArgumentRecord `
                 -Message $($script:localizedData.DevDriveMinimumSizeError) `
-                -ArgumentName 'Size'
+                -ArgumentName 'UserDesiredSize'
 
-            It 'Should throw invalid argument error if size less than 50Gb' {
+            It 'Should throw invalid argument error if UserDesiredSize less than 50Gb' {
                 {
-                    Assert-DevDriveSizeMeetsMinimumRequirement -Size 40Gb -Verbose
+                    Assert-DevDriveSizeMeetsMinimumRequirement `
+                        -UserDesiredSize 10Gb `
+                        -CurrentDiskFreeSpace 50Gb `
+                        -DiskNumber 1 `
+                        -Verbose
                 } | Should -Throw $errorRecord
             }
         }
 
-        Context 'Testing Exception not thrown in Assert-DevDriveSizeMeetsMinimumRequirement when size does meet the minimum size for Dev Drives' {
+        Context 'Testing Exception thrown in Assert-DevDriveSizeMeetsMinimumRequirement when disk free space less than users desired size' {
             # verifiable (should be called) mocks
 
-            It 'Should not throw invalid argument error if size greater than or equal to 50 Gb' {
+            $errorRecord = Get-InvalidArgumentRecord `
+                -Message $($script:localizedData.DevDriveNotEnoughSpaceToCreateDevDriveError -f 1, 50Gb, 40Gb) `
+                -ArgumentName 'UserDesiredSize'
+
+            It 'Should throw invalid argument error if UserDesiredSize greater than CurrentDiskFreeSpace' {
                 {
-                    Assert-DevDriveSizeMeetsMinimumRequirement -Size 50Gb -Verbose
+                    Assert-DevDriveSizeMeetsMinimumRequirement `
+                        -UserDesiredSize 50Gb `
+                        -CurrentDiskFreeSpace 40Gb `
+                        -DiskNumber 1 `
+                        -Verbose
+                } | Should -Throw $errorRecord
+            }
+        }
+
+        Context 'Testing Exception not thrown in Assert-DevDriveSizeMeetsMinimumRequirement when UserDesiredSize does meet the minimum size for Dev Drives' {
+            # verifiable (should be called) mocks
+
+            It 'Should not throw invalid argument error if UserDesiredSize greater than or equal to 50 Gb' {
+                {
+                    Assert-DevDriveSizeMeetsMinimumRequirement `
+                        -UserDesiredSize 50Gb `
+                        -CurrentDiskFreeSpace 50Gb `
+                        -DiskNumber 1 `
+                        -Verbose
+                } | Should -Not -Throw
+            }
+        }
+
+        Context 'Testing Exception not thrown in Assert-DevDriveSizeMeetsMinimumRequirement when UserDesiredSize is 0' {
+            # verifiable (should be called) mocks
+
+            It 'Should not throw invalid argument error if CurrentDiskFreeSpace greater than or equal to 50 Gb' {
+                {
+                    Assert-DevDriveSizeMeetsMinimumRequirement `
+                        -UserDesiredSize 0Gb `
+                        -CurrentDiskFreeSpace 50Gb `
+                        -DiskNumber 1 `
+                        -Verbose
                 } | Should -Not -Throw
             }
         }

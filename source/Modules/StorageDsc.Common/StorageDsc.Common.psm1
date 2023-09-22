@@ -392,8 +392,11 @@ function Assert-DevDriveFormatOnReFsFileSystemOnly
         Validates that the user entered a size greater than the minimum for Dev Drive volumes.
         (The minimum is 50 Gb)
 
-    .PARAMETER FSFormat
-        Specifies the size the user wants to create the Dev Drive with.
+    .PARAMETER UserDesiredSize
+        Specifies the size the user wants to create the Dev Drive volume with.
+
+    .PARAMETER CurrentDiskFreeSpace
+        Specifies the maximum free space that can be used to create a partition on the disk with
 #>
 function Assert-DevDriveSizeMeetsMinimumRequirement
 {
@@ -402,15 +405,37 @@ function Assert-DevDriveSizeMeetsMinimumRequirement
     (
         [Parameter(Mandatory = $true)]
         [System.UInt64]
-        $Size
+        $UserDesiredSize,
+
+        [Parameter(Mandatory = $true)]
+        [System.String]
+        $CurrentDiskFreeSpace,
+
+        [Parameter(Mandatory = $true)]
+        [System.UInt32]
+        $DiskNumber
     )
 
-    # 50 Gb is the minimum size for Dev Drive volumes
-    if ($Size -lt 50Gb)
+    <#
+        50 Gb is the minimum size for Dev Drive volumes. When size is 0 the user wants to use all
+        the available space on the disk
+    #>
+    if ($UserDesiredSize -eq 0 -bor $UserDesiredSize -ge 50Gb)
+    {
+        if ($UserDesiredSize -gt $CurrentDiskFreeSpace)
+        {
+            New-InvalidArgumentException `
+                -Message $($script:localizedData.DevDriveNotEnoughSpaceToCreateDevDriveError -f `
+                    $DiskNumber, $UserDesiredSize, $CurrentDiskFreeSpace) `
+                    -ArgumentName 'UserDesiredSize'
+        }
+
+    }
+    elseif ($UserDesiredSize -lt 50Gb)
     {
         New-InvalidArgumentException `
             -Message $($script:localizedData.DevDriveMinimumSizeError) `
-            -ArgumentName 'Size'
+            -ArgumentName 'UserDesiredSize'
     }
 
 } # end function Assert-DevDriveSizeMeetsMinimumRequirement

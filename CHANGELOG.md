@@ -5,7 +5,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-- Updated DSC_Disk to allow volumes to be formatted as Dev Drives
+- Updated DSC_Disk to allow volumes to be formatted as Dev Drives:  Fixes #276
 
 ## [5.1.0] - 2023-02-22
 
