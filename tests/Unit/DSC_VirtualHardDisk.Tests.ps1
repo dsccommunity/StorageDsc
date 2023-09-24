@@ -40,6 +40,7 @@ try
         $script:DiskImageSizeAboveVhdMaximum = 2041Gb
         $script:DiskImageSizeAboveVhdxMaximum = 65Tb
         $script:DiskImageSize65Gb = 65Gb
+        $script:MockTestPathCount = 0
 
         $script:mockedDiskImageAttachedVhdx = [pscustomobject] @{
             Attached          = $true
@@ -475,10 +476,25 @@ try
                 }
             }
 
-            Context 'Virtual disk does not exist and ensure set to present But exception happened after virtual disk file was created' {
+            Context 'When folder does not exist in user provided path but an exception occurs after creating the virtual disk' {
+
                 Mock `
                     -CommandName Get-DiskImage `
                     -MockWith { $script:mockedDiskImageEmpty } `
+                    -Verifiable
+
+                # Folder does not exist on system so return false to go into if block that creates the folder
+                Mock `
+                    -CommandName Test-Path `
+                    -ParameterFilter { $script:MockTestPathCount -eq 0 } `
+                    -MockWith { $script:MockTestPathCount++; $false } `
+                    -Verifiable
+
+                # File was created and exists on system so return true to go into if block that deletes file
+                Mock `
+                    -CommandName Test-Path `
+                    -ParameterFilter { $script:MockTestPathCount -eq 1 } `
+                    -MockWith { $true } `
                     -Verifiable
 
                 Mock `
@@ -487,16 +503,16 @@ try
                     -Verifiable
 
                 Mock `
-                    -CommandName Test-Path `
-                    -MockWith { $true } `
+                    -CommandName New-Item `
                     -Verifiable
 
                 Mock `
                     -CommandName Remove-Item `
                     -Verifiable
 
+                $script:MockTestPathCount = 0
                 $extension = [System.IO.Path]::GetExtension($script:mockedDiskImageAttachedVhdx.ImagePath).TrimStart('.')
-                It 'Should not throw an exception and should remove the created virtual disk file.' {
+                It 'Should not let exception escape and new folder and file should be deleted' {
                     {
                         Set-TargetResource `
                             -FilePathWithExtension $script:mockedDiskImageAttachedVhdx.ImagePath `
@@ -510,9 +526,9 @@ try
                 It 'Should only call required mocks' {
                     Assert-VerifiableMock
                     Assert-MockCalled -CommandName Get-DiskImage -Exactly 1
-                    Assert-MockCalled -CommandName New-SimpleVirtualDisk -Exactly 1
-                    Assert-MockCalled -CommandName Test-Path -Exactly 1
-                    Assert-MockCalled -CommandName Remove-Item -Exactly 1
+                    Assert-MockCalled -CommandName New-Item -Exactly 1
+                    Assert-MockCalled -CommandName Test-Path -Exactly 2
+                    Assert-MockCalled -CommandName Remove-Item -Exactly 2
                 }
             }
         }

@@ -5,8 +5,12 @@ Import-Module -Name (Join-Path -Path $modulePath `
         -ChildPath (Join-Path -Path 'StorageDsc.Common' `
             -ChildPath 'StorageDsc.Common.psm1'))
 
+# Import the VirtualHardDisk Win32Helpers Module.
+Import-Module -Name (Join-Path -Path $modulePath `
+        -ChildPath (Join-Path -Path 'VirtualHardDisk.Win32Helpers' `
+            -ChildPath 'VirtualHardDisk.Win32Helpers.psm1'))
+
 Import-Module -Name (Join-Path -Path $modulePath -ChildPath 'DscResource.Common')
-Import-Module $PSScriptRoot\\Win32Helpers.psm1
 
 # Import Localization Strings.
 $script:localizedData = Get-LocalizedData -DefaultUICulture 'en-US'
@@ -175,8 +179,18 @@ function Set-TargetResource
                 $($script:localizedData.VirtualDiskDoesNotExistCreatingNowMessage -f $FilePathWithExtension)
             ) -join '' )
 
+            $folderPath = Split-Path -Parent $FilePathWithExtension
+            $wasLocationCreated = $false
+
             try
             {
+                # Create the location if it doesn't exist.
+                if (-not (Test-Path -PathType Container $folderPath))
+                {
+                    New-Item -ItemType Directory -Path $folderPath
+                    $wasLocationCreated = $true
+                }
+
                 New-SimpleVirtualDisk -VirtualDiskPath $FilePathWithExtension -DiskFormat $diskFormat -DiskType $DiskType -DiskSizeInBytes $DiskSize
             }
             catch
@@ -186,6 +200,11 @@ function Set-TargetResource
                 {
                     Write-Verbose -Message ($script:localizedData.VirtualRemovingCreatedFileMessage -f $VirtualDiskPath)
                     Remove-Item $FilePathWithExtension -verbose
+                }
+
+                if ($wasLocationCreated)
+                {
+                    Remove-Item -LiteralPath $folderPath
                 }
             }
 

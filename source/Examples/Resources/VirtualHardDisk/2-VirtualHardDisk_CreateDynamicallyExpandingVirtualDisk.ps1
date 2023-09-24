@@ -19,37 +19,35 @@
 
 <#
     .DESCRIPTION
-        This configuration will wait for disk 2 with Unique Id '5E1E50A401000000001517FFFF0AEB84' to become
-        available, and then make the disk available as two new formatted volumes, 'G' and 'J', with 'J'
-        using all available space after 'G' has been created. It also creates a new ReFS formated
-        volume on disk 3 with Unique Id '5E1E50A4010000000029AB39450AC9A5' attached as drive letter 'S'.
+        This configuration will create a dynamic sized virtual disk that is 40Gb in size and will format a
+        RefS volume named 'new volume 2' that uses the drive letter F. Note: the directory path in the
+        FilePathWithExtension parameter must exist. It will not be created for you.
 #>
 Configuration VirtualHardDisk_CreateDynamicallyExpandingVirtualDisk
 {
     Import-DSCResource -ModuleName StorageDsc
 
-
     Node localhost
     {
-        # Create new virtual disk
-        VirtualHardDisk newVhd
-        {
-            FolderPath = C:\myVhds
-            FileName = myVHD
+          # Create new virtual disk
+          VirtualHardDisk newVhd2
+          {
+            FilePathWithExtension = C:\myVhds\virtDisk2.vhdx
             DiskSize = 40Gb
-            DiskFormat = vhdx
-            DiskType = dynamic
-        }
+            DiskType = 'dynamic'
+            Ensure = 'Present'
+          }
 
-        # Create new volume onto the new virtual disk
-        Disk Volume1
-        {
-            DiskId = ‘C:\myVhds\myVHD.vhdx’
+          # Create new volume onto the new virtual disk
+          Disk Volume1
+          {
+            DiskId = 'C:\myVhds\myVHD2.vhdx'
             DiskIdType = 'Location'
-            DriveLetter = 'E'
-            FSLabel = 'new volume'
+            DriveLetter = 'F'
+            FSLabel = 'new volume 2'
+            FSFormat = 'ReFS'
             Size = 20Gb
-            DependsOn = '[VirtualHardDisk]newVhd'
-        }
+            DependsOn = '[VirtualHardDisk]newVhd2'
+          }
     }
 }

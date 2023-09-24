@@ -19,9 +19,8 @@
 
 <#
     .DESCRIPTION
-        This configuration will wait for disk 2 to become available, and then make the disk available as
-        two new formatted volumes, 'G' and 'J', with 'J' using all available space after 'G' has been
-        created. It also creates a new ReFS formated volume on disk 3 attached as drive letter 'S'.
+        This configuration will create a fixed sized virtual disk that is 40Gb in size and will format a
+        NTFS volume named 'new volume' that uses the drive letter E.
 #>
 Configuration VirtualHardDisk_CreateFixedSizedVirtualDisk
 {
@@ -29,44 +28,24 @@ Configuration VirtualHardDisk_CreateFixedSizedVirtualDisk
 
     Node localhost
     {
-        WaitForDisk Disk2
-        {
-             DiskId = 2
-             RetryIntervalSec = 60
-             RetryCount = 60
-        }
+          # Create new virtual disk
+          VirtualHardDisk newVhd
+          {
+            FilePathWithExtension = C:\myVhds\virtDisk1.vhd
+            DiskSize = 40Gb
+            DiskType = 'fixed'
+            Ensure = 'Present'
+          }
 
-        Disk GVolume
-        {
-             DiskId = 2
-             DriveLetter = 'G'
-             Size = 10737418240
-             DependsOn = '[WaitForDisk]Disk2'
-        }
-
-        Disk JVolume
-        {
-             DiskId = 2
-             DriveLetter = 'J'
-             FSLabel = 'Data'
-             DependsOn = '[Disk]GVolume'
-        }
-
-        WaitForDisk Disk3
-        {
-             DiskId = 3
-             RetryIntervalSec = 60
-             RetryCount = 60
-        }
-
-        Disk SVolume
-        {
-             DiskId = 3
-             DriveLetter = 'S'
-             Size = 107374182400
-             FSFormat = 'ReFS'
-             AllocationUnitSize = 64KB
-             DependsOn = '[WaitForDisk]Disk3'
-        }
+          # Create new volume onto the new virtual disk
+          Disk Volume1
+          {
+            DiskId = 'C:\myVhds\myVHD.vhdx'
+            DiskIdType = 'Location'
+            DriveLetter = 'E'
+            FSLabel = 'new volume'
+            Size = 20Gb
+            DependsOn = '[VirtualHardDisk]newVhd'
+          }
     }
 }
