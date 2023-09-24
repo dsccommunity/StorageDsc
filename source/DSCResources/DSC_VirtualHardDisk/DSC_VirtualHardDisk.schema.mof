@@ -2,9 +2,8 @@
 [ClassVersion("1.0.0.0"), FriendlyName("VirtualHardDisk")]
 class DSC_VirtualHardDisk : OMI_BaseResource
 {
-    [Key, Description("Specifies the folder path where the virtual disk will be created or attached")] String FolderPath;
-    [Required, Description("Specifies the file name of the virtual disk.")] String FileName;
-    [Write, Description("Specifies the size of virtual disk.")] Uint64 DiskSize;
-    [Write, Description("Specifies the disk format the virtual disk file should use. Defaults to vhdx"), ValueMap{"vhd","vhdx"}, Values{"vhd","vhdx"}] String DiskFormat;
-    [Write, Description("Specifies the disk type the virtual disk should use. Defaults to dynamic"), ValueMap{"Fixed","Dynamic"}, Values{"Fixed","Dynamic"}] String DiskType;
+    [Key, Description("Specifies the full path to the virtual disk file that will be created or attached. This includes the files extension.")] String FilePathWithExtension;
+    [Required, Description("Specifies the size the of virtual disk.")] Uint64 DiskSize;
+    [Write, Description("Specifies the disk type the virtual disk should use. Defaults to dynamic."), ValueMap{"Fixed","Dynamic"}, Values{"Fixed","Dynamic"}] String DiskType;
+    [Write, Description("Determines whether the virtual disk should be created and mounted or not."), ValueMap{"Present","Absent"}, Values{"Present","Absent"}] String Ensure;
 };
