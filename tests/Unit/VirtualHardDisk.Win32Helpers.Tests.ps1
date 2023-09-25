@@ -106,7 +106,6 @@ InModuleScope $script:subModuleName {
 
     Function Close-Win32Handle
     {
-
         [CmdletBinding()]
         [OutputType([System.Void])]
         Param
@@ -119,7 +118,6 @@ InModuleScope $script:subModuleName {
 
     Function Get-VirtualDiskUsingWin32
     {
-
         [CmdletBinding()]
         [OutputType([System.Int32])]
         Param
@@ -149,25 +147,10 @@ InModuleScope $script:subModuleName {
             $Handle
         )
     }
-    function Get-VirtualDiskHandle
-    {
-        [CmdletBinding()]
-        param
-        (
-            [Parameter(Mandatory = $true)]
-            [System.String]
-            $VirtualDiskPath,
-
-            [Parameter(Mandatory = $true)]
-            [ValidateSet('vhd', 'vhdx')]
-            [System.String]
-            $DiskFormat
-        )
-    }
-
 
     $script:DiskImageGoodVhdxPath = 'C:\test.vhdx'
     $script:AccessDeniedWin32Error = 5
+    $script:vhdDiskFormat = 'vhd'
     [ref]$script:TestHandle = [System.IntPtr]::Zero
     $script:mockedParams = [pscustomobject] @{
         DiskSizeInBytes   = 65Gb
@@ -209,19 +192,19 @@ InModuleScope $script:subModuleName {
         Context 'Creating a new virtual disk failed due to exception' {
             Mock `
                 -CommandName New-VirtualDiskUsingWin32 `
-                -MockWith { throw [System.ComponentModel.Win32Exception]::new($AccessDeniedWin32Error) } `
+                -MockWith { $script:AccessDeniedWin32Error } `
                 -Verifiable
-
-                It 'Should throw an exception in creation method' {
-                    {
-                        New-SimpleVirtualDisk `
-                            -VirtualDiskPath $script:mockedParams.VirtualDiskPath `
-                            -DiskSizeInBytes $script:mockedParams.DiskSizeInBytes `
-                            -DiskFormat $script:mockedParams.DiskFormat `
-                            -DiskType $script:mockedParams.DiskType`
-                            -Verbose
-                    } | Should -Throw
-                }
+                $exception = [System.ComponentModel.Win32Exception]::new($script:AccessDeniedWin32Error)
+            It 'Should throw an exception in creation method' {
+                {
+                    New-SimpleVirtualDisk `
+                        -VirtualDiskPath $script:mockedParams.VirtualDiskPath `
+                        -DiskSizeInBytes $script:mockedParams.DiskSizeInBytes `
+                        -DiskFormat $script:mockedParams.DiskFormat `
+                        -DiskType $script:mockedParams.DiskType`
+                        -Verbose
+                } | Should -Throw -ExpectedMessage $exception.Message
+            }
 
             It 'Should only call required mocks' {
                 Assert-VerifiableMock
@@ -229,7 +212,7 @@ InModuleScope $script:subModuleName {
             }
         }
     }
-<#
+
     Describe 'VirtualHardDisk.Win32Helpers\Add-SimpleVirtualDisk' -Tag 'Add-SimpleVirtualDisk' {
         Context 'Attaching a virtual disk failed due to exception' {
 
@@ -242,53 +225,143 @@ InModuleScope $script:subModuleName {
                 -CommandName Add-VirtualDiskUsingWin32 `
                 -MockWith { $script:AccessDeniedWin32Error } `
                 -Verifiable
-
-                It 'Should throw an exception during attach function' {
-                    {
-                        Add-SimpleVirtualDisk `
-                            -VirtualDiskPath $script:mockedParams.VirtualDiskPath `
-                            -DiskFormat $script:mockedParams.DiskFormat `
-                            -Handle $script:TestHandle `
-                            -Verbose
-                    } | Should -Throw
-                }
+            $exception = [System.ComponentModel.Win32Exception]::new($script:AccessDeniedWin32Error)
+            It 'Should throw an exception during attach function' {
+                {
+                    Add-SimpleVirtualDisk `
+                        -VirtualDiskPath $script:mockedParams.VirtualDiskPath `
+                        -DiskFormat $script:mockedParams.DiskFormat `
+                        -Verbose
+                } | Should -Throw -ExpectedMessage $exception.Message
+            }
 
             It 'Should only call required mocks' {
                 Assert-VerifiableMock
-                Assert-MockCalled -CommandName Add-VirtualDiskUsingWin32 -Exactly 1
+                Assert-MockCalled -CommandName Add-VirtualDiskUsingWin32 -Exactly 2
                 Assert-MockCalled -CommandName Get-VirtualDiskHandle -Exactly 1
             }
         }
-    }
 
-    Describe 'VirtualHardDisk.Win32Helpers\Get-VirtualStorageType' -Tag 'Get-VirtualStorageType' {
-        Context 'When creating Vhd' {
+        Context 'Attaching a virtual disk successfully' {
+            Mock `
+                -CommandName Add-VirtualDiskUsingWin32 `
+                -MockWith { 0 } `
+                -Verifiable
 
             Mock `
                 -CommandName Get-VirtualDiskHandle `
                 -MockWith { $script:TestHandle } `
                 -Verifiable
 
+            It 'Should not throw an exception' {
+                {
+                    Add-SimpleVirtualDisk `
+                        -VirtualDiskPath $script:mockedParams.VirtualDiskPath `
+                        -DiskFormat $script:mockedParams.DiskFormat `
+                        -Verbose
+                } | Should -Not -Throw
+            }
+
+            It 'Should only call required mocks' {
+                Assert-VerifiableMock
+                Assert-MockCalled -CommandName Get-VirtualDiskHandle -Exactly 1
+                Assert-MockCalled -CommandName Add-VirtualDiskUsingWin32 -Exactly 1
+            }
+        }
+    }
+
+    Describe 'VirtualHardDisk.Win32Helpers\Get-VirtualDiskHandle' -Tag 'Get-VirtualDiskHandle' {
+        Context 'Opening a virtual disk file failed due to exception' {
+
             Mock `
-                -CommandName Add-VirtualDiskUsingWin32 `
-                -MockWith { throw [System.ComponentModel.Win32Exception]::new($AccessDeniedWin32Error) } `
+                -CommandName Get-VirtualDiskUsingWin32 `
+                -MockWith { $script:AccessDeniedWin32Error } `
                 -Verifiable
 
-                It 'Should throw an exception during attach function' {
-                    {
-                        Add-SimpleVirtualDisk `
-                            -VirtualDiskPath $script:mockedParams.VirtualDiskPath `
-                            -DiskFormat $script:mockedParams.DiskFormat `
-                            -Handle $script:TestHandle `
-                            -Verbose
-                    } | Should -Throw
-                }
+            $exception = [System.ComponentModel.Win32Exception]::new($script:AccessDeniedWin32Error)
+            It 'Should throw an exception while attempting to open virtual disk file' {
+                {
+                    Get-VirtualDiskHandle `
+                        -VirtualDiskPath $script:mockedParams.VirtualDiskPath `
+                        -DiskFormat $script:mockedParams.DiskFormat `
+                        -Verbose
+                } | Should -Throw -ExpectedMessage $exception.Message
+            }
 
             It 'Should only call required mocks' {
                 Assert-VerifiableMock
                 Assert-MockCalled -CommandName Get-VirtualDiskUsingWin32 -Exactly 1
-                Assert-MockCalled -CommandName Add-VirtualDiskUsingWin32 -Exactly 1
             }
         }
-    }#>
+
+        Context 'Opening a virtual disk file successfully' {
+            Mock `
+                -CommandName Get-VirtualDiskUsingWin32 `
+                -MockWith { 0 } `
+                -Verifiable
+
+            It 'Should not throw an exception' {
+                {
+                    Get-VirtualDiskHandle `
+                        -VirtualDiskPath $script:mockedParams.VirtualDiskPath `
+                        -DiskFormat $script:mockedParams.DiskFormat `
+                        -Verbose
+                } | Should -Not -Throw
+            }
+
+            It 'Should only call required mocks' {
+                Assert-VerifiableMock
+                Assert-MockCalled -CommandName Get-VirtualDiskUsingWin32 -Exactly 1
+            }
+        }
+    }
+
+    Describe 'VirtualHardDisk.Win32Helpers\Get-VirtualStorageType' -Tag 'Get-VirtualStorageType' {
+        Context 'Storage type requested for vhd disk format' {
+            $result = Get-VirtualStorageType -DiskFormat $script:vhdDiskFormat
+            It 'Should not throw an exception' {
+                {
+                    Get-VirtualStorageType `
+                        -DiskFormat $script:vhdDiskFormat `
+                        -Verbose
+                } | Should -Not -Throw
+            }
+            Get-VirtDiskWin32HelperScript
+            $virtualStorageType = New-Object -TypeName VirtDisk.Helper+VIRTUAL_STORAGE_TYPE
+            $virtualStorageType.VendorId = [VirtDisk.Helper]::VIRTUAL_STORAGE_TYPE_VENDOR_MICROSOFT
+            $virtualStorageType.DeviceId = [VirtDisk.Helper]::VIRTUAL_STORAGE_TYPE_DEVICE_VHD
+
+            It "Should return vendorId $($virtualStorageType.VendorId)" {
+                $result.VendorId | Should -Be $virtualStorageType.VendorId
+            }
+
+            It "Should return DeviceId $($virtualStorageType.DeviceId)" {
+                $result.DeviceId | Should -Be $virtualStorageType.DeviceId
+            }
+        }
+
+        Context 'Storage type requested for vhdx disk format' {
+            $result = Get-VirtualStorageType -DiskFormat $script:mockedParams.DiskFormat
+            It 'Should not throw an exception' {
+                {
+                    Get-VirtualStorageType `
+                        -DiskFormat $script:mockedParams.DiskFormat `
+                        -Verbose
+                } | Should -Not -Throw
+            }
+            Get-VirtDiskWin32HelperScript
+            $virtualStorageType = New-Object -TypeName VirtDisk.Helper+VIRTUAL_STORAGE_TYPE
+            $virtualStorageType.VendorId = [VirtDisk.Helper]::VIRTUAL_STORAGE_TYPE_VENDOR_MICROSOFT
+            $virtualStorageType.DeviceId = [VirtDisk.Helper]::VIRTUAL_STORAGE_TYPE_DEVICE_VHDX
+
+            It "Should return vendorId $($virtualStorageType.VendorId)" {
+                $result.VendorId | Should -Be $virtualStorageType.VendorId
+            }
+
+            It "Should return DeviceId $($virtualStorageType.DeviceId)" {
+                $result.DeviceId | Should -Be $virtualStorageType.DeviceId
+            }
+        }
+
+    }
 }

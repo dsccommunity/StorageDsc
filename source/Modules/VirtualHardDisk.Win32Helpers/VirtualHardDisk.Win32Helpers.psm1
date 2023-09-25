@@ -413,8 +413,8 @@ function New-SimpleVirtualDisk
 
         if ($result -ne 0)
         {
-            Write-Error -Message ($script:localizedData.CreateVirtualDiskError -f $result)
-            throw [System.ComponentModel.Win32Exception]::new($result);
+            Write-Verbose -Message ($script:localizedData.CreateVirtualDiskError -f $result)
+            throw [System.ComponentModel.Win32Exception]::new($result)
         }
 
         Write-Verbose -Message ($script:localizedData.VirtualDiskCreatedSuccessfully -f $VirtualDiskPath)
@@ -510,8 +510,8 @@ function Add-SimpleVirtualDisk
 
         if ($result -ne 0)
         {
-            Write-Error -Message ($script:localizedData.AttachVirtualDiskError -f $result)
-            throw [System.ComponentModel.Win32Exception]::new($result);
+            Write-Verbose -Message ($script:localizedData.AttachVirtualDiskError -f $result)
+            throw [System.ComponentModel.Win32Exception]::new($result)
         }
 
         Write-Verbose -Message ($script:localizedData.VirtualDiskAttachedSuccessfully -f $VirtualDiskPath)
@@ -570,8 +570,8 @@ function Get-VirtualDiskHandle
 
     if ($result -ne 0)
     {
-        Write-Error -Message ($script:localizedData.OpenVirtualDiskError -f $result)
-        throw [System.ComponentModel.Win32Exception]::new($result);
+        Write-Verbose -Message ($script:localizedData.OpenVirtualDiskError -f $result)
+        throw [System.ComponentModel.Win32Exception]::new($result)
     }
 
     Write-Verbose -Message ($script:localizedData.VirtualDiskOpenedSuccessfully -f $VirtualDiskPath)
@@ -606,7 +606,6 @@ function Get-VirtualStorageType
     $virtualStorageType.DeviceId = [VirtDisk.Helper]::VIRTUAL_STORAGE_TYPE_DEVICE_VHDX
     if ($DiskFormat -eq 'vhd')
     {
-        $virtualStorageType.VendorId = [VirtDisk.Helper]::VIRTUAL_STORAGE_TYPE_VENDOR_MICROSOFT
         $virtualStorageType.DeviceId = [VirtDisk.Helper]::VIRTUAL_STORAGE_TYPE_DEVICE_VHD
     }
 
