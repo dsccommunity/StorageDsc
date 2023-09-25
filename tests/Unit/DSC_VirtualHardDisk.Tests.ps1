@@ -560,8 +560,7 @@ try
                         -DiskSize $script:mockedDiskImageAttachedVhdx.Size `
                         -DiskFormat $extension `
                         -Ensure 'Present' `
-                        -Verbose
-                    | Should -Be $false
+                        -Verbose | Should -Be $false
                 }
 
                 It 'Should only call required mocks' {
@@ -583,8 +582,7 @@ try
                         -DiskSize $script:mockedDiskImageAttachedVhdx.Size `
                         -DiskFormat $extension `
                         -Ensure 'Present' `
-                        -Verbose
-                    | Should -Be $false
+                        -Verbose | Should -Be $false
                 }
 
                 It 'Should only call required mocks' {
@@ -606,8 +604,7 @@ try
                         -DiskSize $script:mockedDiskImageAttachedVhdx.Size `
                         -DiskFormat $extension `
                         -Ensure 'Absent' `
-                        -Verbose
-                    | Should -Be $true
+                        -Verbose | Should -Be $true
                 }
 
                 It 'Should only call required mocks' {
@@ -629,8 +626,7 @@ try
                         -DiskSize $script:mockedDiskImageAttachedVhdx.Size `
                         -DiskFormat $extension `
                         -Ensure 'Present' `
-                        -Verbose
-                    | Should -Be $true
+                        -Verbose | Should -Be $true
                 }
 
                 It 'Should only call required mocks' {
@@ -652,8 +648,7 @@ try
                         -DiskSize $script:mockedDiskImageAttachedVhdx.Size `
                         -DiskFormat $extension `
                         -Ensure 'absent' `
-                        -Verbose
-                    | Should -Be $false
+                        -Verbose | Should -Be $false
                 }
 
                 It 'Should only call required mocks' {
@@ -675,8 +670,7 @@ try
                         -DiskSize $script:mockedDiskImageAttachedVhdx.Size `
                         -DiskFormat $extension `
                         -Ensure 'absent' `
-                        -Verbose
-                    | Should -Be $true
+                        -Verbose | Should -Be $true
                 }
 
                 It 'Should only call required mocks' {

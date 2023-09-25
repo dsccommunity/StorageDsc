@@ -137,7 +137,7 @@ function Set-TargetResource
                  # Remove file if we created it but were unable to attach it. No handles are open when this happens.
                 if (Test-Path -Path $FilePath -PathType Leaf)
                 {
-                    Write-Verbose -Message ($script:localizedData.VirtualRemovingCreatedFileMessage -f $VirtualDiskPath)
+                    Write-Verbose -Message ($script:localizedData.VirtualRemovingCreatedFileMessage -f $folderPath)
                     Remove-Item $FilePath -verbose
                 }
 

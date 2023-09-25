@@ -184,7 +184,7 @@ function Get-VirtDiskWin32HelperScript
     .PARAMETER Handle
         Specifies the reference to handle object that represents the newly created virtual disk.
 #>
-Function New-VirtualDiskUsingWin32 {
+function New-VirtualDiskUsingWin32 {
 
     [CmdletBinding()]
     [OutputType([System.Int32])]
@@ -264,7 +264,7 @@ Function New-VirtualDiskUsingWin32 {
         Specifies the reference to an overlapped structure for asynchronous calls.
 
 #>
-Function Add-VirtualDiskUsingWin32 {
+function Add-VirtualDiskUsingWin32 {
 
     [CmdletBinding()]
     [OutputType([System.Int32])]
@@ -313,7 +313,7 @@ Function Add-VirtualDiskUsingWin32 {
     .PARAMETER Handle
         Specifies a reference to handle for a file.
 #>
-Function Close-Win32Handle {
+function Close-Win32Handle {
 
     [CmdletBinding()]
     [OutputType([System.Void])]
@@ -354,7 +354,7 @@ Function Close-Win32Handle {
     .PARAMETER Handle
         Specifies the reference to handle object that represents the a virtual disk file.
 #>
-Function Get-VirtualDiskUsingWin32 {
+function Get-VirtualDiskUsingWin32 {
 
     [CmdletBinding()]
     [OutputType([System.Int32])]

@@ -31,8 +31,9 @@ Configuration VirtualHardDisk_CreateFixedSizedVirtualDisk
           # Create new virtual disk
           VirtualHardDisk newVhd
           {
-            FilePath = C:\myVhds\virtDisk1.vhd
+            FilePath = 'C:\myVhds\virtDisk1.vhd'
             DiskSize = 40Gb
+            DiskFormat = 'vhd'
             DiskType = 'fixed'
             Ensure = 'Present'
           }

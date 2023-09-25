@@ -12,4 +12,6 @@ ConvertFrom-StringData @'
     VirtualHardDiskPathError = The path '{0}' must be a fully qualified path that starts with a Drive Letter.
     VirtualHardExtensionAndFormatMismatchError = The path you entered '{0}' has extension '{1}' but the disk format entered is '{2}'. Both the extension and format must match.
     VirtualHardNoExtensionError = The path '{0}' does not contain an extension. Supported extension types are '.vhd' and '.vhdx'.
+    GettingVirtualDiskMessage = Getting virtual disk information for virtual disk located at '{0}.
+    VirtualRemovingCreatedFileMessage = The virtual disk file at location '{0}' is being removed due to an error while attempting to attach it to the system.
 '@

@@ -8,5 +8,4 @@ ConvertFrom-StringData @'
     OpeningVirtualBeforeAttachingMessage = Attempting to open handle to virtual disk at location '{0}.
     OpenVirtualDiskError = Unable to open virtual disk handle due to win32 error '{0}'.
     VirtualDiskOpenedSuccessfully = Virtual disk handle for location '{0}' opened successfully.
-    VirtualRemovingCreatedFileMessage = The virtual disk file at location '{0}' is being removed due to an error while attempting to attach it to the system.
 '@

@@ -31,8 +31,9 @@ Configuration VirtualHardDisk_CreateDynamicallyExpandingVirtualDisk
           # Create new virtual disk
           VirtualHardDisk newVhd2
           {
-            FilePath = C:\myVhds\virtDisk2.vhdx
+            FilePath = 'C:\myVhds\virtDisk2.vhdx'
             DiskSize = 40Gb
+            DiskFormat = 'vhdx'
             DiskType = 'dynamic'
             Ensure = 'Present'
           }
