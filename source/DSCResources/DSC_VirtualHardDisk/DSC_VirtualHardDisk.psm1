@@ -85,7 +85,8 @@ function Set-TargetResource
         [String]
         $FilePath,
 
-        [Parameter(Mandatory = $true)]
+        [Parameter()]
+        [ValidateScript({$_ -gt 0})]
         [System.UInt64]
         $DiskSize,
 
@@ -208,14 +209,15 @@ function Test-TargetResource
         [String]
         $FilePath,
 
-        [Parameter(Mandatory = $true)]
+        [Parameter()]
+        [ValidateScript({$_ -gt 0})]
         [System.UInt64]
         $DiskSize,
 
         [Parameter()]
         [ValidateSet('vhd', 'vhdx')]
         [System.String]
-        $DiskFormat = 'vhdx',
+        $DiskFormat,
 
         [Parameter()]
         [ValidateSet('fixed', 'dynamic')]
