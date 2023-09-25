@@ -511,7 +511,7 @@ try
 
                 Mock `
                     -CommandName New-SimpleVirtualDisk `
-                    -MockWith { throw } `
+                    -MockWith { throw [System.ComponentModel.Win32Exception]::new($script:AccessDeniedWin32Error) } `
                     -Verifiable
 
                 Mock `
@@ -524,6 +524,7 @@ try
 
                 $script:MockTestPathCount = 0
                 $extension = [System.IO.Path]::GetExtension($script:mockedDiskImageAttachedVhdx.ImagePath).TrimStart('.')
+                $exception = [System.ComponentModel.Win32Exception]::new($script:AccessDeniedWin32Error)
                 It 'Should not let exception escape and new folder and file should be deleted' {
                     {
                         Set-TargetResource `
@@ -532,7 +533,7 @@ try
                             -DiskFormat $extension `
                             -Ensure 'Present' `
                             -Verbose
-                    } | Should -Not -Throw
+                    } | Should -Throw -ExpectedMessage $exception.Message
                 }
 
                 It 'Should only call required mocks' {

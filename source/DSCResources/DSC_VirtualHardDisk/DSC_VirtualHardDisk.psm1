@@ -279,7 +279,7 @@ function Test-TargetResource
 } # function Test-TargetResource
 
 <#
-.SYNOPSIS
+    .SYNOPSIS
         Validates parameters for both set and test operations.
 
     .PARAMETER FilePath
