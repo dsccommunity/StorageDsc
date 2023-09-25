@@ -36,6 +36,7 @@ try
         $script:DiskImageBadPath = '\\test.vhdx'
         $script:DiskImageGoodVhdPath = 'C:\test.vhd'
         $script:DiskImageNonVirtDiskPath = 'C:\test.text'
+        $script:DiskImageVirtDiskPathWithoutExtension = 'C:\test'
         $script:DiskImageSizeBelowVirtDiskMinimum = 9Mb
         $script:DiskImageSizeAboveVhdMaximum = 2041Gb
         $script:DiskImageSizeAboveVhdxMaximum = 65Tb
@@ -43,27 +44,47 @@ try
         $script:MockTestPathCount = 0
 
         $script:mockedDiskImageAttachedVhdx = [pscustomobject] @{
-            Attached          = $true
-            ImagePath         = $script:DiskImageGoodVhdxPath
-            Size              = 100GB
+            Attached              = $true
+            ImagePath             = $script:DiskImageGoodVhdxPath
+            Size                  = 100GB
+            DiskNumber            = 2
         }
 
         $script:mockedDiskImageAttachedVhd = [pscustomobject] @{
-            Attached          = $true
-            ImagePath         = $script:DiskImageGoodVhdPath
-            Size              = 100GB
+            Attached              = $true
+            ImagePath             = $script:DiskImageGoodVhdPath
+            Size                  = 100GB
+            DiskNumber            = 2
         }
 
         $script:mockedDiskImageNotAttachedVhdx = [pscustomobject] @{
-            Attached          = $false
-            ImagePath         = $script:DiskImageGoodVhdxPath
-            Size              = 100GB
+            Attached              = $false
+            ImagePath             = $script:DiskImageGoodVhdxPath
+            Size                  = 100GB
+            DiskNumber            = 2
         }
 
         $script:mockedDiskImageNotAttachedVhd = [pscustomobject] @{
-            Attached          = $false
-            ImagePath         = $script:DiskImageGoodVhdPath
-            Size              = 100GB
+            Attached              = $false
+            ImagePath             = $script:DiskImageGoodVhdPath
+            Size                  = 100GB
+            DiskNumber            = 2
+        }
+
+        $script:GetTargetOutputWhenBadPath = [pscustomobject] @{
+            FilePath    = $null
+            Attached    = $null
+            Size        = $null
+            DiskNumber  = $null
+            Ensure      = 'Absent'
+        }
+
+        $script:GetTargetOutputWhenPathGood = [pscustomobject] @{
+            FilePath     = $mockedDiskImageAttachedVhdx.ImagePath
+            Attached    = $mockedDiskImageAttachedVhdx.Attached
+            Size        = $mockedDiskImageAttachedVhdx.Size
+            DiskNumber  = $mockedDiskImageAttachedVhdx.DiskNumber
+            Ensure      = 'Present'
         }
 
         $script:mockedDiskImageEmpty = $null
@@ -112,129 +133,70 @@ try
                 $DiskType
             )
         }
-        Function New-VirtualDiskUsingWin32
-        {
-            [CmdletBinding()]
-            [OutputType([System.Int32])]
-            Param
-            (
-                [Parameter(Mandatory = $true)]
-                [ref]
-                $VirtualStorageType,
-
-                [Parameter(Mandatory = $true)]
-                [System.String]
-                $VirtualDiskPath,
-
-                [Parameter(Mandatory = $true)]
-                [UInt32]
-                $AccessMask,
-
-                [Parameter(Mandatory = $true)]
-                [System.IntPtr]
-                $SecurityDescriptor,
-
-                [Parameter(Mandatory = $true)]
-                [UInt32]
-                $Flags,
-
-                [Parameter(Mandatory = $true)]
-                [System.UInt32]
-                $ProviderSpecificFlags,
-
-                [Parameter(Mandatory = $true)]
-                [ref]
-                $CreateVirtualDiskParameters,
-
-                [Parameter(Mandatory = $true)]
-                [System.IntPtr]
-                $Overlapped,
-
-                [Parameter(Mandatory = $true)]
-                [ref]
-                $Handle
-            )
-        }
-
-        Function Add-VirtualDiskUsingWin32
-        {
-            [CmdletBinding()]
-            [OutputType([System.Int32])]
-            Param
-            (
-                [Parameter(Mandatory = $true)]
-                [ref]
-                $Handle,
-
-                [Parameter(Mandatory = $true)]
-                [System.IntPtr]
-                $SecurityDescriptor,
-
-                [Parameter(Mandatory = $true)]
-                [System.UInt32]
-                $Flags,
-
-                [Parameter(Mandatory = $true)]
-                [System.Int32]
-                $ProviderSpecificFlags,
-
-                [Parameter(Mandatory = $true)]
-                [ref]
-                $AttachVirtualDiskParameters,
-
-                [Parameter(Mandatory = $true)]
-                [System.IntPtr]
-                $Overlapped
-            )
-        }
-
-        Function Close-Win32Handle
-        {
-
-            [CmdletBinding()]
-            [OutputType([System.Void])]
-            Param
-            (
-                [Parameter(Mandatory = $true)]
-                [ref]
-                $Handle
-            )
-        }
-
-        Function Get-VirtualDiskUsingWin32
-        {
-
-            [CmdletBinding()]
-            [OutputType([System.Int32])]
-            Param
-            (
-                [Parameter(Mandatory = $true)]
-                [ref]
-                $VirtualStorageType,
-
-                [Parameter(Mandatory = $true)]
-                [System.String]
-                $VirtualDiskPath,
-
-                [Parameter(Mandatory = $true)]
-                [System.UInt32]
-                $AccessMask,
-
-                [Parameter(Mandatory = $true)]
-                [System.UInt32]
-                $Flags,
-
-                [Parameter(Mandatory = $true)]
-                [ref]
-                $OpenVirtualDiskParameters,
-
-                [Parameter(Mandatory = $true)]
-                [ref]
-                $Handle
-            )
-        }
 
         Describe 'DSC_VirtualHardDisk\Get-TargetResource' {
+            Context 'When file path does not exist or was never mounted' {
+
+                Mock `
+                    -CommandName Get-DiskImage `
+                    -MockWith { $script:mockedDiskImageEmpty } `
+                    -Verifiable
+
+                $resource = Get-TargetResource -FilePath $script:DiskImageBadPath -Verbose
+
+                It "Should return DiskNumber $($script:GetTargetOutputWhenBadPath.DiskNumber)" {
+                    $resource.DiskNumber | Should -Be $script:GetTargetOutputWhenBadPath.DiskNumber
+                }
+
+                It "Should return FilePath $($script:GetTargetOutputWhenBadPath.FilePath)" {
+                    $resource.FilePath | Should -Be $script:GetTargetOutputWhenBadPath.FilePath
+                }
+
+                It "Should return Attached $($script:GetTargetOutputWhenBadPath.Attached)" {
+                    $resource.Attached | Should -Be $script:GetTargetOutputWhenBadPath.Attached
+                }
+
+                It "Should return Size $($script:GetTargetOutputWhenBadPath.Size)" {
+                    $resource.Size | Should -Be $script:GetTargetOutputWhenBadPath.Size
+                }
+
+                It "Should return Ensure $($script:GetTargetOutputWhenBadPath.Ensure)" {
+                    $resource.Ensure | Should -Be $script:GetTargetOutputWhenBadPath.Ensure
+                }
+            }
+
+            Context 'When file path does exist and was mounted at one point' {
+                Mock `
+                    -CommandName Get-DiskImage `
+                    -MockWith { $script:mockedDiskImageAttachedVhdx } `
+                    -Verifiable
+
+                $resource = Get-TargetResource -FilePath $script:DiskImageGoodVhdxPath -Verbose
+
+                It "Should return DiskNumber $($script:GetTargetOutputWhenPathGood.DiskNumber)" {
+                    $resource.DiskNumber | Should -Be $script:GetTargetOutputWhenPathGood.DiskNumber
+                }
+
+                It "Should return FilePath $($script:GetTargetOutputWhenPathGood.FilePath)" {
+                    $resource.FilePath | Should -Be $script:GetTargetOutputWhenPathGood.FilePath
+                }
+
+                It "Should return Attached $($script:GetTargetOutputWhenPathGood.Attached)" {
+                    $resource.Attached | Should -Be $script:GetTargetOutputWhenPathGood.Attached
+                }
+
+                It "Should return Size $($script:GetTargetOutputWhenPathGood.Size)" {
+                    $resource.Size | Should -Be $script:GetTargetOutputWhenPathGood.Size
+                }
+
+                It "Should return Ensure $($script:GetTargetOutputWhenPathGood.Ensure)" {
+                    $resource.Ensure | Should -Be $script:GetTargetOutputWhenPathGood.Ensure
+                }
+            }
+        }
+
+        Describe 'DSC_VirtualHardDisk\Set-TargetResource' {
+
             Context 'When file path is not fully qualified' {
 
                 $errorRecord = Get-InvalidArgumentRecord `
@@ -244,9 +206,11 @@ try
 
                 It 'Should throw invalid argument error when path is not fully qualified' {
                     {
-                        Get-TargetResource `
-                            -FilePathWithExtension $DiskImageBadPath `
+                        Set-TargetResource `
+                            -FilePath $DiskImageBadPath `
                             -DiskSize $DiskImageSize65Gb `
+                            -DiskFormat 'vhdx' `
+                            -Ensure 'Present' `
                             -Verbose
                     } | Should -Throw $errorRecord
                 }
@@ -261,9 +225,48 @@ try
 
                 It 'Should throw invalid argument error when the file type is not supported' {
                     {
-                        Get-TargetResource `
-                            -FilePathWithExtension $DiskImageNonVirtDiskPath `
+                        Set-TargetResource `
+                            -FilePath $DiskImageNonVirtDiskPath `
                             -DiskSize $DiskImageSize65Gb `
+                            -DiskFormat 'vhdx' `
+                            -Ensure 'Present' `
+                            -Verbose
+                    } | Should -Throw $errorRecord
+                }
+            }
+
+            Context 'When file extension does not match the disk format' {
+                $extension = [System.IO.Path]::GetExtension($DiskImageGoodVhdPath).TrimStart('.')
+                $errorRecord = Get-InvalidArgumentRecord `
+                    -Message ($script:localizedData.VirtualHardExtensionAndFormatMismatchError -f `
+                        $DiskImageGoodVhdPath, $extension, 'vhdx') `
+                    -ArgumentName 'FilePath'
+
+                It 'Should throw invalid argument error when the file type and filepath extension do not match' {
+                    {
+                        Set-TargetResource `
+                            -FilePath $DiskImageGoodVhdPath `
+                            -DiskSize $DiskImageSize65Gb `
+                            -DiskFormat 'vhdx' `
+                            -Ensure 'Present' `
+                            -Verbose
+                    } | Should -Throw $errorRecord
+                }
+            }
+
+            Context 'When file extension is not present in the file path' {
+                $errorRecord = Get-InvalidArgumentRecord `
+                    -Message ($script:localizedData.VirtualHardNoExtensionError -f `
+                    $script:DiskImageVirtDiskPathWithoutExtension) `
+                    -ArgumentName 'FilePath'
+
+                It 'Should throw invalid argument error when the file type and filepath extension do not match' {
+                    {
+                        Set-TargetResource `
+                            -FilePath $script:DiskImageVirtDiskPathWithoutExtension `
+                            -DiskSize $DiskImageSize65Gb `
+                            -DiskFormat 'vhdx' `
+                            -Ensure 'Present' `
                             -Verbose
                     } | Should -Throw $errorRecord
                 }
@@ -279,9 +282,11 @@ try
 
                 It 'Should throw invalid argument error when the provided size is below the minimum for the vhd format' {
                     {
-                        Get-TargetResource `
-                            -FilePathWithExtension $DiskImageGoodVhdPath `
+                        Set-TargetResource `
+                            -FilePath $DiskImageGoodVhdPath `
                             -DiskSize $DiskImageSizeBelowVirtDiskMinimum `
+                            -DiskFormat 'vhd' `
+                            -Ensure 'Present' `
                             -Verbose
                     } | Should -Throw $errorRecord
                 }
@@ -296,9 +301,11 @@ try
 
                 It 'Should throw invalid argument error when the provided size is below the minimum for the vhdx format' {
                     {
-                        Get-TargetResource `
-                            -FilePathWithExtension $DiskImageGoodVhdxPath `
+                        Set-TargetResource `
+                            -FilePath $DiskImageGoodVhdxPath `
                             -DiskSize $DiskImageSizeBelowVirtDiskMinimum `
+                            -DiskFormat 'vhdx' `
+                            -Ensure 'Present' `
                             -Verbose
                     } | Should -Throw $errorRecord
                 }
@@ -313,9 +320,11 @@ try
 
                 It 'Should throw invalid argument error when the provided size is above the maximum for the vhd format' {
                     {
-                        Get-TargetResource `
-                            -FilePathWithExtension $DiskImageGoodVhdPath `
+                        Set-TargetResource `
+                            -FilePath $DiskImageGoodVhdPath `
                             -DiskSize $DiskImageSizeAboveVhdMaximum `
+                            -DiskFormat 'vhd' `
+                            -Ensure 'Present' `
                             -Verbose
                     } | Should -Throw $errorRecord
                 }
@@ -330,9 +339,11 @@ try
 
                 It 'Should throw invalid argument error when the provided size is above the maximum for the vhdx format' {
                     {
-                        Get-TargetResource `
-                            -FilePathWithExtension $DiskImageGoodVhdxPath `
+                        Set-TargetResource `
+                            -FilePath $DiskImageGoodVhdxPath `
                             -DiskSize $DiskImageSizeAboveVhdxMaximum `
+                            -DiskFormat 'vhdx' `
+                            -Ensure 'Present' `
                             -Verbose
                     } | Should -Throw $errorRecord
                 }
@@ -341,9 +352,11 @@ try
             Context 'When file path to vhdx file is fully qualified' {
                 It 'Should not throw invalid argument error when path is fully qualified' {
                     {
-                        Get-TargetResource `
-                            -FilePathWithExtension $DiskImageGoodVhdxPath `
+                        Set-TargetResource `
+                            -FilePath $DiskImageGoodVhdxPath `
                             -DiskSize $DiskImageSize65Gb `
+                            -DiskFormat 'vhdx' `
+                            -Ensure 'Present' `
                             -Verbose
                     } | Should -Not -Throw
                 }
@@ -352,16 +365,15 @@ try
             Context 'When file path to vhd is fully qualified' {
                 It 'Should not throw invalid argument error when path is fully qualified' {
                     {
-                        Get-TargetResource `
-                            -FilePathWithExtension $DiskImageGoodVhdPath `
+                        Set-TargetResource `
+                            -FilePath $DiskImageGoodVhdPath `
                             -DiskSize $DiskImageSize65Gb `
+                            -DiskFormat 'vhd' `
+                            -Ensure 'Present' `
                             -Verbose
                     } | Should -Not -Throw
                 }
             }
-        }
-
-        Describe 'DSC_VirtualHardDisk\Set-TargetResource' {
 
             Context 'Virtual disk is mounted and ensure set to present' {
 
@@ -374,7 +386,7 @@ try
                 It 'Should not throw an exception' {
                     {
                         Set-TargetResource `
-                            -FilePathWithExtension $script:mockedDiskImageAttachedVhdx.ImagePath `
+                            -FilePath $script:mockedDiskImageAttachedVhdx.ImagePath `
                             -DiskSize $script:mockedDiskImageAttachedVhdx.Size `
                             -DiskFormat $extension `
                             -Ensure 'Present' `
@@ -403,7 +415,7 @@ try
                 It 'Should dismount the virtual disk' {
                     {
                         Set-TargetResource `
-                            -FilePathWithExtension $script:mockedDiskImageAttachedVhdx.ImagePath `
+                            -FilePath $script:mockedDiskImageAttachedVhdx.ImagePath `
                             -DiskSize $script:mockedDiskImageAttachedVhdx.Size `
                             -DiskFormat $extension `
                             -Ensure 'Absent' `
@@ -432,7 +444,7 @@ try
                 It 'Should Not throw exception' {
                     {
                         Set-TargetResource `
-                            -FilePathWithExtension $script:mockedDiskImageAttachedVhdx.ImagePath `
+                            -FilePath $script:mockedDiskImageAttachedVhdx.ImagePath `
                             -DiskSize $script:mockedDiskImageAttachedVhdx.Size `
                             -DiskFormat $extension `
                             -Ensure 'Present' `
@@ -461,7 +473,7 @@ try
                 It 'Should not throw an exception' {
                     {
                         Set-TargetResource `
-                            -FilePathWithExtension $script:mockedDiskImageAttachedVhdx.ImagePath `
+                            -FilePath $script:mockedDiskImageAttachedVhdx.ImagePath `
                             -DiskSize $script:mockedDiskImageAttachedVhdx.Size `
                             -DiskFormat $extension `
                             -Ensure 'Present' `
@@ -515,7 +527,7 @@ try
                 It 'Should not let exception escape and new folder and file should be deleted' {
                     {
                         Set-TargetResource `
-                            -FilePathWithExtension $script:mockedDiskImageAttachedVhdx.ImagePath `
+                            -FilePath $script:mockedDiskImageAttachedVhdx.ImagePath `
                             -DiskSize $script:mockedDiskImageAttachedVhdx.Size `
                             -DiskFormat $extension `
                             -Ensure 'Present' `
@@ -543,7 +555,7 @@ try
                 $extension = [System.IO.Path]::GetExtension($script:mockedDiskImageAttachedVhdx.ImagePath).TrimStart('.')
                 It 'Should return false.' {
                     Test-TargetResource `
-                        -FilePathWithExtension $script:mockedDiskImageAttachedVhdx.ImagePath `
+                        -FilePath $script:mockedDiskImageAttachedVhdx.ImagePath `
                         -DiskSize $script:mockedDiskImageAttachedVhdx.Size `
                         -DiskFormat $extension `
                         -Ensure 'Present' `
@@ -566,7 +578,7 @@ try
                 $extension = [System.IO.Path]::GetExtension($script:mockedDiskImageAttachedVhdx.ImagePath).TrimStart('.')
                 It 'Should return false.' {
                     Test-TargetResource `
-                        -FilePathWithExtension $script:mockedDiskImageAttachedVhdx.ImagePath `
+                        -FilePath $script:mockedDiskImageAttachedVhdx.ImagePath `
                         -DiskSize $script:mockedDiskImageAttachedVhdx.Size `
                         -DiskFormat $extension `
                         -Ensure 'Present' `
@@ -589,7 +601,7 @@ try
                 $extension = [System.IO.Path]::GetExtension($script:mockedDiskImageAttachedVhdx.ImagePath).TrimStart('.')
                 It 'Should return true' {
                     Test-TargetResource `
-                        -FilePathWithExtension $script:mockedDiskImageAttachedVhdx.ImagePath `
+                        -FilePath $script:mockedDiskImageAttachedVhdx.ImagePath `
                         -DiskSize $script:mockedDiskImageAttachedVhdx.Size `
                         -DiskFormat $extension `
                         -Ensure 'Absent' `
@@ -612,7 +624,7 @@ try
                 $extension = [System.IO.Path]::GetExtension($script:mockedDiskImageAttachedVhdx.ImagePath).TrimStart('.')
                 It 'Should return true' {
                     Test-TargetResource `
-                        -FilePathWithExtension $script:mockedDiskImageAttachedVhdx.ImagePath `
+                        -FilePath $script:mockedDiskImageAttachedVhdx.ImagePath `
                         -DiskSize $script:mockedDiskImageAttachedVhdx.Size `
                         -DiskFormat $extension `
                         -Ensure 'Present' `
@@ -635,7 +647,7 @@ try
                 $extension = [System.IO.Path]::GetExtension($script:mockedDiskImageAttachedVhdx.ImagePath).TrimStart('.')
                 It 'Should return false.' {
                     Test-TargetResource `
-                        -FilePathWithExtension $script:mockedDiskImageAttachedVhdx.ImagePath `
+                        -FilePath $script:mockedDiskImageAttachedVhdx.ImagePath `
                         -DiskSize $script:mockedDiskImageAttachedVhdx.Size `
                         -DiskFormat $extension `
                         -Ensure 'absent' `
@@ -658,7 +670,7 @@ try
                 $extension = [System.IO.Path]::GetExtension($script:mockedDiskImageAttachedVhdx.ImagePath).TrimStart('.')
                 It 'Should return true.' {
                     Test-TargetResource `
-                        -FilePathWithExtension $script:mockedDiskImageAttachedVhdx.ImagePath `
+                        -FilePath $script:mockedDiskImageAttachedVhdx.ImagePath `
                         -DiskSize $script:mockedDiskImageAttachedVhdx.Size `
                         -DiskFormat $extension `
                         -Ensure 'absent' `
@@ -671,9 +683,7 @@ try
                     Assert-MockCalled -CommandName Get-DiskImage -Exactly 1
                 }
             }
-
         }
-        #endregion
     }
 }
 finally

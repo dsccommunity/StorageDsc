@@ -537,7 +537,6 @@ function Add-SimpleVirtualDisk
 function Get-VirtualDiskHandle
 {
     [CmdletBinding()]
-
     param
     (
         [Parameter(Mandatory = $true)]

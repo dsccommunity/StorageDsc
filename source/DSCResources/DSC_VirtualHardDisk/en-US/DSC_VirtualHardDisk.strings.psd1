@@ -10,4 +10,6 @@ ConvertFrom-StringData @'
     VirtualDiskDismountingImageMessage = The virtual disk located at '{0}' is dismounting.
     VirtualHardDiskUnsupportedFileType = The file type .{0} is not supported. Only .vhd and .vhdx file types are supported.
     VirtualHardDiskPathError = The path '{0}' must be a fully qualified path that starts with a Drive Letter.
+    VirtualHardExtensionAndFormatMismatchError = The path you entered '{0}' has extension '{1}' but the disk format entered is '{2}'. Both the extension and format must match.
+    VirtualHardNoExtensionError = The path '{0}' does not contain an extension. Supported extension types are '.vhd' and '.vhdx'.
 '@

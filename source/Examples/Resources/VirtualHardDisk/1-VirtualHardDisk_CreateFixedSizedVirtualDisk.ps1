@@ -31,7 +31,7 @@ Configuration VirtualHardDisk_CreateFixedSizedVirtualDisk
           # Create new virtual disk
           VirtualHardDisk newVhd
           {
-            FilePathWithExtension = C:\myVhds\virtDisk1.vhd
+            FilePath = C:\myVhds\virtDisk1.vhd
             DiskSize = 40Gb
             DiskType = 'fixed'
             Ensure = 'Present'
@@ -40,7 +40,7 @@ Configuration VirtualHardDisk_CreateFixedSizedVirtualDisk
           # Create new volume onto the new virtual disk
           Disk Volume1
           {
-            DiskId = 'C:\myVhds\myVHD.vhdx'
+            DiskId = 'C:\myVhds\virtDisk1.vhd'
             DiskIdType = 'Location'
             DriveLetter = 'E'
             FSLabel = 'new volume'

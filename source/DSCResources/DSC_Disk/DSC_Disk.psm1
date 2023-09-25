@@ -280,7 +280,7 @@ function Set-TargetResource
             -DiskIdType $DiskIdType
     }
 
-    if ($disk.PartitionStyle -eq 'RAW')
+    if ($disk.PartitionStyle -eq 'RAW' -bor (-not $disk.PartitionStyle))
     {
         Write-Verbose -Message ( @(
                 "$($MyInvocation.MyCommand): "

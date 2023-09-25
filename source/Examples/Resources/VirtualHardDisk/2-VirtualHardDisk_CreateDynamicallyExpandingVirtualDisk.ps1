@@ -21,7 +21,7 @@
     .DESCRIPTION
         This configuration will create a dynamic sized virtual disk that is 40Gb in size and will format a
         RefS volume named 'new volume 2' that uses the drive letter F. Note: the directory path in the
-        FilePathWithExtension parameter must exist. It will not be created for you.
+        FilePath parameter must exist. It will not be created for you.
 #>
 Configuration VirtualHardDisk_CreateDynamicallyExpandingVirtualDisk
 {
@@ -32,7 +32,7 @@ Configuration VirtualHardDisk_CreateDynamicallyExpandingVirtualDisk
           # Create new virtual disk
           VirtualHardDisk newVhd2
           {
-            FilePathWithExtension = C:\myVhds\virtDisk2.vhdx
+            FilePath = C:\myVhds\virtDisk2.vhdx
             DiskSize = 40Gb
             DiskType = 'dynamic'
             Ensure = 'Present'
@@ -41,7 +41,7 @@ Configuration VirtualHardDisk_CreateDynamicallyExpandingVirtualDisk
           # Create new volume onto the new virtual disk
           Disk Volume1
           {
-            DiskId = 'C:\myVhds\myVHD2.vhdx'
+            DiskId = 'C:\myVhds\virtDisk2.vhdx'
             DiskIdType = 'Location'
             DriveLetter = 'F'
             FSLabel = 'new volume 2'
