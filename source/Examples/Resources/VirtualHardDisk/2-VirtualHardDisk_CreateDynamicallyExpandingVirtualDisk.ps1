@@ -20,8 +20,7 @@
 <#
     .DESCRIPTION
         This configuration will create a dynamic sized virtual disk that is 40Gb in size and will format a
-        RefS volume named 'new volume 2' that uses the drive letter F. Note: the directory path in the
-        FilePath parameter must exist. It will not be created for you.
+        RefS volume named 'new volume 2' that uses the drive letter F.
 #>
 Configuration VirtualHardDisk_CreateDynamicallyExpandingVirtualDisk
 {

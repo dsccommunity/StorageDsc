@@ -145,6 +145,9 @@ function Set-TargetResource
                 {
                     Remove-Item -LiteralPath $folderPath
                 }
+
+                # Rethrow the exception
+                throw
             }
 
         }

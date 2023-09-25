@@ -154,10 +154,35 @@ function Get-VirtDiskWin32HelperScript
 <#
     .SYNOPSIS
         Calls Win32 CreateVirtualDisk api. This is used so we can mock this call
-        easier
+        easier.
+
+    .PARAMETER VirtualStorageType
+        Specifies the type and provider (vendor) of the virtual storage device.
 
     .PARAMETER VirtualDiskPath
-        Specifies the whole path to the virtual disk including the file name.
+        Specifies the whole path to the virtual disk file.
+
+    .PARAMETER AccessMask
+        Specifies the bitmask for specifying access rights to a virtual hard disk.
+
+    .PARAMETER SecurityDescriptor
+        Specifies the security information associated with the virtual disk.
+
+    .PARAMETER Flags
+        Specifies creation flags for the virtual disk.
+
+    .PARAMETER ProviderSpecificFlags
+        Specifies flags specific to the type of virtual disk being created.
+
+    .PARAMETER CreateVirtualDiskParameters
+        Specifies the virtual hard disk creation parameters, providing control over,
+        and information about, the newly created virtual disk.
+
+    .PARAMETER Overlapped
+        Specifies the reference to an overlapped structure for asynchronous calls.
+
+    .PARAMETER Handle
+        Specifies the reference to handle object that represents the newly created virtual disk.
 #>
 Function New-VirtualDiskUsingWin32 {
 
@@ -218,10 +243,26 @@ Function New-VirtualDiskUsingWin32 {
 <#
     .SYNOPSIS
         Calls Win32 AttachVirtualDisk api. This is used so we can mock this call
-        easier
+        easier.
 
-    .PARAMETER VirtualDiskPath
-        Specifies the whole path to the virtual disk including the file name.
+    .PARAMETER Handle
+        Specifies the reference to a handle to a virtual disk file.
+
+    .PARAMETER SecurityDescriptor
+        Specifies the security information associated with the virtual disk.
+
+    .PARAMETER Flags
+        Specifies attachment flags for the virtual disk.
+
+    .PARAMETER ProviderSpecificFlags
+        Specifies flags specific to the type of virtual disk being created.
+
+    .PARAMETER AttachVirtualDiskParameters
+        Specifies the virtual hard disk attach request parameters.
+
+    .PARAMETER Overlapped
+        Specifies the reference to an overlapped structure for asynchronous calls.
+
 #>
 Function Add-VirtualDiskUsingWin32 {
 
@@ -267,10 +308,10 @@ Function Add-VirtualDiskUsingWin32 {
 <#
     .SYNOPSIS
         Calls Win32 CloseHandle api. This is used so we can mock this call
-        easier
+        easier.
 
-    .PARAMETER VirtualDiskPath
-        Specifies the file handle to the virtual disk file.
+    .PARAMETER Handle
+        Specifies a reference to handle for a file.
 #>
 Function Close-Win32Handle {
 
@@ -293,10 +334,25 @@ Function Close-Win32Handle {
 <#
     .SYNOPSIS
         Calls Win32 OpenVirtualDisk api. This is used so we can mock this call
-        easier
+        easier.
+
+    .PARAMETER VirtualStorageType
+        Specifies the type and provider (vendor) of the virtual storage device.
 
     .PARAMETER VirtualDiskPath
-        Specifies the whole path to the virtual disk including the file name.
+        Specifies the whole path to the virtual disk file.
+
+    .PARAMETER AccessMask
+        Specifies the bitmask for specifying access rights to a virtual hard disk.
+
+    .PARAMETER Flags
+        Specifies Open virtual disk flags for the virtual disk.
+
+    .PARAMETER CreateVirtualDiskParameters
+        Specifies the virtual hard disk open request parameters.
+
+    .PARAMETER Handle
+        Specifies the reference to handle object that represents the a virtual disk file.
 #>
 Function Get-VirtualDiskUsingWin32 {
 
@@ -343,16 +399,16 @@ Function Get-VirtualDiskUsingWin32 {
         Creates and attaches a virtual disk to the system.
 
     .PARAMETER VirtualDiskPath
-        Specifies the whole path to the virtual disk including the file name.
+        Specifies the whole path to the virtual disk file.
+
+    .PARAMETER DiskSizeInBytes
+        Specifies the size of new virtual disk in bytes.
 
     .PARAMETER DiskFormat
         Specifies the supported virtual disk format.
 
     .PARAMETER DiskType
         Specifies the supported virtual disk type.
-
-    .PARAMETER DiskSizeInBytes
-        Specifies the size of new virtual disk in bytes.
 #>
 function New-SimpleVirtualDisk
 {
@@ -388,7 +444,7 @@ function New-SimpleVirtualDisk
         $createVirtualDiskParameters.Value.Version = [VirtDisk.Helper]::CREATE_VIRTUAL_DISK_VERSION_2
         $createVirtualDiskParameters.Value.MaximumSize = $DiskSizeInBytes
         $securityDescriptor = [System.IntPtr]::Zero
-        $accessMask = [VirtDisk.Helper]::VIRTUAL_DISK_ACCESS_NONE # Access mask
+        $accessMask = [VirtDisk.Helper]::VIRTUAL_DISK_ACCESS_NONE
         $providerSpecificFlags = 0 # No Provider-specific flags.
         [ref]$handle = [System.IntPtr]::Zero # Handle to the new virtual disk
 
@@ -425,14 +481,14 @@ function New-SimpleVirtualDisk
         # Close handle
         Close-Win32Handle $Handle
     }
-} # function New-VirtualDisk
+} # function New-SimpleVirtualDisk
 
 <#
     .SYNOPSIS
         Attaches a virtual disk to the system.
 
     .PARAMETER VirtualDiskPath
-        Specifies the whole path to the virtual disk including the file name.
+        Specifies the whole path to the virtual disk file.
 
     .PARAMETER DiskFormat
         Specifies the supported virtual disk format.
@@ -529,7 +585,7 @@ function Add-SimpleVirtualDisk
         Opens a handle to a virtual disk on the system.
 
     .PARAMETER VirtualDiskPath
-        Specifies the whole path to the virtual disk including the file name.
+        Specifies the whole path to the virtual disk file.
 
     .PARAMETER DiskFormat
         Specifies the supported virtual disk format.
