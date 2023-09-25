@@ -159,8 +159,15 @@ InModuleScope $script:subModuleName {
         DiskFormat        = 'vhdx'
     }
 
+    $script:mockedVhdParams = [pscustomobject] @{
+        DiskSizeInBytes   = 65Gb
+        VirtualDiskPath   = $script:DiskImageGoodVhdxPath
+        DiskType          = 'dynamic'
+        DiskFormat        = 'vhd'
+    }
+
     Describe 'VirtualHardDisk.Win32Helpers\New-SimpleVirtualDisk' -Tag 'New-SimpleVirtualDisk' {
-        Context 'Creating and attaching a new virtual disk successfully' {
+        Context 'Creating and attaching a new virtual disk (vhdx) successfully' {
             Mock `
                 -CommandName New-VirtualDiskUsingWin32 `
                 -MockWith { 0 } `
@@ -178,6 +185,35 @@ InModuleScope $script:subModuleName {
                             -DiskSizeInBytes $script:mockedParams.DiskSizeInBytes `
                             -DiskFormat $script:mockedParams.DiskFormat `
                             -DiskType $script:mockedParams.DiskType`
+                            -Verbose
+                    } | Should -Not -Throw
+                }
+
+            It 'Should only call required mocks' {
+                Assert-VerifiableMock
+                Assert-MockCalled -CommandName New-VirtualDiskUsingWin32 -Exactly 1
+                Assert-MockCalled -CommandName Add-VirtualDiskUsingWin32 -Exactly 1
+            }
+        }
+
+        Context 'Creating and attaching a new virtual disk (vhd) successfully' {
+            Mock `
+                -CommandName New-VirtualDiskUsingWin32 `
+                -MockWith { 0 } `
+                -Verifiable
+
+            Mock `
+                -CommandName Add-VirtualDiskUsingWin32 `
+                -MockWith { 0 } `
+                -Verifiable
+
+                It 'Should not throw an exception' {
+                    {
+                        New-SimpleVirtualDisk `
+                            -VirtualDiskPath $script:mockedVhdParams.VirtualDiskPath `
+                            -DiskSizeInBytes $script:mockedVhdParams.DiskSizeInBytes `
+                            -DiskFormat $script:mockedVhdParams.DiskFormat `
+                            -DiskType $script:mockedVhdParams.DiskType`
                             -Verbose
                     } | Should -Not -Throw
                 }

@@ -184,11 +184,11 @@ function Get-VirtDiskWin32HelperScript
     .PARAMETER Handle
         Specifies the reference to handle object that represents the newly created virtual disk.
 #>
-function New-VirtualDiskUsingWin32 {
-
+function New-VirtualDiskUsingWin32
+{
     [CmdletBinding()]
     [OutputType([System.Int32])]
-    Param
+    param
     (
         [Parameter(Mandatory = $true)]
         [ref]
@@ -264,11 +264,11 @@ function New-VirtualDiskUsingWin32 {
         Specifies the reference to an overlapped structure for asynchronous calls.
 
 #>
-function Add-VirtualDiskUsingWin32 {
-
+function Add-VirtualDiskUsingWin32
+{
     [CmdletBinding()]
     [OutputType([System.Int32])]
-    Param
+    param
     (
         [Parameter(Mandatory = $true)]
         [ref]
@@ -313,11 +313,11 @@ function Add-VirtualDiskUsingWin32 {
     .PARAMETER Handle
         Specifies a reference to handle for a file.
 #>
-function Close-Win32Handle {
-
+function Close-Win32Handle
+{
     [CmdletBinding()]
     [OutputType([System.Void])]
-    Param
+    param
     (
         [Parameter(Mandatory = $true)]
         [ref]
@@ -354,11 +354,11 @@ function Close-Win32Handle {
     .PARAMETER Handle
         Specifies the reference to handle object that represents the a virtual disk file.
 #>
-function Get-VirtualDiskUsingWin32 {
-
+function Get-VirtualDiskUsingWin32
+{
     [CmdletBinding()]
     [OutputType([System.Int32])]
-    Param
+    param
     (
         [Parameter(Mandatory = $true)]
         [ref]
@@ -394,6 +394,7 @@ function Get-VirtualDiskUsingWin32 {
         $OpenVirtualDiskParameters,
         $Handle)
 } # end function Get-VirtualDiskUsingWin32
+
 <#
     .SYNOPSIS
         Creates and attaches a virtual disk to the system.
@@ -445,8 +446,10 @@ function New-SimpleVirtualDisk
         $createVirtualDiskParameters.Value.MaximumSize = $DiskSizeInBytes
         $securityDescriptor = [System.IntPtr]::Zero
         $accessMask = [VirtDisk.Helper]::VIRTUAL_DISK_ACCESS_NONE
-        $providerSpecificFlags = 0 # No Provider-specific flags.
-        [ref]$handle = [System.IntPtr]::Zero # Handle to the new virtual disk
+        $providerSpecificFlags = 0
+
+         # Handle to the new virtual disk
+        [ref]$handle = [System.IntPtr]::Zero
 
         # Virtual disk will be dynamically expanding, up to the size of $DiskSizeInBytes on the parent disk
         $flags = [VirtDisk.Helper]::CREATE_VIRTUAL_DISK_FLAG_NONE
@@ -526,11 +529,11 @@ function Add-SimpleVirtualDisk
             $Handle = Get-VirtualDiskHandle -VirtualDiskPath $VirtualDiskPath -DiskFormat $DiskFormat
         }
 
-        # Build parameters for AttachVirtualDisk function
+        # Build parameters for AttachVirtualDisk function.
         [ref]$attachVirtualDiskParameters = New-Object VirtDisk.Helper+ATTACH_VIRTUAL_DISK_PARAMETERS
         $attachVirtualDiskParameters.Value.Version = [VirtDisk.Helper]::ATTACH_VIRTUAL_DISK_VERSION_1
-        $securityDescriptor = [System.IntPtr]::Zero # Security descriptor
-        $providerSpecificFlags = 0 # No Provider-specific flag
+        $securityDescriptor = [System.IntPtr]::Zero
+        $providerSpecificFlags = 0
         $result = 0
 
         <#
@@ -608,12 +611,14 @@ function Get-VirtualDiskHandle
     Write-Verbose -Message ($script:localizedData.OpeningVirtualBeforeAttachingMessage)
     $vDiskHelper = Get-VirtDiskWin32HelperScript
 
-    # Get parameters for OpenVirtualDisk function
+    # Get parameters for OpenVirtualDisk function.
     [ref]$virtualStorageType =  Get-VirtualStorageType -DiskFormat $DiskFormat
     [ref]$openVirtualDiskParameters = New-Object VirtDisk.Helper+OPEN_VIRTUAL_DISK_PARAMETERS
     $openVirtualDiskParameters.Value.Version = [VirtDisk.Helper]::OPEN_VIRTUAL_DISK_VERSION_1
     $accessMask = [VirtDisk.Helper]::VIRTUAL_DISK_ACCESS_ALL
     $flags = [VirtDisk.Helper]::OPEN_VIRTUAL_DISK_FLAG_NONE
+
+    # Handle to the virtual disk.
     [ref]$handle = [System.IntPtr]::Zero
 
     $result = Get-VirtualDiskUsingWin32 `
@@ -654,7 +659,7 @@ function Get-VirtualStorageType
         $DiskFormat
     )
 
-    # Create VIRTUAL_STORAGE_TYPE structure
+    # Create VIRTUAL_STORAGE_TYPE structure.
     $virtualStorageType = New-Object -TypeName VirtDisk.Helper+VIRTUAL_STORAGE_TYPE
 
     # Default to the vhdx file format.
