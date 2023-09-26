@@ -51,14 +51,6 @@ $script:localizedData = Get-LocalizedData -DefaultUICulture 'en-US'
         Specifies if the disks partition schema should be removed entirely, even if data and OEM
         partitions are present. Only possible with AllowDestructive enabled.
         This parameter is not used in Get-TargetResource.
-
-    .PARAMETER DevDrive
-        Specifies if the volume should be formatted as a Dev Drive.
-        This parameter is not used in Get-TargetResource.
-
-    .PARAMETER UseUnallocatedSpace
-        Specifies that a new partition and volume should be formatted onto unallocated space on the disk.
-        This parameter is not used in Get-TargetResource.
 #>
 function Get-TargetResource
 {
@@ -107,15 +99,7 @@ function Get-TargetResource
 
         [Parameter()]
         [System.Boolean]
-        $ClearDisk,
-
-        [Parameter()]
-        [System.Boolean]
-        $DevDrive,
-
-        [Parameter()]
-        [System.Boolean]
-        $UseUnallocatedSpace
+        $ClearDisk
     )
 
     Write-Verbose -Message ( @(
@@ -152,8 +136,6 @@ function Get-TargetResource
         FSLabel             = $volume.FileSystemLabel
         AllocationUnitSize  = $blockSize
         FSFormat            = $volume.FileSystem
-        DevDrive            = $DevDrive
-        UseUnallocatedSpace = $UseUnallocatedSpace
     }
 } # Get-TargetResource
 
@@ -824,7 +806,10 @@ function Test-TargetResource
         # User is attempting to create a new Dev Drive volume in a new partition
         if ($null -eq $tempPartition)
         {
-            # Get largest contiguous free space that is possible to create a partition with
+            <#
+                Get the largest contiguous free space that is possible to create a partition with
+                and see if its possible to create a Dev Drive using that space.
+            #>
             Assert-DiskHasEnoughSpaceToCreateDevDrive `
                 -UserDesiredSize $Size `
                 -CurrentDiskFreeSpace $disk.LargestFreeExtent `

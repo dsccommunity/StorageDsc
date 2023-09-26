@@ -30,8 +30,10 @@ InModuleScope $script:subModuleName {
         UserDesired0Gb = 0Gb
         UserDesired10Gb = 10Gb
         UserDesired50Gb = 50Gb
+        UserDesired60Gb = 60Gb
         CurrentDiskFreeSpace40Gb = 40Gb
         CurrentDiskFreeSpace50Gb = 50Gb
+        CurrentDiskFreeSpace60Gb = 60Gb
     }
 
     $script:mockedDiskNumber = 1
@@ -522,10 +524,10 @@ InModuleScope $script:subModuleName {
                     -AccessPath @('\\?\Volume{905551f3-33a5-421d-ac24-c993fbfb3184}\', '\\?\Volume{99cf0194-ac45-4a23-b36e-3e458158a63e}\') | Should -Be $false
             }
         }
+    }
 
-        Context 'Testing Dev Drive enablement when dev drive feature not implemented' {
-            # verifiable (should be called) mocks
-
+    Describe 'StorageDsc.Common\Assert-DevDriveFeatureAvailable' -Tag 'Assert-DevDriveFeatureAvailable' {
+        Context 'When testing the Dev Drive enablement state and the dev drive feature not implemented' {
             Mock `
                 -CommandName Get-IsApiSetImplemented `
                 -MockWith { return $false } `
@@ -544,74 +546,16 @@ InModuleScope $script:subModuleName {
             }
         }
 
-        Context 'Testing Dev Drive enablement when dev drive feature is disabled by group policy' {
-            # verifiable (should be called) mocks
-            Get-DevDriveWin32HelperScript
-            $DevDriveEnablementType = [DevDrive.DevDriveHelper+DEVELOPER_DRIVE_ENABLEMENT_STATE]
-
+        Context 'When testing the Dev Drive enablement state returns an enablement state not defined in the enum' {
             Mock `
                 -CommandName Get-IsApiSetImplemented `
-                -MockWith { return $true } `
+                -MockWith { $true } `
                 -ModuleName StorageDsc.Common `
                 -Verifiable
 
             Mock `
                 -CommandName Get-DeveloperDriveEnablementState `
-                -MockWith { return $DevDriveEnablementType::DeveloperDriveDisabledByGroupPolicy } `
-                -ModuleName StorageDsc.Common `
-                -Verifiable
-
-            It 'Should throw with DevDriveDisabledByGroupPolicyError' {
-                {
-                    Assert-DevDriveFeatureAvailable -Verbose
-                } | Should -Throw -ExpectedMessage $LocalizedData.DevDriveDisabledByGroupPolicyError
-            }
-
-            It 'Should call the correct mocks' {
-                Assert-VerifiableMock
-                Assert-MockCalled -CommandName Get-IsApiSetImplemented -Exactly -Times 1
-                Assert-MockCalled -CommandName Get-DeveloperDriveEnablementState -Exactly -Times 1
-            }
-        }
-
-        Context 'Testing Dev Drive enablement when dev drive feature is disabled by system policy' {
-            # verifiable (should be called) mocks
-            Mock `
-                -CommandName Get-IsApiSetImplemented `
-                -MockWith { return $true } `
-                -ModuleName StorageDsc.Common `
-                -Verifiable
-
-            Mock `
-                -CommandName Get-DeveloperDriveEnablementState `
-                -MockWith { return $DevDriveEnablementType::DeveloperDriveDisabledBySystemPolicy } `
-                -ModuleName StorageDsc.Common `
-                -Verifiable
-
-            It 'Should throw with DeveloperDriveDisabledBySystemPolicy' {
-                {
-                    Assert-DevDriveFeatureAvailable -Verbose
-                } | Should -Throw -ExpectedMessage $LocalizedData.DeveloperDriveDisabledBySystemPolicy
-            }
-
-            It 'Should call the correct mocks' {
-                Assert-VerifiableMock
-                Assert-MockCalled -CommandName Get-IsApiSetImplemented -Exactly -Times 1
-                Assert-MockCalled -CommandName Get-DeveloperDriveEnablementState -Exactly -Times 1
-            }
-        }
-
-        Context 'Testing Dev Drive enablement when enablement state is unknown' {
-            # verifiable (should be called) mocks
-            Mock `
-                -CommandName Get-IsApiSetImplemented `
-                -MockWith { return $true } `
-                -ModuleName StorageDsc.Common `
-                -Verifiable
-
-            Mock `
-                -CommandName Get-DeveloperDriveEnablementState `
-                -MockWith { return $DevDriveEnablementType::DeveloperDriveEnablementStateError } `
+                -MockWith { $null } `
                 -ModuleName StorageDsc.Common `
                 -Verifiable
 
@@ -628,17 +572,97 @@ InModuleScope $script:subModuleName {
             }
         }
 
-        Context 'Testing Dev Drive enablement when enablement state is set to enabled' {
-            # verifiable (should be called) mocks
+        Context 'When testing the Dev Drive enablement state and the dev drive feature is disabled by group policy' {
+            Get-DevDriveWin32HelperScript
+            $DevDriveEnablementType = [DevDrive.DevDriveHelper+DEVELOPER_DRIVE_ENABLEMENT_STATE]
+
             Mock `
                 -CommandName Get-IsApiSetImplemented `
-                -MockWith { return $true } `
+                -MockWith { $true } `
                 -ModuleName StorageDsc.Common `
                 -Verifiable
 
             Mock `
                 -CommandName Get-DeveloperDriveEnablementState `
-                -MockWith { return $DevDriveEnablementType::DeveloperDriveEnabled } `
+                -MockWith { $DevDriveEnablementType::DeveloperDriveDisabledByGroupPolicy } `
+                -ModuleName StorageDsc.Common `
+                -Verifiable
+
+            It 'Should throw with DevDriveDisabledByGroupPolicyError' {
+                {
+                    Assert-DevDriveFeatureAvailable -Verbose
+                } | Should -Throw -ExpectedMessage $LocalizedData.DevDriveDisabledByGroupPolicyError
+            }
+
+            It 'Should call the correct mocks' {
+                Assert-VerifiableMock
+                Assert-MockCalled -CommandName Get-IsApiSetImplemented -Exactly -Times 1
+                Assert-MockCalled -CommandName Get-DeveloperDriveEnablementState -Exactly -Times 1
+            }
+        }
+
+        Context 'When testing the Dev Drive enablement state and the dev drive feature is disabled by system policy' {
+            Mock `
+                -CommandName Get-IsApiSetImplemented `
+                -MockWith { $true } `
+                -ModuleName StorageDsc.Common `
+                -Verifiable
+
+            Mock `
+                -CommandName Get-DeveloperDriveEnablementState `
+                -MockWith { $DevDriveEnablementType::DeveloperDriveDisabledBySystemPolicy } `
+                -ModuleName StorageDsc.Common `
+                -Verifiable
+
+            It 'Should throw with DeveloperDriveDisabledBySystemPolicy' {
+                {
+                    Assert-DevDriveFeatureAvailable -Verbose
+                } | Should -Throw -ExpectedMessage $LocalizedData.DeveloperDriveDisabledBySystemPolicy
+            }
+
+            It 'Should call the correct mocks' {
+                Assert-VerifiableMock
+                Assert-MockCalled -CommandName Get-IsApiSetImplemented -Exactly -Times 1
+                Assert-MockCalled -CommandName Get-DeveloperDriveEnablementState -Exactly -Times 1
+            }
+        }
+
+        Context 'When testing the Dev Drive enablement state and the enablement state is unknown' {
+            Mock `
+                -CommandName Get-IsApiSetImplemented `
+                -MockWith { $true } `
+                -ModuleName StorageDsc.Common `
+                -Verifiable
+
+            Mock `
+                -CommandName Get-DeveloperDriveEnablementState `
+                -MockWith { $DevDriveEnablementType::DeveloperDriveEnablementStateError } `
+                -ModuleName StorageDsc.Common `
+                -Verifiable
+
+            It 'Should throw with DevDriveEnablementUnknownError' {
+                {
+                    Assert-DevDriveFeatureAvailable -Verbose
+                } | Should -Throw -ExpectedMessage $LocalizedData.DevDriveEnablementUnknownError
+            }
+
+            It 'Should call the correct mocks' {
+                Assert-VerifiableMock
+                Assert-MockCalled -CommandName Get-IsApiSetImplemented -Exactly -Times 1
+                Assert-MockCalled -CommandName Get-DeveloperDriveEnablementState -Exactly -Times 1
+            }
+        }
+
+        Context 'When testing Dev Drive enablement state and the enablement state is set to enabled' {
+            Mock `
+                -CommandName Get-IsApiSetImplemented `
+                -MockWith { $true } `
+                -ModuleName StorageDsc.Common `
+                -Verifiable
+
+            Mock `
+                -CommandName Get-DeveloperDriveEnablementState `
+                -MockWith { $DevDriveEnablementType::DeveloperDriveEnabled } `
                 -ModuleName StorageDsc.Common `
                 -Verifiable
 
@@ -654,9 +678,10 @@ InModuleScope $script:subModuleName {
                 Assert-MockCalled -CommandName Get-DeveloperDriveEnablementState -Exactly -Times 1
             }
         }
+    }
 
-        Context 'Testing that only ReFS file system allowed in Assert-DevDriveFormatOnReFsFileSystemOnly ' {
-            # verifiable (should be called) mocks
+    Describe 'StorageDsc.Common\Assert-DevDriveFormatOnReFsFileSystemOnly' -Tag 'Assert-DevDriveFormatOnReFsFileSystemOnly' {
+        Context 'When testing that only the ReFS file system is allowed' {
 
             $errorRecord = Get-InvalidArgumentRecord `
                 -Message ($script:localizedData.DevDriveOnlyAvailableForReFsError ) `
@@ -669,8 +694,7 @@ InModuleScope $script:subModuleName {
             }
         }
 
-        Context 'Testing Exception not thrown in Assert-DevDriveFormatOnReFsFileSystemOnly when ReFS file system passed in' {
-            # verifiable (should be called) mocks
+        Context 'When testing Exception not thrown in Assert-DevDriveFormatOnReFsFileSystemOnly when ReFS file system passed in' {
 
             It 'Should not throw invalid argument error if ReFS filesystem is passed in' {
                 {
@@ -678,15 +702,16 @@ InModuleScope $script:subModuleName {
                 } | Should -Not -Throw
             }
         }
+    }
 
-        Context 'Testing Exception thrown in Assert-DevDriveSizeMeetsMinimumRequirement when UserDesiredSize does not meet the minimum size for Dev Drives' {
-            # verifiable (should be called) mocks
+    Describe 'StorageDsc.Common\Assert-DevDriveSizeMeetsMinimumRequirement' -Tag 'Assert-DevDriveSizeMeetsMinimumRequirement' {
+        Context 'When UserDesiredSize does not meet the minimum size for Dev Drive volumes' {
 
             $errorRecord = Get-InvalidArgumentRecord `
                 -Message $($script:localizedData.DevDriveMinimumSizeError) `
                 -ArgumentName 'UserDesiredSize'
 
-            It 'Should throw invalid argument error if UserDesiredSize less than 50Gb' {
+            It 'Should throw invalid argument error' {
                 {
                     Assert-DevDriveSizeMeetsMinimumRequirement `
                         -UserDesiredSize $mockedSizesForDevDriveScenario.UserDesired10Gb `
@@ -695,8 +720,31 @@ InModuleScope $script:subModuleName {
             }
         }
 
-        Context 'Testing Exception thrown in Assert-DiskHasEnoughSpaceToCreateDevDrive when disk free space less than users desired size' {
-            # verifiable (should be called) mocks
+        Context 'When UserDesiredSize meets the minimum size for Dev Drive volumes' {
+
+            It 'Should not throw invalid argument error' {
+                {
+                    Assert-DevDriveSizeMeetsMinimumRequirement `
+                        -UserDesiredSize $mockedSizesForDevDriveScenario.UserDesired50Gb `
+                        -Verbose
+                } | Should -Not -Throw
+            }
+        }
+
+        Context 'When UserDesiredSize is 0' {
+
+            It 'Should not throw invalid argument error' {
+                {
+                    Assert-DevDriveSizeMeetsMinimumRequirement `
+                        -UserDesiredSize $mockedSizesForDevDriveScenario.UserDesired0Gb `
+                        -Verbose
+                } | Should -Not -Throw
+            }
+        }
+    }
+
+    Describe 'StorageDsc.Common\Assert-DiskHasEnoughSpaceToCreateDevDrive' -Tag 'Assert-DiskHasEnoughSpaceToCreateDevDrive' {
+        Context 'When disk free space less than users desired size' {
 
             $userDesiredSizeInGb = [Math]::Round($mockedSizesForDevDriveScenario.UserDesired50Gb / 1GB, 2)
             $currentDiskFreeSpaceInGb = [Math]::Round($mockedSizesForDevDriveScenario.CurrentDiskFreeSpace40Gb / 1GB, 2)
@@ -707,7 +755,7 @@ InModuleScope $script:subModuleName {
                     $currentDiskFreeSpaceInGb) `
                 -ArgumentName 'UserDesiredSize'
 
-            It 'Should throw invalid argument error if UserDesiredSize greater than CurrentDiskFreeSpace' {
+            It 'Should throw invalid argument error' {
                 {
                     Assert-DiskHasEnoughSpaceToCreateDevDrive `
                         -UserDesiredSize $mockedSizesForDevDriveScenario.UserDesired50Gb `
@@ -718,10 +766,44 @@ InModuleScope $script:subModuleName {
             }
         }
 
-        Context 'Testing Exception not thrown in Assert-DiskHasEnoughSpaceToCreateDevDrive when disk free space greater than or equal to users desired size' {
-            # verifiable (should be called) mocks
+        Context 'When no size entered and disk free space less than minimum size for dev drive volumes (50Gb)' {
 
-            It 'Should not throw invalid argument error if CurrentDiskFreeSpace greater than or equal to UserDesiredSize' {
+            $userDesiredSizeInGb = $mockedSizesForDevDriveScenario.UserDesired0Gb
+            $currentDiskFreeSpaceInGb = [Math]::Round($mockedSizesForDevDriveScenario.CurrentDiskFreeSpace40Gb / 1GB, 2)
+            $errorRecord = Get-InvalidArgumentRecord `
+                -Message $($script:localizedData.DevDriveNotEnoughSpaceToCreateDevDriveError -f `
+                    $mockedDiskNumber, `
+                    $userDesiredSizeInGb, `
+                    $currentDiskFreeSpaceInGb) `
+                -ArgumentName 'UserDesiredSize'
+
+            It 'Should throw invalid argument error' {
+                {
+                    Assert-DiskHasEnoughSpaceToCreateDevDrive `
+                        -UserDesiredSize $mockedSizesForDevDriveScenario.UserDesired0Gb `
+                        -CurrentDiskFreeSpace $mockedSizesForDevDriveScenario.CurrentDiskFreeSpace40Gb `
+                        -DiskNumber $mockedDiskNumber `
+                        -Verbose
+                } | Should -Throw $errorRecord
+            }
+        }
+
+        Context 'When disk free space greater than users desired size' {
+
+            It 'Should not throw invalid argument error if CurrentDiskFreeSpace greater than UserDesiredSize' {
+                {
+                    Assert-DiskHasEnoughSpaceToCreateDevDrive `
+                        -UserDesiredSize $mockedSizesForDevDriveScenario.UserDesired50Gb `
+                        -CurrentDiskFreeSpace $mockedSizesForDevDriveScenario.CurrentDiskFreeSpace60Gb `
+                        -DiskNumber $mockedDiskNumber `
+                        -Verbose
+                } | Should -Not -Throw
+            }
+        }
+
+        Context 'When disk free space equal to users desired size' {
+
+            It 'Should not throw invalid argument error if CurrentDiskFreeSpace is equal to UserDesiredSize' {
                 {
                     Assert-DiskHasEnoughSpaceToCreateDevDrive `
                         -UserDesiredSize $mockedSizesForDevDriveScenario.UserDesired50Gb `
@@ -732,25 +814,27 @@ InModuleScope $script:subModuleName {
             }
         }
 
-        Context 'Testing Exception not thrown in Assert-DevDriveSizeMeetsMinimumRequirement when UserDesiredSize does meet the minimum size for Dev Drives' {
-            # verifiable (should be called) mocks
+        Context 'When no size entered and disk free space greater than the minimum size for dev drive volumes (50Gb)' {
 
-            It 'Should not throw invalid argument error if UserDesiredSize greater than or equal to 50 Gb' {
+            It 'Should not throw invalid argument error if CurrentDiskFreeSpace is greater than 50Gb' {
                 {
-                    Assert-DevDriveSizeMeetsMinimumRequirement `
-                        -UserDesiredSize $mockedSizesForDevDriveScenario.UserDesired50Gb `
+                    Assert-DiskHasEnoughSpaceToCreateDevDrive `
+                        -UserDesiredSize $mockedSizesForDevDriveScenario.UserDesired0Gb `
+                        -CurrentDiskFreeSpace $mockedSizesForDevDriveScenario.CurrentDiskFreeSpace60Gb `
+                        -DiskNumber $mockedDiskNumber `
                         -Verbose
                 } | Should -Not -Throw
             }
         }
 
-        Context 'Testing Exception not thrown in Assert-DevDriveSizeMeetsMinimumRequirement when UserDesiredSize is 0' {
-            # verifiable (should be called) mocks
+        Context 'When no size entered and disk free space equal to the minimum size for dev drive volumes (50Gb)' {
 
-            It 'Should not throw invalid argument error if UserDesiredSize is 0' {
+            It 'Should not throw invalid argument error if CurrentDiskFreeSpace is equal to 50Gb' {
                 {
-                    Assert-DevDriveSizeMeetsMinimumRequirement `
+                    Assert-DiskHasEnoughSpaceToCreateDevDrive `
                         -UserDesiredSize $mockedSizesForDevDriveScenario.UserDesired0Gb `
+                        -CurrentDiskFreeSpace $mockedSizesForDevDriveScenario.CurrentDiskFreeSpace50Gb `
+                        -DiskNumber $mockedDiskNumber `
                         -Verbose
                 } | Should -Not -Throw
             }

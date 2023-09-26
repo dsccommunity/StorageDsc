@@ -224,7 +224,7 @@ function Test-AccessPathAssignedToLocal
 
 <#
     .SYNOPSIS
-        Returns C# code that will be used to call Dev Drive related Win32 apis
+        Returns C# code that will be used to call Dev Drive related Win32 apis.
 #>
 function Get-DevDriveWin32HelperScript
 {
@@ -264,7 +264,6 @@ function Get-DevDriveWin32HelperScript
     }
 
     return $script:DevDriveWin32Helper
-
 } # end function Get-DevDriveWin32HelperScript
 
 <#
@@ -274,15 +273,15 @@ function Get-DevDriveWin32HelperScript
     .PARAMETER AccessPath
         Specifies the contract string for the dll that houses the win32 function
 #>
-Function Get-IsApiSetImplemented {
-
+function Get-IsApiSetImplemented
+{
     [CmdletBinding()]
-    Param
+    [OutputType([System.Boolean])]
+    param
     (
-        [Parameter(Mandatory=$True)]
+        [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [OutputType([System.Boolean])]
-        [String]
+        [System.String]
         $Contract
     )
 
@@ -294,11 +293,11 @@ Function Get-IsApiSetImplemented {
     .SYNOPSIS
         Invokes win32 GetDeveloperDriveEnablementState function
 #>
-Function Get-DeveloperDriveEnablementState {
-
+function Get-DeveloperDriveEnablementState
+{
     [CmdletBinding()]
     [OutputType([System.Enum])]
-    Param
+    param
     ()
 
     $helper = Get-DevDriveWin32HelperScript
@@ -325,6 +324,7 @@ function Assert-DevDriveFeatureAvailable
     {
         try
         {
+            # Based on the enablement result we will throw an error or return without doing anything.
             switch (Get-DeveloperDriveEnablementState)
             {
                 ($DevDriveEnablementType::DeveloperDriveEnablementStateError)
@@ -344,19 +344,23 @@ function Assert-DevDriveFeatureAvailable
                     Write-Verbose -Message ($script:localizedData.DevDriveEnabledMessage)
                     return
                 }
-                Default
+                default
                 {
                     throw $script:localizedData.DevDriveEnablementUnknownError
                 }
             }
         }
-        catch [System.EntryPointNotFoundException] # function may not exist in some versions of Windows in the above dll
+        # function may not exist in some versions of Windows in the apiset dll.
+        catch [System.EntryPointNotFoundException]
         {
-            Write-Error $_.Exception.Message
+            Write-Verbose $_.Exception.Message
         }
     }
 
-    # If apiset isn't implemented or we get the EntryPointNotFoundException we should throw since the feature isn't available here.
+    <#
+        If apiset isn't implemented or we get the EntryPointNotFoundException we should throw
+        since the feature isn't available here.
+    #>
     throw $script:localizedData.DevDriveFeatureNotImplementedError
 } # end function Assert-DevDriveFeatureAvailable
 
@@ -419,14 +423,20 @@ function Assert-DiskHasEnoughSpaceToCreateDevDrive
 
     <#
         50 Gb is the minimum size for Dev Drive volumes. When size is 0 the user wants to use all
-        the available space on the disk so we will check if they have at least 50 Gb of space available.
+        the available space on the disk.
     #>
+    $notEnoughSpace = $false
     if (-not $UserDesiredSize)
     {
-        $UserDesiredSize = 50Gb
+        <#
+            The user wants to use all the available space on the disk. We will check if they have at least 50 Gb
+            of free space available.
+        #>
+        $notEnoughSpace = ($CurrentDiskFreeSpace -lt 50Gb)
+        $DesiredSizeInGb = 50Gb
     }
 
-    if ($UserDesiredSize -gt $CurrentDiskFreeSpace)
+    if ($notEnoughSpace -or ($UserDesiredSize -gt $CurrentDiskFreeSpace))
     {
         $DesiredSizeInGb = [Math]::Round($UserDesiredSize / 1GB, 2)
         $CurrentDiskFreeSpaceInGb = [Math]::Round($CurrentDiskFreeSpace / 1GB, 2)
@@ -444,7 +454,6 @@ function Assert-DiskHasEnoughSpaceToCreateDevDrive
 
     .PARAMETER UserDesiredSize
         Specifies the size the user wants to create the Dev Drive volume with.
-
 #>
 function Assert-DevDriveSizeMeetsMinimumRequirement
 {
@@ -454,13 +463,11 @@ function Assert-DevDriveSizeMeetsMinimumRequirement
         [Parameter(Mandatory = $true)]
         [System.UInt64]
         $UserDesiredSize
-
     )
 
     <#
-        50 Gb is the minimum size for Dev Drive volumes. When UserDesiredSize is provided
-        This means the user wants to create a Dev Drive volume using all the available space
-        on the disk. We cover this case in Assert-DiskHasEnoughSpaceToCreateDevDrive
+        50 Gb is the minimum size for Dev Drive volumes. The case where no size is
+        provided is covered in Assert-DiskHasEnoughSpaceToCreateDevDrive.
     #>
     if ($UserDesiredSize -and $UserDesiredSize -lt 50Gb)
     {

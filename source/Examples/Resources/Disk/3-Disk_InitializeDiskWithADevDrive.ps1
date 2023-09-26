@@ -45,16 +45,16 @@ Configuration Disk_InitializeDiskWithADevDrive
             DriveLetter = 'E'
             FSFormat = 'ReFS'
             FSLabel = 'DevDrive'
-            DevDrive = true
+            DevDrive = $true
             Size = 50Gb
-            UseUnallocatedSpace = true
+            UseUnallocatedSpace = $true
             DependsOn = '[WaitForDisk]Disk2'
         }
 
-          <#
-               Will attempt to create a Dev Drive volume using the rest of the space on the disk assuming
-               that the rest of the space is greater than the minimum size for Dev Drive volumes (50Gb).
-          #>
+        <#
+            Will attempt to create a Dev Drive volume using the rest of the space on the disk assuming
+            that the rest of the space is greater than the minimum size for Dev Drive volumes (50Gb).
+        #>
         Disk DevDriveVolume2
         {
             DiskId = '5E1E50A401000000001517FFFF0AEB84'
@@ -62,7 +62,7 @@ Configuration Disk_InitializeDiskWithADevDrive
             DriveLetter = 'F'
             FSFormat = 'ReFS'
             FSLabel = 'DevDrive'
-            DevDrive = true
+            DevDrive = $true
             DependsOn = '[Disk]DevDriveVolume1'
         }
     }
