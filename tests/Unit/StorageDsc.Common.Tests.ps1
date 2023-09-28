@@ -768,7 +768,7 @@ InModuleScope $script:subModuleName {
 
         Context 'When no size entered and disk free space less than minimum size for dev drive volumes (50Gb)' {
 
-            $userDesiredSizeInGb = $mockedSizesForDevDriveScenario.UserDesired0Gb
+            $userDesiredSizeInGb = [Math]::Round($mockedSizesForDevDriveScenario.UserDesired50Gb / 1GB, 2)
             $currentDiskFreeSpaceInGb = [Math]::Round($mockedSizesForDevDriveScenario.CurrentDiskFreeSpace40Gb / 1GB, 2)
             $errorRecord = Get-InvalidArgumentRecord `
                 -Message $($script:localizedData.DevDriveNotEnoughSpaceToCreateDevDriveError -f `

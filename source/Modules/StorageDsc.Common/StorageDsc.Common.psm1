@@ -433,7 +433,7 @@ function Assert-DiskHasEnoughSpaceToCreateDevDrive
             of free space available.
         #>
         $notEnoughSpace = ($CurrentDiskFreeSpace -lt 50Gb)
-        $DesiredSizeInGb = 50Gb
+        $UserDesiredSize = 50Gb
     }
 
     if ($notEnoughSpace -or ($UserDesiredSize -gt $CurrentDiskFreeSpace))

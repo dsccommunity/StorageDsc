@@ -128,14 +128,14 @@ function Get-TargetResource
             -ErrorAction SilentlyContinue).BlockSize
 
     return @{
-        DiskId              = $DiskId
-        DiskIdType          = $DiskIdType
-        DriveLetter         = $partition.DriveLetter
-        PartitionStyle      = $disk.PartitionStyle
-        Size                = $partition.Size
-        FSLabel             = $volume.FileSystemLabel
-        AllocationUnitSize  = $blockSize
-        FSFormat            = $volume.FileSystem
+        DiskId             = $DiskId
+        DiskIdType         = $DiskIdType
+        DriveLetter        = $partition.DriveLetter
+        PartitionStyle     = $disk.PartitionStyle
+        Size               = $partition.Size
+        FSLabel            = $volume.FileSystemLabel
+        AllocationUnitSize = $blockSize
+        FSFormat           = $volume.FileSystem
     }
 } # Get-TargetResource
 
@@ -803,16 +803,26 @@ function Test-TargetResource
             -DriveLetter $DriveLetter `
             -ErrorAction SilentlyContinue | Select-Object -First 1
 
+        # For unintialized disks, the largest free extent is the size of the disk.
+        if ($disk.PartitionStyle -ne 'RAW' )
+        {
+            $currentDiskFreeSpace = $disk.LargestFreeExtent
+        }
+        else
+        {
+            $currentDiskFreeSpace = $disk.Size
+        }
+
         # User is attempting to create a new Dev Drive volume in a new partition
         if ($null -eq $tempPartition)
         {
             <#
-                Get the largest contiguous free space that is possible to create a partition with
-                and see if its possible to create a Dev Drive using that space.
+                The Dev Drive will be created within the largest block of continguous unallocated space
+                available. So we need to check that the space is big enough to create the Dev Drive in.
             #>
             Assert-DiskHasEnoughSpaceToCreateDevDrive `
                 -UserDesiredSize $Size `
-                -CurrentDiskFreeSpace $disk.LargestFreeExtent `
+                -CurrentDiskFreeSpace $currentDiskFreeSpace `
                 -DiskNumber $Disk.Number
         }
 
