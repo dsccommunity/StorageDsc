@@ -10,7 +10,6 @@ ConvertFrom-StringData @'
     DevDriveEnabledMessage = Dev Drive feature is enabled on this system.
     CheckingDevDriveEnablementMessage = Checking if the Dev Drive feature is available and enabled on the system.
     DevDriveFeatureNotImplementedError = Dev Drive feature is not implemented on this system.
-    DevDriveMinimumSizeError = Dev Drive volumes must be 50 Gb or more in size.
-    DevDriveNotEnoughSpaceToCreateDevDriveError = There is not enough unallocated space '{2} Gb' to create a Dev Drive volume of size '{1} Gb' on disk '{0}'.
-    DevDriveOnlyAvailableForReFsError = "Only 'ReFS' is supported for Dev Drive volumes."
+    MinimumSizeNeededToCreateDevDriveVolumeError = To configure a volume as a Dev Drive volume the size parameter must be 50 Gb or more. Size of '{0} Gb' was specified.
+    FSFormatNotReFSWhenDevDriveFlagIsTrueError = Only the 'ReFS' file system can be used with FSFormat when the Dev Drive flag is set to true.
 '@

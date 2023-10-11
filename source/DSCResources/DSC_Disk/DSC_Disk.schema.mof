@@ -13,5 +13,4 @@ class DSC_Disk : OMI_BaseResource
     [Write, Description("Specifies if potentially destructive operations may occur.")] Boolean AllowDestructive;
     [Write, Description("Specifies if the disks partition schema should be removed entirely, even if data and OEM partitions are present. Only possible with AllowDestructive enabled.")] Boolean ClearDisk;
     [Write, Description("Specifies if the volume should be formatted as a Dev Drive.")] Boolean DevDrive;
-    [Write, Description("Specifies that a new partition and volume should be formatted onto unallocated space in the disk.")] Boolean UseUnallocatedSpace;
 };

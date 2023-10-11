@@ -1,3 +1,8 @@
+
+using namespace System;
+using namespace System.Runtime.InteropServices;
+using namespace Microsoft.Win32.SafeHandles;
+
 $modulePath = Join-Path -Path (Split-Path -Path (Split-Path -Path $PSScriptRoot -Parent) -Parent) -ChildPath 'Modules'
 
 Import-Module -Name (Join-Path -Path $modulePath -ChildPath 'DscResource.Common')
@@ -235,6 +240,8 @@ function Get-DevDriveWin32HelperScript
 
     $DevDriveHelperDefinitions =  @'
 
+
+        // https://learn.microsoft.com/en-us/windows/win32/api/sysinfoapi/ne-sysinfoapi-developer_drive_enablement_state
         public enum DEVELOPER_DRIVE_ENABLEMENT_STATE
         {
             DeveloperDriveEnablementStateError = 0,
@@ -243,12 +250,132 @@ function Get-DevDriveWin32HelperScript
             DeveloperDriveDisabledByGroupPolicy = 3,
         }
 
+        // https://learn.microsoft.com/en-us/windows/win32/api/apiquery2/nf-apiquery2-isapisetimplemented
         [DllImport("api-ms-win-core-apiquery-l2-1-0.dll", ExactSpelling = true)]
         [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
         public static extern bool IsApiSetImplemented(string Contract);
 
+        // https://learn.microsoft.com/en-us/windows/win32/api/sysinfoapi/nf-sysinfoapi-getdeveloperdriveenablementstate
         [DllImport("api-ms-win-core-sysinfo-l1-2-6.dll")]
         public static extern DEVELOPER_DRIVE_ENABLEMENT_STATE GetDeveloperDriveEnablementState();
+
+
+        // https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-createfilew
+        [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+        public static extern Microsoft.Win32.SafeHandles.SafeFileHandle CreateFile(
+            string lpFileName,
+            uint dwDesiredAccess,
+            uint dwShareMode,
+            IntPtr lpSecurityAttributes,
+            uint dwCreationDisposition,
+            uint dwFlagsAndAttributes,
+            IntPtr hTemplateFile);
+
+        // https://learn.microsoft.com/en-us/windows/win32/api/ioapiset/nf-ioapiset-deviceiocontrol
+        [DllImport("kernel32.dll", SetLastError = true)]
+        public static extern bool DeviceIoControl(
+            Microsoft.Win32.SafeHandles.SafeFileHandle hDevice,
+            uint dwIoControlCode,
+            IntPtr lpInBuffer,
+            uint nInBufferSize,
+            IntPtr lpOutBuffer,
+            uint nOutBufferSize,
+            out uint lpBytesReturned,
+            IntPtr lpOverlapped);
+
+        // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/ns-ntifs-_file_fs_persistent_volume_information
+        [StructLayout(LayoutKind.Sequential)]
+        public struct FILE_FS_PERSISTENT_VOLUME_INFORMATION
+        {
+            public uint VolumeFlags;
+            public uint FlagMask;
+            public uint Version;
+            public uint Reserved;
+        }
+
+        // https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/ns-ntifs-_file_fs_persistent_volume_information
+        public const uint FSCTL_QUERY_PERSISTENT_VOLUME_STATE = 590396U;
+        public const uint PERSISTENT_VOLUME_STATE_DEV_VOLUME = 0x00002000;
+
+        // https://learn.microsoft.com/en-us/windows/win32/fileio/creating-and-opening-files
+        public const uint FILE_READ_ATTRIBUTES = 0x0080;
+        public const uint FILE_WRITE_ATTRIBUTES = 0x0100;
+        public const uint FILE_SHARE_READ = 0x00000001;
+        public const uint FILE_SHARE_WRITE = 0x00000002;
+        public const uint OPEN_EXISTING = 3;
+        public const uint FILE_FLAG_BACKUP_SEMANTICS = 0x02000000;
+
+        // To call the win32 function without having to allocate memory in powershell
+        public static bool DeviceIoControlWrapperForDevDriveQuery(string volumeGuidPath)
+        {
+            uint notUsedSize = 0;
+            var outputVolumeInfo = new FILE_FS_PERSISTENT_VOLUME_INFORMATION { };
+            var inputVolumeInfo = new FILE_FS_PERSISTENT_VOLUME_INFORMATION { };
+            inputVolumeInfo.FlagMask = PERSISTENT_VOLUME_STATE_DEV_VOLUME;
+            inputVolumeInfo.Version = 1;
+
+            var volumeFileHandle = CreateFile(
+                volumeGuidPath,
+                FILE_READ_ATTRIBUTES | FILE_WRITE_ATTRIBUTES,
+                FILE_SHARE_READ | FILE_SHARE_WRITE,
+                IntPtr.Zero,
+                OPEN_EXISTING,
+                FILE_FLAG_BACKUP_SEMANTICS,
+                IntPtr.Zero);
+
+            if (volumeFileHandle.IsInvalid)
+            {
+                // Handle is invalid.
+                throw new Exception("CreateFile unable to get file handle for volume to check if its a Dev Drive volume",
+                    new System.ComponentModel.Win32Exception(Marshal.GetLastWin32Error()));
+            }
+
+
+            // We need to allocated memory for the structures so we can marshal and unmarshal them.
+            IntPtr inputVolptr = Marshal.AllocHGlobal(Marshal.SizeOf(inputVolumeInfo));
+            IntPtr outputVolptr = Marshal.AllocHGlobal(Marshal.SizeOf(outputVolumeInfo));
+
+            try
+            {
+                Marshal.StructureToPtr(inputVolumeInfo, inputVolptr, false);
+
+                var result = DeviceIoControl(
+                    volumeFileHandle,
+                    FSCTL_QUERY_PERSISTENT_VOLUME_STATE,
+                    inputVolptr,
+                    (uint)Marshal.SizeOf(inputVolumeInfo),
+                    outputVolptr,
+                    (uint)Marshal.SizeOf(outputVolumeInfo),
+                    out notUsedSize,
+                    IntPtr.Zero);
+
+                if (!result)
+                {
+                    // Can't query volume.
+                    throw new Exception("DeviceIoControl unable to query if volume is a Dev Drive volume",
+                        new System.ComponentModel.Win32Exception(Marshal.GetLastWin32Error()));
+                }
+
+                // Unmarshal the output structure
+                outputVolumeInfo = (FILE_FS_PERSISTENT_VOLUME_INFORMATION)Marshal.PtrToStructure(outputVolptr, typeof(FILE_FS_PERSISTENT_VOLUME_INFORMATION));
+
+                if ((outputVolumeInfo.VolumeFlags & PERSISTENT_VOLUME_STATE_DEV_VOLUME) > 0)
+                {
+                    // Volume is a Dev Drive volume.
+                    return true;
+                }
+
+
+                return false;
+            }
+            finally
+            {
+                Marshal.FreeHGlobal(inputVolptr);
+                Marshal.FreeHGlobal(outputVolptr);
+                volumeFileHandle.Close();
+            }
+        }
+
 
 '@
     if (([System.Management.Automation.PSTypeName]'DevDrive.DevDriveHelper').Type)
@@ -268,12 +395,12 @@ function Get-DevDriveWin32HelperScript
 
 <#
     .SYNOPSIS
-        Invokes win32 IsApiSetImplemented function
+        Invokes win32 IsApiSetImplemented function.
 
-    .PARAMETER AccessPath
-        Specifies the contract string for the dll that houses the win32 function
+    .PARAMETER Contract
+        Specifies the contract string for the dll that houses the win32 function.
 #>
-function Get-IsApiSetImplemented
+function Invoke-IsApiSetImplemented
 {
     [CmdletBinding()]
     [OutputType([System.Boolean])]
@@ -287,13 +414,13 @@ function Get-IsApiSetImplemented
 
     $helper = Get-DevDriveWin32HelperScript
     return $helper::IsApiSetImplemented($Contract)
-} # end function Get-IsApiSetImplemented
+} # end function Invoke-IsApiSetImplemented
 
 <#
     .SYNOPSIS
-        Invokes win32 GetDeveloperDriveEnablementState function
+        Invokes win32 GetDeveloperDriveEnablementState function.
 #>
-function Get-DeveloperDriveEnablementState
+function Get-DevDriveEnablementState
 {
     [CmdletBinding()]
     [OutputType([System.Enum])]
@@ -302,7 +429,7 @@ function Get-DeveloperDriveEnablementState
 
     $helper = Get-DevDriveWin32HelperScript
     return $helper::GetDeveloperDriveEnablementState()
-} # end function Get-DeveloperDriveEnablementState
+} # end function Get-DevDriveEnablementState
 
 <#
     .SYNOPSIS
@@ -318,14 +445,15 @@ function Assert-DevDriveFeatureAvailable
     $devDriveHelper = Get-DevDriveWin32HelperScript
     Write-Verbose -Message ($script:localizedData.CheckingDevDriveEnablementMessage)
 
-    $IsApiSetImplemented = Get-IsApiSetImplemented("api-ms-win-core-sysinfo-l1-2-6")
+    $IsApiSetImplemented = Invoke-IsApiSetImplemented('api-ms-win-core-sysinfo-l1-2-6')
     $DevDriveEnablementType = [DevDrive.DevDriveHelper+DEVELOPER_DRIVE_ENABLEMENT_STATE]
+
     if ($IsApiSetImplemented)
     {
         try
         {
             # Based on the enablement result we will throw an error or return without doing anything.
-            switch (Get-DeveloperDriveEnablementState)
+            switch (Get-DevDriveEnablementState)
             {
                 ($DevDriveEnablementType::DeveloperDriveEnablementStateError)
                 {
@@ -371,7 +499,7 @@ function Assert-DevDriveFeatureAvailable
     .PARAMETER FSFormat
         Specifies the file system format of the new volume.
 #>
-function Assert-DevDriveFormatOnReFsFileSystemOnly
+function Assert-FSFormatIsReFsWhenDevDriveFlagSetToTrue
 {
     [CmdletBinding()]
     param
@@ -384,68 +512,11 @@ function Assert-DevDriveFormatOnReFsFileSystemOnly
     if ($FSFormat -ne 'ReFS')
     {
         New-InvalidArgumentException `
-            -Message $($script:localizedData.DevDriveOnlyAvailableForReFsError -f 'ReFS', $FSFormat) `
+            -Message $($script:localizedData.FSFormatNotReFSWhenDevDriveFlagIsTrueError -f 'ReFS', $FSFormat) `
             -ArgumentName 'FSFormat'
     }
 
-} # end function Assert-DevDriveFormatOnReFsFileSystemOnly
-
-<#
-    .SYNOPSIS
-        Validates that the user has enough space on the disk to create a Dev Drive volume.
-
-    .PARAMETER UserDesiredSize
-        Specifies the size the user wants to create the Dev Drive volume with.
-
-    .PARAMETER CurrentDiskFreeSpace
-        Specifies the maximum free space that can be used to create a partition on the disk with.
-
-    .PARAMETER DiskNumber
-        Specifies the the disk number the user what to create the Dev Drive volume inside.
-#>
-function Assert-DiskHasEnoughSpaceToCreateDevDrive
-{
-    [CmdletBinding()]
-    param
-    (
-        [Parameter(Mandatory = $true)]
-        [System.UInt64]
-        $UserDesiredSize,
-
-        [Parameter(Mandatory = $true)]
-        [System.UInt64]
-        $CurrentDiskFreeSpace,
-
-        [Parameter(Mandatory = $true)]
-        [System.UInt32]
-        $DiskNumber
-    )
-
-    <#
-        50 Gb is the minimum size for Dev Drive volumes. When size is 0 the user wants to use all
-        the available space on the disk.
-    #>
-    $notEnoughSpace = $false
-    if (-not $UserDesiredSize)
-    {
-        <#
-            The user wants to use all the available space on the disk. We will check if they have at least 50 Gb
-            of free space available.
-        #>
-        $notEnoughSpace = ($CurrentDiskFreeSpace -lt 50Gb)
-        $UserDesiredSize = 50Gb
-    }
-
-    if ($notEnoughSpace -or ($UserDesiredSize -gt $CurrentDiskFreeSpace))
-    {
-        $DesiredSizeInGb = [Math]::Round($UserDesiredSize / 1GB, 2)
-        $CurrentDiskFreeSpaceInGb = [Math]::Round($CurrentDiskFreeSpace / 1GB, 2)
-        New-InvalidArgumentException `
-            -Message $($script:localizedData.DevDriveNotEnoughSpaceToCreateDevDriveError -f `
-                $DiskNumber, $DesiredSizeInGb, $CurrentDiskFreeSpaceInGb) `
-                -ArgumentName 'UserDesiredSize'
-    }
-} # end function Assert-DiskHasEnoughSpaceToCreateDevDrive
+} # end function Assert-FSFormatIsReFsWhenDevDriveFlagSetToTrue
 
 <#
     .SYNOPSIS
@@ -455,7 +526,7 @@ function Assert-DiskHasEnoughSpaceToCreateDevDrive
     .PARAMETER UserDesiredSize
         Specifies the size the user wants to create the Dev Drive volume with.
 #>
-function Assert-DevDriveSizeMeetsMinimumRequirement
+function Assert-SizeMeetsMinimumDevDriveRequirement
 {
     [CmdletBinding()]
     param
@@ -465,18 +536,65 @@ function Assert-DevDriveSizeMeetsMinimumRequirement
         $UserDesiredSize
     )
 
-    <#
-        50 Gb is the minimum size for Dev Drive volumes. The case where no size is
-        provided is covered in Assert-DiskHasEnoughSpaceToCreateDevDrive.
-    #>
-    if ($UserDesiredSize -and $UserDesiredSize -lt 50Gb)
+    # 50 Gb is the minimum size for Dev Drive volumes.
+    $UserDesiredSizeInGb = [Math]::Round($UserDesiredSize / 1GB, 2)
+    $minimumSizeForDevDriveInGb = 50
+
+    if ($UserDesiredSizeInGb -lt $minimumSizeForDevDriveInGb)
     {
-        New-InvalidArgumentException `
-            -Message $($script:localizedData.DevDriveMinimumSizeError) `
-            -ArgumentName 'UserDesiredSize'
+        throw ($script:localizedData.MinimumSizeNeededToCreateDevDriveVolumeError -F $UserDesiredSizeInGb )
     }
 
-} # end function Assert-DevDriveSizeMeetsMinimumRequirement
+} # end function Assert-SizeMeetsMinimumDevDriveRequirement
+
+<#
+.SYNOPSIS
+    Invokes the wrapper for the DeviceIoControl Win32 API function.
+
+.PARAMETER VolumeGuidPath
+    The guid path of the volume that will be queried.
+#>
+function Invoke-DeviceIoControlWrapperForDevDriveQuery
+{
+    [CmdletBinding()]
+    [OutputType([System.boolean])]
+    param
+    (
+        [Parameter(Mandatory = $true)]
+        [System.String]
+        $VolumeGuidPath
+    )
+
+    $devDriveHelper = Get-DevDriveWin32HelperScript
+
+    return $devDriveHelper::DeviceIoControlWrapperForDevDriveQuery($VolumeGuidPath)
+
+}# end function Invoke-DeviceIoControlWrapperForDevDriveQuery
+
+<#
+    .SYNOPSIS
+        Validates that a volume is a Dev Drive volume. This is temporary until a way to do
+        this is added to the Storage Powershell library to query whether the volume is a Dev Drive volume
+        or not.
+
+    .PARAMETER VolumeGuidPath
+        The guid path of the volume that will be queried.
+#>
+function Test-DevDriveVolume
+{
+    [CmdletBinding()]
+    [OutputType([System.Boolean])]
+    param
+    (
+        [Parameter(Mandatory = $true)]
+        [System.String]
+        $VolumeGuidPath
+    )
+
+    $devDriveHelper = Get-DevDriveWin32HelperScript
+
+    return Invoke-DeviceIoControlWrapperForDevDriveQuery -VolumeGuidPath $VolumeGuidPath
+}# end function Test-DevDriveVolume
 
 Export-ModuleMember -Function @(
     'Restart-ServiceIfExists',
@@ -485,10 +603,11 @@ Export-ModuleMember -Function @(
     'Get-DiskByIdentifier',
     'Test-AccessPathAssignedToLocal',
     'Assert-DevDriveFeatureAvailable',
-    'Assert-DevDriveFormatOnReFsFileSystemOnly',
-    'Assert-DevDriveSizeMeetsMinimumRequirement',
+    'Assert-FSFormatIsReFsWhenDevDriveFlagSetToTrue',
+    'Assert-SizeMeetsMinimumDevDriveRequirement',
     'Get-DevDriveWin32HelperScript',
-    'Get-IsApiSetImplemented',
-    'Get-DeveloperDriveEnablementState',
-    'Assert-DiskHasEnoughSpaceToCreateDevDrive'
+    'Invoke-IsApiSetImplemented',
+    'Get-DevDriveEnablementState',
+    'Test-DevDriveVolume',
+    'Invoke-DeviceIoControlWrapperForDevDriveQuery'
 )

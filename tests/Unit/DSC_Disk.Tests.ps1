@@ -19,6 +19,7 @@ function Invoke-TestSetup
         -TestType 'Unit'
 
     Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath '..\TestHelpers\CommonTestHelper.psm1')
+    $modulePath = Join-Path -Path (Split-Path -Path (Split-Path -Path $PSScriptRoot -Parent) -Parent) -ChildPath 'Modules'
 }
 
 function Invoke-TestCleanup
@@ -34,6 +35,8 @@ try
     InModuleScope $script:dscResourceName {
         $script:testDriveLetter = 'G'
         $script:testDriveLetterH = 'H'
+        $script:testDriveLetterK = 'K'
+        $script:testDriveLetterT = 'T'
         $script:testDiskNumber = 1
         $script:testDiskUniqueId = 'TESTDISKUNIQUEID'
         $script:testDiskFriendlyName = 'TESTDISKFRIENDLYNAME'
@@ -106,7 +109,11 @@ try
             PartitionStyle = 'GPT'
         }
 
-        $script:mockedDisk0GptForDevDrive = [pscustomobject] @{
+        <#
+            Used in the scenario where a user wants to create a Dev Drive volume
+            and there is sufficient unallocated space available.
+        #>
+        $script:mockedDisk0GptForDevDriveResizeNotNeededScenario = [pscustomobject] @{
             Number            = $script:testDiskNumber
             UniqueId          = $script:testDiskUniqueId
             FriendlyName      = $script:testDiskFriendlyName
@@ -116,7 +123,52 @@ try
             IsReadOnly        = $false
             PartitionStyle    = 'GPT'
             Size              = 100Gb
-            LargestFreeExtent = 90Gb
+        }
+
+        <#
+            Used in the scenario where a user wants to create a Dev Drive volume but there
+            is insufficient unallocated space available and a resize of any partition is not possibile.
+        #>
+        $script:mockedDisk0GptForDevDriveResizeNotPossibleScenario = [pscustomobject] @{
+            Number            = $script:testDiskNumber
+            UniqueId          = $script:testDiskUniqueId
+            FriendlyName      = $script:testDiskFriendlyName
+            SerialNumber      = $script:testDiskSerialNumber
+            Guid              = $script:testDiskGptGuid
+            IsOffline         = $false
+            IsReadOnly        = $false
+            PartitionStyle    = 'GPT'
+            Size              = 60Gb
+        }
+
+        <#
+            Used in the scenario where a user wants to create a Dev Drive volume but there
+            is insufficient unallocated space available. However a resize of a partition possibile.
+            which will create new unallocated space for the new partition.
+        #>
+        $script:mockedDisk0GptForDevDriveResizePossibleScenario = [pscustomobject] @{
+            Number            = $script:testDiskNumber
+            UniqueId          = $script:testDiskUniqueId
+            FriendlyName      = $script:testDiskFriendlyName
+            SerialNumber      = $script:testDiskSerialNumber
+            Guid              = $script:testDiskGptGuid
+            IsOffline         = $false
+            IsReadOnly        = $false
+            PartitionStyle    = 'GPT'
+            Size              = 100Gb
+        }
+
+        $script:mockedDisk0GptForDevDriveAfterResize = [pscustomobject] @{
+            Number            = $script:testDiskNumber
+            UniqueId          = $script:testDiskUniqueId
+            FriendlyName      = $script:testDiskFriendlyName
+            SerialNumber      = $script:testDiskSerialNumber
+            Guid              = $script:testDiskGptGuid
+            IsOffline         = $false
+            IsReadOnly        = $false
+            PartitionStyle    = 'GPT'
+            Size              = 100Gb
+            LargestFreeExtent = 50Gb
         }
 
         $script:mockedDisk0RawForDevDrive = [pscustomobject] @{
@@ -149,11 +201,34 @@ try
 
         $script:mockedPartitionSize50Gb = 50GB
 
+        $script:mockedPartitionSize70Gb = 70GB
+
+        $script:mockedPartitionSize100Gb = 100GB
+
+        $script:mockedPartitionWithTDriveLetter = [pscustomobject] @{
+            DriveLetter     = [System.Char] $script:testDriveLetterT
+            Size            = $script:mockedPartitionSize50Gb
+            PartitionNumber = 1
+            Type            = 'Basic'
+        }
+
+        $script:mockedPartitionSupportedSizeForTDriveletter = [pscustomobject] @{
+            DriveLetter    = [System.Char] $script:testDriveLetterT
+            SizeMax         = $script:mockedPartitionSize100Gb
+            SizeMin         = $script:mockedPartitionSize10Gb
+        }
+
         $script:mockedPartitionWithGDriveletter = [pscustomobject] @{
             DriveLetter     = [System.Char] $script:testDriveLetter
             Size            = $script:mockedPartitionSize50Gb
             PartitionNumber = 1
             Type            = 'Basic'
+        }
+
+        $script:mockedPartitionSupportedSizeForGDriveletter = [pscustomobject] @{
+            DriveLetter    = [System.Char] $script:testDriveLetter
+            SizeMax         = $script:mockedPartitionSize50Gb
+            SizeMin         = $script:mockedPartitionSize50Gb
         }
 
         $script:mockedPartitionWithHDriveLetter = [pscustomobject] @{
@@ -162,6 +237,39 @@ try
             PartitionNumber = 1
             Type            = 'Basic'
         }
+
+        $script:mockedPartitionSupportedSizeForHDriveletter = [pscustomobject] @{
+            DriveLetter    = [System.Char] $script:testDriveLetterH
+            SizeMax         = $script:mockedPartitionSize100Gb
+            SizeMin         = $script:mockedPartitionSize10Gb
+        }
+
+        $script:mockedPartitionWithKDriveLetter = [pscustomobject] @{
+            DriveLetter     = [System.Char] $script:testDriveLetterK
+            Size            = $script:mockedPartitionSize70Gb
+            PartitionNumber = 1
+            Type            = 'Basic'
+        }
+
+        $script:mockedPartitionSupportedSizeForKDriveletter = [pscustomobject] @{
+            DriveLetter    = [System.Char] $script:testDriveLetterK
+            SizeMax         = $script:mockedPartitionSize100Gb
+            SizeMin         = $script:mockedPartitionSize
+        }
+
+        $script:mockedPartitionListForResizeNotPossibleScenario = @(
+            $script:mockedPartitionWithGDriveletter
+        )
+
+        $script:mockedPartitionListForResizeNotNeededScenario = @(
+            $script:mockedPartitionWithGDriveletter,
+            $script:mockedPartitionWithHDriveLetter
+        )
+
+        $script:mockedPartitionListForResizePossibleScenario = @(
+            $script:mockedPartitionWithGDriveletter,
+            $script:mockedPartitionWithKDriveLetter
+        )
 
         <#
             This condition seems to occur in some systems where the
@@ -192,6 +300,22 @@ try
 
         $script:mockedPartitionNoDriveLetter50Gb = [pscustomobject] @{
             DriveLetter     = [System.Char] $null
+            Size            = $script:mockedPartitionSize50Gb
+            PartitionNumber = 1
+            Type            = 'Basic'
+            IsReadOnly      = $false
+        }
+
+        $script:mockedPartitionGDriveLetter40Gb = [pscustomobject] @{
+            DriveLetter     = [System.Char] $testDriveLetter
+            Size            = $script:mockedPartitionSize40Gb
+            PartitionNumber = 1
+            Type            = 'Basic'
+            IsReadOnly      = $false
+        }
+
+        $script:mockedPartitionGDriveLetter50Gb = [pscustomobject] @{
+            DriveLetter     = [System.Char] $testDriveLetter
             Size            = $script:mockedPartitionSize50Gb
             PartitionNumber = 1
             Type            = 'Basic'
@@ -230,33 +354,53 @@ try
             DriveLetter     = $script:testDriveLetter
         }
 
+        $script:mockedVolumeDevDrive = [pscustomobject] @{
+            FileSystemLabel = 'myLabel'
+            FileSystem      = 'ReFS'
+            DriveLetter     = $script:testDriveLetter
+            UniqueId        = '\\?\Volume{3a244a32-efba-4b7e-9a19-7293fc7c7924}\'
+        }
+
+        $script:mockedVolumeCreatedAfterNewPartiton = [pscustomobject] @{
+            FileSystemLabel = ''
+            FileSystem      = ''
+            DriveLetter     = $script:testDriveLetterT
+            UniqueId        = '\\?\Volume{3a244a32-efba-4b7e-9a19-7293fc7c7924}\'
+        }
+
+        $script:mockedVolumeThatExistPriorToConfiguration = [pscustomobject] @{
+            FileSystemLabel = 'myLabel'
+            FileSystem      = 'NTFS'
+            DriveLetter     = $script:testDriveLetterT
+            UniqueId        = '\\?\Volume{3a244a32-efba-4b7e-9a19-7293fc7c7924}\'
+            Size            = $script:mockedPartitionSize50Gb
+        }
+
         $script:parameterFilter_MockedDisk0Number = {
             $DiskId -eq $script:mockedDisk0Gpt.Number -and $DiskIdType -eq 'Number'
         }
-
-        $script:UninitializeDiskSizeParamsForDevDrive = {
-            $UserDesiredSize -eq $script:userDesiredSize60Gb -and
-            $CurrentDiskFreeSpace -eq $script:mockedDisk0RawForDevDrive.size -and
-            $DiskNumber -eq $script:mockedDisk0RawForDevDrive.Number
-        }
-
-        $script:InitializeDiskSizeParamsForDevDrive = {
-            $UserDesiredSize -eq $script:userDesiredSize60Gb -and
-            $CurrentDiskFreeSpace -eq $script:mockedDisk0GptForDevDrive.LargestFreeExtent -and
-            $DiskNumber -eq $script:mockedDisk0GptForDevDrive.Number
-        }
-
-        $script:userDesiredSize60Gb = 60Gb
 
         $script:userDesiredSize50Gb = 50Gb
 
         $script:userDesiredSize40Gb = 40Gb
 
-        $script:userDesiredSizeZeroGb = 0Gb
+        $script:amountOfTimesGetDiskByIdentifierIsCalled = 0
 
-        $script:currentFreeSpaceSize60Gb = 60Gb
+        function Get-PartitionSupportedSizeForDevDriveScenarios
+        {
+            [CmdletBinding()]
+            param
+            (
+                [Parameter()]
+                $DriveLetter
+            )
 
-        $script:currentFreeSpaceSize50Gb = 50Gb
+            switch ($DriveLetter) {
+                'G' { $script:mockedPartitionSupportedSizeForGDriveletter }
+                'H' { $script:mockedPartitionSupportedSizeForHDriveletter }
+                'K' { $script:mockedPartitionSupportedSizeForKDriveletter }
+            }
+        }
 
         <#
             These functions are required to be able to mock functions where
@@ -499,44 +643,13 @@ try
             ()
         }
 
-        function Assert-DevDriveFormatOnReFsFileSystemOnly
+        function Test-DevDriveVolume
         {
             [CmdletBinding()]
             param
             (
-                [Parameter(Mandatory = $true)]
-                [System.String]
-                $FSFormat
-            )
-        }
-
-        function Assert-DiskHasEnoughSpaceToCreateDevDrive
-        {
-            [CmdletBinding()]
-            param
-            (
-                [Parameter(Mandatory = $true)]
-                [System.UInt64]
-                $UserDesiredSize,
-
-                [Parameter(Mandatory = $true)]
-                [System.UInt64]
-                $CurrentDiskFreeSpace,
-
-                [Parameter(Mandatory = $true)]
-                [System.UInt32]
-                $DiskNumber
-            )
-        }
-
-        function Assert-DevDriveSizeMeetsMinimumRequirement
-        {
-            [CmdletBinding()]
-            param
-            (
-                [Parameter(Mandatory = $true)]
-                [System.UInt64]
-                $UserDesiredSize
+                [string]
+                $VolumeGuidPath
             )
         }
 
@@ -1196,9 +1309,106 @@ try
                     Assert-MockCalled -CommandName Get-Volume -Exactly 1
                 }
             }
+
+            Context 'When volume on partition is a Dev Drive volume' {
+                # verifiable (should be called) mocks
+                Mock `
+                    -CommandName Get-CimInstance `
+                    -MockWith { $script:mockedCim } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-DiskByIdentifier `
+                    -ParameterFilter $script:parameterFilter_MockedDisk0Number `
+                    -MockWith { $script:mockedDisk0Gpt } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-Partition `
+                    -MockWith { $script:mockedPartition } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-Volume `
+                    -MockWith { $script:mockedVolumeDevDrive } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Test-DevDriveVolume `
+                    -MockWith { $true } `
+                    -Verifiable
+
+                $resource = Get-TargetResource `
+                    -DiskId $script:mockedDisk0Gpt.Number `
+                    -DriveLetter $script:testDriveLetter `
+                    -Verbose
+
+                It "Should return DevDrive as $($true)" {
+                    $resource.DevDrive | Should -Be $true
+                }
+
+                It 'Should call the correct mocks' {
+                    Assert-VerifiableMock
+                    Assert-MockCalled -CommandName Get-CimInstance -Exactly 1
+                    Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly 1 `
+                        -ParameterFilter $script:parameterFilter_MockedDisk0Number
+                    Assert-MockCalled -CommandName Get-Partition -Exactly 1
+                    Assert-MockCalled -CommandName Get-Volume -Exactly 1
+                    Assert-MockCalled -CommandName Test-DevDriveVolume -Exactly 1
+                }
+            }
+
+            Context 'When volume on partition is not a Dev Drive volume' {
+                # verifiable (should be called) mocks
+                Mock `
+                    -CommandName Get-CimInstance `
+                    -MockWith { $script:mockedCim } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-DiskByIdentifier `
+                    -ParameterFilter $script:parameterFilter_MockedDisk0Number `
+                    -MockWith { $script:mockedDisk0Gpt } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-Partition `
+                    -MockWith { $script:mockedPartition } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-Volume `
+                    -MockWith { $script:mockedVolume } `
+                    -Verifiable
+
+                Mock -CommandName Test-DevDriveVolume
+
+                $resource = Get-TargetResource `
+                    -DiskId $script:mockedDisk0Gpt.Number `
+                    -DriveLetter $script:testDriveLetter `
+                    -Verbose
+
+                It "Should return DevDrive as $($false)" {
+                    $resource.DevDrive | Should -Be $false
+                }
+
+                It 'Should call the correct mocks' {
+                    Assert-VerifiableMock
+                    Assert-MockCalled -CommandName Get-CimInstance -Exactly 1
+                    Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly 1 `
+                        -ParameterFilter $script:parameterFilter_MockedDisk0Number
+                    Assert-MockCalled -CommandName Get-Partition -Exactly 1
+                    Assert-MockCalled -CommandName Get-Volume -Exactly 1
+                    Assert-MockCalled -CommandName Test-DevDriveVolume -Exactly 0
+                }
+            }
         }
 
         Describe 'DSC_Disk\Set-TargetResource' {
+            BeforeAll {
+                $localizedCommonStrings = Get-LocalizedData -BaseDirectory "$modulePath\StorageDsc.Common" -FileName "StorageDsc.Common.strings.psd1"
+            }
+
             Context 'When offline GPT disk using Disk Number' {
                 # verifiable (should be called) mocks
                 Mock `
@@ -2575,6 +2785,7 @@ try
 
                 Mock `
                     -CommandName Format-Volume `
+                    -MockWith { $script:mockedVolume } `
                     -Verifiable
 
                 # mocks that should not be called
@@ -2764,37 +2975,99 @@ try
                 }
             }
 
-            Context 'When Dev Drive flag is enabled and format volume is called with the Dev Drive flag' {
+            Context 'When the Dev Drive flag is true, the AllowDestructive flag is false and there is not enough space on the disk to create the partition' {
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Get-DiskByIdentifier `
                     -ParameterFilter $script:parameterFilter_MockedDisk0Number `
-                    -MockWith { $script:mockedDisk0GptForDevDrive } `
+                    -MockWith { $script:mockedDisk0GptForDevDriveResizeNotPossibleScenario } `
                     -Verifiable
 
                 Mock `
                     -CommandName Get-Partition `
+                    -MockWith { $script:mockedPartitionListForResizeNotPossibleScenario } `
                     -Verifiable
 
                 Mock `
-                    -CommandName New-Partition `
-                    -ParameterFilter {
-                    $DriveLetter -eq $script:testDriveLetter
-                } `
-                    -MockWith { $script:mockedPartitionNoDriveLetter } `
+                    -CommandName Assert-DevDriveFeatureAvailable `
+                    -MockWith { $null } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-PartitionSupportedSize `
+                    -MockWith { & Get-PartitionSupportedSizeForDevDriveScenarios  $DriveLetter } `
+                    -Verifiable
+
+                # mocks that should not be called
+                Mock -CommandName Set-Disk
+                Mock -CommandName Initialize-Disk
+
+                $userDesiredSizeInGb = [Math]::Round($script:mockedPartitionSize50Gb / 1GB, 2)
+
+                It 'Should throw an exception' {
+                    {
+                        Set-TargetResource `
+                            -DiskId $script:mockedDisk0Gpt.Number `
+                            -Driveletter $script:testDriveLetterT `
+                            -Size $script:mockedPartitionSize50Gb `
+                            -FSLabel 'NewLabel' `
+                            -FSFormat 'ReFS' `
+                            -DevDrive $true `
+                            -Verbose
+                    } | Should -Throw -ExpectedMessage ($script:localizedData.FoundNoPartitionsThatCanResizedForDevDrive -F $userDesiredSizeInGb)
+                }
+
+                It 'Should call the correct mocks' {
+                    Assert-VerifiableMock
+                    Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 1 `
+                        -ParameterFilter $script:parameterFilter_MockedDisk0Number
+                    Assert-MockCalled -CommandName Set-Disk -Exactly -Times 0
+                    Assert-MockCalled -CommandName Initialize-Disk -Exactly -Times 0
+                    Assert-MockCalled -CommandName Get-Partition -Exactly -Times 1
+                }
+            }
+
+            Context 'When the Dev Drive flag is true, AllowDestructive is false and there is enough space on the disk to create the partition' {
+                # verifiable (should be called) mocks
+                Mock `
+                    -CommandName Get-DiskByIdentifier `
+                    -ParameterFilter $script:parameterFilter_MockedDisk0Number `
+                    -MockWith { $script:mockedDisk0GptForDevDriveResizeNotNeededScenario } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-Partition `
+                    -MockWith { $script:mockedPartitionListForResizeNotNeededScenario } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Assert-DevDriveFeatureAvailable `
+                    -MockWith { $null } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Test-DevDriveVolume `
+                    -MockWith { $true } `
                     -Verifiable
 
                 Mock `
                     -CommandName Get-Volume `
-                    -MockWith { $script:mockedVolumeUnformatted } `
+                    -MockWith { $script:mockedVolumeCreatedAfterNewPartiton } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-PartitionSupportedSize `
+                    -MockWith { & Get-PartitionSupportedSizeForDevDriveScenarios  $DriveLetter } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName New-Partition `
+                    -MockWith { $script:mockedPartitionWithTDriveLetter } `
                     -Verifiable
 
                 Mock `
                     -CommandName Format-Volume `
-                    -Verifiable
-
-                Mock `
-                    -CommandName Set-Partition `
+                    -MockWith { $script:mockedVolumeCreatedAfterNewPartiton } `
                     -Verifiable
 
                 # mocks that should not be called
@@ -2805,8 +3078,8 @@ try
                     {
                         Set-TargetResource `
                             -DiskId $script:mockedDisk0Gpt.Number `
-                            -Driveletter $script:testDriveLetter `
-                            -Size $script:mockedPartitionSize `
+                            -Driveletter $script:testDriveLetterT `
+                            -Size $script:mockedPartitionSize50Gb `
                             -FSLabel 'NewLabel' `
                             -FSFormat 'ReFS' `
                             -DevDrive $true `
@@ -2822,68 +3095,52 @@ try
                     Assert-MockCalled -CommandName Initialize-Disk -Exactly -Times 0
                     Assert-MockCalled -CommandName Get-Partition -Exactly -Times 4
                     Assert-MockCalled -CommandName Get-Volume -Exactly -Times 1
-                    Assert-MockCalled -CommandName New-Partition -Exactly -Times 1 `
-                        -ParameterFilter {
-                        $DriveLetter -eq $script:testDriveLetter
-                    }
+                    Assert-MockCalled -CommandName New-Partition -Exactly -Times 1
                     Assert-MockCalled -CommandName Format-Volume -Exactly -Times 1 `
                         -ParameterFilter {
                         $DevDrive -eq $true
                     }
-                    Assert-MockCalled -CommandName Set-Partition -Exactly -Times 1
                 }
             }
 
-            Context 'When the user explicitly wants to create a new drive on unallocated space regardless of whether there is a partition that matches the size parameter or not. ' {
+            Context 'When the Dev Drive flag is true, AllowDestructive flag is false and there is not enough unallocated disk space but a resize of a partition is possible to create new space' {
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Get-DiskByIdentifier `
                     -ParameterFilter $script:parameterFilter_MockedDisk0Number `
-                    -MockWith { $script:mockedDisk0GptForDevDrive } `
+                    -MockWith { $script:mockedDisk0GptForDevDriveResizePossibleScenario } `
                     -Verifiable
 
                 Mock `
                     -CommandName Get-Partition `
-                    -MockWith { $script:mockedPartitionWithGDriveletter } `
+                    -MockWith { $script:mockedPartitionListForResizePossibleScenario } `
                     -Verifiable
 
                 Mock `
-                    -CommandName New-Partition `
-                    -ParameterFilter {
-                    $DriveLetter -eq $script:testDriveLetterH
-                } `
-                    -MockWith { $script:mockedPartitionNoDriveLetter50Gb } `
+                    -CommandName Assert-DevDriveFeatureAvailable `
+                    -MockWith { $null } `
                     -Verifiable
 
                 Mock `
-                    -CommandName Get-Volume `
-                    -MockWith { $script:mockedVolumeUnformatted } `
-                    -Verifiable
-
-                Mock `
-                    -CommandName Format-Volume `
-                    -Verifiable
-
-                Mock `
-                    -CommandName Set-Partition `
+                    -CommandName Get-PartitionSupportedSize `
+                    -MockWith { & Get-PartitionSupportedSizeForDevDriveScenarios  $DriveLetter } `
                     -Verifiable
 
                 # mocks that should not be called
                 Mock -CommandName Set-Disk
                 Mock -CommandName Initialize-Disk
 
-                It 'Should not throw an exception' {
+                It 'Should throw an exception' {
                     {
                         Set-TargetResource `
                             -DiskId $script:mockedDisk0Gpt.Number `
-                            -Driveletter $script:testDriveLetterH `
+                            -Driveletter $script:testDriveLetterT `
                             -Size $script:mockedPartitionSize50Gb `
                             -FSLabel 'NewLabel' `
                             -FSFormat 'ReFS' `
                             -DevDrive $true `
-                            -UseUnallocatedSpace $true `
                             -Verbose
-                    } | Should -Not -Throw
+                    } | Should -Throw -ExpectedMessage ($script:localizedData.AllowDestructiveNeededForDevDriveOperation  -F $script:testDriveLetterK)
                 }
 
                 It 'Should call the correct mocks' {
@@ -2892,40 +3149,71 @@ try
                         -ParameterFilter $script:parameterFilter_MockedDisk0Number
                     Assert-MockCalled -CommandName Set-Disk -Exactly -Times 0
                     Assert-MockCalled -CommandName Initialize-Disk -Exactly -Times 0
-                    Assert-MockCalled -CommandName Get-Partition -Exactly -Times 4
-                    Assert-MockCalled -CommandName Get-Volume -Exactly -Times 1
-                    Assert-MockCalled -CommandName New-Partition -Exactly -Times 1 `
-                        -ParameterFilter {
-                        $DriveLetter -eq $script:testDriveLetterH
-                    }
-                    Assert-MockCalled -CommandName Format-Volume -Exactly -Times 1 `
-                        -ParameterFilter {
-                        $DevDrive -eq $true
-                    }
-                    Assert-MockCalled -CommandName Set-Partition -Exactly -Times 1
+                    Assert-MockCalled -CommandName Get-Partition -Exactly -Times 1
                 }
             }
 
-            Context 'When the user wants to create a dev drive volume by overwriting a volume that already exists with AllowDestructive set to true' {
+            Context 'When the Dev Drive flag is true, AllowDestructive flag is true and there is not enough unallocated disk space but a resize of a partition is possible to create new space' {
                 # verifiable (should be called) mocks
+
+                # For resize scenario we need to call Get-DiskByIdentifier twice. After the resize a disk.FreeLargestExtent is updated.
                 Mock `
                     -CommandName Get-DiskByIdentifier `
                     -ParameterFilter $script:parameterFilter_MockedDisk0Number `
-                    -MockWith { $script:mockedDisk0GptForDevDrive } `
+                    -MockWith {
+                        $script:amountOfTimesGetDiskByIdentifierIsCalled++
+
+                        if ($script:amountOfTimesGetDiskByIdentifierIsCalled -eq 1) {
+
+                            $script:mockedDisk0GptForDevDriveResizePossibleScenario
+                        }
+                        elseif ($script:amountOfTimesGetDiskByIdentifierIsCalled -eq 2) {
+
+                            $script:mockedDisk0GptForDevDriveAfterResize
+                        }
+                        else {
+                            $script:mockedDisk0GptForDevDriveResizePossibleScenario
+                        }
+                     } `
                     -Verifiable
 
                 Mock `
                     -CommandName Get-Partition `
-                    -MockWith { $script:mockedPartitionWithGDriveletter } `
+                    -MockWith { $script:mockedPartitionListForResizePossibleScenario } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Assert-DevDriveFeatureAvailable `
+                    -MockWith { $null } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-PartitionSupportedSize `
+                    -MockWith { & Get-PartitionSupportedSizeForDevDriveScenarios  $DriveLetter } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Test-DevDriveVolume `
+                    -MockWith { $true } `
                     -Verifiable
 
                 Mock `
                     -CommandName Get-Volume `
-                    -MockWith { $script:mockedVolumeReFS } `
+                    -MockWith { $script:mockedVolumeCreatedAfterNewPartiton } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName New-Partition `
+                    -MockWith { $script:mockedPartitionWithTDriveLetter } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Resize-Partition `
                     -Verifiable
 
                 Mock `
                     -CommandName Format-Volume `
+                    -MockWith { $script:mockedVolumeCreatedAfterNewPartiton } `
                     -Verifiable
 
                 # mocks that should not be called
@@ -2936,10 +3224,77 @@ try
                     {
                         Set-TargetResource `
                             -DiskId $script:mockedDisk0Gpt.Number `
-                            -Driveletter $script:testDriveLetterH `
+                            -Driveletter $script:testDriveLetterT `
                             -Size $script:mockedPartitionSize50Gb `
                             -FSLabel 'NewLabel' `
-                            -FSFormat 'NTFS' `
+                            -FSFormat 'ReFS' `
+                            -DevDrive $true `
+                            -AllowDestructive $true `
+                            -Verbose
+                    } | Should -Not -Throw
+                }
+
+                It 'Should call the correct mocks' {
+                    Assert-VerifiableMock
+                    Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 2 `
+                        -ParameterFilter $script:parameterFilter_MockedDisk0Number
+                    Assert-MockCalled -CommandName Set-Disk -Exactly -Times 0
+                    Assert-MockCalled -CommandName Initialize-Disk -Exactly -Times 0
+                    Assert-MockCalled -CommandName Get-Partition -Exactly -Times 4
+                    Assert-MockCalled -CommandName Get-Volume -Exactly -Times 1
+                    Assert-MockCalled -CommandName Resize-Partition -Exactly -Times 1
+                    Assert-MockCalled -CommandName Format-Volume -Exactly -Times 1 `
+                        -ParameterFilter {
+                        $DevDrive -eq $true
+                    }
+                    Assert-MockCalled -CommandName New-Partition -Exactly -Times 1
+                }
+            }
+
+            Context 'When the Dev Drive flag is true, AllowDestructive is true, and a Partition that matches the users drive letter exists.' {
+                # verifiable (should be called) mocks
+                Mock `
+                    -CommandName Get-DiskByIdentifier `
+                    -ParameterFilter $script:parameterFilter_MockedDisk0Number `
+                    -MockWith { $script:mockedDisk0GptForDevDriveResizeNotNeededScenario } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Test-DevDriveVolume `
+                    -MockWith { $true } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-PartitionSupportedSize `
+                    -MockWith { $script:mockedPartitionSupportedSizeForTDriveletter } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-Partition `
+                    -MockWith { $script:mockedPartitionWithTDriveletter } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-Volume `
+                    -MockWith { $script:mockedVolumeThatExistPriorToConfiguration } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Format-Volume `
+                    -MockWith { $script:mockedVolumeThatExistPriorToConfiguration } `
+                    -Verifiable
+
+                # mocks that should not be called
+                Mock -CommandName Set-Disk
+                Mock -CommandName Initialize-Disk
+
+                It 'Should not throw an exception and overwrite the existing partition' {
+                    {
+                        Set-TargetResource `
+                            -DiskId $script:mockedDisk0Gpt.Number `
+                            -Driveletter $script:testDriveLetterT `
+                            -FSLabel 'NewLabel' `
+                            -FSFormat 'ReFS' `
                             -DevDrive $true `
                             -AllowDestructive $true `
                             -Verbose
@@ -2955,6 +3310,66 @@ try
                     Assert-MockCalled -CommandName Get-Partition -Exactly -Times 1
                     Assert-MockCalled -CommandName Get-Volume -Exactly -Times 1
                     Assert-MockCalled -CommandName Format-Volume -Exactly -Times 1 `
+                        -ParameterFilter {
+                        $DevDrive -eq $true
+                    }
+                }
+            }
+
+            Context 'When the Dev Drive flag is true, AllowDestructive is false, and a Partition that matches the users drive letter exists.' {
+                # verifiable (should be called) mocks
+                Mock `
+                    -CommandName Get-DiskByIdentifier `
+                    -ParameterFilter $script:parameterFilter_MockedDisk0Number `
+                    -MockWith { $script:mockedDisk0GptForDevDriveResizeNotNeededScenario } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Test-DevDriveVolume `
+                    -MockWith { $false } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-PartitionSupportedSize `
+                    -MockWith { $script:mockedPartitionSupportedSizeForTDriveletter } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-Partition `
+                    -MockWith { $script:mockedPartitionWithTDriveletter } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-Volume `
+                    -MockWith { $script:mockedVolumeThatExistPriorToConfiguration } `
+                    -Verifiable
+
+                # mocks that should not be called
+                Mock -CommandName Set-Disk
+                Mock -CommandName Initialize-Disk
+                Mock -CommandName Format-Volume
+
+                It 'Should throw an exception advising that the volume was not formatted as a Dev Drive volume' {
+                    {
+                        Set-TargetResource `
+                            -DiskId $script:mockedDisk0Gpt.Number `
+                            -Driveletter $script:testDriveLetterT `
+                            -FSLabel 'NewLabel' `
+                            -FSFormat 'ReFS' `
+                            -DevDrive $true `
+                            -Verbose
+                    } | Should -Throw -ExpectedMessage ($script:localizedData.FailedToConfigureDevDriveVolume  -F $script:testDriveLetterT)
+                }
+
+                It 'Should call the correct mocks' {
+                    Assert-VerifiableMock
+                    Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 1 `
+                        -ParameterFilter $script:parameterFilter_MockedDisk0Number
+                    Assert-MockCalled -CommandName Set-Disk -Exactly -Times 0
+                    Assert-MockCalled -CommandName Initialize-Disk -Exactly -Times 0
+                    Assert-MockCalled -CommandName Get-Partition -Exactly -Times 1
+                    Assert-MockCalled -CommandName Get-Volume -Exactly -Times 1
+                    Assert-MockCalled -CommandName Format-Volume -Exactly -Times 0 `
                         -ParameterFilter {
                         $DevDrive -eq $true
                     }
@@ -4020,7 +4435,7 @@ try
                 }
             }
 
-            Context 'When the Dev Drive flag is enabled, and the user is attempting to put Dev Drive volume in an existing partition' {
+            Context 'When the Dev Drive flag is true, and Size parameter is less than minimum required size for Dev Drive (50 Gb)' {
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Get-DiskByIdentifier `
@@ -4029,61 +4444,51 @@ try
                     -Verifiable
 
                 Mock `
-                    -CommandName Assert-DevDriveFeatureAvailable `
-                    -Verifiable
-
-                Mock `
                     -CommandName Get-Partition `
-                    -MockWith { $null } `
+                    -MockWith { $mockedPartitionGDriveLetter40Gb } `
                     -Verifiable
 
-                It 'Should not throw an exception' {
+                $userDesiredSizeInGb = [Math]::Round($script:userDesiredSize40Gb / 1GB, 2)
+
+                It 'Should throw an exception as size does not meet minimum requirement' {
                     {
                         $script:result = Test-TargetResource `
                             -DiskId $script:mockedDisk0Gpt.Number `
                             -DriveLetter $script:testDriveLetter `
                             -AllocationUnitSize 4096 `
-                            -Size $script:userDesiredSize60Gb `
+                            -Size $script:userDesiredSize40Gb `
                             -FSLabel $script:mockedVolume.FileSystemLabel `
                             -FSFormat $script:mockedVolumeReFS.FileSystem `
                             -DevDrive $true `
+                            -AllowDestructive $true `
                             -Verbose
-                    } | Should -Not -Throw
+                    } | Should -Throw -ExpectedMessage ($script:localizedCommonStrings.MinimumSizeNeededToCreateDevDriveVolumeError -F $userDesiredSizeInGb)
                 }
 
                 It 'Should call the correct mocks' {
                     Assert-VerifiableMock
                     Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 1 `
                         -ParameterFilter $script:parameterFilter_MockedDisk0Number
-                    Assert-MockCalled -CommandName Assert-DevDriveFeatureAvailable -Exactly -Times 1
-                    Assert-MockCalled -CommandName Get-Partition -Exactly -Times 2
+                    Assert-MockCalled -CommandName Get-Partition -Exactly -Times 1
                 }
             }
 
-            Context 'When the Dev Drive flag is enabled, disk is initialized, and the user is attempting to put a Dev Drive volume in a new partition' {
+            Context 'When the Dev Drive flag is true, but the partition is not formatted as a Dev Drive volume' {
                 # verifiable (should be called) mocks
                 Mock `
                     -CommandName Get-DiskByIdentifier `
                     -ParameterFilter $script:parameterFilter_MockedDisk0Number `
-                    -MockWith { $script:mockedDisk0GptForDevDrive } `
-                    -Verifiable
-
-                Mock `
-                    -CommandName Assert-DevDriveFeatureAvailable `
-                    -Verifiable
-
-                Mock `
-                    -CommandName Assert-DiskHasEnoughSpaceToCreateDevDrive `
-                    -ParameterFilter $script:InitializeDiskSizeParamsForDevDrive `
-                    -Verifiable
-
-                Mock `
-                    -CommandName Assert-DevDriveFormatOnReFsFileSystemOnly `
+                    -MockWith { $script:mockedDisk0Gpt } `
                     -Verifiable
 
                 Mock `
                     -CommandName Get-Partition `
-                    -MockWith { $null } `
+                    -MockWith { $mockedPartitionGDriveLetter50Gb } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-Volume `
+                    -MockWith { $script:mockedVolumeThatExistPriorToConfiguration } `
                     -Verifiable
 
                 It 'Should not throw an exception' {
@@ -4092,10 +4497,11 @@ try
                             -DiskId $script:mockedDisk0Gpt.Number `
                             -DriveLetter $script:testDriveLetter `
                             -AllocationUnitSize 4096 `
-                            -Size $script:userDesiredSize60Gb `
+                            -Size $script:userDesiredSize50Gb `
                             -FSLabel $script:mockedVolume.FileSystemLabel `
                             -FSFormat $script:mockedVolumeReFS.FileSystem `
                             -DevDrive $true `
+                            -AllowDestructive $true `
                             -Verbose
                     } | Should -Not -Throw
                 }
@@ -4104,64 +4510,9 @@ try
                     Assert-VerifiableMock
                     Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 1 `
                         -ParameterFilter $script:parameterFilter_MockedDisk0Number
-                    Assert-MockCalled -CommandName Assert-DevDriveFeatureAvailable -Exactly -Times 1
-                    Assert-MockCalled -CommandName Assert-DiskHasEnoughSpaceToCreateDevDrive -Exactly -Times 1 `
-                        -ParameterFilter $script:InitializeDiskSizeParamsForDevDrive
-                    Assert-MockCalled -CommandName Assert-DevDriveFormatOnReFsFileSystemOnly -Exactly -Times 1
-                    Assert-MockCalled -CommandName Get-Partition -Exactly -Times 2
+                    Assert-MockCalled -CommandName Get-Partition -Exactly -Times 1
+                    Assert-MockCalled -CommandName Get-Volume -Exactly -Times 1
                 }
-            }
-        }
-
-        Context 'When the Dev Drive flag is enabled, disk is not initialized, and the user is attempting to put a Dev Drive volume in a new partition' {
-            # verifiable (should be called) mocks
-            Mock `
-                -CommandName Get-DiskByIdentifier `
-                -ParameterFilter $script:parameterFilter_MockedDisk0Number `
-                -MockWith { $script:mockedDisk0RawForDevDrive } `
-                -Verifiable
-
-            Mock `
-                -CommandName Assert-DevDriveFeatureAvailable `
-                -Verifiable
-
-            Mock `
-                -CommandName Assert-DiskHasEnoughSpaceToCreateDevDrive `
-                -ParameterFilter $script:UninitializeDiskSizeParamsForDevDrive `
-                -Verifiable
-
-            Mock `
-                -CommandName Assert-DevDriveFormatOnReFsFileSystemOnly `
-                -Verifiable
-
-            Mock `
-                -CommandName Get-Partition `
-                -MockWith { $null } `
-                -Verifiable
-
-            It 'Should not throw an exception' {
-                {
-                    $script:result = Test-TargetResource `
-                        -DiskId $script:mockedDisk0Gpt.Number `
-                        -DriveLetter $script:testDriveLetter `
-                        -AllocationUnitSize 4096 `
-                        -Size $script:userDesiredSize60Gb `
-                        -FSLabel $script:mockedVolume.FileSystemLabel `
-                        -FSFormat $script:mockedVolumeReFS.FileSystem `
-                        -DevDrive $true `
-                        -Verbose
-                } | Should -Not -Throw
-            }
-
-            It 'Should call the correct mocks' {
-                Assert-VerifiableMock
-                Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 1 `
-                    -ParameterFilter $script:parameterFilter_MockedDisk0Number
-                Assert-MockCalled -CommandName Assert-DevDriveFeatureAvailable -Exactly -Times 1
-                Assert-MockCalled -CommandName Assert-DiskHasEnoughSpaceToCreateDevDrive -Exactly -Times 1 `
-                    -ParameterFilter $script:UninitializeDiskSizeParamsForDevDrive
-                Assert-MockCalled -CommandName Assert-DevDriveFormatOnReFsFileSystemOnly -Exactly -Times 1
-                Assert-MockCalled -CommandName Get-Partition -Exactly -Times 1
             }
         }
     }
