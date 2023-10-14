@@ -1378,10 +1378,12 @@ try
 
                 Mock `
                     -CommandName Get-Volume `
-                    -MockWith { $script:mockedVolume } `
+                    -MockWith { $script:mockedVolumeThatExistPriorToConfiguration } `
                     -Verifiable
 
-                Mock -CommandName Test-DevDriveVolume
+                Mock -CommandName Test-DevDriveVolume `
+                    -MockWith { $false } `
+                    -Verifiable
 
                 $resource = Get-TargetResource `
                     -DiskId $script:mockedDisk0Gpt.Number `
@@ -1399,7 +1401,7 @@ try
                         -ParameterFilter $script:parameterFilter_MockedDisk0Number
                     Assert-MockCalled -CommandName Get-Partition -Exactly 1
                     Assert-MockCalled -CommandName Get-Volume -Exactly 1
-                    Assert-MockCalled -CommandName Test-DevDriveVolume -Exactly 0
+                    Assert-MockCalled -CommandName Test-DevDriveVolume -Exactly 1
                 }
             }
         }
@@ -3284,6 +3286,11 @@ try
                     -MockWith { $script:mockedVolumeThatExistPriorToConfiguration } `
                     -Verifiable
 
+                Mock `
+                    -CommandName Assert-DevDriveFeatureAvailable `
+                    -MockWith { $null } `
+                    -Verifiable
+
                 # mocks that should not be called
                 Mock -CommandName Set-Disk
                 Mock -CommandName Initialize-Disk
@@ -3309,6 +3316,7 @@ try
                     Assert-MockCalled -CommandName Initialize-Disk -Exactly -Times 0
                     Assert-MockCalled -CommandName Get-Partition -Exactly -Times 1
                     Assert-MockCalled -CommandName Get-Volume -Exactly -Times 1
+                    Assert-MockCalled -CommandName Assert-DevDriveFeatureAvailable -Exactly -Times 1
                     Assert-MockCalled -CommandName Format-Volume -Exactly -Times 1 `
                         -ParameterFilter {
                         $DevDrive -eq $true
@@ -3344,6 +3352,11 @@ try
                     -MockWith { $script:mockedVolumeThatExistPriorToConfiguration } `
                     -Verifiable
 
+                Mock `
+                    -CommandName Assert-DevDriveFeatureAvailable `
+                    -MockWith { $null } `
+                    -Verifiable
+
                 # mocks that should not be called
                 Mock -CommandName Set-Disk
                 Mock -CommandName Initialize-Disk
@@ -3369,6 +3382,7 @@ try
                     Assert-MockCalled -CommandName Initialize-Disk -Exactly -Times 0
                     Assert-MockCalled -CommandName Get-Partition -Exactly -Times 1
                     Assert-MockCalled -CommandName Get-Volume -Exactly -Times 1
+                    Assert-MockCalled -CommandName Assert-DevDriveFeatureAvailable -Exactly -Times 1
                     Assert-MockCalled -CommandName Format-Volume -Exactly -Times 0 `
                         -ParameterFilter {
                         $DevDrive -eq $true

@@ -134,17 +134,13 @@ function Get-TargetResource
             -Query "SELECT BlockSize from Win32_Volume WHERE DriveLetter = '$($DriveLetter):'" `
             -ErrorAction SilentlyContinue).BlockSize
 
+    $DevDrive = $false
     if ($volume.UniqueId)
     {
         $DevDrive = Test-DevDriveVolume `
             -VolumeGuidPath $volume.UniqueId `
             -ErrorAction SilentlyContinue
     }
-    else
-    {
-        $DevDrive = $false
-    }
-
 
     return @{
         DiskId             = $DiskId
