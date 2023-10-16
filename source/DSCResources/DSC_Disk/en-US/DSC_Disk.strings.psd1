@@ -41,12 +41,15 @@
     ResizeNotAllowedMessage = Skipping resize of {0} from {1} to {2}. AllowDestructive is not set to $true.
     AllowDestructiveNeededForDevDriveOperation = The partition with drive letter '{0}' was found to be big enough to be resized to create enough space for a new Dev Drive volume. However the 'AllowDestructive' flag was not set to $true.
     ResizingPartitionToMakeSpaceForDevDriveVolume = Resizing partition with drive letter '{0}' to size '{1} Gb', so we can make enough unallocated space for a Dev Drive volume of size '{2} Gb'.
-    SuccessfullyConfiguredDevDriveVolume = The volume on drive '{0}:\\' has been successfully configured as a Dev Drive volume.
-    FailedToConfigureDevDriveVolume = Failed to configure volume on drive '{0}:\\' as a Dev Drive volume.
+    SuccessfullyConfiguredDevDriveVolume = The volume with path '{0}' on drive '{1}:\\' has been successfully configured as a Dev Drive volume.
+    FailedToConfigureDevDriveVolume = Failed to configure the volume with path '{0}' on drive '{1}:\\' as a Dev Drive volume.
     AttemptingToFindAPartitionToResizeForDevDrive = Attempting to find a partition that we can resize, in order to create enough unallocated space for a new Dev Drive volume.
     CheckingIfPartitionCanBeResizedForDevDrive = Checking if partition with drive letter '{0}' can be resized to create enough unallocated space for the new Dev Drive volume.
     PartitionCantBeResizedForDevDrive = Partition with drive letter '{0}' cannot be resized to create the new Dev Drive volume. Continuing search...
     PartitionFoundThatCanBeResizedForDevDrive = Found partition with drive letter '{0}' which can be resized to create a new Dev Drive volume.
     FoundNoPartitionsThatCanResizedForDevDrive = There is no unallocated space available to create the Dev Drive volume. We found no partitions that could be resized to create '{0} Gb' of unallocated space.
     NoPartitionResizeNeededForDevDrive = We found enough unallocated space available on the disk. No partition resize is needed to create the Dev Drive volume.
+    CheckingDevDriveAssertions = Checking system meets requirements for the Dev Drive feature.
+    TheVolumeIsNotConfiguredAsADevDriveVolume = The volume with path '{0}' and Drive letter '{1}' is not configured as a Dev Drive volume.
+    TheVolumeIsCurrentlyConfiguredAsADevDriveVolume = The volume with path '{0}' and Drive letter '{1}' is currently configured as a Dev Drive volume.
 '@

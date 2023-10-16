@@ -711,7 +711,7 @@ function Set-TargetResource
     }
 
     <#
-        If the Set-TargetResource function is run as a standalone function, and $assignedPartition is not null and there are multiple partitions in $partition
+        If the Set-TargetResource function is run as a standalone function, and $assignedPartition is not null and there are multiple partitions in $partition,
         then '$partition | Get-Volume', will give $volume back the first volume on the first partition. If $assignedPartition is after that one, then we could
         potentially format a different volume. So we need to make sure that $partition is equal to $assignedPartition before we call Get-Volume.
     #>
@@ -845,18 +845,22 @@ function Set-TargetResource
     # Confirm that the volume is now actually formatted as a Dev Drive volume.
     if ($DevDrive)
     {
-        if ($volume.UniqueId -and (Test-DevDriveVolume -VolumeGuidPath $volume.UniqueId))
+        $isDevDriveVolume = Test-DevDriveVolume -VolumeGuidPath $volume.UniqueId -ErrorAction SilentlyContinue
+
+        if ($isDevDriveVolume)
         {
             Write-Verbose -Message ( @(
                     "$($MyInvocation.MyCommand): "
-                    $($script:localizedData.SuccessfullyConfiguredDevDriveVolume -f $DriveLetter)
+                    $($script:localizedData.SuccessfullyConfiguredDevDriveVolume `
+                        -F $volume.UniqueId, $volume.DriveLetter)
                 ) -join '' )
         }
         else
         {
             throw ( @(
                     "$($MyInvocation.MyCommand): "
-                    $($script:localizedData.FailedToConfigureDevDriveVolume -f $DriveLetter)
+                    $($script:localizedData.FailedToConfigureDevDriveVolume `
+                        -F $volume.UniqueId, $volume.DriveLetter)
                 ) -join '' )
         }
     }
@@ -1182,12 +1186,33 @@ function Test-TargetResource
 
     if ($DevDrive)
     {
+        # User requested to configure the volume as a Dev Drive volume. So we check that the assertions are met.
+        Write-Verbose -Message ( @(
+            "$($MyInvocation.MyCommand): "
+            $($script:localizedData.CheckingDevDriveAssertions)
+        ) -join '' )
+
         Assert-DevDriveFeatureAvailable
         Assert-FSFormatIsReFsWhenDevDriveFlagSetToTrue -FSFormat $FSFormat
 
-        if ($volume.UniqueId -and (-not (Test-DevDriveVolume -VolumeGuidPath $volume.UniqueId)))
+        $isDevDriveVolume = Test-DevDriveVolume -VolumeGuidPath $volume.UniqueId -ErrorAction SilentlyContinue
+
+        if ($isDevDriveVolume)
         {
-            # The volume is not configured as a Dev Drive volume.
+            Write-Verbose -Message ( @(
+                "$($MyInvocation.MyCommand): "
+                $($script:localizedData.TheVolumeIsCurrentlyConfiguredAsADevDriveVolume `
+                    -F $volume.UniqueId, $volume.DriveLetter)
+            ) -join '' )
+        }
+        else
+        {
+            Write-Verbose -Message ( @(
+                "$($MyInvocation.MyCommand): "
+                $($script:localizedData.TheVolumeIsNotConfiguredAsADevDriveVolume `
+                    -F $volume.UniqueId, $volume.DriveLetter)
+            ) -join '' )
+
             return $false
         }
     }

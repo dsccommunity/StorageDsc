@@ -1,8 +1,3 @@
-
-using namespace System;
-using namespace System.Runtime.InteropServices;
-using namespace Microsoft.Win32.SafeHandles;
-
 $modulePath = Join-Path -Path (Split-Path -Path (Split-Path -Path $PSScriptRoot -Parent) -Parent) -ChildPath 'Modules'
 
 Import-Module -Name (Join-Path -Path $modulePath -ChildPath 'DscResource.Common')
@@ -240,7 +235,6 @@ function Get-DevDriveWin32HelperScript
 
     $DevDriveHelperDefinitions =  @'
 
-
         // https://learn.microsoft.com/en-us/windows/win32/api/sysinfoapi/ne-sysinfoapi-developer_drive_enablement_state
         public enum DEVELOPER_DRIVE_ENABLEMENT_STATE
         {
@@ -262,7 +256,7 @@ function Get-DevDriveWin32HelperScript
 
         // https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-createfilew
         [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-        public static extern Microsoft.Win32.SafeHandles.SafeFileHandle CreateFile(
+        public static extern SafeFileHandle CreateFile(
             string lpFileName,
             uint dwDesiredAccess,
             uint dwShareMode,
@@ -274,7 +268,7 @@ function Get-DevDriveWin32HelperScript
         // https://learn.microsoft.com/en-us/windows/win32/api/ioapiset/nf-ioapiset-deviceiocontrol
         [DllImport("kernel32.dll", SetLastError = true)]
         public static extern bool DeviceIoControl(
-            Microsoft.Win32.SafeHandles.SafeFileHandle hDevice,
+            SafeFileHandle hDevice,
             uint dwIoControlCode,
             IntPtr lpInBuffer,
             uint nInBufferSize,
@@ -327,9 +321,8 @@ function Get-DevDriveWin32HelperScript
             {
                 // Handle is invalid.
                 throw new Exception("CreateFile unable to get file handle for volume to check if its a Dev Drive volume",
-                    new System.ComponentModel.Win32Exception(Marshal.GetLastWin32Error()));
+                    new Win32Exception(Marshal.GetLastWin32Error()));
             }
-
 
             // We need to allocated memory for the structures so we can marshal and unmarshal them.
             IntPtr inputVolptr = Marshal.AllocHGlobal(Marshal.SizeOf(inputVolumeInfo));
@@ -353,30 +346,32 @@ function Get-DevDriveWin32HelperScript
                 {
                     // Can't query volume.
                     throw new Exception("DeviceIoControl unable to query if volume is a Dev Drive volume",
-                        new System.ComponentModel.Win32Exception(Marshal.GetLastWin32Error()));
+                        new Win32Exception(Marshal.GetLastWin32Error()));
                 }
 
                 // Unmarshal the output structure
-                outputVolumeInfo = (FILE_FS_PERSISTENT_VOLUME_INFORMATION)Marshal.PtrToStructure(outputVolptr, typeof(FILE_FS_PERSISTENT_VOLUME_INFORMATION));
+                outputVolumeInfo = (FILE_FS_PERSISTENT_VOLUME_INFORMATION) Marshal.PtrToStructure(
+                    outputVolptr,
+                    typeof(FILE_FS_PERSISTENT_VOLUME_INFORMATION)
+                );
 
+                // Check that the output flag is set to Dev Drive volume.
                 if ((outputVolumeInfo.VolumeFlags & PERSISTENT_VOLUME_STATE_DEV_VOLUME) > 0)
                 {
                     // Volume is a Dev Drive volume.
                     return true;
                 }
 
-
                 return false;
             }
             finally
             {
+                // Free the memory we allocated.
                 Marshal.FreeHGlobal(inputVolptr);
                 Marshal.FreeHGlobal(outputVolptr);
                 volumeFileHandle.Close();
             }
         }
-
-
 '@
     if (([System.Management.Automation.PSTypeName]'DevDrive.DevDriveHelper').Type)
     {
@@ -384,10 +379,14 @@ function Get-DevDriveWin32HelperScript
     }
     else
     {
+        # Note: when recompiling changes to the C# code above you'll need to close the powershell session and reopen a new one.
         $script:DevDriveWin32Helper = Add-Type `
             -Namespace 'DevDrive' `
             -Name 'DevDriveHelper' `
-            -MemberDefinition $DevDriveHelperDefinitions
+            -MemberDefinition $DevDriveHelperDefinitions `
+            -UsingNamespace `
+                'System.ComponentModel',
+                'Microsoft.Win32.SafeHandles'
     }
 
     return $script:DevDriveWin32Helper
