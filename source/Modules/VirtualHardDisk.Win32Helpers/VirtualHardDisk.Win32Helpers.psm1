@@ -304,32 +304,6 @@ function Add-VirtualDiskUsingWin32
 
 <#
     .SYNOPSIS
-        Calls Win32 CloseHandle api. This is used so we can mock this call
-        easier.
-
-    .PARAMETER Handle
-        Specifies a reference to handle for a file.
-#>
-function Close-Win32Handle
-{
-    [CmdletBinding()]
-    [OutputType([System.Void])]
-    param
-    (
-        [Parameter(Mandatory = $true)]
-        [ref]
-        $Handle
-    )
-
-    $helper = Get-VirtDiskWin32HelperScript
-    if ($Handle.Value)
-    {
-        $null = $helper::CloseHandle($Handle.value)
-    }
-} # end function Close-Win32Handle
-
-<#
-    .SYNOPSIS
         Calls Win32 OpenVirtualDisk api. This is used so we can mock this call
         easier.
 
