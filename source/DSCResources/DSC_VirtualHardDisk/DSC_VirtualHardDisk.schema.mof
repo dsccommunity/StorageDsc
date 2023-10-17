@@ -2,9 +2,9 @@
 [ClassVersion("1.0.0.0"), FriendlyName("VirtualHardDisk")]
 class DSC_VirtualHardDisk : OMI_BaseResource
 {
-    [Key, Description("Specifies the full path to the virtual disk file that will be created or attached. This may or may not include the extension, but the extension must match the disk format.")] String FilePath;
-    [Write, Description("Specifies the size the of virtual disk.")] Uint64 DiskSize;
-    [Write, Description("Specifies the disk type the virtual disk should use."), ValueMap{"fixed","dynamic"}, Values{"fixed","dynamic"}] String DiskType;
-    [Write, Description("Specifies the disk format the virtual disk should use. Defaults to vhdx."), ValueMap{"vhd","vhdx"}, Values{"vhd","vhdx"}] String DiskFormat;
-    [Write, Description("Determines whether the virtual disk should be created and mounted or not."), ValueMap{"Present","Absent"}, Values{"Present","Absent"}] String Ensure;
+    [Key, Description("Specifies the full path to the virtual hard disk file that will be created or attached. This must include the extension, and the extension must match the disk format.")] String FilePath;
+    [Write, Description("Specifies the size the of virtual hard disk.")] Uint64 DiskSize;
+    [Write, Description("Specifies the disk type the virtual hard disk should use."), ValueMap{"Fixed","Dynamic"}, Values{"Fixed","Dynamic"}] String DiskType;
+    [Write, Description("Specifies the disk format the virtual hard disk should use. Defaults to Vhdx."), ValueMap{"Vhd","Vhdx"}, Values{"Vhd","Vhdx"}] String DiskFormat;
+    [Write, Description("Determines whether the virtual hard disk should be created and attached or should not be attached."), ValueMap{"Present","Absent"}, Values{"Present","Absent"}] String Ensure;
 };

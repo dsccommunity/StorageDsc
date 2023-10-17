@@ -104,18 +104,6 @@ InModuleScope $script:subModuleName {
         )
     }
 
-    Function Close-Win32Handle
-    {
-        [CmdletBinding()]
-        [OutputType([System.Void])]
-        Param
-        (
-            [Parameter(Mandatory = $true)]
-            [ref]
-            $Handle
-        )
-    }
-
     Function Get-VirtualDiskUsingWin32
     {
         [CmdletBinding()]
@@ -151,7 +139,8 @@ InModuleScope $script:subModuleName {
     $script:DiskImageGoodVhdxPath = 'C:\test.vhdx'
     $script:AccessDeniedWin32Error = 5
     $script:vhdDiskFormat = 'vhd'
-    [ref]$script:TestHandle = [System.IntPtr]::Zero
+    [ref]$script:TestHandle = [Microsoft.Win32.SafeHandles.SafeFileHandle]::Zero
+
     $script:mockedParams = [pscustomobject] @{
         DiskSizeInBytes   = 65Gb
         VirtualDiskPath   = $script:DiskImageGoodVhdxPath
@@ -230,7 +219,12 @@ InModuleScope $script:subModuleName {
                 -CommandName New-VirtualDiskUsingWin32 `
                 -MockWith { $script:AccessDeniedWin32Error } `
                 -Verifiable
-                $exception = [System.ComponentModel.Win32Exception]::new($script:AccessDeniedWin32Error)
+
+            $win32Error = [System.ComponentModel.Win32Exception]::new($script:AccessDeniedWin32Error)
+            $exception = [System.Exception]::new( `
+                ($script:localizedData.CreateVirtualDiskError -f $win32Error.Message), `
+                $win32Error)
+
             It 'Should throw an exception in creation method' {
                 {
                     New-SimpleVirtualDisk `
@@ -261,7 +255,12 @@ InModuleScope $script:subModuleName {
                 -CommandName Add-VirtualDiskUsingWin32 `
                 -MockWith { $script:AccessDeniedWin32Error } `
                 -Verifiable
-            $exception = [System.ComponentModel.Win32Exception]::new($script:AccessDeniedWin32Error)
+
+            $win32Error = [System.ComponentModel.Win32Exception]::new($script:AccessDeniedWin32Error)
+            $exception = [System.Exception]::new( `
+                ($script:localizedData.AttachVirtualDiskError -f $win32Error.Message), `
+                $win32Error)
+
             It 'Should throw an exception during attach function' {
                 {
                     Add-SimpleVirtualDisk `
@@ -314,7 +313,11 @@ InModuleScope $script:subModuleName {
                 -MockWith { $script:AccessDeniedWin32Error } `
                 -Verifiable
 
-            $exception = [System.ComponentModel.Win32Exception]::new($script:AccessDeniedWin32Error)
+            $win32Error = [System.ComponentModel.Win32Exception]::new($script:AccessDeniedWin32Error)
+            $exception = [System.Exception]::new( `
+                ($script:localizedData.OpenVirtualDiskError -f $win32Error.Message), `
+                $win32Error)
+
             It 'Should throw an exception while attempting to open virtual disk file' {
                 {
                     Get-VirtualDiskHandle `

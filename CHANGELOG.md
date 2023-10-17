@@ -5,7 +5,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-- Added DSC_VirtualHardDisk resource for creating virtual disks and tests.
+- Added DSC_VirtualHardDisk resource for creating virtual disks and tests. - Fixes [Issue #277](https://github.com/dsccommunity/StorageDsc/issues/277)
 
 ## [5.1.0] - 2023-02-22
 

@@ -103,14 +103,14 @@ function Get-VirtDiskWin32HelperScript
             UInt32 ProviderSpecificFlags,
             ref CREATE_VIRTUAL_DISK_PARAMETERS Parameters,
             IntPtr Overlapped,
-            ref IntPtr Handle
+            out SafeFileHandle Handle
         );
 
         // Declare method to attach a virtual disk
         // https://learn.microsoft.com/en-us/windows/win32/api/virtdisk/nf-virtdisk-attachvirtualdisk
         [DllImport("virtdisk.dll", CharSet = CharSet.Unicode)]
         public static extern Int32 AttachVirtualDisk(
-            IntPtr VirtualDiskHandle,
+            SafeFileHandle VirtualDiskHandle,
             IntPtr SecurityDescriptor,
             UInt32 Flags,
             UInt32 ProviderSpecificFlags,
@@ -127,14 +127,8 @@ function Get-VirtDiskWin32HelperScript
             UInt32 VirtualDiskAccessMask,
             UInt32 Flags,
             ref OPEN_VIRTUAL_DISK_PARAMETERS Parameters,
-            ref IntPtr Handle
+            out SafeFileHandle Handle
         );
-
-        // https://learn.microsoft.com/en-us/windows/win32/api/handleapi/nf-handleapi-closehandle
-        [DllImport("kernel32.dll", SetLastError = true)]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        public static extern bool CloseHandle(IntPtr hObject);
-
 '@
     if (([System.Management.Automation.PSTypeName]'VirtDisk.Helper').Type)
     {
@@ -145,7 +139,10 @@ function Get-VirtDiskWin32HelperScript
         $script:VirtDiskHelper = Add-Type `
             -Namespace 'VirtDisk' `
             -Name 'Helper' `
-            -MemberDefinition $virtDiskDefinitions
+            -MemberDefinition $virtDiskDefinitions `
+            -UsingNamespace `
+                'System.ComponentModel',
+                'Microsoft.Win32.SafeHandles'
     }
 
     return $script:VirtDiskHelper
@@ -425,40 +422,41 @@ function New-SimpleVirtualDisk
         $DiskSizeInBytes,
 
         [Parameter(Mandatory = $true)]
-        [ValidateSet('vhd', 'vhdx')]
+        [ValidateSet('Vhd', 'Vhdx')]
         [System.String]
         $DiskFormat,
 
         [Parameter(Mandatory = $true)]
-        [ValidateSet('fixed', 'dynamic')]
+        [ValidateSet('Fixed', 'Dynamic')]
         [System.String]
         $DiskType
     )
+
+    Write-Verbose -Message ($script:localizedData.CreatingVirtualDiskMessage -f $VirtualDiskPath)
+    $vDiskHelper = Get-VirtDiskWin32HelperScript
+
+    # Get parameters for CreateVirtualDisk function
+    [ref]$virtualStorageType = Get-VirtualStorageType -DiskFormat $DiskFormat
+    [ref]$createVirtualDiskParameters = New-Object VirtDisk.Helper+CREATE_VIRTUAL_DISK_PARAMETERS
+    $createVirtualDiskParameters.Value.Version = [VirtDisk.Helper]::CREATE_VIRTUAL_DISK_VERSION_2
+    $createVirtualDiskParameters.Value.MaximumSize = $DiskSizeInBytes
+    $securityDescriptor = [System.IntPtr]::Zero
+    $accessMask = [VirtDisk.Helper]::VIRTUAL_DISK_ACCESS_NONE
+    $providerSpecificFlags = 0
+
+    # Handle to the new virtual disk
+    [ref]$handle = [Microsoft.Win32.SafeHandles.SafeFileHandle]::Zero
+
+    # Virtual disk will be dynamically expanding, up to the size of $DiskSizeInBytes on the parent disk
+    $flags = [VirtDisk.Helper]::CREATE_VIRTUAL_DISK_FLAG_NONE
+    if ($DiskType -eq 'Fixed')
+    {
+        # Virtual disk will be fixed, and will take up the up the full size of $DiskSizeInBytes on the parent disk after creation
+        $flags = [VirtDisk.Helper]::CREATE_VIRTUAL_DISK_FLAG_FULL_PHYSICAL_ALLOCATION
+    }
+
     try
     {
-        Write-Verbose -Message ($script:localizedData.CreatingVirtualDiskMessage -f $VirtualDiskPath)
-        $vDiskHelper = Get-VirtDiskWin32HelperScript
-
-        # Get parameters for CreateVirtualDisk function
-        [ref]$virtualStorageType = Get-VirtualStorageType -DiskFormat $DiskFormat
-        [ref]$createVirtualDiskParameters = New-Object VirtDisk.Helper+CREATE_VIRTUAL_DISK_PARAMETERS
-        $createVirtualDiskParameters.Value.Version = [VirtDisk.Helper]::CREATE_VIRTUAL_DISK_VERSION_2
-        $createVirtualDiskParameters.Value.MaximumSize = $DiskSizeInBytes
-        $securityDescriptor = [System.IntPtr]::Zero
-        $accessMask = [VirtDisk.Helper]::VIRTUAL_DISK_ACCESS_NONE
-        $providerSpecificFlags = 0
-
-         # Handle to the new virtual disk
-        [ref]$handle = [System.IntPtr]::Zero
-
-        # Virtual disk will be dynamically expanding, up to the size of $DiskSizeInBytes on the parent disk
-        $flags = [VirtDisk.Helper]::CREATE_VIRTUAL_DISK_FLAG_NONE
-        if ($DiskType -eq 'fixed')
-        {
-            # Virtual disk will be fixed, and will take up the up the full size of $DiskSizeInBytes on the parent disk after creation
-            $flags = [VirtDisk.Helper]::CREATE_VIRTUAL_DISK_FLAG_FULL_PHYSICAL_ALLOCATION
-        }
-
         $result = New-VirtualDiskUsingWin32 `
             $virtualStorageType `
             $VirtualDiskPath `
@@ -472,8 +470,10 @@ function New-SimpleVirtualDisk
 
         if ($result -ne 0)
         {
-            Write-Verbose -Message ($script:localizedData.CreateVirtualDiskError -f $result)
-            throw [System.ComponentModel.Win32Exception]::new($result)
+            $win32Error = [System.ComponentModel.Win32Exception]::new($result)
+            throw [System.Exception]::new( `
+                ($script:localizedData.CreateVirtualDiskError -f $win32Error.Message), `
+                $win32Error)
         }
 
         Write-Verbose -Message ($script:localizedData.VirtualDiskCreatedSuccessfully -f $VirtualDiskPath)
@@ -482,7 +482,10 @@ function New-SimpleVirtualDisk
     finally
     {
         # Close handle
-        Close-Win32Handle $Handle
+        if ($handle.Value)
+        {
+            $handle.Value.Close()
+        }
     }
 } # function New-SimpleVirtualDisk
 
@@ -509,7 +512,7 @@ function Add-SimpleVirtualDisk
         $VirtualDiskPath,
 
         [Parameter(Mandatory = $true)]
-        [ValidateSet('vhd', 'vhdx')]
+        [ValidateSet('Vhd', 'Vhdx')]
         [System.String]
         $DiskFormat,
 
@@ -569,8 +572,10 @@ function Add-SimpleVirtualDisk
 
         if ($result -ne 0)
         {
-            Write-Verbose -Message ($script:localizedData.AttachVirtualDiskError -f $result)
-            throw [System.ComponentModel.Win32Exception]::new($result)
+            $win32Error = [System.ComponentModel.Win32Exception]::new($result)
+            throw [System.Exception]::new( `
+                ($script:localizedData.AttachVirtualDiskError -f $win32Error.Message), `
+                $win32Error)
         }
 
         Write-Verbose -Message ($script:localizedData.VirtualDiskAttachedSuccessfully -f $VirtualDiskPath)
@@ -578,7 +583,10 @@ function Add-SimpleVirtualDisk
     finally
     {
         # Close handle
-        Close-Win32Handle $Handle
+        if ($handle.Value)
+        {
+            $handle.Value.Close()
+        }
     }
 
 } # function Add-SimpleVirtualDisk
@@ -603,7 +611,7 @@ function Get-VirtualDiskHandle
         $VirtualDiskPath,
 
         [Parameter(Mandatory = $true)]
-        [ValidateSet('vhd', 'vhdx')]
+        [ValidateSet('Vhd', 'Vhdx')]
         [System.String]
         $DiskFormat
     )
@@ -619,7 +627,7 @@ function Get-VirtualDiskHandle
     $flags = [VirtDisk.Helper]::OPEN_VIRTUAL_DISK_FLAG_NONE
 
     # Handle to the virtual disk.
-    [ref]$handle = [System.IntPtr]::Zero
+    [ref]$handle = [Microsoft.Win32.SafeHandles.SafeFileHandle]::Zero
 
     $result = Get-VirtualDiskUsingWin32 `
         $virtualStorageType `
@@ -631,8 +639,10 @@ function Get-VirtualDiskHandle
 
     if ($result -ne 0)
     {
-        Write-Verbose -Message ($script:localizedData.OpenVirtualDiskError -f $result)
-        throw [System.ComponentModel.Win32Exception]::new($result)
+        $win32Error = [System.ComponentModel.Win32Exception]::new($result)
+        throw [System.Exception]::new( `
+            ($script:localizedData.OpenVirtualDiskError -f $win32Error.Message), `
+            $win32Error)
     }
 
     Write-Verbose -Message ($script:localizedData.VirtualDiskOpenedSuccessfully -f $VirtualDiskPath)
@@ -654,7 +664,7 @@ function Get-VirtualStorageType
     param
     (
         [Parameter(Mandatory = $true)]
-        [ValidateSet('vhd', 'vhdx')]
+        [ValidateSet('Vhd', 'Vhdx')]
         [System.String]
         $DiskFormat
     )
@@ -665,7 +675,7 @@ function Get-VirtualStorageType
     # Default to the vhdx file format.
     $virtualStorageType.VendorId = [VirtDisk.Helper]::VIRTUAL_STORAGE_TYPE_VENDOR_MICROSOFT
     $virtualStorageType.DeviceId = [VirtDisk.Helper]::VIRTUAL_STORAGE_TYPE_DEVICE_VHDX
-    if ($DiskFormat -eq 'vhd')
+    if ($DiskFormat -eq 'Vhd')
     {
         $virtualStorageType.DeviceId = [VirtDisk.Helper]::VIRTUAL_STORAGE_TYPE_DEVICE_VHD
     }

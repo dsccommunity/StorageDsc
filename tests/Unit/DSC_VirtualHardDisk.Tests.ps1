@@ -238,7 +238,7 @@ try
             Context 'When file extension does not match the disk format' {
                 $extension = [System.IO.Path]::GetExtension($DiskImageGoodVhdPath).TrimStart('.')
                 $errorRecord = Get-InvalidArgumentRecord `
-                    -Message ($script:localizedData.VirtualHardExtensionAndFormatMismatchError -f `
+                    -Message ($script:localizedData.VirtualHardDiskExtensionAndFormatMismatchError -f `
                         $DiskImageGoodVhdPath, $extension, 'vhdx') `
                     -ArgumentName 'FilePath'
 
@@ -256,7 +256,7 @@ try
 
             Context 'When file extension is not present in the file path' {
                 $errorRecord = Get-InvalidArgumentRecord `
-                    -Message ($script:localizedData.VirtualHardNoExtensionError -f `
+                    -Message ($script:localizedData.VirtualHardDiskNoExtensionError -f `
                     $script:DiskImageVirtDiskPathWithoutExtension) `
                     -ArgumentName 'FilePath'
 
@@ -276,7 +276,7 @@ try
 
                 $minSizeInMbString = ($DiskImageSizeBelowVirtDiskMinimum / 1MB).ToString("0.00MB")
                 $errorRecord = Get-InvalidArgumentRecord `
-                    -Message ($script:localizedData.VhdFormatDiskSizeInvalidMessage -f `
+                    -Message ($script:localizedData.VhdFormatDiskSizeInvalid -f `
                         $minSizeInMbString) `
                     -ArgumentName 'DiskSize'
 
@@ -295,7 +295,7 @@ try
             Context 'When size provided is less than the minimum size for the vhdx format' {
                 $minSizeInMbString = ($DiskImageSizeBelowVirtDiskMinimum / 1MB).ToString("0.00MB")
                 $errorRecord = Get-InvalidArgumentRecord `
-                    -Message ($script:localizedData.VhdxFormatDiskSizeInvalidMessage -f `
+                    -Message ($script:localizedData.VhdxFormatDiskSizeInvalid -f `
                         $minSizeInMbString) `
                     -ArgumentName 'DiskSize'
 
@@ -314,7 +314,7 @@ try
             Context 'When size provided is greater than the maximum size for the vhd format' {
                 $maxSizeInTbString = ($DiskImageSizeAboveVhdMaximum / 1TB).ToString("0.00TB")
                 $errorRecord = Get-InvalidArgumentRecord `
-                    -Message ($script:localizedData.VhdFormatDiskSizeInvalidMessage -f `
+                    -Message ($script:localizedData.VhdFormatDiskSizeInvalid -f `
                         $maxSizeInTbString) `
                     -ArgumentName 'DiskSize'
 
@@ -333,7 +333,7 @@ try
             Context 'When size provided is greater than the maximum size for the vhdx format' {
                 $maxSizeInTbString = ($DiskImageSizeAboveVhdxMaximum / 1TB).ToString("0.00TB")
                 $errorRecord = Get-InvalidArgumentRecord `
-                    -Message ($script:localizedData.VhdxFormatDiskSizeInvalidMessage -f `
+                    -Message ($script:localizedData.VhdxFormatDiskSizeInvalid -f `
                         $maxSizeInTbString) `
                     -ArgumentName 'DiskSize'
 

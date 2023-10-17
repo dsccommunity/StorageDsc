@@ -20,7 +20,8 @@
 <#
     .DESCRIPTION
         This configuration will create a fixed sized virtual disk that is 40Gb in size and will format a
-        NTFS volume named 'new volume' that uses the drive letter E.
+        NTFS volume named 'new volume' that uses the drive letter E. If the folder path in the FilePath
+        property does not exist, it will be created.
 #>
 Configuration VirtualHardDisk_CreateFixedSizedVirtualDisk
 {
@@ -33,8 +34,8 @@ Configuration VirtualHardDisk_CreateFixedSizedVirtualDisk
           {
             FilePath = 'C:\myVhds\virtDisk1.vhd'
             DiskSize = 40Gb
-            DiskFormat = 'vhd'
-            DiskType = 'fixed'
+            DiskFormat = 'Vhd'
+            DiskType = 'Fixed'
             Ensure = 'Present'
           }
 

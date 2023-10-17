@@ -17,10 +17,10 @@ $script:localizedData = Get-LocalizedData -DefaultUICulture 'en-US'
 
 <#
     .SYNOPSIS
-        Returns the current state of the virtual disk.
+        Returns the current state of the virtual hard disk.
 
     .PARAMETER FilePath
-        Specifies the complete path to the virtual disk file.
+        Specifies the complete path to the virtual hard disk file.
 #>
 function Get-TargetResource
 {
@@ -36,17 +36,18 @@ function Get-TargetResource
 
     Write-Verbose -Message ( @(
             "$($MyInvocation.MyCommand): "
-            $($script:localizedData.GettingVirtualDiskMessage -f $FilePath)
+            $($script:localizedData.GettingVirtualHardDisk -f $FilePath)
         ) -join '' )
 
     $diskImage = Get-DiskImage -ImagePath $FilePath -ErrorAction SilentlyContinue
     $Ensure = 'Present'
+
     if (-not $diskImage)
     {
         $Ensure = 'Absent'
     }
 
-    # Get the virtual disk info using its path on the system
+    # Get the virtual hard disk info using its path on the system
     return @{
         FilePath   = $diskImage.ImagePath
         Attached   = $diskImage.Attached
@@ -58,19 +59,19 @@ function Get-TargetResource
 
 <#
     .SYNOPSIS
-        Returns the current state of the virtual disk.
+        Returns the current state of the virtual hard disk.
 
     .PARAMETER FilePath
-        Specifies the complete path to the virtual disk file.
+        Specifies the complete path to the virtual hard disk file.
 
     .PARAMETER DiskSize
-        Specifies the size of new virtual disk.
+        Specifies the size of new virtual hard disk.
 
     .PARAMETER DiskFormat
-        Specifies the supported virtual disk format. Currently only the vhd and vhdx formats are supported.
+        Specifies the supported virtual hard disk format. Currently only the vhd and vhdx formats are supported.
 
     .PARAMETER DiskType
-        Specifies the supported virtual disk type.
+        Specifies the supported virtual hard disk type.
 
     .PARAMETER Ensure
         Determines whether the setting should be applied or removed.
@@ -91,14 +92,14 @@ function Set-TargetResource
         $DiskSize,
 
         [Parameter()]
-        [ValidateSet('vhd', 'vhdx')]
+        [ValidateSet('Vhd', 'Vhdx')]
         [System.String]
         $DiskFormat,
 
         [Parameter()]
-        [ValidateSet('fixed', 'dynamic')]
+        [ValidateSet('Fixed', 'Dynamic')]
         [System.String]
-        $DiskType = 'dynamic',
+        $DiskType = 'Dynamic',
 
         [Parameter()]
         [ValidateSet('Present','Absent')]
@@ -107,16 +108,17 @@ function Set-TargetResource
     )
 
     Assert-ParametersValid -FilePath $FilePath -DiskSize $DiskSize -DiskFormat $DiskFormat
-    $diskImage = Get-DiskImage -ImagePath $FilePath -ErrorAction SilentlyContinue
+
+    $resource = Get-TargetResource -FilePath $FilePath
 
     if ($Ensure -eq 'Present')
     {
         # Disk doesn't exist
-        if (-not $diskImage)
+        if (-not $resource.FilePath)
         {
             Write-Verbose -Message ( @(
                 "$($MyInvocation.MyCommand): "
-                $($script:localizedData.VirtualDiskDoesNotExistCreatingNowMessage -f $FilePath)
+                $($script:localizedData.VirtualHardDiskDoesNotExistCreatingNow -f $FilePath)
             ) -join '' )
 
             $folderPath = Split-Path -Parent $FilePath
@@ -138,13 +140,13 @@ function Set-TargetResource
                  # Remove file if we created it but were unable to attach it. No handles are open when this happens.
                 if (Test-Path -Path $FilePath -PathType Leaf)
                 {
-                    Write-Verbose -Message ($script:localizedData.VirtualRemovingCreatedFileMessage -f $folderPath)
+                    Write-Verbose -Message ($script:localizedData.RemovingCreatedVirtualHardDiskFile -f $FilePath)
                     Remove-Item $FilePath -verbose
                 }
 
                 if ($wasLocationCreated)
                 {
-                    Remove-Item -LiteralPath $folderPath
+                    Remove-Item -LiteralPath $folderPath -verbose
                 }
 
                 # Rethrow the exception
@@ -152,25 +154,25 @@ function Set-TargetResource
             }
 
         }
-        elseif (-not $diskImage.Attached)
+        elseif (-not $resource.Attached)
         {
             Write-Verbose -Message ( @(
                 "$($MyInvocation.MyCommand): "
-                $($script:localizedData.VirtualDiskNotAttachedMessage -f $FilePath)
+                $($script:localizedData.VirtualDiskNotAttached -f $FilePath)
                 ) -join '' )
 
-            # Virtual disk file exists so lets attempt to attach it to the system.
+            # Virtual hard disk file exists so lets attempt to attach it to the system.
             Add-SimpleVirtualDisk -VirtualDiskPath $FilePath -DiskFormat $DiskFormat
         }
     }
     else
     {
-        # Detach the virtual disk if its not suppose to be mounted
-        if ($diskImage.Attached)
+        # Detach the virtual hard disk if its not suppose to be attached.
+        if ($resource.Attached)
         {
             Write-Verbose -Message ( @(
                     "$($MyInvocation.MyCommand): "
-                    $($script:localizedData.VirtualDiskDismountingImageMessage `
+                    $($script:localizedData.VirtualHardDiskDetachingImage `
                         -f $FilePath)
                 ) -join '' )
 
@@ -181,19 +183,19 @@ function Set-TargetResource
 
 <#
     .SYNOPSIS
-        Returns the current state of the virtual disk.
+        Returns the current state of the virtual hard disk.
 
     .PARAMETER FilePath
-        Specifies the complete path to the virtual disk file.
+        Specifies the complete path to the virtual hard disk file.
 
     .PARAMETER DiskSize
-        Specifies the size of new virtual disk.
+        Specifies the size of new virtual hard disk.
 
     .PARAMETER DiskFormat
-        Specifies the supported virtual disk format. Currently only the vhd and vhdx formats are supported.
+        Specifies the supported virtual hard disk format. Currently only the vhd and vhdx formats are supported.
 
     .PARAMETER DiskType
-        Specifies the supported virtual disk type.
+        Specifies the supported virtual hard disk type.
 
     .PARAMETER Ensure
         Determines whether the setting should be applied or removed.
@@ -215,14 +217,14 @@ function Test-TargetResource
         $DiskSize,
 
         [Parameter()]
-        [ValidateSet('vhd', 'vhdx')]
+        [ValidateSet('Vhd', 'Vhdx')]
         [System.String]
         $DiskFormat,
 
         [Parameter()]
-        [ValidateSet('fixed', 'dynamic')]
+        [ValidateSet('Fixed', 'Dynamic')]
         [System.String]
-        $DiskType = 'dynamic',
+        $DiskType = 'Dynamic',
 
         [Parameter()]
         [ValidateSet('Present','Absent')]
@@ -231,21 +233,22 @@ function Test-TargetResource
     )
 
     Assert-ParametersValid -FilePath $FilePath -DiskSize $DiskSize -DiskFormat $DiskFormat
+
+    $resource = Get-TargetResource -FilePath $FilePath
+
     Write-Verbose -Message ( @(
         "$($MyInvocation.MyCommand): "
-        $($script:localizedData.CheckingVirtualDiskExistsMessage -f $FilePath)
+        $($script:localizedData.CheckingVirtualDiskExists -f $FilePath)
     ) -join '' )
-
-    $diskImage = Get-DiskImage -ImagePath $FilePath -ErrorAction SilentlyContinue
 
     if ($Ensure -eq 'Present')
     {
-        # Found the virtual disk and confirmed its attached to the system.
-        if ($diskImage.Attached)
+        # Found the virtual hard disk and confirmed its attached to the system.
+        if ($resource.Attached)
         {
             Write-Verbose -Message ( @(
                 "$($MyInvocation.MyCommand): "
-                $($script:localizedData.VirtualDiskCurrentlyAttachedMessage -f $FilePath)
+                $($script:localizedData.VirtualHardDiskCurrentlyAttached -f $FilePath)
             ) -join '' )
 
             return $true
@@ -253,19 +256,19 @@ function Test-TargetResource
 
         Write-Verbose -Message ( @(
             "$($MyInvocation.MyCommand): "
-            $($script:localizedData.VirtualDiskDoesNotExistMessage -f $FilePath)
+            $($script:localizedData.VirtualHardDiskMayNotExistOrNotAttached -f $FilePath)
         ) -join '' )
 
         return $false
     }
     else
     {
-        # Found the virtual disk and confirmed its attached to the system but ensure variable set to absent.
-        if ($diskImage.Attached)
+        # Found the virtual hard disk and confirmed its attached to the system but ensure variable set to 'Absent'.
+        if ($resource.Attached)
         {
             Write-Verbose -Message ( @(
                 "$($MyInvocation.MyCommand): "
-                $($script:localizedData.VirtualDiskCurrentlyAttachedButShouldNotBeMessage -f $FilePath)
+                $($script:localizedData.VirtualHardDiskCurrentlyAttachedButShouldNotBe -f $FilePath)
             ) -join '' )
 
             return $false
@@ -273,7 +276,7 @@ function Test-TargetResource
 
         Write-Verbose -Message ( @(
             "$($MyInvocation.MyCommand): "
-            $($script:localizedData.VirtualDiskDoesNotExistMessage -f $FilePath)
+            $($script:localizedData.VirtualHardDiskMayNotExistOrNotAttached -f $FilePath)
         ) -join '' )
 
         return $true
@@ -285,13 +288,13 @@ function Test-TargetResource
         Validates parameters for both set and test operations.
 
     .PARAMETER FilePath
-        Specifies the complete path to the virtual disk file.
+        Specifies the complete path to the virtual hard disk file.
 
     .PARAMETER DiskSize
-        Specifies the size of new virtual disk.
+        Specifies the size of new virtual hard disk.
 
     .PARAMETER DiskFormat
-        Specifies the supported virtual disk format. Currently only the vhd and vhdx formats are supported.
+        Specifies the supported virtual hard disk format. Currently only the vhd and vhdx formats are supported.
 #>
 function Assert-ParametersValid
 {
@@ -308,7 +311,7 @@ function Assert-ParametersValid
         $DiskSize,
 
         [Parameter(Mandatory = $true)]
-        [ValidateSet('vhd', 'vhdx')]
+        [ValidateSet('Vhd', 'Vhdx')]
         [System.String]
         $DiskFormat
     )
@@ -334,22 +337,22 @@ function Assert-ParametersValid
         elseif ($extension -ne $DiskFormat)
         {
             New-InvalidArgumentException `
-              -Message $($script:localizedData.VirtualHardExtensionAndFormatMismatchError -f $FilePath, $extension, $DiskFormat) `
+              -Message $($script:localizedData.VirtualHardDiskExtensionAndFormatMismatchError -f $FilePath, $extension, $DiskFormat) `
               -ArgumentName 'FilePath'
         }
     }
     else
     {
         New-InvalidArgumentException `
-            -Message $($script:localizedData.VirtualHardNoExtensionError -f $FilePath) `
+            -Message $($script:localizedData.VirtualHardDiskNoExtensionError -f $FilePath) `
             -ArgumentName 'FilePath'
     }
 
     <#
         Validate DiskFormat values. Minimum value for GPT is around ~10MB and the maximum value for
-        the vhd format in 2040GB. Maximum for vhdx is 64TB
+        the vhd format in 2040GB. Maximum for the vhdx format is 64TB.
     #>
-    $isVhdxFormat = $DiskFormat -eq 'vhdx'
+    $isVhdxFormat = $DiskFormat -eq 'Vhdx'
     $isInValidSizeForVhdFormat = ($DiskSize -lt 10MB -bor $DiskSize -gt 2040GB)
     $isInValidSizeForVhdxFormat = ($DiskSize -lt 10MB -bor $DiskSize -gt 64TB)
     if ((-not $isVhdxFormat -and $isInValidSizeForVhdFormat) -bor
@@ -364,10 +367,10 @@ function Assert-ParametersValid
             $DiskSizeString =  ($DiskSize / 1TB).ToString("0.00TB")
         }
 
-        $InvalidSizeMsg = $script:localizedData.VhdFormatDiskSizeInvalidMessage
+        $InvalidSizeMsg = $script:localizedData.VhdFormatDiskSizeInvalid
         if ($isVhdxFormat)
         {
-            $InvalidSizeMsg = $script:localizedData.VhdxFormatDiskSizeInvalidMessage
+            $InvalidSizeMsg = $script:localizedData.VhdxFormatDiskSizeInvalid
         }
 
         New-InvalidArgumentException `
