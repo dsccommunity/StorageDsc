@@ -311,6 +311,11 @@ function Set-TargetResource
             ) -join '' )
 
         $disk | Initialize-Disk -PartitionStyle $PartitionStyle
+
+        # Requery the disk
+        $disk = Get-DiskByIdentifier `
+            -DiskId $DiskId `
+            -DiskIdType $DiskIdType
     }
     else
     {
@@ -354,6 +359,9 @@ function Set-TargetResource
     # Check if the disk has an existing partition assigned to the drive letter
     $assignedPartition = $partition |
         Where-Object -Property DriveLetter -eq $DriveLetter
+
+    # Get the current max unallocated space in bytes. Round up to nearest Gb so we can do better comparisons with the Size parameter.
+    $currentMaxUnallocatedSpaceInBytes = [Math]::Round($disk.LargestFreeExtent / 1GB, 2) * 1GB
 
     # Check if existing partition already has file system on it
     if ($null -eq $assignedPartition)
@@ -432,6 +440,7 @@ function Set-TargetResource
                                 $($script:localizedData.PartitionFoundThatCanBeResizedForDevDrive -F $tempPartition.DriveLetter)
                                 ) -join '' )
 
+
                             $partitionToResizeForDevDriveScenario = $tempPartition
                             $amountToDecreasePartitionBy = $Size - $unallocatedSpaceNextToPartition
                             break
@@ -445,7 +454,7 @@ function Set-TargetResource
 
                     $partition = $partitionToResizeForDevDriveScenario
 
-                    if ($isResizeNeeded -and (-not $partition))
+                    if ($isResizeNeeded -and (-not $partition) -and $currentMaxUnallocatedSpaceInBytes -lt $Size)
                     {
                         $SizeInGb = [Math]::Round($Size / 1GB, 2)
                         throw ($script:localizedData.FoundNoPartitionsThatCanResizedForDevDrive -F $SizeInGb)
@@ -520,7 +529,7 @@ function Set-TargetResource
             We can't find a partition with the required drive letter, so we may need to make a new one.
             First we need to check if there is already enough unallocated space on the disk.
         #>
-        $enoughUnallocatedSpace = ($disk.LargestFreeExtent -ge $Size)
+        $enoughUnallocatedSpace = ($currentMaxUnallocatedSpaceInBytes -ge $Size)
 
         if ($DevDrive -and $Size -and $partition -and (-not $enoughUnallocatedSpace))
         {
@@ -607,7 +616,7 @@ function Set-TargetResource
 
                 if ($DevDrive)
                 {
-                    Assert-SizeMeetsMinimumDevDriveRequirement -UserDesiredSize $disk.LargestFreeExtent
+                    Assert-SizeMeetsMinimumDevDriveRequirement -UserDesiredSize $currentMaxUnallocatedSpaceInBytes
                 }
 
                 $partitionParams['UseMaximumSize'] = $true
