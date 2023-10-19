@@ -1915,7 +1915,7 @@ try
 
                 It 'Should call the correct mocks' {
                     Assert-VerifiableMock
-                    Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 1 `
+                    Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 2 `
                         -ParameterFilter $script:parameterFilter_MockedDisk0Number
                     Assert-MockCalled -CommandName Set-Disk -Exactly -Times 1
                     Assert-MockCalled -CommandName Initialize-Disk -Exactly -Times 1
@@ -1984,7 +1984,7 @@ try
 
                 It 'Should call the correct mocks' {
                     Assert-VerifiableMock
-                    Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 1 `
+                    Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 2 `
                         -ParameterFilter $script:parameterFilter_MockedDisk0Number
                     Assert-MockCalled -CommandName Set-Disk -Exactly -Times 0
                     Assert-MockCalled -CommandName Initialize-Disk -Exactly -Times 1
@@ -3019,7 +3019,7 @@ try
 
                 It 'Should call the correct mocks' {
                     Assert-VerifiableMock
-                    Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 2 `
+                    Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 3 `
                         -ParameterFilter $script:parameterFilter_MockedDisk0Number
                     Assert-MockCalled -CommandName Set-Disk -Exactly -Times 0
                     Assert-MockCalled -CommandName Initialize-Disk -Exactly -Times 1
