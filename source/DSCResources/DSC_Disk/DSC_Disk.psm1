@@ -379,30 +379,38 @@ function Set-TargetResource
                     ) -join '' )
 
                     <#
-                        Find the first basic partition whose max - min supported partition size is greater than or equal
+                        Find the first partition whose max - min supported partition size is greater than or equal
                         to the size the user wants so we can resize it later. The max size also includes any unallocated
                         space next to the partition.
                     #>
                     $partitionToResizeForDevDriveScenario = $null
                     $amountToDecreasePartitionBy = 0
                     $isResizeNeeded = $true
-                    foreach ($tempPartiton in $partition)
+                    foreach ($tempPartition in $partition)
                     {
-                        if (-not $tempPartiton.DriveLetter -or $tempPartiton.DriveLetter -eq '')
+                        $shouldNotBeResized = ($tempPartition.Type -eq 'System' -or `
+                            $tempPartition.Type -eq 'Reserved' -or `
+                            $tempPartition.Type -eq 'Recovery' `
+                        )
+
+                        $doesNotHaveDriveLetter = (-not $tempPartition.DriveLetter -or `
+                            $tempPartition.DriveLetter -eq '')
+
+                        if ($shouldNotBeResized -or $doesNotHaveDriveLetter)
                         {
                             continue
                         }
 
-                        $supportedSize = Get-PartitionSupportedSize -DriveLetter $tempPartiton.DriveLetter
+                        $supportedSize = Get-PartitionSupportedSize -DriveLetter $tempPartition.DriveLetter
 
                         Write-Verbose -Message ( @(
                             "$($MyInvocation.MyCommand): "
-                            $($script:localizedData.CheckingIfPartitionCanBeResizedForDevDrive -F $tempPartiton.DriveLetter)
+                            $($script:localizedData.CheckingIfPartitionCanBeResizedForDevDrive -F $tempPartition.DriveLetter)
                             ) -join '' )
 
-                        if ($tempPartiton.Type -eq 'Basic' -and (($supportedSize.SizeMax - $supportedSize.SizeMin) -ge $Size))
+                        if (($supportedSize.SizeMax - $supportedSize.SizeMin) -ge $Size)
                         {
-                            $unallocatedSpaceNextToPartition = $supportedSize.SizeMax - $tempPartiton.Size
+                            $unallocatedSpaceNextToPartition = $supportedSize.SizeMax - $tempPartition.Size
 
                             if ($unallocatedSpaceNextToPartition -ge $Size)
                             {
@@ -421,17 +429,17 @@ function Set-TargetResource
 
                             Write-Verbose -Message ( @(
                                 "$($MyInvocation.MyCommand): "
-                                $($script:localizedData.PartitionFoundThatCanBeResizedForDevDrive -F $tempPartiton.DriveLetter)
+                                $($script:localizedData.PartitionFoundThatCanBeResizedForDevDrive -F $tempPartition.DriveLetter)
                                 ) -join '' )
 
-                            $partitionToResizeForDevDriveScenario = $tempPartiton
+                            $partitionToResizeForDevDriveScenario = $tempPartition
                             $amountToDecreasePartitionBy = $Size - $unallocatedSpaceNextToPartition
                             break
                         }
 
                         Write-Verbose -Message ( @(
                             "$($MyInvocation.MyCommand): "
-                            $($script:localizedData.PartitionCantBeResizedForDevDrive -F $tempPartiton.DriveLetter)
+                            $($script:localizedData.PartitionCantBeResizedForDevDrive -F $tempPartition.DriveLetter)
                             ) -join '' )
                     }
 
@@ -1087,8 +1095,9 @@ function Test-TargetResource
 
                         See the 'Size' parameter in https://learn.microsoft.com/en-us/windows-hardware/drivers/storage/createpartition-msft-disk
                         for more information. But to some it up, what the user enters and what the New-Partition cmdlet is able to allocate
-                        can be different in bytes. So to Keep idempotence, we only return false when they arent the same in GB. Also if volume
-                        already ReFs, there is no point in returning false for size mismatches since they can't be resized with resize-partition.
+                        can be different in bytes. So to keep idempotence, we only return false when they arent the same in GB. Also if the volume
+                        already is formatted as a ReFS, there is no point in returning false for size mismatches since they can't be resized with
+                        resize-partition.
                     #>
 
                     $partitionInGb = [Math]::Round($partition.Size / 1GB, 2)

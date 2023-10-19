@@ -43,6 +43,14 @@ Yes, more than one Dev Drive volume can be mounted at a time. You can have as ma
 
 Yes, since the Dev Drive volume is just like any other volume storage wise to the Windows operating system, a non Dev Drive ReFS volume can be reformatted as a Dev Drive volume. An NTFS volume can also be reformatted as a Dev Drive volume. Note, the Disk resource will throw an exception, should you also attempt to resize a ReFS volume while attempting to reformat it as a Dev Drive volume since ReFS volumes cannot be resized. As Dev Drive volumes are also ReFS volumes, they carry the same restrictions, see: [Resilient File System (ReFS) overview | Microsoft Learn](https://learn.microsoft.com/en-us/windows-server/storage/refs/refs-overview)
 
+### If I don't have any unallocated space available to create a Dev Drive volume, what will happen?
+
+The Disk resource uses the Get-PartitionSupportedSize cmdlet to know which volume can be be resized to a safe size to create enough unallocated space for the Dev Drive volume to be created. As long as the size parameter is used, the Disk resource will shrink the first non ReFS Drive whose (MaxSize - MinSize) is greater than or equal to the size entered in the size parameter.
+
+If unallocated space exists but isn't enough to create a Dev Drive volume with, The Disk Resource will only shrink the volume noted above by the minimum size needed, to add to the existing unallocated space so it can be equal to the size parameter. For example, if you wanted to create a new 50 Gb Dev Drive volume on disk 0, and let's say on disk 0 there was only a 'C' drive that was 800 Gb in size. Next to the 'C' drive there was only 40 Gb of free contiguous unallocated space. The Disk resource would shrink the 'C' drive by 10 Gb,  creating an addition 10 Gb of unallocated space. Now the unallocated space would be 50 Gb in size. The disk resource would then create a new partition and create the Dev Drive volume into this new partition.
+
+**Note: if no size is entered the disk resource will throw an error stating that size is 0 gb, so no partitions can be resized.**
+
 ### Dev Drive requirements for this resource
 
 There are only five requirements:

@@ -19,9 +19,9 @@
 
 <#
     .DESCRIPTION
-        For this scenario we want to create two 60 Gb Dev Drive volumes. We know that disk 2 has 3 existing volumes
-        NTFS volumes and we prefer not to remove them. At most we only wantvthe disk DSC resource to resize any
-        of them should there not be enough space for any Dev Drive volume to be created. We also know that the
+        For this scenario we want to create two 60 Gb Dev Drive volumes. We know that disk 2 has 3 existing
+        NTFS volumes and we prefer not to remove them. At most we only want the disk DSC resource to shrink any
+        of them should there not be enough space for any of the Dev Drive volumes to be created. We also know that the
         the 3 existing volumes are 100Gb, 200Gb and 300Gb in size and disk 2 is 600 Gb in size. Since all the space
         is being used by the existing volumes, The Disk Dsc resource will resize the existing volumes to create
         space for our new Dev Drive volumes. An example of what could happen is the Disk resource could resize the
