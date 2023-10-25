@@ -34,6 +34,12 @@ InModuleScope $script:subModuleName {
         CurrentDiskFreeSpace40Gb = 40Gb
         CurrentDiskFreeSpace50Gb = 50Gb
         CurrentDiskFreeSpace60Gb = 60Gb
+
+        # Alternate value in bytes that can represent a 150 Gb partition in a physical hard disk that has been formatted by Windows.
+        SizeAEffectively150GbInBytes = 161060225024
+
+        SizeB150GbInBytes = 150Gb
+        SizeBInBytesFor49Point99Scenario = 49.99Gb
     }
 
     $script:mockedDiskNumber = 1
@@ -713,7 +719,7 @@ InModuleScope $script:subModuleName {
                     Assert-SizeMeetsMinimumDevDriveRequirement `
                         -UserDesiredSize $mockedSizesForDevDriveScenario.UserDesired10Gb `
                         -Verbose
-                } | Should -Throw -ExpectedMessage ($script:localizedCommonStrings.MinimumSizeNeededToCreateDevDriveVolumeError -F $UserDesiredSizeInGb)
+                } | Should -Throw -ExpectedMessage ($script:localizedCommonStrings.MinimumSizeNeededToCreateDevDriveVolumeError -f $UserDesiredSizeInGb)
             }
         }
 
@@ -766,6 +772,41 @@ InModuleScope $script:subModuleName {
             It 'Should call the correct mocks' {
                 Assert-VerifiableMock
                 Assert-MockCalled -CommandName Invoke-DeviceIoControlWrapperForDevDriveQuery -Exactly -Times 1
+            }
+        }
+    }
+
+    Describe 'StorageDsc.Common\Compare-SizeUsingGB' -Tag 'Compare-SizeUsingGB' {
+        Context 'When comparing whether SizeAInBytes is equal to SizeBInBytes when SizeAInBytes is effectively equal to SizeBInBytes when both are converted to Gb' {
+
+            $result = Compare-SizeUsingGB `
+                -SizeAInBytes $mockedSizesForDevDriveScenario.SizeB150GbInBytes `
+                -SizeBInBytes $mockedSizesForDevDriveScenario.SizeAEffectively150GbInBytes
+
+            It 'Should return true' {
+                $result | Should -BeTrue
+            }
+        }
+
+        Context 'When comparing whether SizeAInBytes is equal to SizeBInBytes when SizeAInBytes is equal to SizeBInBytes when both are converted to Gb' {
+
+            $result = Compare-SizeUsingGB `
+                -SizeAInBytes $mockedSizesForDevDriveScenario.UserDesired50Gb `
+                -SizeBInBytes $mockedSizesForDevDriveScenario.CurrentDiskFreeSpace50Gb
+
+            It 'Should return true' {
+                $result | Should -BeTrue
+            }
+        }
+
+        Context 'When comparing whether SizeAInBytes is equal to SizeBInBytes when SizeAInBytes is not equal to SizeBInBytes when both are converted to Gb' {
+
+            $result = Compare-SizeUsingGB `
+                -SizeAInBytes $mockedSizesForDevDriveScenario.UserDesired50Gb `
+                -SizeBInBytes $mockedSizesForDevDriveScenario.SizeBInBytesFor49Point99Scenario
+
+            It 'Should return false' {
+                $result | Should -BeFalse
             }
         }
     }
