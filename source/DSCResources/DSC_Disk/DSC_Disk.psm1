@@ -51,6 +51,9 @@ $script:localizedData = Get-LocalizedData -DefaultUICulture 'en-US'
         Specifies if the disks partition schema should be removed entirely, even if data and OEM
         partitions are present. Only possible with AllowDestructive enabled.
         This parameter is not used in Get-TargetResource.
+
+    .PARAMETER DevDrive
+        Specifies if the volume is formatted as a Dev Drive.
 #>
 function Get-TargetResource
 {
@@ -99,7 +102,11 @@ function Get-TargetResource
 
         [Parameter()]
         [System.Boolean]
-        $ClearDisk
+        $ClearDisk,
+
+        [Parameter()]
+        [System.Boolean]
+        $DevDrive
     )
 
     Write-Verbose -Message ( @(
@@ -127,6 +134,14 @@ function Get-TargetResource
             -Query "SELECT BlockSize from Win32_Volume WHERE DriveLetter = '$($DriveLetter):'" `
             -ErrorAction SilentlyContinue).BlockSize
 
+    $DevDrive = $false
+    if ($volume.UniqueId)
+    {
+        $DevDrive = Test-DevDriveVolume `
+            -VolumeGuidPath $volume.UniqueId `
+            -ErrorAction SilentlyContinue
+    }
+
     return @{
         DiskId             = $DiskId
         DiskIdType         = $DiskIdType
@@ -136,6 +151,7 @@ function Get-TargetResource
         FSLabel            = $volume.FileSystemLabel
         AllocationUnitSize = $blockSize
         FSFormat           = $volume.FileSystem
+        DevDrive           = $DevDrive
     }
 } # Get-TargetResource
 
@@ -173,6 +189,9 @@ function Get-TargetResource
     .PARAMETER ClearDisk
         Specifies if the disks partition schema should be removed entirely, even if data and OEM
         partitions are present. Only possible with AllowDestructive enabled.
+
+    .PARAMETER DevDrive
+        Specifies if the volume should be formatted as a Dev Drive.
 #>
 function Set-TargetResource
 {
@@ -222,7 +241,11 @@ function Set-TargetResource
 
         [Parameter()]
         [System.Boolean]
-        $ClearDisk
+        $ClearDisk,
+
+        [Parameter()]
+        [System.Boolean]
+        $DevDrive
     )
 
     Write-Verbose -Message ( @(
@@ -288,6 +311,11 @@ function Set-TargetResource
             ) -join '' )
 
         $disk | Initialize-Disk -PartitionStyle $PartitionStyle
+
+        # Requery the disk
+        $disk = Get-DiskByIdentifier `
+            -DiskId $DiskId `
+            -DiskIdType $DiskIdType
     }
     else
     {
@@ -310,12 +338,36 @@ function Set-TargetResource
         }
     }
 
+    <#
+        Check Dev Drive assertions.
+    #>
+    if ($DevDrive)
+    {
+        Assert-DevDriveFeatureAvailable
+        Assert-FSFormatIsReFsWhenDevDriveFlagSetToTrue -FSFormat $FSFormat
+
+        <#
+            We validate the case where the user does not specify a size later on, should we need to create a new
+            partition.
+        #>
+        if ($Size)
+        {
+            Assert-SizeMeetsMinimumDevDriveRequirement -UserDesiredSize $Size
+        }
+    }
+
     # Get the partitions on the disk
     $partition = $disk | Get-Partition -ErrorAction SilentlyContinue
 
     # Check if the disk has an existing partition assigned to the drive letter
     $assignedPartition = $partition |
         Where-Object -Property DriveLetter -eq $DriveLetter
+
+    <#
+        Get the current max unallocated space in bytes. Round up to nearest Gb so we can do better comparisons
+        with the Size parameter.
+    #>
+    $currentMaxUnallocatedSpaceInBytes = [Math]::Round($disk.LargestFreeExtent / 1GB, 2) * 1GB
 
     # Check if existing partition already has file system on it
     if ($null -eq $assignedPartition)
@@ -333,10 +385,94 @@ function Set-TargetResource
             # There are partitions defined - identify if one matches the size required
             if ($Size)
             {
-                # Find the first basic partition matching the size
-                $partition = $partition |
-                    Where-Object -FilterScript { $_.Type -eq 'Basic' -and $_.Size -eq $Size } |
-                    Select-Object -First 1
+                if ($DevDrive)
+                {
+                    Write-Verbose -Message ( @(
+                        "$($MyInvocation.MyCommand): "
+                        $($script:localizedData.AttemptingToFindAPartitionToResizeForDevDrive)
+                    ) -join '' )
+
+                    <#
+                        Find the first partition whose max - min supported partition size is greater than or equal
+                        to the size the user wants so we can resize it later. The max size also includes any
+                        unallocated space next to the partition.
+                    #>
+                    $partitionToResizeForDevDriveScenario = $null
+                    $amountToDecreasePartitionBy = 0
+                    $isResizeNeeded = $true
+                    foreach ($tempPartition in $partition)
+                    {
+                        $shouldNotBeResized = ($tempPartition.Type -in 'System','Reserved','Recovery')
+
+                        $doesNotHaveDriveLetter = (-not $tempPartition.DriveLetter -or `
+                            $tempPartition.DriveLetter -eq '')
+
+                        if ($shouldNotBeResized -or $doesNotHaveDriveLetter)
+                        {
+                            continue
+                        }
+
+                        $supportedSize = Get-PartitionSupportedSize -DriveLetter $tempPartition.DriveLetter
+
+                        Write-Verbose -Message ( @(
+                            "$($MyInvocation.MyCommand): "
+                            $($script:localizedData.CheckingIfPartitionCanBeResizedForDevDrive -f $tempPartition.DriveLetter)
+                            ) -join '' )
+
+                        if (($supportedSize.SizeMax - $supportedSize.SizeMin) -ge $Size)
+                        {
+                            $unallocatedSpaceNextToPartition = $supportedSize.SizeMax - $tempPartition.Size
+
+                            if ($unallocatedSpaceNextToPartition -ge $Size)
+                            {
+                                <#
+                                    The size of the unallocated space next to the partition is already big enough
+                                    to create a Dev Drive volume on, so we don't need to resize any partitions.
+                                #>
+                                Write-Verbose -Message ( @(
+                                    "$($MyInvocation.MyCommand): "
+                                    $($script:localizedData.NoPartitionResizeNeededForDevDrive)
+                                    ) -join '' )
+
+                                $isResizeNeeded = $false
+                                break
+                            }
+
+                            Write-Verbose -Message ( @(
+                                "$($MyInvocation.MyCommand): "
+                                $($script:localizedData.PartitionFoundThatCanBeResizedForDevDrive -f $tempPartition.DriveLetter)
+                                ) -join '' )
+
+
+                            $partitionToResizeForDevDriveScenario = $tempPartition
+                            $amountToDecreasePartitionBy = $Size - $unallocatedSpaceNextToPartition
+                            break
+                        }
+
+                        Write-Verbose -Message ( @(
+                            "$($MyInvocation.MyCommand): "
+                            $($script:localizedData.PartitionCantBeResizedForDevDrive -f $tempPartition.DriveLetter)
+                            ) -join '' )
+                    }
+
+                    $partition = $partitionToResizeForDevDriveScenario
+
+                    if ($isResizeNeeded -and (-not $partition) -and $currentMaxUnallocatedSpaceInBytes -lt $Size)
+                    {
+                        $SizeInGb = [Math]::Round($Size / 1GB, 2)
+                        throw ($script:localizedData.FoundNoPartitionsThatCanResizedForDevDrive -f $SizeInGb)
+                    }
+                }
+                else
+                {
+                    <#
+                        When not in the Dev Drive scenario we attempt to find the first basic partition matching
+                        the size and use that as the partition.
+                    #>
+                    $partition = $partition |
+                        Where-Object -FilterScript { $_.Type -eq 'Basic' -and $_.Size -eq $Size } |
+                        Select-Object -First 1
+                }
 
                 if ($partition)
                 {
@@ -395,7 +531,51 @@ function Set-TargetResource
             } # if
         } # if
 
-        # Do we need to create a new partition?
+        <#
+            We can't find a partition with the required drive letter, so we may need to make a new one.
+            First we need to check if there is already enough unallocated space on the disk.
+        #>
+        $enoughUnallocatedSpace = ($currentMaxUnallocatedSpaceInBytes -ge $Size)
+
+        if ($DevDrive -and $Size -and $partition -and (-not $enoughUnallocatedSpace))
+        {
+            <#
+                Resize the partition that has the largest max - min supported size. This will create
+                enough new unallocated space for the  Dev Drive volume to be created on.
+            #>
+            if ($AllowDestructive)
+            {
+                $newPartitionSize = ($partition.Size - $amountToDecreasePartitionBy)
+                $newPartitionSizeInGb = [Math]::Round($newPartitionSize / 1GB, 2)
+                $SizeInGb = [Math]::Round($Size / 1GB, 2)
+
+                Write-Verbose -Message ( @(
+                    "$($MyInvocation.MyCommand): "
+                        $($script:localizedData.ResizingPartitionToMakeSpaceForDevDriveVolume `
+                        -f $partition.DriveLetter, $newPartitionSizeInGb, $SizeInGb)
+                    ) -join '' )
+
+                $partition | Resize-Partition -Size $newPartitionSize
+
+                # Requery the disk since we resized a partition
+                $disk = Get-DiskByIdentifier `
+                    -DiskId $DiskId `
+                    -DiskIdType $DiskIdType
+            }
+            else
+            {
+                # Allow Destructive is not set to true, so throw an exception.
+                throw  ($script:localizedData.AllowDestructiveNeededForDevDriveOperation -f $partition.DriveLetter)
+            }
+
+            # We no longer need to use the resized partition as we now have enough unallocated space.
+            $partition = $null
+        }
+
+        <#
+            We enter here if there are no partitions on the disk or when we need to create a new partition
+            using unallocated space.
+        #>
         if (-not $partition)
         {
             # Attempt to create a new partition
@@ -412,6 +592,21 @@ function Set-TargetResource
                                 -f $DiskIdType, $DiskId, $DriveLetter, "$($Size/1KB) KB")
                     ) -join '' )
 
+                if ($DevDrive)
+                {
+                    <#
+                        If size is slightly larger in bytes due to low level rounding differences than the max
+                        free extent there won't be any capacity to create the new partition. So if the values
+                        are the same in GB after rounding, we'll update size to be the max free extent
+                    #>
+                    if (Compare-SizeUsingGB -SizeAInBytes $Size -SizeBInBytes $disk.LargestFreeExtent)
+                    {
+                        $Size = $disk.LargestFreeExtent
+                    }
+
+                    Assert-SizeMeetsMinimumDevDriveRequirement -UserDesiredSize $Size
+                }
+
                 $partitionParams['Size'] = $Size
             }
             else
@@ -422,6 +617,11 @@ function Set-TargetResource
                         $($script:localizedData.CreatingPartitionMessage `
                                 -f $DiskIdType, $DiskId, $DriveLetter, 'all free space')
                     ) -join '' )
+
+                if ($DevDrive)
+                {
+                    Assert-SizeMeetsMinimumDevDriveRequirement -UserDesiredSize $currentMaxUnallocatedSpaceInBytes
+                }
 
                 $partitionParams['UseMaximumSize'] = $true
             } # if
@@ -477,7 +677,7 @@ function Set-TargetResource
         $supportedSize = $assignedPartition | Get-PartitionSupportedSize
 
         <#
-            If the parition size was not specified then try and make the partition
+            If the partition size was not specified then try and make the partition
             use all possible space on the disk.
         #>
         if (-not ($PSBoundParameters.ContainsKey('Size')))
@@ -487,7 +687,7 @@ function Set-TargetResource
 
         if ($assignedPartition.Size -ne $Size)
         {
-            # A patition resize is required
+            # A partition resize is required
             if ($AllowDestructive)
             {
                 if ($FSFormat -eq 'ReFS')
@@ -531,6 +731,18 @@ function Set-TargetResource
         }
     }
 
+    <#
+        If the Set-TargetResource function is run as a standalone function, and $assignedPartition is not null
+        and there are multiple partitions in $partition, then '$partition | Get-Volume', will give $volume back
+        the first volume on the first partition. If $assignedPartition is after that one, then we could
+        potentially format a different volume. So we need to make sure that $partition is equal to
+        $assignedPartition before we call Get-Volume.
+    #>
+    if ($assignedPartition)
+    {
+        $partition = $assignedPartition
+    }
+
     # Get the Volume on the partition
     $volume = $partition | Get-Volume
 
@@ -559,6 +771,14 @@ function Set-TargetResource
                 "$($MyInvocation.MyCommand): "
                 $($script:localizedData.FormattingVolumeMessage -f $formatVolumeParameters.FileSystem)
             ) -join '' )
+
+        if ($DevDrive)
+        {
+            # Confirm that the partition size meets the minimum requirements for a Dev Drive volume.
+            Assert-SizeMeetsMinimumDevDriveRequirement -UserDesiredSize $partition.Size
+
+            $formatVolumeParameters['DevDrive'] = $DevDrive
+        }
 
         # Format the volume
         $volume = $partition | Format-Volume @formatVolumeParameters
@@ -597,7 +817,16 @@ function Set-TargetResource
                         $formatParam.Add('AllocationUnitSize', $AllocationUnitSize)
                     }
 
-                    $Volume | Format-Volume @formatParam
+                    if ($DevDrive)
+                    {
+                        # Confirm that the volume size meets the minimum requirements for a Dev Drive volume.
+                        Assert-SizeMeetsMinimumDevDriveRequirement -UserDesiredSize $volume.Size
+
+                        $formatParam.Add('DevDrive', $DevDrive)
+                    }
+
+                    # Update the volume with the new format information.
+                    $volume = $volume | Format-Volume @formatParam
                 }
             } # if
         } # if
@@ -635,6 +864,29 @@ function Set-TargetResource
                 $($script:localizedData.SuccessfullyInitializedMessage -f $DriveLetter)
             ) -join '' )
     } # if
+
+    # Confirm that the volume is now actually formatted as a Dev Drive volume.
+    if ($DevDrive)
+    {
+        $isDevDriveVolume = Test-DevDriveVolume -VolumeGuidPath $volume.UniqueId -ErrorAction SilentlyContinue
+
+        if ($isDevDriveVolume)
+        {
+            Write-Verbose -Message ( @(
+                    "$($MyInvocation.MyCommand): "
+                    $($script:localizedData.SuccessfullyConfiguredDevDriveVolume `
+                        -f $volume.UniqueId, $volume.DriveLetter)
+                ) -join '' )
+        }
+        else
+        {
+            throw ( @(
+                    "$($MyInvocation.MyCommand): "
+                    $($script:localizedData.FailedToConfigureDevDriveVolume `
+                        -f $volume.UniqueId, $volume.DriveLetter)
+                ) -join '' )
+        }
+    }
 } # Set-TargetResource
 
 <#
@@ -671,6 +923,9 @@ function Set-TargetResource
     .PARAMETER ClearDisk
         Specifies if the disks partition schema should be removed entirely, even if data and OEM
         partitions are present. Only possible with AllowDestructive enabled.
+
+    .PARAMETER DevDrive
+        Specifies if the volume should be formatted as a Dev Drive.
 #>
 function Test-TargetResource
 {
@@ -719,7 +974,11 @@ function Test-TargetResource
 
         [Parameter()]
         [System.Boolean]
-        $ClearDisk
+        $ClearDisk,
+
+        [Parameter()]
+        [System.Boolean]
+        $DevDrive
     )
 
     Write-Verbose -Message ( @(
@@ -841,7 +1100,40 @@ function Test-TargetResource
                                 -f $DriveLetter, $Partition.Size, $Size)
                     ) -join '' )
 
-                return $false
+                if ($DevDrive)
+                {
+                    <#
+                        In the Dev Drive scenario we may resize a partition to create new unallocated space, so
+                        that we can create a new Dev Drive. When this is done we create a new partition on the
+                        largest free extent on the disk. However, Though the value is equivalent they aren't
+                        always the same. E.g 150Gb in powershell cmdline is 161061273600 bytes.
+                        But $disk.LargestFreeExtent could be 161060225024 bytes. Which is different but they are
+                        both 150Gb when you convert them.
+
+                        See the 'Size' parameter in:
+                        https://learn.microsoft.com/en-us/windows-hardware/drivers/storage/createpartition-msft-disk
+                        for more information. But to some it up, what the user enters and what the New-Partition
+                        cmdlet is able to allocate can be different in bytes. So to keep idempotence, we only
+                        return false when they arent the same in GB. Also if the volume already is formatted as
+                        a ReFS, there is no point in returning false for size mismatches since they can't be
+                        resized with resize-partition.
+                    #>
+
+                    $partitionSizeEqualToSizeParam = Compare-SizeUsingGB `
+                        -SizeAInBytes $Size `
+                        -SizeBInBytes $partition.Size
+
+                    $volume = $partition | Get-Volume
+
+                    if ((-not $partitionSizeEqualToSizeParam) -and $volume.FileSystem -ne 'ReFS')
+                    {
+                        return $false
+                    }
+                }
+                else
+                {
+                    return $false
+                }
             }
             else
             {
@@ -852,6 +1144,11 @@ function Test-TargetResource
                     ) -join '' )
             }
         } # if
+
+        if ($DevDrive)
+        {
+            Assert-SizeMeetsMinimumDevDriveRequirement -UserDesiredSize $Size
+        }
     } # if
 
     $blockSize = (Get-CimInstance `
@@ -916,6 +1213,39 @@ function Test-TargetResource
             return $false
         } # if
     } # if
+
+    if ($DevDrive)
+    {
+        # User requested to configure the volume as a Dev Drive volume. So we check that the assertions are met.
+        Write-Verbose -Message ( @(
+            "$($MyInvocation.MyCommand): "
+            $($script:localizedData.CheckingDevDriveAssertions)
+        ) -join '' )
+
+        Assert-DevDriveFeatureAvailable
+        Assert-FSFormatIsReFsWhenDevDriveFlagSetToTrue -FSFormat $FSFormat
+
+        $isDevDriveVolume = Test-DevDriveVolume -VolumeGuidPath $volume.UniqueId -ErrorAction SilentlyContinue
+
+        if ($isDevDriveVolume)
+        {
+            Write-Verbose -Message ( @(
+                "$($MyInvocation.MyCommand): "
+                $($script:localizedData.TheVolumeIsCurrentlyConfiguredAsADevDriveVolume `
+                    -f $volume.UniqueId, $volume.DriveLetter)
+            ) -join '' )
+        }
+        else
+        {
+            Write-Verbose -Message ( @(
+                "$($MyInvocation.MyCommand): "
+                $($script:localizedData.TheVolumeIsNotConfiguredAsADevDriveVolume `
+                    -f $volume.UniqueId, $volume.DriveLetter)
+            ) -join '' )
+
+            return $false
+        }
+    }
 
     return $true
 } # Test-TargetResource
