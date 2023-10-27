@@ -12,4 +12,5 @@ class DSC_Disk : OMI_BaseResource
     [Write, Description("Specifies the file system format of the new volume."), ValueMap{"NTFS","ReFS"}, Values{"NTFS","ReFS"}] String FSFormat;
     [Write, Description("Specifies if potentially destructive operations may occur.")] Boolean AllowDestructive;
     [Write, Description("Specifies if the disks partition schema should be removed entirely, even if data and OEM partitions are present. Only possible with AllowDestructive enabled.")] Boolean ClearDisk;
+    [Write, Description("Specifies if the volume should be formatted as a Dev Drive.")] Boolean DevDrive;
 };

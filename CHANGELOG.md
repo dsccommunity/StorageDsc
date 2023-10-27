@@ -5,6 +5,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Disk:
+  - BREAKING CHANGE: Added support for volumes to be formatted as Dev Drives - Fixes [Issue #276](https://github.com/dsccommunity/StorageDsc/issues/276)
+
 ## [5.1.0] - 2023-02-22
 
 ### Changed
