@@ -52,7 +52,7 @@
             Prerelease   = ''
 
             # Tags applied to this module. These help with module discovery in online galleries.
-            Tags         = @('DesiredStateConfiguration', 'DSC', 'DSCResource', 'Disk', 'Storage', 'Partition', 'Volume', 'Dev Drive')
+            Tags         = @('DesiredStateConfiguration', 'DSC', 'DSCResource', 'Disk', 'Storage', 'Partition', 'Volume', 'DevDrive')
 
             # A URL to the license for this module.
             LicenseUri   = 'https://github.com/dsccommunity/StorageDsc/blob/main/LICENSE'
