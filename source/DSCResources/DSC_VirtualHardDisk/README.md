@@ -2,48 +2,79 @@
 
 The resource is used to create a virtual hard disk and attach it to the system.
 
-There are 2 high level scenarios, one where the user uses the 'Present' flag and the second when the user uses the 'Absent' flag in the resource.
+There are 2 high level scenarios, one where the user uses the 'Present' flag
+and the second when the user uses the 'Absent' flag in the resource.
 
-1. When the 'Present' flag is used the resource checks if the virtual hard disk is on the machine using the file path that is entered.
+1. When the 'Present' flag is used the resource checks if the virtual hard disk
+is on the machine using the file path that is entered.
+    1. If the parameters are valid but the file path does not exist. The
+    resource will attempt to create and attach the virtual hard disk to
+    the system. Note: only paths with drive letters are accepted e.g
+    `C:\Myfolder\newVirtFile.vhdx`, or `D:\newVirtFile.vhd`, etc.
+    1. If the file path is confirmed to be the location of a real virtual hard
+    disk file, and it is attached to the system the resource will do nothing.
+    1. If the file path is confirmed to be the location of a real virtual hard
+    disk file, but is not attached, the resource will attach the virtual hard
+    disk to the system.
+    1. If the file path does exist but is not a real file path to a virtual
+    hard disk file, the resource will throw an error.
+1. When the 'Absent' flag is used the resource checks if the virtual disk is on
+the machine using the file path that is entered.
+    1. If the file path is confirmed to be the location of a real virtual hard
+    disk file. The resource will check if the virtual hard disk is attached.
+    If it is attached, the resource will detach the virtual hard disk from
+    the system.
+    1. If the location is a real virtual hard disk but the virtual hard disk
+    is detached from the system, the resource will do nothing.
+    1. If the parameters are valid but the file path is a path to a virtual
+    hard disk file that doesn't exist, the resource will do nothing.
+    1. The resource **does not** delete a virtual hard disk file, that
+    **already** exists on the system prior to the `Set-TargetResource`
+    function being called. It will only detach the virtual hard disk
+    from the system. The file will remain, this is to prevent accidental deletions.
 
-    a. If the file path is correct and it is confirmed to be the location of a real virtual hard disk file. The resource will do nothing.
+Note: If the file path to the `.vhd` or `.vhdx` file is real and exists but is
+not attached. The resource will simply attach it. Even if the `DiskSize` and
+`DiskType` parameters are different. These values are currently only useful for
+creation. Additional functionality would need to be added to [resize](https://learn.microsoft.com/en-us/windows/win32/api/virtdisk/nf-virtdisk-resizevirtualdisk)
+or change
+the virtual disk's type after creation.
 
-    b. If the location is a real virtual hard disk file but is not attached, the resource will attach the virtual hard disk to the system.
-
-    c. If the location is not real the resource will throw an error advising that the location does not exist.
-
-2. When the 'Absent' flag is used the resource checks if the virtual disk is on the machine using the file path that is entered.
-
-    a. If the file path is correct and it is confirmed to be the location of a real virtual hard disk. The resource will detach the virtual hard disk from the system.
-
-    b. If the location is a real virtual hard disk but is not attached to the system, the resource will do nothing.
-
-    c. If the location is not real, the resource will throw an error advising that the location does not exist.
-
-    d. The resource **does not** delete a virtual hard disk file, that **already** exists on the system prior to the `Set-TargetResource` function being called. It will only detach the virtual hard disk from the system. The file will remain, this is to prevent accidental deletions.
-
+See the [Limitations](#limitations) section for more limitations.
 
 ## How does this differ from the [DSC_VHD](https://github.com/dsccommunity/HyperVDsc/tree/main/source/DSCResources/DSC_VHD) in the Hyper-V Dsc?
 
-This DSC_VirtualHardDisk resource does not rely on the Hyper-V Windows feature being enabled to allow users to use the resource. Unlike the DSC_VHD, users can use this resource right out of the box assuming they are running at least `Windows 8.1 / Windows Server 2008 R2 or later`. The resource uses the publicly available Win32 virtual disk apis, to create and attach a virtual hard disk file (`.vhd` and `.vhdx`) to the system. See more information about the apis [here](https://learn.microsoft.com/en-us/windows/win32/api/virtdisk/).
+This DSC_VirtualHardDisk resource does not rely on the Hyper-V Windows feature
+being enabled to allow users to use the resource. Unlike the DSC_VHD, users can
+use this resource right out of the box assuming they are running at least
+`Windows 8.1 / Windows Server 2008 R2 or later`. The resource uses the publicly
+available Win32 virtual disk apis, to create and attach a virtual hard disk file
+(`.vhd` and `.vhdx`) to the system. See more information about the apis [here](https://learn.microsoft.com/en-us/windows/win32/api/virtdisk/).
+
+Warning: Using both the DSC_VirtualHardDisk and DSC_VHD resources in the same
+config/machine could result in an invalid config.
 
 ## Limitations
 
-1. The resource only supports .vhd and .vhdx files. No other virtual hard disk file extension is supported at this time.
-2. The ability to `expand` the max size of the virtual hard disk after its creation is not currently included in this resource.
-3. The resource uses default values internally to create the virtual hard disk file that are not provided in the Get\Test\Set Methods. Values such as:
+1. The resource only supports `.vhd` and `.vhdx` files. No other virtual hard disk
+file extension is supported at this time.
+1. The ability to `expand` the max size of the virtual hard disk after its creation
+1. The ability to `shrink` the max size of the virtual hard disk after its creation
+is not currently included in this resource.
+1. The resource uses default values internally to create the virtual hard disk
+file that are not provided in the Get\Test\Set Methods. Values such as:
+    1. The ability to set the block size of the virtual hard disk in bytes.
+    1. The ability to set the sector size of the virtual hard disk in bytes.
+    1. The ability to associate the new virtual hard disk with an existing virtual
+    hard disk.
+    1. The ability to specify a resiliency guid for the virtual hard disk.
+    1. The ability to set a unique Id for the virtual hard disk and not use one
+    generated by the system.
+    1. The ability to prepopulate a new virtual disk with data from an existing
+    virtual disk.
 
-    a. The ability to set the block size of the virtual hard disk in bytes.
-
-    b. The ability to set the sector size of the virtual hard disk in bytes.
-
-    c. The ability to associate the new virtual hard disk with an existing virtual hard disk.
-
-    d. The ability to specify a resiliency guid for the virtual hard disk.
-
-    e. The ability to set a unique Id for the virtual hard disk and not use one generated by the system.
-
-    f. The ability to prepopulate a new virtual disk with data from an existing virtual disk.
-
-See [virtdisk.h](https://learn.microsoft.com/en-us/windows/win32/api/virtdisk/) to read about what the Win32 api supports. This resource could in theory support all of these, as the parameters just need to be passed to the the [CreateVirtualDisk](https://learn.microsoft.com/en-us/windows/win32/api/virtdisk/nf-virtdisk-createvirtualdisk) Win32 function call in the resource. So additional help from the community if any of these are wanted, is welcomed.
-
+See [virtdisk.h](https://learn.microsoft.com/en-us/windows/win32/api/virtdisk/)
+to read about what the Win32 api supports. This resource could in theory support
+all of these, as the parameters just need to be passed to the the [CreateVirtualDisk](https://learn.microsoft.com/en-us/windows/win32/api/virtdisk/nf-virtdisk-createvirtualdisk)
+Win32 function call in the resource. So additional help from the community if any
+of these are wanted, is welcomed.

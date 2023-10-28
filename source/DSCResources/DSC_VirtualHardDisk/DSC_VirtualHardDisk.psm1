@@ -7,8 +7,8 @@ Import-Module -Name (Join-Path -Path $modulePath `
 
 # Import the VirtualHardDisk Win32Helpers Module.
 Import-Module -Name (Join-Path -Path $modulePath `
-        -ChildPath (Join-Path -Path 'VirtualHardDisk.Win32Helpers' `
-            -ChildPath 'VirtualHardDisk.Win32Helpers.psm1'))
+        -ChildPath (Join-Path -Path 'StorageDsc.VirtualHardDisk.Win32Helpers' `
+            -ChildPath 'StorageDsc.VirtualHardDisk.Win32Helpers.psm1'))
 
 Import-Module -Name (Join-Path -Path $modulePath -ChildPath 'DscResource.Common')
 

@@ -19,9 +19,7 @@ Remove-Module -Name $script:parentModule -Force -ErrorAction 'SilentlyContinue'
 $script:subModuleName = (Split-Path -Path $PSCommandPath -Leaf) -replace '\.Tests.ps1'
 $script:subModuleFile = Join-Path -Path $script:subModulesFolder -ChildPath "$($script:subModuleName)/$($script:subModuleName).psm1"
 
-if (-not (Get-Module -Name $script:subModuleFile -ListAvailable)) {
-    Import-Module $script:subModuleFile -Force -ErrorAction Stop
-}
+Import-Module $script:subModuleFile -Force -ErrorAction Stop
 #endregion HEADER
 
 Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath '..\TestHelpers\CommonTestHelper.psm1')
@@ -155,7 +153,7 @@ InModuleScope $script:subModuleName {
         DiskFormat        = 'vhd'
     }
 
-    Describe 'VirtualHardDisk.Win32Helpers\New-SimpleVirtualDisk' -Tag 'New-SimpleVirtualDisk' {
+    Describe 'StorageDsc.VirtualHardDisk.Win32Helpers\New-SimpleVirtualDisk' -Tag 'New-SimpleVirtualDisk' {
         Context 'Creating and attaching a new virtual disk (vhdx) successfully' {
             Mock `
                 -CommandName New-VirtualDiskUsingWin32 `
@@ -222,7 +220,7 @@ InModuleScope $script:subModuleName {
 
             $win32Error = [System.ComponentModel.Win32Exception]::new($script:AccessDeniedWin32Error)
             $exception = [System.Exception]::new( `
-                ($script:localizedData.CreateVirtualDiskError -f $win32Error.Message), `
+                ($script:localizedData.CreateVirtualDiskError -f $script:mockedParams.VirtualDiskPath, $win32Error.Message), `
                 $win32Error)
 
             It 'Should throw an exception in creation method' {
@@ -243,7 +241,7 @@ InModuleScope $script:subModuleName {
         }
     }
 
-    Describe 'VirtualHardDisk.Win32Helpers\Add-SimpleVirtualDisk' -Tag 'Add-SimpleVirtualDisk' {
+    Describe 'StorageDsc.VirtualHardDisk.Win32Helpers\Add-SimpleVirtualDisk' -Tag 'Add-SimpleVirtualDisk' {
         Context 'Attaching a virtual disk failed due to exception' {
 
             Mock `
@@ -258,7 +256,7 @@ InModuleScope $script:subModuleName {
 
             $win32Error = [System.ComponentModel.Win32Exception]::new($script:AccessDeniedWin32Error)
             $exception = [System.Exception]::new( `
-                ($script:localizedData.AttachVirtualDiskError -f $win32Error.Message), `
+                ($script:localizedData.AttachVirtualDiskError -f $script:mockedParams.VirtualDiskPath, $win32Error.Message), `
                 $win32Error)
 
             It 'Should throw an exception during attach function' {
@@ -305,7 +303,7 @@ InModuleScope $script:subModuleName {
         }
     }
 
-    Describe 'VirtualHardDisk.Win32Helpers\Get-VirtualDiskHandle' -Tag 'Get-VirtualDiskHandle' {
+    Describe 'StorageDsc.VirtualHardDisk.Win32Helpers\Get-VirtualDiskHandle' -Tag 'Get-VirtualDiskHandle' {
         Context 'Opening a virtual disk file failed due to exception' {
 
             Mock `
@@ -315,7 +313,7 @@ InModuleScope $script:subModuleName {
 
             $win32Error = [System.ComponentModel.Win32Exception]::new($script:AccessDeniedWin32Error)
             $exception = [System.Exception]::new( `
-                ($script:localizedData.OpenVirtualDiskError -f $win32Error.Message), `
+                ($script:localizedData.OpenVirtualDiskError -f $script:mockedParams.VirtualDiskPath, $win32Error.Message), `
                 $win32Error)
 
             It 'Should throw an exception while attempting to open virtual disk file' {
@@ -355,7 +353,7 @@ InModuleScope $script:subModuleName {
         }
     }
 
-    Describe 'VirtualHardDisk.Win32Helpers\Get-VirtualStorageType' -Tag 'Get-VirtualStorageType' {
+    Describe 'StorageDsc.VirtualHardDisk.Win32Helpers\Get-VirtualStorageType' -Tag 'Get-VirtualStorageType' {
         Context 'Storage type requested for vhd disk format' {
             $result = Get-VirtualStorageType -DiskFormat $script:vhdDiskFormat
             It 'Should not throw an exception' {

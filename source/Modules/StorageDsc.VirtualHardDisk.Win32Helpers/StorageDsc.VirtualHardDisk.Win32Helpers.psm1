@@ -225,6 +225,7 @@ function New-VirtualDiskUsingWin32
     )
 
     $helper = Get-VirtDiskWin32HelperScript
+
     return $helper::CreateVirtualDisk(
         $virtualStorageType,
         $VirtualDiskPath,
@@ -293,6 +294,7 @@ function Add-VirtualDiskUsingWin32
     )
 
     $helper = Get-VirtDiskWin32HelperScript
+
     return $helper::AttachVirtualDisk(
         $Handle.Value,
         $SecurityDescriptor,
@@ -357,6 +359,7 @@ function Get-VirtualDiskUsingWin32
     )
 
     $helper = Get-VirtDiskWin32HelperScript
+
     return $helper::OpenVirtualDisk(
         $VirtualStorageType,
         $VirtualDiskPath,
@@ -423,6 +426,7 @@ function New-SimpleVirtualDisk
 
     # Virtual disk will be dynamically expanding, up to the size of $DiskSizeInBytes on the parent disk
     $flags = [VirtDisk.Helper]::CREATE_VIRTUAL_DISK_FLAG_NONE
+
     if ($DiskType -eq 'Fixed')
     {
         # Virtual disk will be fixed, and will take up the up the full size of $DiskSizeInBytes on the parent disk after creation
@@ -432,26 +436,30 @@ function New-SimpleVirtualDisk
     try
     {
         $result = New-VirtualDiskUsingWin32 `
-            $virtualStorageType `
-            $VirtualDiskPath `
-            $accessMask `
-            $securityDescriptor `
-            $flags `
-            $providerSpecificFlags `
-            $createVirtualDiskParameters `
-            ([System.IntPtr]::Zero) `
-            $handle
+            -VirtualStorageType $virtualStorageType `
+            -VirtualDiskPath $VirtualDiskPath `
+            -AccessMask $accessMask `
+            -SecurityDescriptor $securityDescriptor `
+            -Flags $flags `
+            -ProviderSpecificFlags $providerSpecificFlags `
+            -CreateVirtualDiskParameters $createVirtualDiskParameters `
+            -Overlapped ([System.IntPtr]::Zero) `
+            -Handle $handle
 
         if ($result -ne 0)
         {
             $win32Error = [System.ComponentModel.Win32Exception]::new($result)
             throw [System.Exception]::new( `
-                ($script:localizedData.CreateVirtualDiskError -f $win32Error.Message), `
+                ($script:localizedData.CreateVirtualDiskError -f $VirtualDiskPath, $win32Error.Message), `
                 $win32Error)
         }
 
         Write-Verbose -Message ($script:localizedData.VirtualDiskCreatedSuccessfully -f $VirtualDiskPath)
-        Add-SimpleVirtualDisk -VirtualDiskPath $VirtualDiskPath -DiskFormat $DiskFormat -Handle $handle
+
+        Add-SimpleVirtualDisk `
+            -VirtualDiskPath $VirtualDiskPath `
+            -DiskFormat $DiskFormat `
+            -Handle $handle
     }
     finally
     {
@@ -531,12 +539,12 @@ function Add-SimpleVirtualDisk
             }
 
             $result = Add-VirtualDiskUsingWin32 `
-                $Handle `
-                $securityDescriptor `
-                $flags `
-                $providerSpecificFlags `
-                $attachVirtualDiskParameters `
-                ([System.IntPtr]::Zero)
+                -Handle $Handle `
+                -SecurityDescriptor $securityDescriptor `
+                -Flags $flags `
+                -ProviderSpecificFlags $providerSpecificFlags `
+                -AttachVirtualDiskParameters $attachVirtualDiskParameters `
+                -Overlapped ([System.IntPtr]::Zero)
 
             if ($result -eq 0)
             {
@@ -548,7 +556,7 @@ function Add-SimpleVirtualDisk
         {
             $win32Error = [System.ComponentModel.Win32Exception]::new($result)
             throw [System.Exception]::new( `
-                ($script:localizedData.AttachVirtualDiskError -f $win32Error.Message), `
+                ($script:localizedData.AttachVirtualDiskError -f $VirtualDiskPath, $win32Error.Message), `
                 $win32Error)
         }
 
@@ -604,18 +612,18 @@ function Get-VirtualDiskHandle
     [ref]$handle = [Microsoft.Win32.SafeHandles.SafeFileHandle]::Zero
 
     $result = Get-VirtualDiskUsingWin32 `
-        $virtualStorageType `
-        $VirtualDiskPath `
-        $accessMask `
-        $flags `
-        $openVirtualDiskParameters `
-        $handle
+        -VirtualStorageType $virtualStorageType `
+        -VirtualDiskPath $VirtualDiskPath `
+        -AccessMask $accessMask `
+        -Flags $flags `
+        -OpenVirtualDiskParameters $openVirtualDiskParameters `
+        -Handle $handle
 
     if ($result -ne 0)
     {
         $win32Error = [System.ComponentModel.Win32Exception]::new($result)
         throw [System.Exception]::new( `
-            ($script:localizedData.OpenVirtualDiskError -f $win32Error.Message), `
+            ($script:localizedData.OpenVirtualDiskError -f $VirtualDiskPath, $win32Error.Message), `
             $win32Error)
     }
 
@@ -649,6 +657,7 @@ function Get-VirtualStorageType
     # Default to the vhdx file format.
     $virtualStorageType.VendorId = [VirtDisk.Helper]::VIRTUAL_STORAGE_TYPE_VENDOR_MICROSOFT
     $virtualStorageType.DeviceId = [VirtDisk.Helper]::VIRTUAL_STORAGE_TYPE_DEVICE_VHDX
+
     if ($DiskFormat -eq 'Vhd')
     {
         $virtualStorageType.DeviceId = [VirtDisk.Helper]::VIRTUAL_STORAGE_TYPE_DEVICE_VHD
