@@ -42,7 +42,8 @@
         'OpticalDiskDriveLetter',
         'WaitForDisk',
         'WaitForVolume',
-        'Disk'
+        'Disk',
+        'VirtualHardDisk'
     )
 
     # Private data to pass to the module specified in RootModule/ModuleToProcess. This may also contain a PSData hashtable with additional module metadata used by PowerShell.
@@ -52,7 +53,7 @@
             Prerelease   = ''
 
             # Tags applied to this module. These help with module discovery in online galleries.
-            Tags         = @('DesiredStateConfiguration', 'DSC', 'DSCResource', 'Disk', 'Storage', 'Partition', 'Volume', 'DevDrive')
+            Tags         = @('DesiredStateConfiguration', 'DSC', 'DSCResource', 'Disk', 'Storage', 'Partition', 'Volume', 'DevDrive', 'VirtualHardDisk', 'VHD')
 
             # A URL to the license for this module.
             LicenseUri   = 'https://github.com/dsccommunity/StorageDsc/blob/main/LICENSE'
