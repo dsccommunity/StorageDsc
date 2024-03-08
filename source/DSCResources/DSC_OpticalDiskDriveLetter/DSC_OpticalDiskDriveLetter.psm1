@@ -12,6 +12,47 @@ $script:localizedData = Get-LocalizedData -DefaultUICulture 'en-US'
 
 <#
     .SYNOPSIS
+        This helper function determines if an optical disk can be managed
+        or not by this resource. This resource can not be used to manage
+        mounted ISO images in Windows 2012 and Windows 10 or newer operating
+        systems.
+
+    .PARAMETER OpticalIdsk
+        The CIM instance of the optical disk to check if it can be managed.
+
+    .OUTPUTS
+        System.Boolean
+
+    .NOTES
+        This function will use the following logic when determining if a drive is
+        a mounted ISO and therefore should **not** be mnanaged by this resource:
+
+        - If the `Caption` is 'Microsoft Virtual DVD-ROM'
+        - And the length of the string after the final backslash in the `DeviceID`
+          is greater than 6 characters and less than 20 characters.
+
+        Note: This is not a 100% reliable method and improvements to this detection
+        method are welcome.
+#>
+function Test-OpticalDiskCanBeManaged
+{
+    [CmdletBinding()]
+    [OutputType([System.Boolean])]
+    param
+    (
+        [Parameter(Mandatory = $true)]
+        [Microsoft.Management.Infrastructure.CimInstance]
+        $OpticalDisk
+    )
+
+    $deviceIdPostfixLength = ($OpticalDisk.DeviceID.Split('\')[-1]).Length
+    return
+        -not ($OpticalDisk.Caption -eq 'Microsoft Virtual DVD-ROM' -and
+             $deviceIdPostfixLength -gt 6 -and $deviceIdPostfixLength -lt 20)
+}
+
+<#
+    .SYNOPSIS
         This helper function returns a hashtable containing the current
         drive letter assigned to the optical disk in the system matching
         the disk number.
@@ -23,18 +64,13 @@ $script:localizedData = Get-LocalizedData -DefaultUICulture 'en-US'
         If there are no optical disks found in the system an exception
         will be thrown.
 
+        The function will only return the drive letter if the optical disk
+        is not a mounted ISO, as determined by the Test-OpticalDiskCanBeManaged
+        function.
+
     .PARAMETER DiskId
         Specifies the optical disk number for the disk to return the drive
         letter of.
-
-    .NOTES
-        The Caption and DeviceID properties are checked to avoid
-        mounted ISO images in Windows 2012+ and Windows 10. The
-        device ID is required because a CD/DVD in a Hyper-V virtual
-        machine has the same caption as a mounted ISO.
-
-        Example DeviceID for a virtual drive in a Hyper-V VM - SCSI\CDROM&VEN_MSFT&PROD_VIRTUAL_DVD-ROM\000006
-        Example DeviceID for a mounted ISO   in a Hyper-V VM - SCSI\CDROM&VEN_MSFT&PROD_VIRTUAL_DVD-ROM\2&1F4ADFFE&0&000002
 #>
 function Get-OpticalDiskDriveLetter
 {
@@ -54,19 +90,16 @@ function Get-OpticalDiskDriveLetter
             $($script:localizedData.UsingGetCimInstanceToFetchDriveLetter -f $DiskId)
         ) -join '' )
 
-    # Get the optical disk matching the Id
+    # Get all optical disks in the system that are not mounted ISOs
     $opticalDisks = Get-CimInstance -ClassName Win32_CDROMDrive |
         Where-Object -FilterScript {
-        -not (
-            $_.Caption -eq 'Microsoft Virtual DVD-ROM' -and
-            ($_.DeviceID.Split('\')[-1]).Length -gt 10
-        )
-    }
+            Test-OpticalDiskCanBeManaged -OpticalDisk $_
+        }
 
     if ($opticalDisks)
     {
         <#
-            To behave in a similar fashion to the other xStorage resources the
+            To behave in a similar fashion to the other StorageDsc resources the
             DiskId represents the number of the optical disk in the system.
             However as these are returned as an array of 0..x elements then
             subtract one from the DiskId to get the actual optical disk number
