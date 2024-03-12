@@ -13,12 +13,11 @@ $script:localizedData = Get-LocalizedData -DefaultUICulture 'en-US'
 <#
     .SYNOPSIS
         This helper function determines if an optical disk can be managed
-        or not by this resource. This resource can not be used to manage
-        mounted ISO images in Windows 2012 and Windows 10 or newer operating
-        systems.
+        or not by this resource.
 
     .PARAMETER OpticalIdsk
-        The CIM instance of the optical disk to check if it can be managed.
+        The cimv2:Win32_CDROMDrive instance of the optical disk that should
+        be checked.
 
     .OUTPUTS
         System.Boolean
@@ -27,12 +26,15 @@ $script:localizedData = Get-LocalizedData -DefaultUICulture 'en-US'
         This function will use the following logic when determining if a drive is
         a mounted ISO and therefore should **not** be mnanaged by this resource:
 
-        - If the `Caption` is 'Microsoft Virtual DVD-ROM'
-        - And the length of the string after the final backslash in the `DeviceID`
-          is greater than 6 characters and less than 20 characters.
-
-        Note: This is not a 100% reliable method and improvements to this detection
-        method are welcome.
+        - Get the Drive letter assigned to the drive in the `cimv2:Win32_CDROMDrive`
+          instance
+        - If the drive letter is set, query the volume information for the device
+           using drive letter and get the device path.
+        - Look up the disk image using the device path.
+        - If no error occurs then the device is a mounted ISO and should not be
+          used with this resource.
+          If a "The specified disk is not a virtual disk." error occurs then it
+          is not an ISO and can be managed by this resource.
 #>
 function Test-OpticalDiskCanBeManaged
 {
@@ -45,10 +47,28 @@ function Test-OpticalDiskCanBeManaged
         $OpticalDisk
     )
 
-    $deviceIdPostfixLength = ($OpticalDisk.DeviceID.Split('\')[-1]).Length
-    return
-        -not ($OpticalDisk.Caption -eq 'Microsoft Virtual DVD-ROM' -and
-             $deviceIdPostfixLength -gt 6 -and $deviceIdPostfixLength -lt 20)
+    $driveIsMountedIso = $true
+    $driveLetter = ($OpticalDisk.Drive -replace ":$")
+    $devicePath = (Get-Volume -DriveLetter $driveLetter).Path -replace "\\$"
+
+    try
+    {
+        <#
+            If the device is not a mounted ISO then this will throw an
+            exception with the message "The specified disk is not a virtual disk."
+        #>
+        Get-DiskImage -DevicePath $devicePath -ErrorAction Stop | Out-Null
+    }
+    catch [Microsoft.Management.Infrastructure.CimException]
+    {
+        if ($_.Exception.MessageId -eq 'HRESULT 0xc03a0015')
+        {
+            # This is not a mounted ISO, so can manage
+            $driveIsMountedIso = $false
+        }
+    }
+
+    return $driveIsMountedIso
 }
 
 <#
@@ -64,9 +84,9 @@ function Test-OpticalDiskCanBeManaged
         If there are no optical disks found in the system an exception
         will be thrown.
 
-        The function will only return the drive letter if the optical disk
-        is not a mounted ISO, as determined by the Test-OpticalDiskCanBeManaged
-        function.
+        The function will exclude all optical disks that are mounted ISOs
+        as determined by the Test-OpticalDiskCanBeManaged function because
+        these should be managed by the DSC_MountImage resource.
 
     .PARAMETER DiskId
         Specifies the optical disk number for the disk to return the drive

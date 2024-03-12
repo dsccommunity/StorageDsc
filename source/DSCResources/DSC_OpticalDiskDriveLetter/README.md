@@ -39,7 +39,7 @@ drive:
   instance using:
 
   ```powershell
-  $driveLetter = ($cimInstance.Drive - replace ":$")
+  $driveLetter = ($cimInstance.Drive -replace ":$")
   ```
 
 1. If the drive letter is set, query the volume information for the device
