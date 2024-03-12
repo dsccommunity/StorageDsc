@@ -21,6 +21,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     a mounted ISO is detected. This resolves issues with using the resource
     in Azure Gen2 VMs with Windows Server 2022 Azure Edition - Fixes [Issue #285](https://github.com/dsccommunity/StorageDsc/issues/285)
 
+### Fixed
+
+- Azure DevOps Build Pipeline:
+  - Tests 'Unit (Windows Server 2022)' corrected to execute on Windows Server
+    2022 node instead of Windows Server 2019.
+  - 'Package Module' job runs on 'Ubuntu-latest' hosted agent.
+
 ## [5.1.0] - 2023-02-22
 
 ### Changed

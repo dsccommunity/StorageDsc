@@ -24,7 +24,7 @@ stages:
       - job: Package_Module
         displayName: 'Package Module'
         pool:
-          vmImage: 'ubuntu-20.04'
+          vmImage: 'ubuntu-latest'
         steps:
           - pwsh: |
               dotnet tool install --global GitVersion.Tool
@@ -194,7 +194,7 @@ stages:
       - job: Test_Unit_2022
         displayName: 'Unit (Windows Server 2022)'
         pool:
-          vmImage: 'windows-2019'
+          vmImage: 'windows-2022'
         timeoutInMinutes: 0
         steps:
           - task: DownloadPipelineArtifact@2
