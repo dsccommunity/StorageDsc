@@ -39,7 +39,7 @@ drive:
   instance using:
 
   ```powershell
-  $driveLetter = ($cimInstance.Drive -replace ":$")
+  $driveLetter = ($opticalDisk.Drive -replace ":$")
   ```
 
 1. If the drive letter is set, query the volume information for the device
@@ -47,6 +47,13 @@ drive:
 
   ```powershell
   $devicePath = (Get-Volume -DriveLetter $driveLetter).Path -replace "\\$"
+  ```
+
+1. If the drive letter is not set, then just create the device path from the
+   drive property using:
+
+  ```powershell
+  $devicePath = "\\?\$($opticalDisk.Drive)\"
   ```
 
 1. Look up the disk image using the device path with:
@@ -61,6 +68,9 @@ drive:
   resource.
 
 ### Old Detection Method
+
+> Note: This method is no longer used because it is unreliable, but is documented
+> here for reference.
 
 In older versions (prior to v6.0.0) of the resource, the `DSC_OpticalDiskDriveLetter`
 resource used the `DeviceID` and the `Caption` of the CIM Instance representing

@@ -30,6 +30,7 @@ $script:localizedData = Get-LocalizedData -DefaultUICulture 'en-US'
           instance
         - If the drive letter is set, query the volume information for the device
            using drive letter and get the device path.
+        - If the drive letter is not set, just use the drive as the device path.
         - Look up the disk image using the device path.
         - If no error occurs then the device is a mounted ISO and should not be
           used with this resource.
@@ -47,9 +48,23 @@ function Test-OpticalDiskCanBeManaged
         $OpticalDisk
     )
 
-    $driveIsMountedIso = $true
-    $driveLetter = ($OpticalDisk.Drive -replace ":$")
-    $devicePath = (Get-Volume -DriveLetter $driveLetter).Path -replace "\\$"
+    $diskCanBeManaged = $false
+    <#
+        If the OpticalDisk.Drive matches Volume{<Guid>} then the disk is not
+        assigned a drive letter and so just use the drive value as a device
+        path.
+    #>
+    if ($OpticalDisk.Drive -match 'Volume{.*}')
+    {
+        $devicePath = "\\?\$($OpticalDisk.Drive)\"
+    }
+    else
+    {
+        $driveLetter = ($OpticalDisk.Drive -replace ":$")
+        $devicePath = (Get-CimInstance `
+            -ClassName Win32_Volume `
+            -Filter "DriveLetter = '$driveLetter'").Path -replace "\\$"
+    }
 
     try
     {
@@ -63,12 +78,12 @@ function Test-OpticalDiskCanBeManaged
     {
         if ($_.Exception.MessageId -eq 'HRESULT 0xc03a0015')
         {
-            # This is not a mounted ISO, so can manage
-            $driveIsMountedIso = $false
+            # This is not a mounted ISO, so it can managed
+            $diskCanBeManaged = $true
         }
     }
 
-    return $driveIsMountedIso
+    return $diskCanBeManaged
 }
 
 <#

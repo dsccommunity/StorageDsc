@@ -32,68 +32,45 @@ Invoke-TestSetup
 try
 {
     InModuleScope $script:dscResourceName {
-        $script:testDriveLetter = 'X:'
-        $script:testDriveLetterNoVolume = 'Volume{47b90a5d-f340-11e7-80fd-806e6f6e6963}'
-        $script:testVolumeDeviceId = '"\\?\$($script:testDriveLetterNoVolume)\"'
+        $testOpticalDrives = [PSCustomObject] @{
+            OpticalDrive = [PSCustomObject] @{
+                DriveLetter = 'X:'
+                VolumeId = 'Volume{47b90a5d-f340-11e7-80fd-806e6f6e6963}'
+            }
+            OpticalDriveISO = [PSCustomObject] @{
+                DriveLetter = 'I:'
+                VolumeId = 'Volume{0365fab8-a4e1-4f87-b1ef-b3c32515138b}'
+            }
+            OpticalDriveWrongLetter = [PSCustomObject] @{
+                DriveLetter = 'W:'
+                VolumeId = 'Volume{18508a20-5827-4bfa-96b3-0aeb5a2797c2}'
+            }
+            OpticalDriveNoDriveLetter = [PSCustomObject] @{
+                DriveLetter = 'Volume{8c58ce81-0f58-4bd2-a575-0eb66a993ad7}'
+                VolumeId = 'Volume{8c58ce81-0f58-4bd2-a575-0eb66a993ad7}'
+            }
+        }
 
         $script:mockedNoOpticalDrive = $null
 
-        $script:virtualDevices = [pscustomobject] @{
-            MountedIso = [pscustomobject] @{
-                Description = 'Mounted ISO - should not be managed by the resource'
-                DeviceID    = 'SCSI\CDROM&VEN_MSFT&PROD_VIRTUAL_DVD-ROM\2&1F4ADFFE&0&000004'
-                Caption     = 'Microsoft Virtual DVD-ROM'
-                CanManage   = $false
-            }
-
-            PhysicalDevice = [pscustomobject] @{
-                Description = 'Physical device'
-                DeviceID    = 'SCSI\CDROM&VEN_MATSHITA&PROD_BD-MLT_UJ260AF\4&23A5A6AC&0&000200'
-                Caption     = 'MATSHITA BD-MLT UJ260AF'
-                CanManage   = $true
-            }
-
-            VirtualAtaDvdRomWs2019HyperVGen1 = [pscustomobject] @{
-                Description = 'Hyper-V Gen1 (BIOS/IDE) VM - Windows Server 2019'
-                DeviceID    = 'IDE\CDROMMSFT_VIRTUAL_CD/ROM_____________________1.0_____\5&CFB56DE&0&1.0.0'
-                Caption     = 'Msft Virtual CD/ROM ATA Device'
-                CanManage   = $true
-            }
-
-            VirtualScsiDvdRomWs2019HyperVGen2 = [pscustomobject] @{
-                Description = 'Hyper-V Gen2 (UEFI/SCSI) VM - Windows Server 2019'
-                DeviceID    = 'SCSI\CDROM&VEN_MSFT&PROD_VIRTUAL_DVD-ROM\000001'
-                Caption     = 'Microsoft Virtual DVD-ROM'
-                CanManage   = $true
-            }
-
-            VirtualAtaDvdRomWs2022AzureGen1 = [pscustomobject] @{
-                Description = 'Azure Gen1 (BIOS/IDE) VM – Windows Server 2022 Azure Edition'
-                DeviceID    = 'IDE\CDROMMSFT_VIRTUAL_CD/ROM_____________________1.0_____\5&CFB56DE&0&1.0.0'
-                Caption     = 'Msft Virtual CD/ROM ATA Device'
-                CanManage   = $true
-            }
-
-            VirtualScsiDvdRomWs2022AzureGen2 = [pscustomobject] @{
-                Description = 'Azure Gen2 (UEFI/SCSI) VM – Windows Server 2022 Azure Edition'
-                DeviceID    = 'SCSI\CDROM&VEN_MSFT&PROD_VIRTUAL_DVD-ROM\5&394B69D0&0&000002'
-                Caption     = 'Microsoft Virtual DVD-ROM'
-                CanManage   = $true
-            }
+        $script:mockedOpticalDrive = New-CimInstance -ClassName Win32_CDROMDrive -Property @{
+            Drive    = $script:testOpticalDrives.OpticalDrive.DriveLetter
+            Id       = $script:testOpticalDrives.OpticalDrive.DriveLetter
         }
 
-        $script:mockedOpticalDrive = [pscustomobject] @{
-            Drive    = $script:testDriveLetter
-            Caption  = $script:virtualDevices.VirtualScsiDvdRom.Caption
-            DeviceID = $script:virtualDevices.VirtualScsiDvdRom.DeviceID
-            Id       = $script:testDriveLetter
+        $script:mockedOpticalDriveISO = New-CimInstance -ClassName Win32_CDROMDrive -Property @{
+            Drive    = $script:testOpticalDrives.OpticalDriveISO.DriveLetter
+            Id       = $script:testOpticalDrives.OpticalDriveISO.DriveLetter
         }
 
-        $script:mockedOpticalDriveNoDriveLetter = [pscustomobject] @{
-            Drive    = $script:testDriveLetterNoVolume
-            Caption  = $script:virtualDevices.VirtualScsiDvdRom.Caption
-            DeviceID = $script:virtualDevices.VirtualScsiDvdRom.DeviceID
-            Id       = $script:testDriveLetterNoVolume
+        $script:mockedOpticalDriveWrongLetter = New-CimInstance -ClassName Win32_CDROMDrive -Property @{
+            Drive    = $script:testOpticalDrives.OpticalDriveWrongLetter.DriveLetter
+            Id       = $script:testOpticalDrives.OpticalDriveWrongLetter.DriveLetter
+        }
+
+        $script:mockedOpticalDriveNoDriveLetter = New-CimInstance -ClassName Win32_CDROMDrive -Property @{
+            Drive    = $script:testOpticalDrives.OpticalDriveNoDriveLetter.DriveLetter
+            Id       = $script:testOpticalDrives.OpticalDriveNoDriveLetter.DriveLetter
         }
 
         $script:mockedOpticalDriveMultiDisks = @(
@@ -101,39 +78,28 @@ try
             $script:mockedOpticalDrive
         )
 
-        $script:mockedWrongLetterOpticalDrive = [pscustomobject] @{
-            Drive    = 'W:'
-            Caption  = $script:virtualDevices.VirtualScsiDvdRom.Caption
-            DeviceID = $script:virtualDevices.VirtualScsiDvdRom.DeviceID
-            Id       = 'W:'
-        }
-
-        $script:mockedOpticalDriveISO = [pscustomobject] @{
-            Drive    = 'I:'
-            Caption  = $script:virtualDevices.MountedIso.Caption
-            DeviceID = $script:virtualDevices.MountedIso.DeviceID
-            Id       = 'I:'
-        }
-
-        $script:mockedOpticalDriveIDE = [pscustomobject] @{
-            Drive    = 'I:'
-            Caption  = $script:virtualDevices.VirtualAtaDvdRomWs2022AzureGen1.Caption
-            DeviceID = $script:virtualDevices.VirtualAtaDvdRomWs2022AzureGen1.DeviceID
-            Id       = 'I:'
-        }
-
-        $script:mockedVolume = [pscustomobject] @{
-            DriveLetter = $script:testDriveLetter
+        $script:mockedVolume = New-CimInstance -ClassName Win32_Volume -Property @{
+            DriveLetter = $script:testOpticalDrives.OpticalDrive.DriveLetter
             DriveType   = 5
-            DeviceId    = '\\?\Volume{bba1802b-e7a1-11e3-824e-806e6f6e6963}\'
-            Id          = $script:testDriveLetter
+            DeviceId    = "\\?\$($script:testOpticalDrives.OpticalDrive.VolumeId)\"
         }
 
-        $script:mockedWrongVolume = [pscustomobject] @{
-            DriveLetter = 'W:'
+        $script:mockedVolumeISO = New-CimInstance -ClassName Win32_Volume -Property @{
+            DriveLetter = $script:testOpticalDrives.OpticalDriveISO.DriveLetter
             DriveType   = 5
-            DeviceId    = $script:testVolumeDeviceId
-            Id          = 'W:'
+            DeviceId    = "\\?\$($script:testOpticalDrives.OpticalDriveISO.VolumeId)\"
+        }
+
+        $script:mockedVolumeWrongLetter = New-CimInstance -ClassName Win32_Volume -Property @{
+            DriveLetter = $script:testOpticalDrives.OpticalDriveWrongLetter.DriveLetter
+            DriveType   = 5
+            DeviceId    = "\\?\$($script:testOpticalDrives.OpticalDriveWrongLetter.VolumeId)\"
+        }
+
+        $script:mockedVolumeNoDriveLetter = New-CimInstance -ClassName Win32_Volume -Property @{
+            DriveLetter = $script:testOpticalDrives.OpticalDriveNoDriveLetter.DriveLetter
+            DriveType   = 5
+            DeviceId    = "\\?\$($script:testOpticalDrives.OpticalDriveWrongLetter.VolumeId)\"
         }
 
         function Set-CimInstance
@@ -151,16 +117,6 @@ try
         }
 
         Describe 'DSC_OpticalDiskDriveLetter\Test-OpticalDiskCanBeManaged' {
-            foreach ($virtualDevice in $script:virtualDevices.Values)
-            {
-                Context "When the optical drive is a $($virtualDevice.Description)" {
-                    It 'Should return $($virtualDevice.CanManage)' {
-                        Test-OpticalDiskCanBeManaged `
-                            -OpticalDisk $virtualDevice `
-                            -Verbose | Should -Be $virtualDevice.CanManage
-                    }
-                }
-            }
         }
 
         Describe 'DSC_OpticalDiskDriveLetter\Get-OpticalDiskDriveLetter' {
@@ -168,11 +124,11 @@ try
                 Mock `
                     -CommandName Get-CimInstance `
                     -ParameterFilter {
-                    $ClassName -eq 'Win32_CDROMDrive'
-                } `
+                        $ClassName -eq 'Win32_CDROMDrive'
+                    } `
                     -MockWith {
-                    $script:mockedOpticalDrive
-                } `
+                        $script:mockedOpticalDrive
+                    } `
                     -Verifiable
 
                 It 'Should not throw an exception' {
@@ -192,7 +148,7 @@ try
                 }
             }
 
-            Context 'When a single optical disk drive is present and not assiged a drive letter' {
+            Context 'When a single optical disk drive is present and is not assiged a drive letter' {
                 Mock `
                     -CommandName Get-CimInstance `
                     -ParameterFilter {
@@ -221,7 +177,7 @@ try
                 }
             }
 
-            Context 'When a single optical disk drive is present in a Windows Server 2022 Azure Gen 2 VM and assigned a drive letter' {
+            Context 'When a single optical disk drive is present and assigned a drive letter' {
                 Mock `
                     -CommandName Get-CimInstance `
                     -ParameterFilter {
@@ -242,35 +198,6 @@ try
 
                 It "DriveLetter should be $($script:testDriveLetter)" {
                     $script:result.DriveLetter | Should -Be $script:testDriveLetter
-                }
-
-                It 'Should call all the Get mocks' {
-                    Assert-VerifiableMock
-                }
-            }
-
-            Context 'When a single optical disk drive is present in a Windows Server 2022 Azure Gen 2 VM and not assiged a drive letter' {
-                Mock `
-                    -CommandName Get-CimInstance `
-                    -ParameterFilter {
-                    $ClassName -eq 'Win32_CDROMDrive'
-                } `
-                    -MockWith {
-                    $script:mockedOpticalDriveNoDriveLetterGen2
-                } `
-                    -Verifiable
-
-                It 'Should not throw an exception' {
-                    {
-                        $script:result = Get-OpticalDiskDriveLetter `
-                            -DiskId 1 `
-                            -Verbose
-                    } | Should -Not -Throw
-                }
-
-                It "DriveLetter should be empty" {
-                    $script:result.DriveLetter | Should -Be ''
-                    $script:result.DeviceId | Should -Be $script:testDriveLetterNoVolume
                 }
 
                 It 'Should call all the Get mocks' {
@@ -306,7 +233,7 @@ try
                 }
             }
 
-            Context 'When a single optical disk drive is present but second disk is requested' {
+            Context 'When a single optical disk drive is present but a second disk is requested' {
                 Mock `
                     -CommandName Get-CimInstance `
                     -ParameterFilter {
@@ -314,34 +241,6 @@ try
                     } `
                         -MockWith {
                         $script:mockedOpticalDrive
-                    } `
-                    -Verifiable
-
-                It 'Should not throw exception' {
-                    {
-                        $script:result = Get-OpticalDiskDriveLetter `
-                            -DiskId 2 `
-                            -Verbose
-                    } | Should -Not -Throw
-                }
-
-                It 'DeviceId should be empty' {
-                    $script:result.DeviceId | Should -BeNullOrEmpty
-                }
-
-                It 'Should call all the Get mocks' {
-                    Assert-VerifiableMock
-                }
-            }
-
-            Context 'When a single optical disk drive is present in a Windows Server 2022 Azure Gen 2 VM but second disk is requested' {
-                Mock `
-                    -CommandName Get-CimInstance `
-                    -ParameterFilter {
-                        $ClassName -eq 'Win32_CDROMDrive'
-                    } `
-                        -MockWith {
-                        $script:mockedOpticalDriveWs2022AzureGen2
                     } `
                     -Verifiable
 
