@@ -17,8 +17,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - OpticalDiskDriveLetter:
-  - Fix detection of virtual optical drives on Windows Server 2022 21H2
-    running in Azure - Fixes [Issue #285](https://github.com/dsccommunity/StorageDsc/issues/285)
+  - Fix detection of virtual optical drives by changing logic to detect how
+    a mounted ISO is detected. This resolves issues with using the resource
+    in Azure Gen2 VMs with Windows Server 2022 Azure Edition - Fixes [Issue #285](https://github.com/dsccommunity/StorageDsc/issues/285)
 
 ## [5.1.0] - 2023-02-22
 
