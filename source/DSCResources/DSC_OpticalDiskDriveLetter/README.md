@@ -24,13 +24,50 @@ drive ordinal number may be affected in these situations.
 
 ## Detection of Optical Disk Drives
 
-This resource is not intended to be used to manage _temporary_ optical disk
-drives that are created when mounting ISOs on Windows Server 2012 and newer.
-Mounted ISO drives should be managed by the `DSC_MountImage` resource.
+This resource is intended to manage _permanent_ optical disk drives that are
+either physically present in the system or are presented to the system by
+hypervisors or other virtualization platforms. It is not intended to be used
+to manage _temporary_ optical disk drives that are created when mounting ISOs
+on Windows Server 2012 and newer. Mounted ISO drives should be managed by the
+`DSC_MountImage` resource.
 
-However, to detect whether a drive is a mounted ISO, the resource uses the
-`DeviceID` and the `Caption` of the CIM Instance representing the drive.
-This is not a 100% reliable method, but it is currently the best method available.
+To detect whether a drive is a mounted ISO the following logic is used.
+For a CIM instance of a `cimv2:Win32_CDROMDrive` class representing a
+drive:
+
+1. Get the Drive letter assigned to the drive in the `cimv2:Win32_CDROMDrive`
+  instance using:
+
+  ```powershell
+  $driveLetter = ($cimInstance.Drive - replace ":$")
+  ```
+
+1. If the drive letter is set, query the volume information for the device
+   using drive letter and get the device path using:
+
+  ```powershell
+  $devicePath = (Get-Volume -DriveLetter $driveLetter).Path -replace "\\$"
+  ```
+
+1. Look up the disk image using the device path with:
+
+  ```powershell
+  Get-DiskImage -DevicePath $devicePath
+  ```
+
+  If no error occurs then the device is a mounted ISO and should not be
+  used with this resource. If a "The specified disk is not a virtual
+  disk." error occurs then it is not an ISO and can be managed by this
+  resource.
+
+### Old Detection Method
+
+In older versions (prior to v6.0.0) of the resource, the `DSC_OpticalDiskDriveLetter`
+resource used the `DeviceID` and the `Caption` of the CIM Instance representing
+the drive. This was not a 100% reliable method, and in recent versions of Windows
+Server, it was found that the `DeviceID` and `Caption` of the CIM Instance
+representing the drive were not unique enough to determine if the drive was a
+mounted ISO or not.
 
 The following is a table of sample captions and device IDs for some common
 optical drive configurations. The items in bold are the strings used to
@@ -38,7 +75,7 @@ determine if the drive is a mounted ISO.
 
 | Type | Caption | DeviceID | Manage using |
 | ---- | ------- | -------- | ----------- |
-| Mounted ISO | **Microsoft Virtual DVD-ROM** | SCSI\CDROM&VEN_MSFT&PROD_VIRTUAL_DVD-ROM\\**2&1F4ADFFE&0&000004** | `DSC_MountImage`* |
+| Mounted ISO in Windows Server 2019 | Microsoft Virtual DVD-ROM | SCSI\CDROM&VEN_MSFT&PROD_VIRTUAL_DVD-ROM\2&1F4ADFFE&0&000004 | `DSC_MountImage`* |
 | Physical device | MATSHITA BD-MLT UJ260AF | SCSI\CDROM&VEN_MATSHITA&PROD_BD-MLT_UJ260AF\4&23A5A6AC&0&000200 | `DSC_OpticalDiskDriveLetter` |
 | Hyper-V Gen1 (BIOS/IDE) VM - Windows Server 2019 | Msft Virtual CD/ROM ATA Device | IDE\CDROMMSFT_VIRTUAL_CD/ROM_____________________1.0_____\5&CFB56DE&0&1.0.0 | `DSC_OpticalDiskDriveLetter` |
 | Hyper-V Gen2 (UEFI/SCSI) VM - Windows Server 2019 | Microsoft Virtual DVD-ROM | SCSI\CDROM&VEN_MSFT&PROD_VIRTUAL_DVD-ROM\000001 | `DSC_OpticalDiskDriveLetter` |
@@ -51,13 +88,3 @@ determine if the drive is a mounted ISO.
 
 This is not a complete list, as some other virtual devices from other vendors
 might not be available for testing.
-
-The resource will use the following logic when determining if a drive is
-a mounted ISO and therefore should **not** be mnanaged by this resource:
-
-- If the `Caption` is 'Microsoft Virtual DVD-ROM'
-- And the length of the string after the final backslash in the `DeviceID`
-  is greater than 6 characters and less than 20 characters.
-
-Note: This is not a 100% reliable method and improvements to this detection
-method are welcome.
