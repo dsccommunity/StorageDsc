@@ -26,7 +26,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Azure DevOps Build Pipeline:
   - Tests 'Unit (Windows Server 2022)' corrected to execute on Windows Server
     2022 node instead of Windows Server 2019.
-  - 'Package Module' job runs on 'Ubuntu-latest' hosted agent.
+  - 'Package Module' job runs on 'windows-latest' hosted agent to resolve
+    'Unable to load shared library 'libmi' or one of its dependencies.' error.
 
 ## [5.1.0] - 2023-02-22
 
