@@ -82,6 +82,17 @@ try
             } -ClientOnly
         }
 
+        $script:mockGetDiskImage = [PSCustomObject] @{
+            ManageableVirtualDrive = {
+                # Throw an Microsoft.Management.Infrastructure.CimException with Message set to 'The specified disk is not a virtual disk.'
+                throw [Microsoft.Management.Infrastructure.CimException]::new($localizedData.ErrorDiskIsNotAVirtualDisk)
+            }
+            NotManageableMountedISO = {
+                # This value doesn't matter as it is not used in the function
+                $true
+            }
+        }
+
         $script:mockedOpticalDriveNone = $null
 
         $script:mockedOpticalDriveMultiDisks = @(
@@ -121,6 +132,7 @@ try
                     -ParameterFilter {
                         $DevicePath -eq "\\?\$($script:testOpticalDrives.Default.VolumeId)"
                     } `
+                    -MockWith $script:mockGetDiskImage.NotManageableMountedISO `
                     -Verifiable
 
                 It 'Should not throw an exception' {
@@ -146,6 +158,7 @@ try
                     -ParameterFilter {
                         $DevicePath -eq "\\?\$($script:testOpticalDrives.NoDriveLetter.VolumeId)"
                     } `
+                    -MockWith $script:mockGetDiskImage.NotManageableMountedISO `
                     -Verifiable
 
                 It 'Should not throw an exception' {
@@ -182,10 +195,7 @@ try
                     -ParameterFilter {
                         $DevicePath -eq "\\?\$($script:testOpticalDrives.Default.VolumeId)"
                     } `
-                    -MockWith {
-                        # Throw an Microsoft.Management.Infrastructure.CimException with Exception.MessageId set 'HRESULT 0xc03a0015'
-                        throw [Microsoft.Management.Infrastructure.CimException]::new('The specified disk is not a virtual disk.')
-                    } `
+                    -MockWith $script:mockGetDiskImage.ManageableVirtualDrive `
                     -Verifiable
 
                 It 'Should not throw an exception' {
@@ -211,10 +221,7 @@ try
                     -ParameterFilter {
                         $DevicePath -eq "\\?\$($script:testOpticalDrives.NoDriveLetter.VolumeId)"
                     } `
-                    -MockWith {
-                        # Throw an Microsoft.Management.Infrastructure.CimException with Exception.MessageId set 'HRESULT 0xc03a0015'
-                        throw [Microsoft.Management.Infrastructure.CimException]::new('The specified disk is not a virtual disk.')
-                    } `
+                    -MockWith $script:mockGetDiskImage.ManageableVirtualDrive `
                     -Verifiable
 
                 It 'Should not throw an exception' {
