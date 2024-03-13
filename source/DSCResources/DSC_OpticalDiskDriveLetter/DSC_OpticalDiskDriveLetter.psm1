@@ -79,14 +79,15 @@ function Test-OpticalDiskCanBeManaged
     try
     {
         <#
-            If the device is not a mounted ISO then this will throw an
-            exception with the message "The specified disk is not a virtual disk."
+            If the device is not a mounted ISO then the Get-DiskImage will throw an
+            Microsoft.Management.Infrastructure.CimException exception with the
+            message "The specified disk is not a virtual disk."
         #>
         Get-DiskImage -DevicePath $devicePath -ErrorAction Stop | Out-Null
     }
     catch [Microsoft.Management.Infrastructure.CimException]
     {
-        if ($_.Exception.Message -eq 'The specified disk is not a virtual disk.')
+        if ($_.Exception.Message -eq $script:localizedData.ErrorDiskIsNotAVirtualDisk)
         {
             # This is not a mounted ISO, so it can managed
             $diskCanBeManaged = $true
@@ -103,7 +104,7 @@ function Test-OpticalDiskCanBeManaged
 
     Write-Verbose -Message ( @(
         "$($MyInvocation.MyCommand): "
-        $($script:localizedData.OpticalDiskCanBeManagedStatus -f $devicePath, @('can', 'can not')[0, 1][$diskCanBeManaged])
+        $($script:localizedData.OpticalDiskCanBeManagedStatus -f $devicePath, @('can not', 'can')[0, 1][$diskCanBeManaged])
     ) -join '')
 
     return $diskCanBeManaged
