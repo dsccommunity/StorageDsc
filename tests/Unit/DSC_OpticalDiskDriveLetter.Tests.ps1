@@ -38,11 +38,6 @@ try
                 DriveLetterNoColon = 'X'
                 VolumeId = 'Volume{47b90a5d-f340-11e7-80fd-806e6f6e6963}'
             }
-            ISO = [PSCustomObject] @{
-                DriveLetter = 'I:'
-                DriveLetterNoColon = 'I'
-                VolumeId = 'Volume{0365fab8-a4e1-4f87-b1ef-b3c32515138b}'
-            }
             WrongLetter = [PSCustomObject] @{
                 DriveLetter = 'W:'
                 DriveLetterNoColon = 'W'
@@ -59,10 +54,6 @@ try
                 Drive    = $script:testOpticalDrives.Default.DriveLetter
                 Id       = $script:testOpticalDrives.Default.DriveLetter
             } -ClientOnly
-            ISO = New-CimInstance -ClassName Win32_CDROMDrive -Property @{
-                Drive    = $script:testOpticalDrives.ISO.DriveLetter
-                Id       = $script:testOpticalDrives.ISO.DriveLetter
-            } -ClientOnly
             WrongLetter = New-CimInstance -ClassName Win32_CDROMDrive -Property @{
                 Drive    = $script:testOpticalDrives.WrongLetter.DriveLetter
                 Id       = $script:testOpticalDrives.WrongLetter.DriveLetter
@@ -78,11 +69,6 @@ try
                 Name = $script:testOpticalDrives.Default.DriveLetter
                 DriveType   = 5
                 DeviceId    = "\\?\$($script:testOpticalDrives.Default.VolumeId)\"
-            } -ClientOnly
-            ISO = New-CimInstance -ClassName Win32_Volume -Property @{
-                Name = $script:testOpticalDrives.ISO.DriveLetter
-                DriveType   = 5
-                DeviceId    = "\\?\$($script:testOpticalDrives.ISO.VolumeId)\"
             } -ClientOnly
             WrongLetter = New-CimInstance -ClassName Win32_Volume -Property @{
                 Name = $script:testOpticalDrives.WrongLetter.DriveLetter
@@ -123,24 +109,24 @@ try
                     -CommandName Get-CimInstance `
                     -ParameterFilter {
                         $ClassName -eq 'Win32_Volume' -and `
-                        $Filter -eq "DriveLetter = '$($script:testOpticalDrives.ISO.DriveLetterNoColon)'"
+                        $Filter -eq "DriveLetter = '$($script:testOpticalDrives.Default.DriveLetterNoColon)'"
                     } `
                     -MockWith {
-                        $script:mockedVolume.ISO
+                        $script:mockedVolume.Default
                     } `
                     -Verifiable
 
                 Mock `
                     -CommandName Get-DiskImage `
                     -ParameterFilter {
-                        $DevicePath -eq "\\?\$($script:testOpticalDrives.ISO.VolumeId)"
+                        $DevicePath -eq "\\?\$($script:testOpticalDrives.Default.VolumeId)"
                     } `
                     -Verifiable
 
                 It 'Should not throw an exception' {
                     {
                         $script:result = Test-OpticalDiskCanBeManaged `
-                            -OpticalDisk $script:mockedOpticalDrives.ISO `
+                            -OpticalDisk $script:mockedOpticalDrives.Default `
                             -Verbose
                     } | Should -Not -Throw
                 }
@@ -184,17 +170,17 @@ try
                     -CommandName Get-CimInstance `
                     -ParameterFilter {
                         $ClassName -eq 'Win32_Volume' -and `
-                        $Filter -eq "DriveLetter = '$($script:testOpticalDrives.ISO.DriveLetterNoColon)'"
+                        $Filter -eq "DriveLetter = '$($script:testOpticalDrives.Default.DriveLetterNoColon)'"
                     } `
                     -MockWith {
-                        $script:mockedVolume.ISO
+                        $script:mockedVolume.Default
                     } `
                     -Verifiable
 
                 Mock `
                     -CommandName Get-DiskImage `
                     -ParameterFilter {
-                        $DevicePath -eq "\\?\$($script:testOpticalDrives.ISO.VolumeId)"
+                        $DevicePath -eq "\\?\$($script:testOpticalDrives.Default.VolumeId)"
                     } `
                     -MockWith {
                         # Throw an Microsoft.Management.Infrastructure.CimException with Exception.MessageId set 'HRESULT 0xc03a0015'
@@ -205,7 +191,36 @@ try
                 It 'Should not throw an exception' {
                     {
                         $script:result = Test-OpticalDiskCanBeManaged `
-                            -OpticalDisk $script:mockedOpticalDrives.ISO `
+                            -OpticalDisk $script:mockedOpticalDrives.Default `
+                            -Verbose
+                    } | Should -Not -Throw
+                }
+
+                It 'Should return $true' {
+                    $script:result | Should -BeTrue
+                }
+
+                It 'Should call all the Get mocks' {
+                    Assert-VerifiableMock
+                }
+            }
+
+            Context 'When the optical disk drive passed is a virtual optical drive (not a mounted ISO) without a drive letter' {
+                Mock `
+                    -CommandName Get-DiskImage `
+                    -ParameterFilter {
+                        $DevicePath -eq "\\?\$($script:testOpticalDrives.NoDriveLetter.VolumeId)"
+                    } `
+                    -MockWith {
+                        # Throw an Microsoft.Management.Infrastructure.CimException with Exception.MessageId set 'HRESULT 0xc03a0015'
+                        throw [Microsoft.Management.Infrastructure.CimException]::new('The specified disk is not a virtual disk.')
+                    } `
+                    -Verifiable
+
+                It 'Should not throw an exception' {
+                    {
+                        $script:result = Test-OpticalDiskCanBeManaged `
+                            -OpticalDisk $script:mockedOpticalDrives.NoDriveLetter `
                             -Verbose
                     } | Should -Not -Throw
                 }
