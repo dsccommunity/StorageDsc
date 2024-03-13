@@ -32,75 +32,76 @@ Invoke-TestSetup
 try
 {
     InModuleScope $script:dscResourceName {
-        $testOpticalDrives = [PSCustomObject] @{
-            OpticalDrive = [PSCustomObject] @{
+        $script:testOpticalDrives = [PSCustomObject] @{
+            Default = [PSCustomObject] @{
                 DriveLetter = 'X:'
+                DriveLetterNoColon = 'X'
                 VolumeId = 'Volume{47b90a5d-f340-11e7-80fd-806e6f6e6963}'
             }
-            OpticalDriveISO = [PSCustomObject] @{
+            ISO = [PSCustomObject] @{
                 DriveLetter = 'I:'
+                DriveLetterNoColon = 'I'
                 VolumeId = 'Volume{0365fab8-a4e1-4f87-b1ef-b3c32515138b}'
             }
-            OpticalDriveWrongLetter = [PSCustomObject] @{
+            WrongLetter = [PSCustomObject] @{
                 DriveLetter = 'W:'
+                DriveLetterNoColon = 'W'
                 VolumeId = 'Volume{18508a20-5827-4bfa-96b3-0aeb5a2797c2}'
             }
-            OpticalDriveNoDriveLetter = [PSCustomObject] @{
+            NoDriveLetter = [PSCustomObject] @{
                 DriveLetter = 'Volume{8c58ce81-0f58-4bd2-a575-0eb66a993ad7}'
                 VolumeId = 'Volume{8c58ce81-0f58-4bd2-a575-0eb66a993ad7}'
             }
         }
 
-        $script:mockedNoOpticalDrive = $null
-
-        $script:mockedOpticalDrive = New-CimInstance -ClassName Win32_CDROMDrive -Property @{
-            Drive    = $script:testOpticalDrives.OpticalDrive.DriveLetter
-            Id       = $script:testOpticalDrives.OpticalDrive.DriveLetter
+        $script:mockedOpticalDrives = [PSCustomObject] @{
+            Default = New-CimInstance -ClassName Win32_CDROMDrive -Property @{
+                Drive    = $script:testOpticalDrives.Default.DriveLetter
+                Id       = $script:testOpticalDrives.Default.DriveLetter
+            } -ClientOnly
+            ISO = New-CimInstance -ClassName Win32_CDROMDrive -Property @{
+                Drive    = $script:testOpticalDrives.ISO.DriveLetter
+                Id       = $script:testOpticalDrives.ISO.DriveLetter
+            } -ClientOnly
+            WrongLetter = New-CimInstance -ClassName Win32_CDROMDrive -Property @{
+                Drive    = $script:testOpticalDrives.WrongLetter.DriveLetter
+                Id       = $script:testOpticalDrives.WrongLetter.DriveLetter
+            } -ClientOnly
+            NoDriveLetter = New-CimInstance -ClassName Win32_CDROMDrive -Property @{
+                Drive    = $script:testOpticalDrives.NoDriveLetter.DriveLetter
+                Id       = $script:testOpticalDrives.NoDriveLetter.DriveLetter
+            } -ClientOnly
         }
 
-        $script:mockedOpticalDriveISO = New-CimInstance -ClassName Win32_CDROMDrive -Property @{
-            Drive    = $script:testOpticalDrives.OpticalDriveISO.DriveLetter
-            Id       = $script:testOpticalDrives.OpticalDriveISO.DriveLetter
+        $script:mockedVolume = [PSCustomObject] @{
+            Default = New-CimInstance -ClassName Win32_Volume -Property @{
+                Name = $script:testOpticalDrives.Default.DriveLetter
+                DriveType   = 5
+                DeviceId    = "\\?\$($script:testOpticalDrives.Default.VolumeId)\"
+            } -ClientOnly
+            ISO = New-CimInstance -ClassName Win32_Volume -Property @{
+                Name = $script:testOpticalDrives.ISO.DriveLetter
+                DriveType   = 5
+                DeviceId    = "\\?\$($script:testOpticalDrives.ISO.VolumeId)\"
+            } -ClientOnly
+            WrongLetter = New-CimInstance -ClassName Win32_Volume -Property @{
+                Name = $script:testOpticalDrives.WrongLetter.DriveLetter
+                DriveType   = 5
+                DeviceId    = "\\?\$($script:testOpticalDrives.WrongLetter.VolumeId)\"
+            } -ClientOnly
+            NoDriveLetter = New-CimInstance -ClassName Win32_Volume -Property @{
+                Name = $script:testOpticalDrives.NoDriveLetter.DriveLetter
+                DriveType   = 5
+                DeviceId    = "\\?\$($script:testOpticalDrives.NoDriveLetter.VolumeId)\"
+            } -ClientOnly
         }
 
-        $script:mockedOpticalDriveWrongLetter = New-CimInstance -ClassName Win32_CDROMDrive -Property @{
-            Drive    = $script:testOpticalDrives.OpticalDriveWrongLetter.DriveLetter
-            Id       = $script:testOpticalDrives.OpticalDriveWrongLetter.DriveLetter
-        }
-
-        $script:mockedOpticalDriveNoDriveLetter = New-CimInstance -ClassName Win32_CDROMDrive -Property @{
-            Drive    = $script:testOpticalDrives.OpticalDriveNoDriveLetter.DriveLetter
-            Id       = $script:testOpticalDrives.OpticalDriveNoDriveLetter.DriveLetter
-        }
+        $script:mockedOpticalDriveNone = $null
 
         $script:mockedOpticalDriveMultiDisks = @(
-            $script:mockedOpticalDriveNoDriveLetter
-            $script:mockedOpticalDrive
+            $script:mockedOpticalDrives.NoDriveLetter
+            $script:mockedOpticalDrives.Default
         )
-
-        $script:mockedVolume = New-CimInstance -ClassName Win32_Volume -Property @{
-            DriveLetter = $script:testOpticalDrives.OpticalDrive.DriveLetter
-            DriveType   = 5
-            DeviceId    = "\\?\$($script:testOpticalDrives.OpticalDrive.VolumeId)\"
-        }
-
-        $script:mockedVolumeISO = New-CimInstance -ClassName Win32_Volume -Property @{
-            DriveLetter = $script:testOpticalDrives.OpticalDriveISO.DriveLetter
-            DriveType   = 5
-            DeviceId    = "\\?\$($script:testOpticalDrives.OpticalDriveISO.VolumeId)\"
-        }
-
-        $script:mockedVolumeWrongLetter = New-CimInstance -ClassName Win32_Volume -Property @{
-            DriveLetter = $script:testOpticalDrives.OpticalDriveWrongLetter.DriveLetter
-            DriveType   = 5
-            DeviceId    = "\\?\$($script:testOpticalDrives.OpticalDriveWrongLetter.VolumeId)\"
-        }
-
-        $script:mockedVolumeNoDriveLetter = New-CimInstance -ClassName Win32_Volume -Property @{
-            DriveLetter = $script:testOpticalDrives.OpticalDriveNoDriveLetter.DriveLetter
-            DriveType   = 5
-            DeviceId    = "\\?\$($script:testOpticalDrives.OpticalDriveWrongLetter.VolumeId)\"
-        }
 
         function Set-CimInstance
         {
@@ -117,6 +118,41 @@ try
         }
 
         Describe 'DSC_OpticalDiskDriveLetter\Test-OpticalDiskCanBeManaged' {
+            Context 'When the optical disk drive passed is a mounted ISO with a drive letter' {
+                Mock `
+                    -CommandName Get-CimInstance `
+                    -ParameterFilter {
+                        $ClassName -eq 'Win32_Volume' -and `
+                        $Filter -eq "DriveLetter = '$($script:testOpticalDrives.ISO.DriveLetterNoColon)'"
+                    } `
+                    -MockWith {
+                        $script:mockedVolume.ISO
+                    } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-DiskImage `
+                    -ParameterFilter {
+                        $DevicePath -eq "\\?\$($script:testOpticalDrives.ISO.VolumeId)"
+                    } `
+                    -Verifiable
+
+                It 'Should not throw an exception' {
+                    {
+                        $script:result = Test-OpticalDiskCanBeManaged `
+                            -OpticalDisk $script:mockedOpticalDrives.ISO `
+                            -Verbose
+                    } | Should -Not -Throw
+                }
+
+                It 'Should return $false' {
+                    $script:result | Should -BeFalse
+                }
+
+                It 'Should call all the Get mocks' {
+                    Assert-VerifiableMock
+                }
+            }
         }
 
         Describe 'DSC_OpticalDiskDriveLetter\Get-OpticalDiskDriveLetter' {
@@ -127,7 +163,17 @@ try
                         $ClassName -eq 'Win32_CDROMDrive'
                     } `
                     -MockWith {
-                        $script:mockedOpticalDrive
+                        $script:mockedOpticalDrives.Default
+                    } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-DiskImage `
+                    -ParameterFilter {
+                        $DevicePath -eq "\\?\$($script:testOpticalDrives.Default.VolumeId)"
+                    } `
+                    -MockWith {
+                        $script:mockedOpticalDrives.Default
                     } `
                     -Verifiable
 
@@ -139,8 +185,8 @@ try
                     } | Should -Not -Throw
                 }
 
-                It "DriveLetter should be $($script:testDriveLetter)" {
-                    $script:result.DriveLetter | Should -Be $script:testDriveLetter
+                It "DriveLetter should be $($script:testOpticalDrives.Default.DriveLetter)" {
+                    $script:result.DriveLetter | Should -Be $script:testOpticalDrives.Default.DriveLetter
                 }
 
                 It 'Should call all the Get mocks' {
@@ -296,7 +342,7 @@ try
                         $ClassName -eq 'Win32_CDROMDrive'
                     } `
                         -MockWith {
-                        $script:mockedNoOpticalDrive
+                        $script:mockedOpticalDriveNone
                     } `
                     -Verifiable
 
@@ -416,7 +462,7 @@ try
                         $ClassName -eq 'Win32_CDROMDrive'
                     } `
                         -MockWith {
-                        $script:mockedNoOpticalDrive
+                        $script:mockedOpticalDriveNone
                     } `
                     -Verifiable
 
@@ -598,7 +644,7 @@ try
                         $ClassName -eq 'Win32_CDROMDrive'
                     } `
                         -MockWith {
-                        $script:mockedNoOpticalDrive
+                        $script:mockedOpticalDriveNone
                     } `
                     -Verifiable
 
@@ -782,7 +828,7 @@ try
                         $ClassName -eq 'Win32_CDROMDrive'
                     } `
                     -MockWith {
-                        $script:mockedNoOpticalDrive
+                        $script:mockedOpticalDriveNone
                     } `
                     -Verifiable
 
@@ -811,7 +857,7 @@ try
                         $ClassName -eq 'Win32_CDROMDrive'
                     } `
                     -MockWith {
-                        $script:mockedNoOpticalDrive
+                        $script:mockedOpticalDriveNone
                     } `
                     -Verifiable
 

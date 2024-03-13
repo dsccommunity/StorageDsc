@@ -56,15 +56,20 @@ function Test-OpticalDiskCanBeManaged
     #>
     if ($OpticalDisk.Drive -match 'Volume{.*}')
     {
-        $devicePath = "\\?\$($OpticalDisk.Drive)\"
+        $devicePath = "\\?\$($OpticalDisk.Drive)"
     }
     else
     {
         $driveLetter = ($OpticalDisk.Drive -replace ":$")
         $devicePath = (Get-CimInstance `
             -ClassName Win32_Volume `
-            -Filter "DriveLetter = '$driveLetter'").Path -replace "\\$"
+            -Filter "DriveLetter = '$driveLetter'").DeviceId -replace "\\$"
     }
+
+    Write-Verbose -Message ( @(
+        "$($MyInvocation.MyCommand): "
+        $($script:localizedData.TestOpticalDiskCanBeManaged -f $devicePath)
+    ) -join '')
 
     try
     {
@@ -82,6 +87,11 @@ function Test-OpticalDiskCanBeManaged
             $diskCanBeManaged = $true
         }
     }
+
+    Write-Verbose -Message ( @(
+        "$($MyInvocation.MyCommand): "
+        $($script:localizedData.OpticalDiskCanBeManagedStatus -f $devicePath, @('can', 'can not')[0, 1][$diskCanBeManaged])
+    ) -join '')
 
     return $diskCanBeManaged
 }

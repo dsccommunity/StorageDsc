@@ -46,14 +46,16 @@ drive:
    using drive letter and get the device path using:
 
   ```powershell
-  $devicePath = (Get-Volume -DriveLetter $driveLetter).Path -replace "\\$"
+  $devicePath = (Get-CimInstance `
+      -ClassName Win32_Volume `
+      -Filter "DriveLetter = '$driveLetter'").DeviceId -replace "\\$"
   ```
 
 1. If the drive letter is not set, then just create the device path from the
    drive property using:
 
   ```powershell
-  $devicePath = "\\?\$($opticalDisk.Drive)\"
+  $devicePath = "\\?\$($opticalDisk.Drive)"
   ```
 
 1. Look up the disk image using the device path with:
