@@ -153,6 +153,71 @@ try
                     Assert-VerifiableMock
                 }
             }
+
+            Context 'When the optical disk drive passed is a mounted ISO without a drive letter' {
+                Mock `
+                    -CommandName Get-DiskImage `
+                    -ParameterFilter {
+                        $DevicePath -eq "\\?\$($script:testOpticalDrives.NoDriveLetter.VolumeId)"
+                    } `
+                    -Verifiable
+
+                It 'Should not throw an exception' {
+                    {
+                        $script:result = Test-OpticalDiskCanBeManaged `
+                            -OpticalDisk $script:mockedOpticalDrives.NoDriveLetter `
+                            -Verbose
+                    } | Should -Not -Throw
+                }
+
+                It 'Should return $false' {
+                    $script:result | Should -BeFalse
+                }
+
+                It 'Should call all the Get mocks' {
+                    Assert-VerifiableMock
+                }
+            }
+
+            Context 'When the optical disk drive passed is a virtual optical drive (not a mounted ISO) with a drive letter' {
+                Mock `
+                    -CommandName Get-CimInstance `
+                    -ParameterFilter {
+                        $ClassName -eq 'Win32_Volume' -and `
+                        $Filter -eq "DriveLetter = '$($script:testOpticalDrives.ISO.DriveLetterNoColon)'"
+                    } `
+                    -MockWith {
+                        $script:mockedVolume.ISO
+                    } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-DiskImage `
+                    -ParameterFilter {
+                        $DevicePath -eq "\\?\$($script:testOpticalDrives.ISO.VolumeId)"
+                    } `
+                    -MockWith {
+                        # Throw an Microsoft.Management.Infrastructure.CimException with Exception.MessageId set 'HRESULT 0xc03a0015'
+                        throw [Microsoft.Management.Infrastructure.CimException]::new('The specified disk is not a virtual disk.')
+                    } `
+                    -Verifiable
+
+                It 'Should not throw an exception' {
+                    {
+                        $script:result = Test-OpticalDiskCanBeManaged `
+                            -OpticalDisk $script:mockedOpticalDrives.ISO `
+                            -Verbose
+                    } | Should -Not -Throw
+                }
+
+                It 'Should return $true' {
+                    $script:result | Should -BeTrue
+                }
+
+                It 'Should call all the Get mocks' {
+                    Assert-VerifiableMock
+                }
+            }
         }
 
         Describe 'DSC_OpticalDiskDriveLetter\Get-OpticalDiskDriveLetter' {

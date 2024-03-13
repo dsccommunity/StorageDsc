@@ -57,6 +57,11 @@ function Test-OpticalDiskCanBeManaged
     if ($OpticalDisk.Drive -match 'Volume{.*}')
     {
         $devicePath = "\\?\$($OpticalDisk.Drive)"
+
+        Write-Verbose -Message ( @(
+            "$($MyInvocation.MyCommand): "
+            $($script:localizedData.TestOpticalDiskWithoutDriveLetterCanBeManaged -f $devicePath)
+        ) -join '')
     }
     else
     {
@@ -64,12 +69,12 @@ function Test-OpticalDiskCanBeManaged
         $devicePath = (Get-CimInstance `
             -ClassName Win32_Volume `
             -Filter "DriveLetter = '$driveLetter'").DeviceId -replace "\\$"
-    }
 
-    Write-Verbose -Message ( @(
-        "$($MyInvocation.MyCommand): "
-        $($script:localizedData.TestOpticalDiskCanBeManaged -f $devicePath)
-    ) -join '')
+        Write-Verbose -Message ( @(
+            "$($MyInvocation.MyCommand): "
+            $($script:localizedData.TestOpticalDiskWithDriveLetterCanBeManaged -f $devicePath, $driveLetter)
+        ) -join '')
+    }
 
     try
     {
@@ -81,11 +86,19 @@ function Test-OpticalDiskCanBeManaged
     }
     catch [Microsoft.Management.Infrastructure.CimException]
     {
-        if ($_.Exception.MessageId -eq 'HRESULT 0xc03a0015')
+        if ($_.Exception.Message -eq 'The specified disk is not a virtual disk.')
         {
             # This is not a mounted ISO, so it can managed
             $diskCanBeManaged = $true
         }
+        else
+        {
+            throw $_
+        }
+    }
+    catch
+    {
+        throw $_
     }
 
     Write-Verbose -Message ( @(
