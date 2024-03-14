@@ -21,14 +21,15 @@ Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath '..\TestHelpers\Co
 try
 {
     # Locate an optical disk in the system to use for testing
-    $opticalDisk = (Get-CimInstance -ClassName Win32_CDROMDrive)[0]
+    $opticalDisks = Get-CimInstance -ClassName Win32_CDROMDrive
 
-    if (-not $opticalDisk)
+    if (-not $opticalDisks)
     {
         Write-Verbose -Message "$($script:dscResourceName) integration tests cannot be run because there is no optical disk in the system." -Verbose
         return
     }
 
+    $opticalDisk = opticalDisks[0]
     $currentDriveLetter = $opticalDisk.Drive
     $volume = Get-CimInstance -ClassName Win32_Volume -Filter "DriveLetter = '$currentDriveLetter'"
 
