@@ -87,7 +87,7 @@ function Test-OpticalDiskCanBeManaged
     }
     catch [Microsoft.Management.Infrastructure.CimException]
     {
-        if ($_.Exception.Message -eq $script:localizedData.ErrorDiskIsNotAVirtualDisk)
+        if ($_.Exception.Message.TrimEnd() -eq $script:localizedData.ErrorDiskIsNotAVirtualDisk)
         {
             # This is not a mounted ISO, so it can managed
             $diskCanBeManaged = $true
