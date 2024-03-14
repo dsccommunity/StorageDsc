@@ -93,6 +93,10 @@ try
             }
         }
 
+        $script:getCimInstanceCdRomDrive_ParameterFilter = {
+            $ClassName -eq 'Win32_CDROMDrive'
+        }
+
         $script:mockedOpticalDriveNone = $null
 
         $script:mockedOpticalDriveMultiDisks = @(
@@ -147,7 +151,7 @@ try
                     $script:result | Should -BeFalse
                 }
 
-                It 'Should call all the Get mocks' {
+                It 'Should call all the verifiable mocks' {
                     Assert-VerifiableMock
                 }
             }
@@ -173,7 +177,7 @@ try
                     $script:result | Should -BeFalse
                 }
 
-                It 'Should call all the Get mocks' {
+                It 'Should call all the verifiable mocks' {
                     Assert-VerifiableMock
                 }
             }
@@ -210,7 +214,7 @@ try
                     $script:result | Should -BeTrue
                 }
 
-                It 'Should call all the Get mocks' {
+                It 'Should call all the verifiable mocks' {
                     Assert-VerifiableMock
                 }
             }
@@ -236,21 +240,30 @@ try
                     $script:result | Should -BeTrue
                 }
 
-                It 'Should call all the Get mocks' {
+                It 'Should call all the verifiable mocks' {
                     Assert-VerifiableMock
                 }
             }
         }
 
         Describe 'DSC_OpticalDiskDriveLetter\Get-OpticalDiskDriveLetter' {
-            Context 'When a single optical disk drive is present and assigned a drive letter' {
+            Context 'When a single manageable optical disk drive is present and assigned a drive letter' {
+                Mock `
+                    -CommandName Get-CimInstance `
+                    -ParameterFilter $script:getCimInstanceCdRomDrive_ParameterFilter `
+                    -MockWith {
+                        $script:mockedOpticalDrives.Default
+                    } `
+                    -Verifiable
+
                 Mock `
                     -CommandName Get-CimInstance `
                     -ParameterFilter {
-                        $ClassName -eq 'Win32_CDROMDrive'
+                        $ClassName -eq 'Win32_Volume' -and `
+                        $Filter -eq "DriveLetter = '$($script:testOpticalDrives.Default.DriveLetterNoColon)'"
                     } `
                     -MockWith {
-                        $script:mockedOpticalDrives.Default
+                        $script:mockedVolume.Default
                     } `
                     -Verifiable
 
@@ -259,9 +272,7 @@ try
                     -ParameterFilter {
                         $DevicePath -eq "\\?\$($script:testOpticalDrives.Default.VolumeId)"
                     } `
-                    -MockWith {
-                        $script:mockedOpticalDrives.Default
-                    } `
+                    -MockWith $script:mockGetDiskImage.ManageableVirtualDrive `
                     -Verifiable
 
                 It 'Should not throw an exception' {
@@ -276,20 +287,26 @@ try
                     $script:result.DriveLetter | Should -Be $script:testOpticalDrives.Default.DriveLetter
                 }
 
-                It 'Should call all the Get mocks' {
+                It 'Should call all the verifiable mocks' {
                     Assert-VerifiableMock
                 }
             }
 
-            Context 'When a single optical disk drive is present and is not assiged a drive letter' {
+            Context 'When a single manageable optical disk drive is present and is not assiged a drive letter' {
                 Mock `
                     -CommandName Get-CimInstance `
-                    -ParameterFilter {
-                    $ClassName -eq 'Win32_CDROMDrive'
-                } `
+                    -ParameterFilter $script:getCimInstanceCdRomDrive_ParameterFilter `
                     -MockWith {
-                    $script:mockedOpticalDriveNoDriveLetter
-                } `
+                        $script:mockedOpticalDrives.NoDriveLetter
+                    } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-DiskImage `
+                    -ParameterFilter {
+                        $DevicePath -eq "\\?\$($script:testOpticalDrives.NoDriveLetter.VolumeId)"
+                    } `
+                    -MockWith $script:mockGetDiskImage.ManageableVirtualDrive `
                     -Verifiable
 
                 It 'Should not throw an exception' {
@@ -301,52 +318,49 @@ try
                 }
 
                 It "DriveLetter should be empty" {
-                    $script:result.DriveLetter | Should -Be ''
-                    $script:result.DeviceId | Should -Be $script:testDriveLetterNoVolume
+                    $script:result.DriveLetter | Should -BeNullOrEmpty
+                    $script:result.DeviceId | Should -Be $script:testOpticalDrives.NoDriveLetter.VolumeId
                 }
 
-                It 'Should call all the Get mocks' {
+                It 'Should call all the verifiable mocks' {
                     Assert-VerifiableMock
                 }
             }
 
-            Context 'When a single optical disk drive is present and assigned a drive letter' {
+            Context 'When multiple manageable optical disk drives are present but only the second one is assigned a drive letter and the second disk is requested' {
                 Mock `
                     -CommandName Get-CimInstance `
-                    -ParameterFilter {
-                    $ClassName -eq 'Win32_CDROMDrive'
-                } `
+                    -ParameterFilter $script:getCimInstanceCdRomDrive_ParameterFilter `
                     -MockWith {
-                    $script:mockedOpticalDriveWs2022AzureGen2
-                } `
+                        $script:mockedOpticalDriveMultiDisks
+                    } `
                     -Verifiable
 
-                It 'Should not throw an exception' {
-                    {
-                        $script:result = Get-OpticalDiskDriveLetter `
-                            -DiskId 1 `
-                            -Verbose
-                    } | Should -Not -Throw
-                }
-
-                It "DriveLetter should be $($script:testDriveLetter)" {
-                    $script:result.DriveLetter | Should -Be $script:testDriveLetter
-                }
-
-                It 'Should call all the Get mocks' {
-                    Assert-VerifiableMock
-                }
-            }
-
-            Context 'When multiple optical disk drives are present and second one is assigned a drive letter' {
                 Mock `
                     -CommandName Get-CimInstance `
                     -ParameterFilter {
-                    $ClassName -eq 'Win32_CDROMDrive'
-                } `
+                        $ClassName -eq 'Win32_Volume' -and `
+                        $Filter -eq "DriveLetter = '$($script:testOpticalDrives.Default.DriveLetterNoColon)'"
+                    } `
                     -MockWith {
-                    $script:mockedOpticalDriveMultiDisks
-                } `
+                        $script:mockedVolume.Default
+                    } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-DiskImage `
+                    -ParameterFilter {
+                        $DevicePath -eq "\\?\$($script:testOpticalDrives.Default.VolumeId)"
+                    } `
+                    -MockWith $script:mockGetDiskImage.ManageableVirtualDrive `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-DiskImage `
+                    -ParameterFilter {
+                        $DevicePath -eq "\\?\$($script:testOpticalDrives.NoDriveLetter.VolumeId)"
+                    } `
+                    -MockWith $script:mockGetDiskImage.ManageableVirtualDrive `
                     -Verifiable
 
                 It 'Should not throw an exception' {
@@ -357,24 +371,41 @@ try
                     } | Should -Not -Throw
                 }
 
-                It "DriveLetter should be $($script:testDriveLetter)" {
-                    $script:result.DriveLetter | Should -Be $script:testDriveLetter
+                It "DriveLetter should be $($script:testOpticalDrives.Default.DriveLetter)" {
+                    $script:result.DriveLetter | Should -Be $script:testOpticalDrives.Default.DriveLetter
                 }
 
-                It 'Should call all the Get mocks' {
+                It 'Should call all the verifiable mocks' {
                     Assert-VerifiableMock
                 }
             }
 
-            Context 'When a single optical disk drive is present but a second disk is requested' {
+            Context 'When a single manageable optical disk drive is present but a second disk is requested' {
+                Mock `
+                    -CommandName Get-CimInstance `
+                    -ParameterFilter $script:getCimInstanceCdRomDrive_ParameterFilter `
+                    -MockWith {
+                        $script:mockedOpticalDrives.Default
+                    } `
+                    -Verifiable
+
                 Mock `
                     -CommandName Get-CimInstance `
                     -ParameterFilter {
-                        $ClassName -eq 'Win32_CDROMDrive'
+                        $ClassName -eq 'Win32_Volume' -and `
+                        $Filter -eq "DriveLetter = '$($script:testOpticalDrives.Default.DriveLetterNoColon)'"
                     } `
-                        -MockWith {
-                        $script:mockedOpticalDrive
+                    -MockWith {
+                        $script:mockedVolume.Default
                     } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-DiskImage `
+                    -ParameterFilter {
+                        $DevicePath -eq "\\?\$($script:testOpticalDrives.Default.VolumeId)"
+                    } `
+                    -MockWith $script:mockGetDiskImage.ManageableVirtualDrive `
                     -Verifiable
 
                 It 'Should not throw exception' {
@@ -389,19 +420,96 @@ try
                     $script:result.DeviceId | Should -BeNullOrEmpty
                 }
 
-                It 'Should call all the Get mocks' {
+                It 'Should call all the verifiable mocks' {
                     Assert-VerifiableMock
                 }
             }
 
-            Context 'When a single optical disk drive is present but is mounted with ISO' {
+            Context 'When a single unmanageable optical disk drive (a mounted ISO) is present and is assigned a drive letter' {
+                Mock `
+                    -CommandName Get-CimInstance `
+                    -ParameterFilter $script:getCimInstanceCdRomDrive_ParameterFilter `
+                    -MockWith {
+                        $script:mockedOpticalDrives.Default
+                    } `
+                    -Verifiable
+
                 Mock `
                     -CommandName Get-CimInstance `
                     -ParameterFilter {
-                        $ClassName -eq 'Win32_CDROMDrive'
+                        $ClassName -eq 'Win32_Volume' -and `
+                        $Filter -eq "DriveLetter = '$($script:testOpticalDrives.Default.DriveLetterNoColon)'"
                     } `
-                        -MockWith {
-                        $script:mockedOpticalDriveISO
+                    -MockWith {
+                        $script:mockedVolume.Default
+                    } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-DiskImage `
+                    -ParameterFilter {
+                        $DevicePath -eq "\\?\$($script:testOpticalDrives.Default.VolumeId)"
+                    } `
+                    -MockWith $script:mockGetDiskImage.NotManageableMountedISO `
+                    -Verifiable
+
+                It 'Should not throw exception' {
+                    {
+                        $script:result = Get-OpticalDiskDriveLetter `
+                            -DiskId 1 `
+                            -Verbose
+                    } | Should -Not -Throw
+                }
+
+                It 'DeviceId should be empty' {
+                    $script:result.DeviceId | Should -BeNullOrEmpty
+                }
+
+                It 'Should call all the verifiable mocks' {
+                    Assert-VerifiableMock
+                }
+            }
+
+            Context 'When a single unmanageable optical disk drive (a mounted ISO) is present and is not assigned a drive letter' {
+                Mock `
+                    -CommandName Get-CimInstance `
+                    -ParameterFilter $script:getCimInstanceCdRomDrive_ParameterFilter `
+                    -MockWith {
+                        $script:mockedOpticalDrives.NoDriveLetter
+                    } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-DiskImage `
+                    -ParameterFilter {
+                        $DevicePath -eq "\\?\$($script:testOpticalDrives.NoDriveLetter.VolumeId)"
+                    } `
+                    -MockWith $script:mockGetDiskImage.NotManageableMountedISO `
+                    -Verifiable
+
+                It 'Should not throw exception' {
+                    {
+                        $script:result = Get-OpticalDiskDriveLetter `
+                            -DiskId 1 `
+                            -Verbose
+                    } | Should -Not -Throw
+                }
+
+                It 'DeviceId should be empty' {
+                    $script:result.DeviceId | Should -BeNullOrEmpty
+                }
+
+                It 'Should call all the verifiable mocks' {
+                    Assert-VerifiableMock
+                }
+            }
+
+            Context 'When there are manageable or unmanageable optical disk drives are present in the system but a disk is requested' {
+                Mock `
+                    -CommandName Get-CimInstance `
+                    -ParameterFilter $script:getCimInstanceCdRomDrive_ParameterFilter `
+                    -MockWith {
+                        @()
                     } `
                     -Verifiable
 
@@ -417,35 +525,7 @@ try
                     $script:result.DeviceId | Should -BeNullOrEmpty
                 }
 
-                It 'Should call all the Get mocks' {
-                    Assert-VerifiableMock
-                }
-            }
-
-            Context 'When no optical disk drives are present in the system' {
-                Mock `
-                    -CommandName Get-CimInstance `
-                    -ParameterFilter {
-                        $ClassName -eq 'Win32_CDROMDrive'
-                    } `
-                        -MockWith {
-                        $script:mockedOpticalDriveNone
-                    } `
-                    -Verifiable
-
-                It 'Should not throw exception' {
-                    {
-                        $script:result = Get-OpticalDiskDriveLetter `
-                            -DiskId 1 `
-                            -Verbose
-                    } | Should -Not -Throw
-                }
-
-                It 'DeviceId should be empty' {
-                    $script:result.DeviceId | Should -BeNullOrEmpty
-                }
-
-                It 'Should call all the Get mocks' {
+                It 'Should call all the verifiable mocks' {
                     Assert-VerifiableMock
                 }
             }
@@ -477,7 +557,7 @@ try
                     $script:result.Ensure | Should -Be 'Present'
                 }
 
-                It 'Should call all the Get mocks' {
+                It 'Should call all the verifiable mocks' {
                     Assert-VerifiableMock
                 }
             }
@@ -507,7 +587,7 @@ try
                     $script:result.Ensure | Should -Be 'Present'
                 }
 
-                It 'Should call all the Get mocks' {
+                It 'Should call all the verifiable mocks' {
                     Assert-VerifiableMock
                 }
             }
@@ -537,7 +617,7 @@ try
                     $script:result.Ensure | Should -Be 'Present'
                 }
 
-                It 'Should call all the Get mocks' {
+                It 'Should call all the verifiable mocks' {
                     Assert-VerifiableMock
                 }
             }
@@ -568,7 +648,7 @@ try
                     $script:result.Ensure | Should -Be 'Absent'
                 }
 
-                It 'Should call all the Get mocks' {
+                It 'Should call all the verifiable mocks' {
                     Assert-VerifiableMock
                 }
             }
@@ -744,7 +824,7 @@ try
                     } | Should -Not -Throw
                 }
 
-                It 'Should call all the Get mocks' {
+                It 'Should call all the verifiable mocks' {
                     Assert-VerifiableMock
                 }
             }
@@ -775,7 +855,7 @@ try
                     $script:result | Should -BeTrue
                 }
 
-                It 'Should call all the Get mocks' {
+                It 'Should call all the verifiable mocks' {
                     Assert-VerifiableMock
                 }
             }
@@ -805,7 +885,7 @@ try
                     $script:result | Should -BeFalse
                 }
 
-                It 'Should call all the Get mocks' {
+                It 'Should call all the verifiable mocks' {
                     Assert-VerifiableMock
                 }
             }
@@ -843,7 +923,7 @@ try
                     } | Should -Throw $errorRecord
                 }
 
-                It 'Should call all the Get mocks' {
+                It 'Should call all the verifiable mocks' {
                     Assert-VerifiableMock
                 }
             }
@@ -873,7 +953,7 @@ try
                     $script:result | Should -BeFalse
                 }
 
-                It 'Should call all the Get mocks' {
+                It 'Should call all the verifiable mocks' {
                     Assert-VerifiableMock
                 }
             }
@@ -903,7 +983,7 @@ try
                     $script:result | Should -BeTrue
                 }
 
-                It 'Should call all the Get mocks' {
+                It 'Should call all the verifiable mocks' {
                     Assert-VerifiableMock
                 }
             }
@@ -932,7 +1012,7 @@ try
                     } | Should -Throw $errorRecord
                 }
 
-                It 'Should call all the Get mocks' {
+                It 'Should call all the verifiable mocks' {
                     Assert-VerifiableMock
                 }
             }
@@ -962,7 +1042,7 @@ try
                     $script:result | Should -BeTrue
                 }
 
-                It 'Should call all the Get mocks' {
+                It 'Should call all the verifiable mocks' {
                     Assert-VerifiableMock
                 }
             }

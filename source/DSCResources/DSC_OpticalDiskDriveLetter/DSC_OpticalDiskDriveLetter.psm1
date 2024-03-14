@@ -97,10 +97,6 @@ function Test-OpticalDiskCanBeManaged
             throw $_
         }
     }
-    catch
-    {
-        throw $_
-    }
 
     Write-Verbose -Message ( @(
         "$($MyInvocation.MyCommand): "
