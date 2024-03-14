@@ -29,7 +29,7 @@ try
         return
     }
 
-    $opticalDisk = opticalDisks[0]
+    $opticalDisk = $opticalDisks[0]
     $currentDriveLetter = $opticalDisk.Drive
     $volume = Get-CimInstance -ClassName Win32_Volume -Filter "DriveLetter = '$currentDriveLetter'"
 
