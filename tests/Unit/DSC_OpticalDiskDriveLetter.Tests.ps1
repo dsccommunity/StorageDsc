@@ -893,6 +893,48 @@ try
                 }
             }
 
+            Context 'When there are no optical disk drives present and Ensure is not specified (Present)' {
+                Mock `
+                    -CommandName Get-CimInstance `
+                    -ParameterFilter $script:getCimInstanceCdRomDrive_ParameterFilter `
+                    -MockWith {
+                        $script:mockedOpticalDrives.Default
+                    } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-CimInstance `
+                    -ParameterFilter {
+                        $ClassName -eq 'Win32_Volume' -and `
+                        $Filter -eq "DriveLetter = '$($script:testOpticalDrives.Default.DriveLetter)'"
+                    } `
+                    -MockWith {
+                        $script:mockedVolume.Default
+                    } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-DiskImage `
+                    -ParameterFilter {
+                        $DevicePath -eq "\\?\$($script:testOpticalDrives.Default.VolumeId)"
+                    } `
+                    -MockWith $script:mockGetDiskImage.NotManageableMountedISO `
+                    -Verifiable
+
+                It 'Should not throw exception' {
+                    {
+                        $script:result = Set-TargetResource `
+                            -DiskId 1 `
+                            -Driveletter $script:testOpticalDrives.Default.DriveLetter `
+                            -Verbose
+                    } | Should -Not -Throw
+                }
+
+                It 'Should call all the verifiable mocks' {
+                    Assert-VerifiableMock
+                }
+            }
+
             Context 'When there are no manageable optical disk drives present and Ensure is not specified (Present)' {
                 Mock `
                     -CommandName Get-CimInstance `
