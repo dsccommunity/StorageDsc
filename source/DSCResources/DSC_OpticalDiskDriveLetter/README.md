@@ -18,11 +18,16 @@ returned when executing the following cmdlet:
 Get-CimInstance -ClassName Win32_CDROMDrive
 ```
 
-Warning: Adding and removing optical drive devices to a system may cause the
-order the optical drives appear in the system to change. Therefore, the
-drive ordinal number may be affected in these situations.
+> Warning: Adding and removing optical drive devices to a system may cause the
+> order the optical drives appear in the system to change. Therefore, the
+> drive ordinal number may be affected in these situations.
 
-## Detection of Optical Disk Drives
+If the `DiskId` that is specified is greater than the number of manageable
+optical disk drives in the system, then the resource will write a warning to
+the log and will not attempt to set the drive letter. This will also occur
+if there are no manageable optical disk drives in the system.
+
+## Detection of Manageable Optical Disk Drives
 
 This resource is intended to manage _permanent_ optical disk drives that are
 either physically present in the system or are presented to the system by
@@ -35,20 +40,14 @@ To detect whether a drive is a mounted ISO the following logic is used.
 For a CIM instance of a `cimv2:Win32_CDROMDrive` class representing a
 drive:
 
-1. Get the Drive letter assigned to the drive in the `cimv2:Win32_CDROMDrive`
-  instance using:
-
-  ```powershell
-  $driveLetter = ($opticalDisk.Drive -replace ":$")
-  ```
-
-1. If the drive letter is set, query the volume information for the device
+1. Get the Drive letter assigned to the drive in the `cimv2:Win32_CDROMDrive`.
+   If the drive letter is set, query the volume information for the device
    using drive letter and get the device path using:
 
   ```powershell
   $devicePath = (Get-CimInstance `
       -ClassName Win32_Volume `
-      -Filter "DriveLetter = '$driveLetter'").DeviceId -replace "\\$"
+      -Filter "DriveLetter = '$($opticalDisk.Drive)'").DeviceId -replace "\\$"
   ```
 
 1. If the drive letter is not set, then just create the device path from the

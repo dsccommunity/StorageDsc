@@ -65,10 +65,9 @@ function Test-OpticalDiskCanBeManaged
     }
     else
     {
-        $driveLetter = ($OpticalDisk.Drive -replace ":$")
         $devicePath = (Get-CimInstance `
             -ClassName Win32_Volume `
-            -Filter "DriveLetter = '$driveLetter'").DeviceId -replace "\\$"
+            -Filter "DriveLetter = '$($OpticalDisk.Drive)'").DeviceId -replace "\\$"
 
         Write-Verbose -Message ( @(
             "$($MyInvocation.MyCommand): "
@@ -187,7 +186,7 @@ function Get-OpticalDiskDriveLetter
     if ([System.String]::IsNullOrEmpty($deviceId))
     {
         # The requested optical drive does not exist in the system
-        Write-Verbose -Message ( @(
+        Write-Warning -Message ( @(
                 "$($MyInvocation.MyCommand): "
                 $($script:localizedData.OpticalDiskDriveDoesNotExist -f $DiskId)
             ) -join '' )
@@ -308,52 +307,57 @@ function Set-TargetResource
 
     # Get the drive letter assigned to the optical disk
     $currentDriveInfo = Get-OpticalDiskDriveLetter -DiskId $DiskId
-    $currentDriveLetter = $currentDriveInfo.DriveLetter
 
-    if ([System.String]::IsNullOrWhiteSpace($currentDriveLetter))
+    if (-not [System.String]::IsNullOrWhiteSpace($currentDriveInfo.DeviceId))
     {
-        <#
-            If the current drive letter is empty then the volume must be looked up by DeviceId
-            The DeviceId in the volume will show as \\?\Volume{bba1802b-e7a1-11e3-824e-806e6f6e6963}\
-            So we need to change the currentDriveLetter to match this value when we set the drive letter
-        #>
-        $deviceId = $currentDriveInfo.DeviceId
+        # The optical disk with the DiskId exists in the system
+        $currentDriveLetter = $currentDriveInfo.DriveLetter
 
-        $volume = Get-CimInstance `
-            -ClassName Win32_Volume `
-            -Filter "DeviceId = '\\\\?\\$deviceId\\'"
-    }
-    else
-    {
-        $volume = Get-CimInstance `
-            -ClassName Win32_Volume `
-            -Filter "DriveLetter = '$currentDriveLetter'"
-    }
+        if ([System.String]::IsNullOrWhiteSpace($currentDriveLetter))
+        {
+            <#
+                If the current drive letter is empty then the volume must be looked up by DeviceId
+                The DeviceId in the volume will show as \\?\Volume{bba1802b-e7a1-11e3-824e-806e6f6e6963}\
+                So we need to change the currentDriveLetter to match this value when we set the drive letter
+            #>
+            $deviceId = $currentDriveInfo.DeviceId
 
-    # Does the Drive Letter need to be added or removed
-    if ($Ensure -eq 'Absent')
-    {
-        if (-not [System.String]::IsNullOrEmpty($currentDriveInfo.DeviceId))
+            $volume = Get-CimInstance `
+                -ClassName Win32_Volume `
+                -Filter "DeviceId = '\\\\?\\$deviceId\\'"
+        }
+        else
+        {
+            $volume = Get-CimInstance `
+                -ClassName Win32_Volume `
+                -Filter "DriveLetter = '$currentDriveLetter'"
+        }
+
+        # Does the Drive Letter need to be added or removed
+        if ($Ensure -eq 'Absent')
+        {
+            if (-not [System.String]::IsNullOrEmpty($currentDriveInfo.DeviceId))
+            {
+                Write-Verbose -Message ( @(
+                    "$($MyInvocation.MyCommand): "
+                    $($script:localizedData.AttemptingToRemoveDriveLetter -f $diskId, $currentDriveLetter)
+                ) -join '' )
+
+                $volume | Set-CimInstance -Property @{
+                    DriveLetter = $null
+                }
+            }
+        }
+        else
         {
             Write-Verbose -Message ( @(
                 "$($MyInvocation.MyCommand): "
-                $($script:localizedData.AttemptingToRemoveDriveLetter -f $diskId, $currentDriveLetter)
+                $($script:localizedData.AttemptingToSetDriveLetter -f $diskId, $currentDriveLetter, $DriveLetter)
             ) -join '' )
 
             $volume | Set-CimInstance -Property @{
-                DriveLetter = $null
+                DriveLetter = $DriveLetter
             }
-        }
-    }
-    else
-    {
-        Write-Verbose -Message ( @(
-            "$($MyInvocation.MyCommand): "
-            $($script:localizedData.AttemptingToSetDriveLetter -f $diskId, $currentDriveLetter, $DriveLetter)
-        ) -join '' )
-
-        $volume | Set-CimInstance -Property @{
-            DriveLetter = $DriveLetter
         }
     }
 } # Set-TargetResource
@@ -402,72 +406,77 @@ function Test-TargetResource
 
     # Get the drive letter assigned to the optical disk
     $currentDriveInfo = Get-OpticalDiskDriveLetter -DiskId $DiskId
-    $currentDriveLetter = $currentDriveInfo.DriveLetter
 
-    if ($Ensure -eq 'Absent')
+    if (-not [System.String]::IsNullOrWhiteSpace($currentDriveInfo.DeviceId))
     {
-        if (-not [System.String]::IsNullOrEmpty($currentDriveInfo.DeviceId))
-        {
-            # The Drive Letter should be absent from the optical disk
-            if ([System.String]::IsNullOrWhiteSpace($currentDriveLetter))
-            {
-                Write-Verbose -Message ( @(
-                        "$($MyInvocation.MyCommand): "
-                        $($script:localizedData.DriveLetterDoesNotExistAndShouldNot -f $DiskId)
-                    ) -join '' )
-            }
-            else
-            {
-                # The Drive Letter needs to be dismounted
-                Write-Verbose -Message ( @(
-                        "$($MyInvocation.MyCommand): "
-                        $($script:localizedData.DriveLetterExistsButShouldNot -f $DiskId, $currentDriveLetter)
-                    ) -join '' )
+            # The optical disk with the DiskId exists in the system
+        $currentDriveLetter = $currentDriveInfo.DriveLetter
 
-                $desiredConfigurationMatch = $false
-            }
-        }
-    }
-    else
-    {
-        # Throw an exception if the desired optical disk does not exist
-        if ([System.String]::IsNullOrEmpty($currentDriveInfo.DeviceId))
+        if ($Ensure -eq 'Absent')
         {
-            New-InvalidArgumentException `
-                -Message ($script:localizedData.NoOpticalDiskDriveError -f $DiskId) `
-                -ArgumentName 'DiskId'
-        }
+            if (-not [System.String]::IsNullOrEmpty($currentDriveInfo.DeviceId))
+            {
+                # The Drive Letter should be absent from the optical disk
+                if ([System.String]::IsNullOrWhiteSpace($currentDriveLetter))
+                {
+                    Write-Verbose -Message ( @(
+                            "$($MyInvocation.MyCommand): "
+                            $($script:localizedData.DriveLetterDoesNotExistAndShouldNot -f $DiskId)
+                        ) -join '' )
+                }
+                else
+                {
+                    # The Drive Letter needs to be dismounted
+                    Write-Verbose -Message ( @(
+                            "$($MyInvocation.MyCommand): "
+                            $($script:localizedData.DriveLetterExistsButShouldNot -f $DiskId, $currentDriveLetter)
+                        ) -join '' )
 
-        if ($currentDriveLetter -eq $DriveLetter)
-        {
-            # The optical disk drive letter is already set correctly
-            Write-Verbose -Message ( @(
-                    "$($MyInvocation.MyCommand): "
-                    $($script:localizedData.DriverLetterExistsAndIsCorrect -f $DiskId, $DriveLetter)
-                ) -join '' )
+                    $desiredConfigurationMatch = $false
+                }
+            }
         }
         else
         {
-            # Is a desired drive letter already assigned to a different drive?
-            $existingVolume = Get-CimInstance `
-                -ClassName Win32_Volume `
-                -Filter "DriveLetter = '$DriveLetter'"
-
-            if ($existingVolume)
+            # Throw an exception if the desired optical disk does not exist
+            if ([System.String]::IsNullOrEmpty($currentDriveInfo.DeviceId))
             {
-                # The desired drive letter is already assigned to another drive - can't proceed
-                New-InvalidOperationException `
-                    -Message $($script:localizedData.DriveLetterAssignedToAnotherDrive -f $DriveLetter)
+                New-InvalidArgumentException `
+                    -Message ($script:localizedData.NoOpticalDiskDriveError -f $DiskId) `
+                    -ArgumentName 'DiskId'
+            }
+
+            if ($currentDriveLetter -eq $DriveLetter)
+            {
+                # The optical disk drive letter is already set correctly
+                Write-Verbose -Message ( @(
+                        "$($MyInvocation.MyCommand): "
+                        $($script:localizedData.DriverLetterExistsAndIsCorrect -f $DiskId, $DriveLetter)
+                    ) -join '' )
             }
             else
             {
-                # The optical drive letter needs to be changed
-                Write-Verbose -Message ( @(
-                        "$($MyInvocation.MyCommand): "
-                        $($script:localizedData.DriverLetterExistsAndIsNotCorrect -f $DiskId, $currentDriveLetter, $DriveLetter)
-                    ) -join '' )
+                # Is a desired drive letter already assigned to a different drive?
+                $existingVolume = Get-CimInstance `
+                    -ClassName Win32_Volume `
+                    -Filter "DriveLetter = '$DriveLetter'"
 
-                $desiredConfigurationMatch = $false
+                if ($existingVolume)
+                {
+                    # The desired drive letter is already assigned to another drive - can't proceed
+                    New-InvalidOperationException `
+                        -Message $($script:localizedData.DriveLetterAssignedToAnotherDrive -f $DriveLetter)
+                }
+                else
+                {
+                    # The optical drive letter needs to be changed
+                    Write-Verbose -Message ( @(
+                            "$($MyInvocation.MyCommand): "
+                            $($script:localizedData.DriverLetterExistsAndIsNotCorrect -f $DiskId, $currentDriveLetter, $DriveLetter)
+                        ) -join '' )
+
+                    $desiredConfigurationMatch = $false
+                }
             }
         }
     }
