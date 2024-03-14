@@ -21,13 +21,7 @@ Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath '..\TestHelpers\Co
 try
 {
     # Locate an optical disk in the system to use for testing
-    $opticalDisk = Get-CimInstance -ClassName Win32_CDROMDrive |
-        Where-Object -FilterScript {
-        -not (
-            $_.Caption -eq "Microsoft Virtual DVD-ROM" -and
-            ($_.DeviceID.Split("\")[-1]).Length -gt 10
-        )
-    }[0]
+    $opticalDisk = (Get-CimInstance -ClassName Win32_CDROMDrive)[0]
 
     if (-not $opticalDisk)
     {
