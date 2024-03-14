@@ -46,7 +46,7 @@ try
         }
 
         Context 'Assign a Drive Letter to an optical drive that is not mounted' {
-            It 'Should compile and apply the MOF without throwing' {
+            It 'Should compile MOF without throwing' {
                 {
                     # This is to pass to the Config
                     $configData = @{
@@ -63,7 +63,11 @@ try
                     & "$($script:dscResourceName)_Config" `
                         -OutputPath $TestDrive `
                         -ConfigurationData $configData
+                } | Should -Not -Throw
+            }
 
+            It 'Should apply the MOF without throwing' {
+                {
                     Start-DscConfiguration `
                         -Path $TestDrive `
                         -ComputerName localhost `
@@ -90,7 +94,7 @@ try
         $driveLetter = [char](([int][char]$lastDrive) + 2)
 
         Context 'Assign a Drive Letter to an optical drive that is already mounted' {
-            It 'Should compile and apply the MOF without throwing' {
+            It 'Should compile the MOF without throwing' {
                 {
                     # This is to pass to the Config
                     $configData = @{
@@ -107,7 +111,11 @@ try
                     & "$($script:dscResourceName)_Config" `
                         -OutputPath $TestDrive `
                         -ConfigurationData $configData
+                } | Should -Not -Throw
+            }
 
+            It 'Should apply the MOF without throwing' {
+                {
                     Start-DscConfiguration `
                         -Path $TestDrive `
                         -ComputerName localhost `
@@ -132,7 +140,7 @@ try
         }
 
         Context 'Remove a Drive Letter from an optical drive that is already mounted' {
-            It 'Should compile and apply the MOF without throwing' {
+            It 'Should compile the MOF without throwing' {
                 {
                     # This is to pass to the Config
                     $configData = @{
@@ -149,7 +157,11 @@ try
                     & "$($script:dscResourceName)_Config" `
                         -OutputPath $TestDrive `
                         -ConfigurationData $configData
+                } | Should -Not -Throw
+            }
 
+            It 'Should apply the MOF without throwing' {
+                {
                     Start-DscConfiguration `
                         -Path $TestDrive `
                         -ComputerName localhost `
