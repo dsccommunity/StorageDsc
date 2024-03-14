@@ -27,6 +27,9 @@ optical disk drives in the system, then the resource will write a warning to
 the log and will not attempt to set the drive letter. This will also occur
 if there are no manageable optical disk drives in the system.
 
+If the `DriveLetter` that should be assigned to the optical disk drive is
+already assigned to another device, then the resource will throw an exception.
+
 ## Detection of Manageable Optical Disk Drives
 
 This resource is intended to manage _permanent_ optical disk drives that are
@@ -37,36 +40,20 @@ on Windows Server 2012 and newer. Mounted ISO drives should be managed by the
 `DSC_MountImage` resource.
 
 To detect whether a drive is a mounted ISO the following logic is used.
-For a CIM instance of a `cimv2:Win32_CDROMDrive` class representing a
-drive:
+For a CIM instance of a `cimv2:Win32_CDROMDrive` class representing an
+optical disk drive:
 
-1. Get the Drive letter assigned to the drive in the `cimv2:Win32_CDROMDrive`.
-   If the drive letter is set, query the volume information for the device
-   using drive letter and get the device path using:
-
-  ```powershell
-  $devicePath = (Get-CimInstance `
-      -ClassName Win32_Volume `
-      -Filter "DriveLetter = '$($opticalDisk.Drive)'").DeviceId -replace "\\$"
-  ```
-
-1. If the drive letter is not set, then just create the device path from the
-   drive property using:
-
-  ```powershell
-  $devicePath = "\\?\$($opticalDisk.Drive)"
-  ```
-
-1. Look up the disk image using the device path with:
-
-  ```powershell
-  Get-DiskImage -DevicePath $devicePath
-  ```
-
-  If no error occurs then the device is a mounted ISO and should not be
-  used with this resource. If a "The specified disk is not a virtual
-  disk." error occurs then it is not an ISO and can be managed by this
-  resource.
+1. Get the _drive letter_ assigned to the drive in the `cimv2:Win32_CDROMDrive`.
+   If the drive letter is set, query the volume information using the
+   ``cimv2:Win32_Volume` CIM class for the device using _drive letter_ and get
+   the _device path_.
+1. If the drive letter is not set, then just create the _device path_ from the
+   `drive` property.
+1. Look up the disk image using the _device path_ using the `Get-DiskImage` cmdlet.
+1. If no error occurs then the device is a mounted ISO and should not be
+   used with this resource. If a "The specified disk is not a virtual
+   disk." error occurs then it is not an ISO and can be managed by this
+   resource.
 
 ### Old Detection Method
 

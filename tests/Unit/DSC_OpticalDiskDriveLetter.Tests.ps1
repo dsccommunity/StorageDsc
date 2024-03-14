@@ -960,22 +960,39 @@ try
         }
 
         Describe 'DSC_OpticalDiskDriveLetter\Test-TargetResource' {
-            Context 'When the optical drive exists and is assigned expected drive letter' {
+            Context 'When a single manageable optical drive exists and is assigned the expected drive letter and Ensure is not specified (Present)' {
+                Mock `
+                    -CommandName Get-CimInstance `
+                    -ParameterFilter $script:getCimInstanceCdRomDrive_ParameterFilter `
+                    -MockWith {
+                        $script:mockedOpticalDrives.Default
+                    } `
+                    -Verifiable
+
                 Mock `
                     -CommandName Get-CimInstance `
                     -ParameterFilter {
-                        $ClassName -eq 'Win32_CDROMDrive'
+                        $ClassName -eq 'Win32_Volume' -and `
+                        $Filter -eq "DriveLetter = '$($script:testOpticalDrives.Default.DriveLetter)'"
                     } `
-                        -MockWith {
-                        $script:mockedOpticalDrive
+                    -MockWith {
+                        $script:mockedVolume.Default
                     } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-DiskImage `
+                    -ParameterFilter {
+                        $DevicePath -eq "\\?\$($script:testOpticalDrives.Default.VolumeId)"
+                    } `
+                    -MockWith $script:mockGetDiskImage.ManageableVirtualDrive `
                     -Verifiable
 
                 It 'Should not throw an exception' {
                     {
                         $script:result = Test-TargetResource `
                             -DiskId 1 `
-                            -DriveLetter $script:testDriveLetter `
+                            -DriveLetter $script:testOpticalDrives.Default.DriveLetter `
                             -Verbose
                     } | Should -Not -Throw
                 }
@@ -989,22 +1006,39 @@ try
                 }
             }
 
-            Context 'When the optical drive exists but is assigned a drive letter but should not be' {
+            Context 'When a single manageable optical drive exists but is assigned a drive letter but Ensure is set to Absent' {
+                Mock `
+                    -CommandName Get-CimInstance `
+                    -ParameterFilter $script:getCimInstanceCdRomDrive_ParameterFilter `
+                    -MockWith {
+                        $script:mockedOpticalDrives.Default
+                    } `
+                    -Verifiable
+
                 Mock `
                     -CommandName Get-CimInstance `
                     -ParameterFilter {
-                        $ClassName -eq 'Win32_CDROMDrive'
+                        $ClassName -eq 'Win32_Volume' -and `
+                        $Filter -eq "DriveLetter = '$($script:testOpticalDrives.Default.DriveLetter)'"
                     } `
-                        -MockWith {
-                        $script:mockedOpticalDrive
+                    -MockWith {
+                        $script:mockedVolume.Default
                     } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-DiskImage `
+                    -ParameterFilter {
+                        $DevicePath -eq "\\?\$($script:testOpticalDrives.Default.VolumeId)"
+                    } `
+                    -MockWith $script:mockGetDiskImage.ManageableVirtualDrive `
                     -Verifiable
 
                 It 'Should not throw an exception' {
                     {
                         $script:result = Test-TargetResource `
                             -DiskId 1 `
-                            -DriveLetter $script:testDriveLetter `
+                            -DriveLetter $script:testOpticalDrives.Default.DriveLetter `
                             -Ensure 'Absent' `
                             -Verbose
                     } | Should -Not -Throw
@@ -1019,35 +1053,53 @@ try
                 }
             }
 
-            Context 'When the drive letter already exists on a volume that is not an optical disk drive' {
+            Context 'When a single manageable optical drive exists but the drive letter already exists on a volume that is not an optical disk drive' {
                 Mock `
                     -CommandName Get-CimInstance `
-                    -ParameterFilter {
-                    $ClassName -eq 'Win32_CDROMDrive'
-                } `
+                    -ParameterFilter $script:getCimInstanceCdRomDrive_ParameterFilter `
                     -MockWith {
-                    $script:mockedWrongLetterOpticalDrive
-                } `
+                        $script:mockedOpticalDrives.WrongLetter
+                    } `
                     -Verifiable
 
                 Mock `
                     -CommandName Get-CimInstance `
                     -ParameterFilter {
-                        $ClassName -eq 'Win32_Volume'
+                        $ClassName -eq 'Win32_Volume' -and `
+                        $Filter -eq "DriveLetter = '$($script:testOpticalDrives.WrongLetter.DriveLetter)'"
                     } `
-                        -MockWith {
-                        $script:mockedVolume
+                    -MockWith {
+                        $script:mockedVolume.WrongLetter
                     } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-CimInstance `
+                    -ParameterFilter {
+                        $ClassName -eq 'Win32_Volume' -and `
+                        $Filter -eq "DriveLetter = '$($script:testOpticalDrives.Default.DriveLetter)'"
+                    } `
+                    -MockWith {
+                        $script:mockedVolume.Default
+                    } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-DiskImage `
+                    -ParameterFilter {
+                        $DevicePath -eq "\\?\$($script:testOpticalDrives.WrongLetter.VolumeId)"
+                    } `
+                    -MockWith $script:mockGetDiskImage.ManageableVirtualDrive `
                     -Verifiable
 
                 $errorRecord = Get-InvalidOperationRecord `
-                    -Message $($localizedData.DriveLetterAssignedToAnotherDrive -f $script:testDriveLetter)
+                    -Message $($localizedData.DriveLetterAssignedToAnotherDrive -f $script:testOpticalDrives.Default.DriveLetter)
 
                 It 'Should throw expected exception' {
                     {
                         $script:result = Test-TargetResource `
                             -DiskId 1 `
-                            -DriveLetter $script:testDriveLetter `
+                            -DriveLetter $script:testOpticalDrives.Default.DriveLetter `
                             -Verbose
                     } | Should -Throw $errorRecord
                 }
@@ -1057,22 +1109,39 @@ try
                 }
             }
 
-            Context 'When the optical drive is assigned a drive letter but should not be' {
+            Context 'When a single manageable optical drive exists and is assigned a drive letter but should not be because Ensure is Absent' {
+                Mock `
+                    -CommandName Get-CimInstance `
+                    -ParameterFilter $script:getCimInstanceCdRomDrive_ParameterFilter `
+                    -MockWith {
+                        $script:mockedOpticalDrives.Default
+                    } `
+                    -Verifiable
+
                 Mock `
                     -CommandName Get-CimInstance `
                     -ParameterFilter {
-                        $ClassName -eq 'Win32_CDROMDrive'
+                        $ClassName -eq 'Win32_Volume' -and `
+                        $Filter -eq "DriveLetter = '$($script:testOpticalDrives.Default.DriveLetter)'"
                     } `
-                        -MockWith {
-                        $script:mockedOpticalDrive
+                    -MockWith {
+                        $script:mockedVolume.Default
                     } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-DiskImage `
+                    -ParameterFilter {
+                        $DevicePath -eq "\\?\$($script:testOpticalDrives.Default.VolumeId)"
+                    } `
+                    -MockWith $script:mockGetDiskImage.ManageableVirtualDrive `
                     -Verifiable
 
                 It 'Should not throw an exception' {
                     {
                         $script:result = Test-TargetResource `
                             -DiskId 1 `
-                            -DriveLetter $script:testDriveLetter `
+                            -DriveLetter $script:testOpticalDrives.Default.DriveLetter `
                             -Ensure 'Absent' `
                             -Verbose
                     } | Should -Not -Throw
@@ -1087,22 +1156,28 @@ try
                 }
             }
 
-            Context 'When the optical drive is not assigned a drive letter and should not be' {
+            Context 'When a single manageable optical drive exists and is not assigned a drive letter and should not be because Ensure is Absent' {
                 Mock `
                     -CommandName Get-CimInstance `
+                    -ParameterFilter $script:getCimInstanceCdRomDrive_ParameterFilter `
+                    -MockWith {
+                        $script:mockedOpticalDrives.NoDriveLetter
+                    } `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-DiskImage `
                     -ParameterFilter {
-                        $ClassName -eq 'Win32_CDROMDrive'
+                        $DevicePath -eq "\\?\$($script:testOpticalDrives.NoDriveLetter.VolumeId)"
                     } `
-                        -MockWith {
-                        $script:mockedOpticalDriveNoDriveLetter
-                    } `
+                    -MockWith $script:mockGetDiskImage.ManageableVirtualDrive `
                     -Verifiable
 
                 It 'Should not throw an exception' {
                     {
                         $script:result = Test-TargetResource `
                             -DiskId 1 `
-                            -DriveLetter $script:testDriveLetter `
+                            -DriveLetter $script:testOpticalDrives.Default.DriveLetter `
                             -Ensure 'Absent' `
                             -Verbose
                     } | Should -Not -Throw
@@ -1117,14 +1192,12 @@ try
                 }
             }
 
-            Context 'When the optical drive does not exist and Ensure is Present' {
+            Context 'When there are no manageable optical drives in the system and Ensure is Present' {
                 Mock `
                     -CommandName Get-CimInstance `
-                    -ParameterFilter {
-                        $ClassName -eq 'Win32_CDROMDrive'
-                    } `
+                    -ParameterFilter $script:getCimInstanceCdRomDrive_ParameterFilter `
                     -MockWith {
-                        $script:mockedOpticalDriveNone
+                        @()
                     } `
                     -Verifiable
 
@@ -1136,7 +1209,7 @@ try
                     {
                         $script:result = Test-TargetResource `
                             -DiskId 1 `
-                            -Driveletter $script:testDriveLetter `
+                            -Driveletter $script:testOpticalDrives.Default.DriveLetter `
                             -Verbose
                     } | Should -Throw $errorRecord
                 }
@@ -1146,14 +1219,12 @@ try
                 }
             }
 
-            Context 'When the optical drive does not exist and Ensure is Absent' {
+            Context 'When there are no manageable optical drives in the system and Ensure is Absent' {
                 Mock `
                     -CommandName Get-CimInstance `
-                    -ParameterFilter {
-                        $ClassName -eq 'Win32_CDROMDrive'
-                    } `
+                    -ParameterFilter $script:getCimInstanceCdRomDrive_ParameterFilter `
                     -MockWith {
-                        $script:mockedOpticalDriveNone
+                        @()
                     } `
                     -Verifiable
 
@@ -1161,7 +1232,7 @@ try
                     {
                         $script:result = Test-TargetResource `
                             -DiskId 1 `
-                            -DriveLetter $script:testDriveLetter `
+                            -DriveLetter $script:testOpticalDrives.Default.DriveLetter `
                             -Ensure 'Absent' `
                             -Verbose
                     } | Should -Not -Throw
