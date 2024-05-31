@@ -17,5 +17,6 @@ ConvertFrom-StringData @'
     TestOpticalDiskWithoutDriveLetterCanBeManaged = Testing if the optical disk with Device Id '{0}' and without a drive letter assigned can be managed by this resource.
     TestOpticalDiskWithDriveLetterCanBeManaged = Testing if the optical disk with Device Id '{0}' and assigned drive letter '{1}' can be managed by this resource.
     OpticalDiskCanBeManagedStatus = The optical disk with Device Id '{0}' {1} be managed by this resource.
-    ErrorDiskIsNotAVirtualDisk = The specified disk is not a virtual disk.
+    DiskIsNotAVirtualDiskError = The specified disk is not a virtual disk.
+    TestOpticalDiskVolumeNotMatchableWarning = The optical disk with drive letter value '{0}' is not matchable to a volume and can not be managed by this resource.
 '@

@@ -86,3 +86,19 @@ determine if the drive is a mounted ISO.
 
 This is not a complete list, as some other virtual devices from other vendors
 might not be available for testing.
+
+## Known Issues
+
+Some operating systems report the optical disk in the Win32_CDROMDrive list,
+but a volume that matches either the DeviceId or DriveLetter can not be found.
+The DriveLetter value appears as 'CdRom0' in the Win32_CDROMDrive list.
+This prevents the resource from matching the optical disk to a volume if the
+volume is not mounted.
+
+This appears to only be an issue with IDE optical drives. SCSI optical drives
+do not appear to have this issue.
+
+Therefore, this resource will not manage the optical disk if the volume can not
+be found and is not already mounted. The verbose logs will report this condition
+if detected. See [Issue #289](https://github.com/dsccommunity/StorageDsc/issues/289)
+for more information.

@@ -5,6 +5,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- OpticalDiskDriveLetter:
+  - Some operating systems report the optical disk in the Win32_CDROMDrive list,
+    but a volume that matches either the DeviceId or DriveLetter can not be found.
+    This caused an `Cannot bind argument to parameter 'DevicePath' because it is an empty string.`
+    exception to occur in the `Test-OpticalDiskCanBeManaged`. Prevented this
+    exception from occuring by marking disk as not manageable - Fixes [Issue #289](https://github.com/dsccommunity/StorageDsc/issues/289).
+- Azure DevOps Build Pipeline:
+  - Update pipeline files to use latest DSC Community pattern and sampler tasks.invok
+
 ## [6.0.0] - 2024-03-19
 
 ### Added

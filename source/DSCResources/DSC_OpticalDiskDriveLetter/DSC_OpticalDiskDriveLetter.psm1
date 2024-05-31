@@ -70,38 +70,57 @@ function Test-OpticalDiskCanBeManaged
             -ClassName Win32_Volume `
             -Filter "DriveLetter = '$($driveLetter)'").DeviceId -replace "\\$"
 
-        Write-Verbose -Message ( @(
-            "$($MyInvocation.MyCommand): "
-            $($script:localizedData.TestOpticalDiskWithDriveLetterCanBeManaged -f $devicePath, $driveLetter)
-        ) -join '')
-    }
-
-    try
-    {
-        <#
-            If the device is not a mounted ISO then the Get-DiskImage will throw an
-            Microsoft.Management.Infrastructure.CimException exception with the
-            message "The specified disk is not a virtual disk."
-        #>
-        Get-DiskImage -DevicePath $devicePath -ErrorAction Stop | Out-Null
-    }
-    catch [Microsoft.Management.Infrastructure.CimException]
-    {
-        if ($_.Exception.Message.TrimEnd() -eq $script:localizedData.ErrorDiskIsNotAVirtualDisk)
+        if ([System.String]::IsNullOrEmpty($devicePath))
         {
-            # This is not a mounted ISO, so it can managed
-            $diskCanBeManaged = $true
+            <#
+                A drive letter is not assigned to this disk, but the Drive property does
+                not contain a Volume{<Guid>} value. This has prevented the volume to be
+                matched to the disk. This prevents this disk from being managed, but it
+                is not a terminal error.
+            #>
+            Write-Warning -Message ( @(
+                "$($MyInvocation.MyCommand): "
+                $($script:localizedData.TestOpticalDiskVolumeNotMatchableWarning -f $driveLetter)
+            ) -join '')
         }
         else
         {
-            throw $_
+            Write-Verbose -Message ( @(
+                "$($MyInvocation.MyCommand): "
+                $($script:localizedData.TestOpticalDiskWithDriveLetterCanBeManaged -f $devicePath, $driveLetter)
+            ) -join '')
         }
     }
 
-    Write-Verbose -Message ( @(
-        "$($MyInvocation.MyCommand): "
-        $($script:localizedData.OpticalDiskCanBeManagedStatus -f $devicePath, @('can not', 'can')[0, 1][$diskCanBeManaged])
-    ) -join '')
+    if ($devicePath)
+    {
+        try
+        {
+            <#
+                If the device is not a mounted ISO then the Get-DiskImage will throw an
+                Microsoft.Management.Infrastructure.CimException exception with the
+                message "The specified disk is not a virtual disk."
+            #>
+            Get-DiskImage -DevicePath $devicePath -ErrorAction Stop | Out-Null
+        }
+        catch [Microsoft.Management.Infrastructure.CimException]
+        {
+            if ($_.Exception.Message.TrimEnd() -eq $script:localizedData.DiskIsNotAVirtualDiskError)
+            {
+                # This is not a mounted ISO, so it can managed
+                $diskCanBeManaged = $true
+            }
+            else
+            {
+                throw $_
+            }
+        }
+
+        Write-Verbose -Message ( @(
+            "$($MyInvocation.MyCommand): "
+            $($script:localizedData.OpticalDiskCanBeManagedStatus -f $devicePath, @('can not', 'can')[0, 1][$diskCanBeManaged])
+        ) -join '')
+    }
 
     return $diskCanBeManaged
 }
