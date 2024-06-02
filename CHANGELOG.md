@@ -15,7 +15,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     exception from occuring by marking disk as not manageable - Fixes [Issue #289](https://github.com/dsccommunity/StorageDsc/issues/289).
 - Azure DevOps Build Pipeline:
   - Update pipeline files to use latest DSC Community pattern and sampler tasks.
-  - Update pipeline to use `PublishCodeCoverageResults@2` task to publish code coverage results.
 
 ## [6.0.0] - 2024-03-19
 
