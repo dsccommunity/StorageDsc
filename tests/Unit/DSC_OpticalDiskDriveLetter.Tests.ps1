@@ -45,6 +45,10 @@ try
                 DriveLetter = ''
                 VolumeId = 'Volume{8c58ce81-0f58-4bd2-a575-0eb66a993ad7}'
             }
+            Issue289 = [PSCustomObject] @{
+                DriveLetter = 'CdRom0'
+                VolumeId = 'Volume{52a193f8-18db-11ef-8403-806e6f6e6963}'
+            }
         }
 
         $script:mockedOpticalDrives = [PSCustomObject] @{
@@ -60,6 +64,17 @@ try
                 # When no drive letter is assigned, the Drive property is set to the volume ID
                 Drive    = $script:testOpticalDrives.NoDriveLetter.VolumeId
                 Id       = $script:testOpticalDrives.NoDriveLetter.DriveLetter
+            } -ClientOnly
+            Issue289 = New-CimInstance -ClassName Win32_CDROMDrive -Property @{
+                <#
+                    It is possible for OS to report oprtical drive exists, but matching volume is not found
+                    This prevents disk from being maanged by this resource. See https://github.com/dsccommunity/StorageDsc/issues/289
+                #>
+                Drive    = $script:testOpticalDrives.Issue289.DriveLetter
+                Id       = $script:testOpticalDrives.Issue289.DriveLetter
+                Caption  = 'Msft Virtual CD/ROM ATA Device'
+                Name     = 'Msft Virtual CD/ROM ATA Device'
+                DeviceID = 'IDE\CDROMMSFT_VIRTUAL_CD/ROM_____________________1.0_____\5&CFB56DE&0&1.0.0'
             } -ClientOnly
         }
 
@@ -82,12 +97,18 @@ try
                 DriveType   = 5
                 DeviceId    = "\\?\$($script:testOpticalDrives.NoDriveLetter.VolumeId)\"
             } -ClientOnly
+            Issue289 = New-CimInstance -ClassName Win32_Volume -Property @{
+                Name = "$($script:testOpticalDrives.Issue289.DriveLetter)\"
+                DriveLetter = ''
+                DriveType   = 5
+                DeviceId    = "\\?\$($script:testOpticalDrives.Issue289.VolumeId)\"
+            } -ClientOnly
         }
 
         $script:mockGetDiskImage = [PSCustomObject] @{
             ManageableVirtualDrive = {
                 # Throw an Microsoft.Management.Infrastructure.CimException with Message set to 'The specified disk is not a virtual disk.'
-                throw [Microsoft.Management.Infrastructure.CimException]::new($localizedData.ErrorDiskIsNotAVirtualDisk)
+                throw [Microsoft.Management.Infrastructure.CimException]::new($localizedData.DiskIsNotAVirtualDiskError)
             }
             NotManageableMountedISO = {
                 # This value doesn't matter as it is not used in the function
@@ -244,6 +265,43 @@ try
 
                 It 'Should call all the verifiable mocks' {
                     Assert-VerifiableMock
+                }
+            }
+
+            Context 'When the optical disk drive passed has DriveLetter set to "CdRom0" and so the volume can not be matched' {
+                Mock `
+                    -CommandName Get-CimInstance `
+                    -ParameterFilter {
+                        $ClassName -eq 'Win32_Volume' -and `
+                        $Filter -eq "DriveLetter = '$($script:testOpticalDrives.Issue289.DriveLetter)'"
+                    } `
+                    -Verifiable
+
+                # Get-DiskImage should not be called in this test, but if it is, it should throw an exception
+                Mock `
+                    -CommandName Get-DiskImage `
+                    -MockWith {
+                        throw "Cannot bind argument to parameter 'DevicePath' because it is null."
+                    }
+
+                It 'Should not throw an exception' {
+                    {
+                        $script:result = Test-OpticalDiskCanBeManaged `
+                            -OpticalDisk $script:mockedOpticalDrives.Issue289 `
+                            -Verbose
+                    } | Should -Not -Throw
+                }
+
+                It 'Should return $false' {
+                    $script:result | Should -BeFalse
+                }
+
+                It 'Should call all the verifiable mocks' {
+                    Assert-VerifiableMock
+                }
+
+                It 'Should not call Get-DiskImage' {
+                    Assert-MockCalled -CommandName Get-DiskImage -Times 0
                 }
             }
         }
