@@ -21,20 +21,15 @@ Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath '..\TestHelpers\Co
 try
 {
     # Locate an optical disk in the system to use for testing
-    $opticalDisk = Get-CimInstance -ClassName Win32_CDROMDrive |
-        Where-Object -FilterScript {
-        -not (
-            $_.Caption -eq "Microsoft Virtual DVD-ROM" -and
-            ($_.DeviceID.Split("\")[-1]).Length -gt 10
-        )
-    }[0]
+    $opticalDisks = Get-CimInstance -ClassName Win32_CDROMDrive
 
-    if (-not $opticalDisk)
+    if (-not $opticalDisks)
     {
         Write-Verbose -Message "$($script:dscResourceName) integration tests cannot be run because there is no optical disk in the system." -Verbose
         return
     }
 
+    $opticalDisk = $opticalDisks[0]
     $currentDriveLetter = $opticalDisk.Drive
     $volume = Get-CimInstance -ClassName Win32_Volume -Filter "DriveLetter = '$currentDriveLetter'"
 
@@ -52,7 +47,7 @@ try
         }
 
         Context 'Assign a Drive Letter to an optical drive that is not mounted' {
-            It 'Should compile and apply the MOF without throwing' {
+            It 'Should compile MOF without throwing' {
                 {
                     # This is to pass to the Config
                     $configData = @{
@@ -69,7 +64,11 @@ try
                     & "$($script:dscResourceName)_Config" `
                         -OutputPath $TestDrive `
                         -ConfigurationData $configData
+                } | Should -Not -Throw
+            }
 
+            It 'Should apply the MOF without throwing' {
+                {
                     Start-DscConfiguration `
                         -Path $TestDrive `
                         -ComputerName localhost `
@@ -96,7 +95,7 @@ try
         $driveLetter = [char](([int][char]$lastDrive) + 2)
 
         Context 'Assign a Drive Letter to an optical drive that is already mounted' {
-            It 'Should compile and apply the MOF without throwing' {
+            It 'Should compile the MOF without throwing' {
                 {
                     # This is to pass to the Config
                     $configData = @{
@@ -113,7 +112,11 @@ try
                     & "$($script:dscResourceName)_Config" `
                         -OutputPath $TestDrive `
                         -ConfigurationData $configData
+                } | Should -Not -Throw
+            }
 
+            It 'Should apply the MOF without throwing' {
+                {
                     Start-DscConfiguration `
                         -Path $TestDrive `
                         -ComputerName localhost `
@@ -138,7 +141,7 @@ try
         }
 
         Context 'Remove a Drive Letter from an optical drive that is already mounted' {
-            It 'Should compile and apply the MOF without throwing' {
+            It 'Should compile the MOF without throwing' {
                 {
                     # This is to pass to the Config
                     $configData = @{
@@ -155,7 +158,11 @@ try
                     & "$($script:dscResourceName)_Config" `
                         -OutputPath $TestDrive `
                         -ConfigurationData $configData
+                } | Should -Not -Throw
+            }
 
+            It 'Should apply the MOF without throwing' {
+                {
                     Start-DscConfiguration `
                         -Path $TestDrive `
                         -ComputerName localhost `

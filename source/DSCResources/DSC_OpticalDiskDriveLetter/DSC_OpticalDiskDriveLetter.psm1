@@ -12,6 +12,121 @@ $script:localizedData = Get-LocalizedData -DefaultUICulture 'en-US'
 
 <#
     .SYNOPSIS
+        This helper function determines if an optical disk can be managed
+        or not by this resource.
+
+    .PARAMETER OpticalIdsk
+        The cimv2:Win32_CDROMDrive instance of the optical disk that should
+        be checked.
+
+    .OUTPUTS
+        System.Boolean
+
+    .NOTES
+        This function will use the following logic when determining if a drive is
+        a mounted ISO and therefore should **not** be mnanaged by this resource:
+
+        - Get the Drive letter assigned to the drive in the `cimv2:Win32_CDROMDrive`
+          instance
+        - If the drive letter is set, query the volume information for the device
+           using drive letter and get the device path.
+        - If the drive letter is not set, just use the drive as the device path.
+        - Look up the disk image using the device path.
+        - If no error occurs then the device is a mounted ISO and should not be
+          used with this resource.
+          If a "The specified disk is not a virtual disk." error occurs then it
+          is not an ISO and can be managed by this resource.
+#>
+function Test-OpticalDiskCanBeManaged
+{
+    [CmdletBinding()]
+    [OutputType([System.Boolean])]
+    param
+    (
+        [Parameter(Mandatory = $true)]
+        [Microsoft.Management.Infrastructure.CimInstance]
+        $OpticalDisk
+    )
+
+    $diskCanBeManaged = $false
+    <#
+        If the OpticalDisk.Drive matches Volume{<Guid>} then the disk is not
+        assigned a drive letter and so just use the drive value as a device
+        path.
+    #>
+    if ($OpticalDisk.Drive -match 'Volume{.*}')
+    {
+        $devicePath = "\\?\$($OpticalDisk.Drive)"
+
+        Write-Verbose -Message ( @(
+            "$($MyInvocation.MyCommand): "
+            $($script:localizedData.TestOpticalDiskWithoutDriveLetterCanBeManaged -f $devicePath)
+        ) -join '')
+    }
+    else
+    {
+        $driveLetter = $OpticalDisk.Drive
+        $devicePath = (Get-CimInstance `
+            -ClassName Win32_Volume `
+            -Filter "DriveLetter = '$($driveLetter)'").DeviceId -replace "\\$"
+
+        if ([System.String]::IsNullOrEmpty($devicePath))
+        {
+            <#
+                A drive letter is not assigned to this disk, but the Drive property does
+                not contain a Volume{<Guid>} value. This has prevented the volume to be
+                matched to the disk. This prevents this disk from being managed, but it
+                is not a terminal error.
+            #>
+            Write-Warning -Message ( @(
+                "$($MyInvocation.MyCommand): "
+                $($script:localizedData.TestOpticalDiskVolumeNotMatchableWarning -f $driveLetter)
+            ) -join '')
+        }
+        else
+        {
+            Write-Verbose -Message ( @(
+                "$($MyInvocation.MyCommand): "
+                $($script:localizedData.TestOpticalDiskWithDriveLetterCanBeManaged -f $devicePath, $driveLetter)
+            ) -join '')
+        }
+    }
+
+    if ($devicePath)
+    {
+        try
+        {
+            <#
+                If the device is not a mounted ISO then the Get-DiskImage will throw an
+                Microsoft.Management.Infrastructure.CimException exception with the
+                message "The specified disk is not a virtual disk."
+            #>
+            Get-DiskImage -DevicePath $devicePath -ErrorAction Stop | Out-Null
+        }
+        catch [Microsoft.Management.Infrastructure.CimException]
+        {
+            if ($_.Exception.Message.TrimEnd() -eq $script:localizedData.DiskIsNotAVirtualDiskError)
+            {
+                # This is not a mounted ISO, so it can managed
+                $diskCanBeManaged = $true
+            }
+            else
+            {
+                throw $_
+            }
+        }
+
+        Write-Verbose -Message ( @(
+            "$($MyInvocation.MyCommand): "
+            $($script:localizedData.OpticalDiskCanBeManagedStatus -f $devicePath, @('can not', 'can')[0, 1][$diskCanBeManaged])
+        ) -join '')
+    }
+
+    return $diskCanBeManaged
+}
+
+<#
+    .SYNOPSIS
         This helper function returns a hashtable containing the current
         drive letter assigned to the optical disk in the system matching
         the disk number.
@@ -23,18 +138,13 @@ $script:localizedData = Get-LocalizedData -DefaultUICulture 'en-US'
         If there are no optical disks found in the system an exception
         will be thrown.
 
+        The function will exclude all optical disks that are mounted ISOs
+        as determined by the Test-OpticalDiskCanBeManaged function because
+        these should be managed by the DSC_MountImage resource.
+
     .PARAMETER DiskId
         Specifies the optical disk number for the disk to return the drive
         letter of.
-
-    .NOTES
-        The Caption and DeviceID properties are checked to avoid
-        mounted ISO images in Windows 2012+ and Windows 10. The
-        device ID is required because a CD/DVD in a Hyper-V virtual
-        machine has the same caption as a mounted ISO.
-
-        Example DeviceID for a virtual drive in a Hyper-V VM - SCSI\CDROM&VEN_MSFT&PROD_VIRTUAL_DVD-ROM\000006
-        Example DeviceID for a mounted ISO   in a Hyper-V VM - SCSI\CDROM&VEN_MSFT&PROD_VIRTUAL_DVD-ROM\2&1F4ADFFE&0&000002
 #>
 function Get-OpticalDiskDriveLetter
 {
@@ -54,19 +164,16 @@ function Get-OpticalDiskDriveLetter
             $($script:localizedData.UsingGetCimInstanceToFetchDriveLetter -f $DiskId)
         ) -join '' )
 
-    # Get the optical disk matching the Id
+    # Get all optical disks in the system that are not mounted ISOs
     $opticalDisks = Get-CimInstance -ClassName Win32_CDROMDrive |
         Where-Object -FilterScript {
-        -not (
-            $_.Caption -eq 'Microsoft Virtual DVD-ROM' -and
-            ($_.DeviceID.Split('\')[-1]).Length -gt 10
-        )
-    }
+            Test-OpticalDiskCanBeManaged -OpticalDisk $_
+        }
 
     if ($opticalDisks)
     {
         <#
-            To behave in a similar fashion to the other xStorage resources the
+            To behave in a similar fashion to the other StorageDsc resources the
             DiskId represents the number of the optical disk in the system.
             However as these are returned as an array of 0..x elements then
             subtract one from the DiskId to get the actual optical disk number
@@ -99,7 +206,7 @@ function Get-OpticalDiskDriveLetter
     if ([System.String]::IsNullOrEmpty($deviceId))
     {
         # The requested optical drive does not exist in the system
-        Write-Verbose -Message ( @(
+        Write-Warning -Message ( @(
                 "$($MyInvocation.MyCommand): "
                 $($script:localizedData.OpticalDiskDriveDoesNotExist -f $DiskId)
             ) -join '' )
@@ -220,6 +327,7 @@ function Set-TargetResource
 
     # Get the drive letter assigned to the optical disk
     $currentDriveInfo = Get-OpticalDiskDriveLetter -DiskId $DiskId
+
     $currentDriveLetter = $currentDriveInfo.DriveLetter
 
     if ([System.String]::IsNullOrWhiteSpace($currentDriveLetter))
@@ -314,6 +422,7 @@ function Test-TargetResource
 
     # Get the drive letter assigned to the optical disk
     $currentDriveInfo = Get-OpticalDiskDriveLetter -DiskId $DiskId
+
     $currentDriveLetter = $currentDriveInfo.DriveLetter
 
     if ($Ensure -eq 'Absent')
