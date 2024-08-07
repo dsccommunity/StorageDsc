@@ -1465,7 +1465,10 @@ try
 
         Describe 'DSC_Disk\Set-TargetResource' {
             BeforeAll {
-                $localizedCommonStrings = Get-LocalizedData -BaseDirectory "$modulePath\StorageDsc.Common" -FileName "StorageDsc.Common.strings.psd1"
+                $localizedCommonStrings = Get-LocalizedData `
+                    -BaseDirectory "$modulePath\StorageDsc.Common" `
+                    -FileName 'StorageDsc.Common.strings' `
+                    -DefaultUICulture 'en-US'
             }
 
             Context 'When offline GPT disk using Disk Number' {

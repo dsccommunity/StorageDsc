@@ -5,15 +5,48 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [6.0.1] - 2024-06-11
+
+### Fixed
+
+- OpticalDiskDriveLetter:
+  - Some operating systems report the optical disk in the Win32_CDROMDrive list,
+    but a volume that matches either the DeviceId or DriveLetter can not be found.
+    This caused an `Cannot bind argument to parameter 'DevicePath' because it is an empty string.`
+    exception to occur in the `Test-OpticalDiskCanBeManaged`. Prevented this
+    exception from occuring by marking disk as not manageable - Fixes [Issue #289](https://github.com/dsccommunity/StorageDsc/issues/289).
+- Azure DevOps Build Pipeline:
+  - Update pipeline files to use latest DSC Community pattern and sampler tasks.
+
+## [6.0.0] - 2024-03-19
+
 ### Added
 
 - Disk:
   - BREAKING CHANGE: Added support for volumes to be formatted as Dev Drives -
-    Fixes [Issue #276](https://github.com/dsccommunity/StorageDsc/issues/276)
+    Fixes [Issue #276](https://github.com/dsccommunity/StorageDsc/issues/276).
   - Fixed minor markdown linting issues in README.md and used to issue BREAKING
-    CHANGE commit - Fixes [Issue #282](https://github.com/dsccommunity/StorageDsc/issues/282)
-- Updated tag from 'Dev Drive' to 'DevDrive' in manifest file - Fixes [Issue #280](https://github.com/dsccommunity/StorageDsc/issues/280)
+    CHANGE commit - Fixes [Issue #282](https://github.com/dsccommunity/StorageDsc/issues/282).
+- Updated tag from 'Dev Drive' to 'DevDrive' in manifest file - Fixes [Issue #280](https://github.com/dsccommunity/StorageDsc/issues/280).
 - Added DSC_VirtualHardDisk resource for creating virtual disks and tests - Fixes [Issue #277](https://github.com/dsccommunity/StorageDsc/issues/277)
+
+### Changed
+
+- OpticalDiskDriveLetter:
+  - Fix detection of virtual optical drives by changing logic to detect how
+    a mounted ISO is detected. This resolves issues with using the resource
+    in Azure Gen2 VMs with Windows Server 2022 Azure Edition - Fixes [Issue #285](https://github.com/dsccommunity/StorageDsc/issues/285).
+
+### Fixed
+
+- Azure DevOps Build Pipeline:
+  - Tests 'Unit (Windows Server 2022)' corrected to execute on Windows Server
+    2022 node instead of Windows Server 2019.
+  - 'Package Module' job runs on 'windows-latest' hosted agent to resolve
+    'Unable to load shared library 'libmi' or one of its dependencies.' error.
+- Disk:
+  - Fixed unit test failure loading `StorageDsc.Common.strings` due to change in
+    `DscResource.Common\Get-LocalizationData` in [this PR](https://github.com/dsccommunity/DscResource.Common/pull/109).
 
 ## [5.1.0] - 2023-02-22
 
