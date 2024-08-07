@@ -30,7 +30,7 @@ function Get-TargetResource
     (
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [String]
+        [System.String]
         $FilePath
     )
 
@@ -40,11 +40,11 @@ function Get-TargetResource
         ) -join '' )
 
     $diskImage = Get-DiskImage -ImagePath $FilePath -ErrorAction SilentlyContinue
-    $Ensure = 'Present'
+    $ensure = 'Present'
 
     if (-not $diskImage)
     {
-        $Ensure = 'Absent'
+        $ensure = 'Absent'
     }
 
     # Get the virtual hard disk info using its path on the system
@@ -53,7 +53,7 @@ function Get-TargetResource
         Attached   = $diskImage.Attached
         Size       = $diskImage.Size
         DiskNumber = $diskImage.DiskNumber
-        Ensure     = $Ensure
+        Ensure     = $ensure
     }
 } # function Get-TargetResource
 
@@ -83,11 +83,11 @@ function Set-TargetResource
     (
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [String]
+        [System.String]
         $FilePath,
 
         [Parameter()]
-        [ValidateScript({$_ -gt 0})]
+        [ValidateScript({ $_ -gt 0 })]
         [System.UInt64]
         $DiskSize,
 
@@ -102,24 +102,29 @@ function Set-TargetResource
         $DiskType = 'Dynamic',
 
         [Parameter()]
-        [ValidateSet('Present','Absent')]
+        [ValidateSet('Present', 'Absent')]
         [System.String]
         $Ensure = 'Present'
     )
 
     Assert-ParametersValid -FilePath $FilePath -DiskSize $DiskSize -DiskFormat $DiskFormat
 
-    $resource = Get-TargetResource -FilePath $FilePath
+    if (-not (Test-RunningAsAdministrator))
+    {
+        throw $script:localizedData.VirtualDiskAdminError
+    }
+
+    $currentState = Get-TargetResource -FilePath $FilePath
 
     if ($Ensure -eq 'Present')
     {
         # Disk doesn't exist
-        if (-not $resource.FilePath)
+        if (-not $currentState.FilePath)
         {
             Write-Verbose -Message ( @(
-                "$($MyInvocation.MyCommand): "
-                $($script:localizedData.VirtualHardDiskDoesNotExistCreatingNow -f $FilePath)
-            ) -join '' )
+                    "$($MyInvocation.MyCommand): "
+                    $($script:localizedData.VirtualHardDiskDoesNotExistCreatingNow -f $FilePath)
+                ) -join '' )
 
             $folderPath = Split-Path -Parent $FilePath
             $wasLocationCreated = $false
@@ -137,16 +142,16 @@ function Set-TargetResource
             }
             catch
             {
-                 # Remove file if we created it but were unable to attach it. No handles are open when this happens.
+                # Remove file if we created it but were unable to attach it. No handles are open when this happens.
                 if (Test-Path -Path $FilePath -PathType Leaf)
                 {
                     Write-Verbose -Message ($script:localizedData.RemovingCreatedVirtualHardDiskFile -f $FilePath)
-                    Remove-Item $FilePath -verbose
+                    Remove-Item -LiteralPath $FilePath -Verbose -Force
                 }
 
                 if ($wasLocationCreated)
                 {
-                    Remove-Item -LiteralPath $folderPath -verbose
+                    Remove-Item -LiteralPath $folderPath -Verbose -Force
                 }
 
                 # Rethrow the exception
@@ -154,11 +159,11 @@ function Set-TargetResource
             }
 
         }
-        elseif (-not $resource.Attached)
+        elseif (-not $currentState.Attached)
         {
             Write-Verbose -Message ( @(
-                "$($MyInvocation.MyCommand): "
-                $($script:localizedData.VirtualDiskNotAttached -f $FilePath)
+                    "$($MyInvocation.MyCommand): "
+                    $($script:localizedData.VirtualDiskNotMounted -f $FilePath)
                 ) -join '' )
 
             # Virtual hard disk file exists so lets attempt to attach it to the system.
@@ -168,12 +173,12 @@ function Set-TargetResource
     else
     {
         # Detach the virtual hard disk if its not suppose to be attached.
-        if ($resource.Attached)
+        if ($currentState.Attached)
         {
             Write-Verbose -Message ( @(
                     "$($MyInvocation.MyCommand): "
                     $($script:localizedData.VirtualHardDiskDetachingImage `
-                        -f $FilePath)
+                            -f $FilePath)
                 ) -join '' )
 
             Dismount-DiskImage -ImagePath $FilePath
@@ -205,14 +210,14 @@ function Test-TargetResource
     [CmdletBinding()]
     [OutputType([System.Boolean])]
     param
-     (
+    (
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [String]
+        [System.String]
         $FilePath,
 
         [Parameter()]
-        [ValidateScript({$_ -gt 0})]
+        [ValidateScript({ $_ -gt 0 })]
         [System.UInt64]
         $DiskSize,
 
@@ -227,57 +232,57 @@ function Test-TargetResource
         $DiskType = 'Dynamic',
 
         [Parameter()]
-        [ValidateSet('Present','Absent')]
+        [ValidateSet('Present', 'Absent')]
         [System.String]
         $Ensure = 'Present'
     )
 
     Assert-ParametersValid -FilePath $FilePath -DiskSize $DiskSize -DiskFormat $DiskFormat
 
-    $resource = Get-TargetResource -FilePath $FilePath
+    $currentState = Get-TargetResource -FilePath $FilePath
 
     Write-Verbose -Message ( @(
-        "$($MyInvocation.MyCommand): "
-        $($script:localizedData.CheckingVirtualDiskExists -f $FilePath)
-    ) -join '' )
+            "$($MyInvocation.MyCommand): "
+            $($script:localizedData.CheckingVirtualDiskExists -f $FilePath)
+        ) -join '' )
 
     if ($Ensure -eq 'Present')
     {
         # Found the virtual hard disk and confirmed its attached to the system.
-        if ($resource.Attached)
+        if ($currentState.Attached)
         {
             Write-Verbose -Message ( @(
-                "$($MyInvocation.MyCommand): "
-                $($script:localizedData.VirtualHardDiskCurrentlyAttached -f $FilePath)
-            ) -join '' )
+                    "$($MyInvocation.MyCommand): "
+                    $($script:localizedData.VirtualHardDiskCurrentlyMounted -f $FilePath)
+                ) -join '' )
 
             return $true
         }
 
         Write-Verbose -Message ( @(
-            "$($MyInvocation.MyCommand): "
-            $($script:localizedData.VirtualHardDiskMayNotExistOrNotAttached -f $FilePath)
-        ) -join '' )
+                "$($MyInvocation.MyCommand): "
+                $($script:localizedData.VirtualHardDiskMayNotExistOrNotMounted -f $FilePath)
+            ) -join '' )
 
         return $false
     }
     else
     {
         # Found the virtual hard disk and confirmed its attached to the system but ensure variable set to 'Absent'.
-        if ($resource.Attached)
+        if ($currentState.Attached)
         {
             Write-Verbose -Message ( @(
-                "$($MyInvocation.MyCommand): "
-                $($script:localizedData.VirtualHardDiskCurrentlyAttachedButShouldNotBe -f $FilePath)
-            ) -join '' )
+                    "$($MyInvocation.MyCommand): "
+                    $($script:localizedData.VirtualHardDiskCurrentlyMountedButShouldNotBe -f $FilePath)
+                ) -join '' )
 
             return $false
         }
 
         Write-Verbose -Message ( @(
-            "$($MyInvocation.MyCommand): "
-            $($script:localizedData.VirtualHardDiskMayNotExistOrNotAttached -f $FilePath)
-        ) -join '' )
+                "$($MyInvocation.MyCommand): "
+                $($script:localizedData.VirtualHardDiskMayNotExistOrNotMounted -f $FilePath)
+            ) -join '' )
 
         return $true
     }
@@ -303,10 +308,11 @@ function Assert-ParametersValid
     (
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [String]
+        [System.String]
         $FilePath,
 
         [Parameter(Mandatory = $true)]
+        [ValidateScript({ $_ -gt 0 })]
         [System.UInt64]
         $DiskSize,
 
@@ -337,8 +343,8 @@ function Assert-ParametersValid
         elseif ($extension -ne $DiskFormat)
         {
             New-InvalidArgumentException `
-              -Message $($script:localizedData.VirtualHardDiskExtensionAndFormatMismatchError -f $FilePath, $extension, $DiskFormat) `
-              -ArgumentName 'FilePath'
+                -Message $($script:localizedData.VirtualHardDiskExtensionAndFormatMismatchError -f $FilePath, $extension, $DiskFormat) `
+                -ArgumentName 'FilePath'
         }
     }
     else
@@ -356,25 +362,25 @@ function Assert-ParametersValid
     $isInValidSizeForVhdFormat = ($DiskSize -lt 10MB -bor $DiskSize -gt 2040GB)
     $isInValidSizeForVhdxFormat = ($DiskSize -lt 10MB -bor $DiskSize -gt 64TB)
     if ((-not $isVhdxFormat -and $isInValidSizeForVhdFormat) -bor
-        ($IsVhdxFormat -and $isInValidSizeForVhdxFormat))
+        ($isVhdxFormat -and $isInValidSizeForVhdxFormat))
     {
         if ($DiskSize -lt 1GB)
         {
-            $DiskSizeString =  ($DiskSize / 1MB).ToString("0.00MB")
+            $diskSizeString = ($DiskSize / 1MB).ToString('0.00MB')
         }
         else
         {
-            $DiskSizeString =  ($DiskSize / 1TB).ToString("0.00TB")
+            $diskSizeString = ($DiskSize / 1TB).ToString('0.00TB')
         }
 
-        $InvalidSizeMsg = $script:localizedData.VhdFormatDiskSizeInvalid
+        $invalidSizeMsg = $script:localizedData.VhdFormatDiskSizeInvalid
         if ($isVhdxFormat)
         {
-            $InvalidSizeMsg = $script:localizedData.VhdxFormatDiskSizeInvalid
+            $invalidSizeMsg = $script:localizedData.VhdxFormatDiskSizeInvalid
         }
 
         New-InvalidArgumentException `
-            -Message $($InvalidSizeMsg -f $DiskSizeString) `
+            -Message $($invalidSizeMsg -f $diskSizeString) `
             -ArgumentName 'DiskSize'
     }
 } #  Assert-ParametersValid

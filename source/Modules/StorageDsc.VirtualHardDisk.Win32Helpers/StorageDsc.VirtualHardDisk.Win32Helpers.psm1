@@ -16,7 +16,7 @@ function Get-VirtDiskWin32HelperScript
     param
     ()
 
-    $virtDiskDefinitions =  @'
+    $virtDiskDefinitions = @'
 
         // https://learn.microsoft.com/en-us/windows/win32/api/virtdisk/ns-virtdisk-virtual_storage_type
         [StructLayout(LayoutKind.Sequential)]
@@ -141,17 +141,20 @@ function Get-VirtDiskWin32HelperScript
             -Name 'Helper' `
             -MemberDefinition $virtDiskDefinitions `
             -UsingNamespace `
-                'System.ComponentModel',
-                'Microsoft.Win32.SafeHandles'
+            'System.ComponentModel',
+        'Microsoft.Win32.SafeHandles'
     }
 
     return $script:VirtDiskHelper
 } # end function Get-VirtDiskWin32HelperScript
 
 <#
+    .DESCRIPTION
+        Calls the CreateVirtualDisk Win32 api to create a new virtual disk.
+        This is used so we can mock this call easier.
+
     .SYNOPSIS
-        Calls Win32 CreateVirtualDisk api. This is used so we can mock this call
-        easier.
+        Creates a new virtual disk.
 
     .PARAMETER VirtualStorageType
         Specifies the type and provider (vendor) of the virtual storage device.
@@ -192,6 +195,7 @@ function New-VirtualDiskUsingWin32
         $VirtualStorageType,
 
         [Parameter(Mandatory = $true)]
+        [ValidateScript({ -not (Test-Path $_) })]
         [System.String]
         $VirtualDiskPath,
 
@@ -239,9 +243,12 @@ function New-VirtualDiskUsingWin32
 } # end function New-VirtualDiskUsingWin32
 
 <#
+    .DESCRIPTION
+        Calls the AttachVirtualDisk Win32 api to mount an existing virtual disk
+        to the system. This is used so we can mock this call easier.
+
     .SYNOPSIS
-        Calls Win32 AttachVirtualDisk api. This is used so we can mock this call
-        easier.
+        Mounts an existing virtual disk to the system.
 
     .PARAMETER Handle
         Specifies the reference to a handle to a virtual disk file.
@@ -305,9 +312,12 @@ function Add-VirtualDiskUsingWin32
 } # end function Add-VirtualDiskUsingWin32
 
 <#
+    .DESCRIPTION
+        Calls the OpenVirtualDisk Win32 api to open an existing virtual disk.
+        This is used so we can mock this call easier.
+
     .SYNOPSIS
-        Calls Win32 OpenVirtualDisk api. This is used so we can mock this call
-        easier.
+        Opens an existing virtual disk.
 
     .PARAMETER VirtualStorageType
         Specifies the type and provider (vendor) of the virtual storage device.
@@ -338,6 +348,7 @@ function Get-VirtualDiskUsingWin32
         $VirtualStorageType,
 
         [Parameter(Mandatory = $true)]
+        [ValidateScript({ Test-Path $_ })]
         [System.String]
         $VirtualDiskPath,
 
@@ -371,7 +382,7 @@ function Get-VirtualDiskUsingWin32
 
 <#
     .SYNOPSIS
-        Creates and attaches a virtual disk to the system.
+        Creates and mounts a virtual disk to the system.
 
     .PARAMETER VirtualDiskPath
         Specifies the whole path to the virtual disk file.
@@ -414,7 +425,7 @@ function New-SimpleVirtualDisk
 
     # Get parameters for CreateVirtualDisk function
     [ref]$virtualStorageType = Get-VirtualStorageType -DiskFormat $DiskFormat
-    [ref]$createVirtualDiskParameters = New-Object VirtDisk.Helper+CREATE_VIRTUAL_DISK_PARAMETERS
+    [ref]$createVirtualDiskParameters = New-Object -TypeName VirtDisk.Helper+CREATE_VIRTUAL_DISK_PARAMETERS
     $createVirtualDiskParameters.Value.Version = [VirtDisk.Helper]::CREATE_VIRTUAL_DISK_VERSION_2
     $createVirtualDiskParameters.Value.MaximumSize = $DiskSizeInBytes
     $securityDescriptor = [System.IntPtr]::Zero
@@ -435,6 +446,7 @@ function New-SimpleVirtualDisk
 
     try
     {
+        # create the virtual disk
         $result = New-VirtualDiskUsingWin32 `
             -VirtualStorageType $virtualStorageType `
             -VirtualDiskPath $VirtualDiskPath `
@@ -451,11 +463,12 @@ function New-SimpleVirtualDisk
             $win32Error = [System.ComponentModel.Win32Exception]::new($result)
             throw [System.Exception]::new( `
                 ($script:localizedData.CreateVirtualDiskError -f $VirtualDiskPath, $win32Error.Message), `
-                $win32Error)
+                    $win32Error)
         }
 
         Write-Verbose -Message ($script:localizedData.VirtualDiskCreatedSuccessfully -f $VirtualDiskPath)
 
+        # Mount the newly created virtual disk
         Add-SimpleVirtualDisk `
             -VirtualDiskPath $VirtualDiskPath `
             -DiskFormat $DiskFormat `
@@ -473,7 +486,7 @@ function New-SimpleVirtualDisk
 
 <#
     .SYNOPSIS
-        Attaches a virtual disk to the system.
+        Mounts a virtual disk to the system.
 
     .PARAMETER VirtualDiskPath
         Specifies the whole path to the virtual disk file.
@@ -504,7 +517,7 @@ function Add-SimpleVirtualDisk
     )
     try
     {
-        Write-Verbose -Message ($script:localizedData.AttachingVirtualDiskMessage -f $VirtualDiskPath)
+        Write-Verbose -Message ($script:localizedData.MountingVirtualDiskMessage -f $VirtualDiskPath)
 
         $vDiskHelper = Get-VirtDiskWin32HelperScript
 
@@ -515,29 +528,22 @@ function Add-SimpleVirtualDisk
         }
 
         # Build parameters for AttachVirtualDisk function.
-        [ref]$attachVirtualDiskParameters = New-Object VirtDisk.Helper+ATTACH_VIRTUAL_DISK_PARAMETERS
+        [ref]$attachVirtualDiskParameters = New-Object -TypeName VirtDisk.Helper+ATTACH_VIRTUAL_DISK_PARAMETERS
         $attachVirtualDiskParameters.Value.Version = [VirtDisk.Helper]::ATTACH_VIRTUAL_DISK_VERSION_1
         $securityDescriptor = [System.IntPtr]::Zero
         $providerSpecificFlags = 0
         $result = 0
 
         <#
-            Some builds of Windows may not have the ATTACH_VIRTUAL_DISK_FLAG_AT_BOOT flag. So we attempt to attach the virtual
-            disk with the flag first. If this fails we attach the virtual disk without the flag. The flag allows the
-            virtual disk to be attached by the system at boot time.
+            Some builds of Windows may not have the ATTACH_VIRTUAL_DISK_FLAG_AT_BOOT flag. So we attempt to mount the virtual
+            disk with the flag first. If this fails we mount the virtual disk without the flag. The flag allows the
+            virtual disk to be auto-mounted by the system at boot time.
         #>
-        for ($attempts = 0; $attempts -lt 2; $attempts++)
-        {
-            if ($attempts -eq 0)
-            {
-                $flags = [VirtDisk.Helper]::ATTACH_VIRTUAL_DISK_FLAG_PERMANENT_LIFETIME -bor
-                    [VirtDisk.Helper]::ATTACH_VIRTUAL_DISK_FLAG_AT_BOOT
-            }
-            else
-            {
-                $flags = [VirtDisk.Helper]::ATTACH_VIRTUAL_DISK_FLAG_PERMANENT_LIFETIME
-            }
+        $combinedFlags = [VirtDisk.Helper]::ATTACH_VIRTUAL_DISK_FLAG_PERMANENT_LIFETIME -bor [VirtDisk.Helper]::ATTACH_VIRTUAL_DISK_FLAG_AT_BOOT
+        $attemptFlagValues = @($combinedFlags, [VirtDisk.Helper]::ATTACH_VIRTUAL_DISK_FLAG_PERMANENT_LIFETIME)
 
+        foreach ($flags in $attemptFlagValues)
+        {
             $result = Add-VirtualDiskUsingWin32 `
                 -Handle $Handle `
                 -SecurityDescriptor $securityDescriptor `
@@ -556,11 +562,11 @@ function Add-SimpleVirtualDisk
         {
             $win32Error = [System.ComponentModel.Win32Exception]::new($result)
             throw [System.Exception]::new( `
-                ($script:localizedData.AttachVirtualDiskError -f $VirtualDiskPath, $win32Error.Message), `
-                $win32Error)
+                ($script:localizedData.MountVirtualDiskError -f $VirtualDiskPath, $win32Error.Message), `
+                    $win32Error)
         }
 
-        Write-Verbose -Message ($script:localizedData.VirtualDiskAttachedSuccessfully -f $VirtualDiskPath)
+        Write-Verbose -Message ($script:localizedData.VirtualDiskMountedSuccessfully -f $VirtualDiskPath)
     }
     finally
     {
@@ -598,12 +604,12 @@ function Get-VirtualDiskHandle
         $DiskFormat
     )
 
-    Write-Verbose -Message ($script:localizedData.OpeningVirtualBeforeAttachingMessage)
+    Write-Verbose -Message ($script:localizedData.OpeningVirtualBeforeMountingMessage)
     $vDiskHelper = Get-VirtDiskWin32HelperScript
 
     # Get parameters for OpenVirtualDisk function.
-    [ref]$virtualStorageType =  Get-VirtualStorageType -DiskFormat $DiskFormat
-    [ref]$openVirtualDiskParameters = New-Object VirtDisk.Helper+OPEN_VIRTUAL_DISK_PARAMETERS
+    [ref]$virtualStorageType = Get-VirtualStorageType -DiskFormat $DiskFormat
+    [ref]$openVirtualDiskParameters = New-Object -TypeName VirtDisk.Helper+OPEN_VIRTUAL_DISK_PARAMETERS
     $openVirtualDiskParameters.Value.Version = [VirtDisk.Helper]::OPEN_VIRTUAL_DISK_VERSION_1
     $accessMask = [VirtDisk.Helper]::VIRTUAL_DISK_ACCESS_ALL
     $flags = [VirtDisk.Helper]::OPEN_VIRTUAL_DISK_FLAG_NONE
@@ -624,7 +630,7 @@ function Get-VirtualDiskHandle
         $win32Error = [System.ComponentModel.Win32Exception]::new($result)
         throw [System.Exception]::new( `
             ($script:localizedData.OpenVirtualDiskError -f $VirtualDiskPath, $win32Error.Message), `
-            $win32Error)
+                $win32Error)
     }
 
     Write-Verbose -Message ($script:localizedData.VirtualDiskOpenedSuccessfully -f $VirtualDiskPath)

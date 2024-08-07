@@ -58,7 +58,7 @@ config/machine could result in an invalid config.
 
 1. The resource only supports `.vhd` and `.vhdx` files. No other virtual hard disk
 file extension is supported at this time.
-1. The ability to `expand` the max size of the virtual hard disk after its creation
+1. The ability to `expand` the max size of the virtual hard disk after its creation is not currently included in this resource.
 1. The ability to `shrink` the max size of the virtual hard disk after its creation
 is not currently included in this resource.
 1. The resource uses default values internally to create the virtual hard disk

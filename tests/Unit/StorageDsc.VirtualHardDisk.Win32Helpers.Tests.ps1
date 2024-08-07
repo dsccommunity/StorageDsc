@@ -26,7 +26,7 @@ Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath '..\TestHelpers\Co
 
 # Begin Testing
 InModuleScope $script:subModuleName {
-    Function New-VirtualDiskUsingWin32
+    function New-VirtualDiskUsingWin32
     {
         [CmdletBinding()]
         [OutputType([System.Int32])]
@@ -70,7 +70,7 @@ InModuleScope $script:subModuleName {
         )
     }
 
-    Function Add-VirtualDiskUsingWin32
+    function Add-VirtualDiskUsingWin32
     {
         [CmdletBinding()]
         [OutputType([System.Int32])]
@@ -102,7 +102,7 @@ InModuleScope $script:subModuleName {
         )
     }
 
-    Function Get-VirtualDiskUsingWin32
+    function Get-VirtualDiskUsingWin32
     {
         [CmdletBinding()]
         [OutputType([System.Int32])]
@@ -140,17 +140,17 @@ InModuleScope $script:subModuleName {
     [ref]$script:TestHandle = [Microsoft.Win32.SafeHandles.SafeFileHandle]::Zero
 
     $script:mockedParams = [pscustomobject] @{
-        DiskSizeInBytes   = 65Gb
-        VirtualDiskPath   = $script:DiskImageGoodVhdxPath
-        DiskType          = 'dynamic'
-        DiskFormat        = 'vhdx'
+        DiskSizeInBytes = 65Gb
+        VirtualDiskPath = $script:DiskImageGoodVhdxPath
+        DiskType        = 'dynamic'
+        DiskFormat      = 'vhdx'
     }
 
     $script:mockedVhdParams = [pscustomobject] @{
-        DiskSizeInBytes   = 65Gb
-        VirtualDiskPath   = $script:DiskImageGoodVhdxPath
-        DiskType          = 'dynamic'
-        DiskFormat        = 'vhd'
+        DiskSizeInBytes = 65Gb
+        VirtualDiskPath = $script:DiskImageGoodVhdxPath
+        DiskType        = 'dynamic'
+        DiskFormat      = 'vhd'
     }
 
     Describe 'StorageDsc.VirtualHardDisk.Win32Helpers\New-SimpleVirtualDisk' -Tag 'New-SimpleVirtualDisk' {
@@ -165,16 +165,16 @@ InModuleScope $script:subModuleName {
                 -MockWith { 0 } `
                 -Verifiable
 
-                It 'Should not throw an exception' {
-                    {
-                        New-SimpleVirtualDisk `
-                            -VirtualDiskPath $script:mockedParams.VirtualDiskPath `
-                            -DiskSizeInBytes $script:mockedParams.DiskSizeInBytes `
-                            -DiskFormat $script:mockedParams.DiskFormat `
-                            -DiskType $script:mockedParams.DiskType`
-                            -Verbose
-                    } | Should -Not -Throw
-                }
+            It 'Should not throw an exception' {
+                {
+                    New-SimpleVirtualDisk `
+                        -VirtualDiskPath $script:mockedParams.VirtualDiskPath `
+                        -DiskSizeInBytes $script:mockedParams.DiskSizeInBytes `
+                        -DiskFormat $script:mockedParams.DiskFormat `
+                        -DiskType $script:mockedParams.DiskType`
+                        -Verbose
+                } | Should -Not -Throw
+            }
 
             It 'Should only call required mocks' {
                 Assert-VerifiableMock
@@ -194,16 +194,16 @@ InModuleScope $script:subModuleName {
                 -MockWith { 0 } `
                 -Verifiable
 
-                It 'Should not throw an exception' {
-                    {
-                        New-SimpleVirtualDisk `
-                            -VirtualDiskPath $script:mockedVhdParams.VirtualDiskPath `
-                            -DiskSizeInBytes $script:mockedVhdParams.DiskSizeInBytes `
-                            -DiskFormat $script:mockedVhdParams.DiskFormat `
-                            -DiskType $script:mockedVhdParams.DiskType`
-                            -Verbose
-                    } | Should -Not -Throw
-                }
+            It 'Should not throw an exception' {
+                {
+                    New-SimpleVirtualDisk `
+                        -VirtualDiskPath $script:mockedVhdParams.VirtualDiskPath `
+                        -DiskSizeInBytes $script:mockedVhdParams.DiskSizeInBytes `
+                        -DiskFormat $script:mockedVhdParams.DiskFormat `
+                        -DiskType $script:mockedVhdParams.DiskType`
+                        -Verbose
+                } | Should -Not -Throw
+            }
 
             It 'Should only call required mocks' {
                 Assert-VerifiableMock
@@ -221,7 +221,7 @@ InModuleScope $script:subModuleName {
             $win32Error = [System.ComponentModel.Win32Exception]::new($script:AccessDeniedWin32Error)
             $exception = [System.Exception]::new( `
                 ($script:localizedData.CreateVirtualDiskError -f $script:mockedParams.VirtualDiskPath, $win32Error.Message), `
-                $win32Error)
+                    $win32Error)
 
             It 'Should throw an exception in creation method' {
                 {
@@ -256,8 +256,8 @@ InModuleScope $script:subModuleName {
 
             $win32Error = [System.ComponentModel.Win32Exception]::new($script:AccessDeniedWin32Error)
             $exception = [System.Exception]::new( `
-                ($script:localizedData.AttachVirtualDiskError -f $script:mockedParams.VirtualDiskPath, $win32Error.Message), `
-                $win32Error)
+                ($script:localizedData.MountVirtualDiskError -f $script:mockedParams.VirtualDiskPath, $win32Error.Message), `
+                    $win32Error)
 
             It 'Should throw an exception during attach function' {
                 {
@@ -314,7 +314,7 @@ InModuleScope $script:subModuleName {
             $win32Error = [System.ComponentModel.Win32Exception]::new($script:AccessDeniedWin32Error)
             $exception = [System.Exception]::new( `
                 ($script:localizedData.OpenVirtualDiskError -f $script:mockedParams.VirtualDiskPath, $win32Error.Message), `
-                $win32Error)
+                    $win32Error)
 
             It 'Should throw an exception while attempting to open virtual disk file' {
                 {
