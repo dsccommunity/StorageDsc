@@ -149,26 +149,26 @@ try
                     -MockWith { $script:mockedDiskImageEmpty } `
                     -Verifiable
 
-                $resource = Get-TargetResource -FilePath $script:DiskImageBadPath -Verbose
+                $currentState = Get-TargetResource -FilePath $script:DiskImageBadPath -Verbose
 
                 It "Should return DiskNumber $($script:GetTargetOutputWhenBadPath.DiskNumber)" {
-                    $resource.DiskNumber | Should -Be $script:GetTargetOutputWhenBadPath.DiskNumber
+                    $currentState.DiskNumber | Should -Be $script:GetTargetOutputWhenBadPath.DiskNumber
                 }
 
                 It "Should return FilePath $($script:GetTargetOutputWhenBadPath.FilePath)" {
-                    $resource.FilePath | Should -Be $script:GetTargetOutputWhenBadPath.FilePath
+                    $currentState.FilePath | Should -Be $script:GetTargetOutputWhenBadPath.FilePath
                 }
 
                 It "Should return Mounted $($script:GetTargetOutputWhenBadPath.Attached)" {
-                    $resource.Attached | Should -Be $script:GetTargetOutputWhenBadPath.Attached
+                    $currentState.Attached | Should -Be $script:GetTargetOutputWhenBadPath.Attached
                 }
 
                 It "Should return Size $($script:GetTargetOutputWhenBadPath.Size)" {
-                    $resource.Size | Should -Be $script:GetTargetOutputWhenBadPath.Size
+                    $currentState.DiskSize | Should -Be $script:GetTargetOutputWhenBadPath.Size
                 }
 
                 It "Should return Ensure $($script:GetTargetOutputWhenBadPath.Ensure)" {
-                    $resource.Ensure | Should -Be $script:GetTargetOutputWhenBadPath.Ensure
+                    $currentState.Ensure | Should -Be $script:GetTargetOutputWhenBadPath.Ensure
                 }
             }
 
@@ -178,26 +178,26 @@ try
                     -MockWith { $script:mockedDiskImageMountedVhdx } `
                     -Verifiable
 
-                $resource = Get-TargetResource -FilePath $script:DiskImageGoodVhdxPath -Verbose
+                $currentState = Get-TargetResource -FilePath $script:DiskImageGoodVhdxPath -Verbose
 
                 It "Should return DiskNumber $($script:GetTargetOutputWhenPathGood.DiskNumber)" {
-                    $resource.DiskNumber | Should -Be $script:GetTargetOutputWhenPathGood.DiskNumber
+                    $currentState.DiskNumber | Should -Be $script:GetTargetOutputWhenPathGood.DiskNumber
                 }
 
                 It "Should return FilePath $($script:GetTargetOutputWhenPathGood.FilePath)" {
-                    $resource.FilePath | Should -Be $script:GetTargetOutputWhenPathGood.FilePath
+                    $currentState.FilePath | Should -Be $script:GetTargetOutputWhenPathGood.FilePath
                 }
 
                 It "Should return Mounted $($script:GetTargetOutputWhenPathGood.Attached)" {
-                    $resource.Attached | Should -Be $script:GetTargetOutputWhenPathGood.Attached
+                    $currentState.Attached | Should -Be $script:GetTargetOutputWhenPathGood.Attached
                 }
 
                 It "Should return Size $($script:GetTargetOutputWhenPathGood.Size)" {
-                    $resource.Size | Should -Be $script:GetTargetOutputWhenPathGood.Size
+                    $currentState.DiskSize | Should -Be $script:GetTargetOutputWhenPathGood.Size
                 }
 
                 It "Should return Ensure $($script:GetTargetOutputWhenPathGood.Ensure)" {
-                    $resource.Ensure | Should -Be $script:GetTargetOutputWhenPathGood.Ensure
+                    $currentState.Ensure | Should -Be $script:GetTargetOutputWhenPathGood.Ensure
                 }
             }
         }
