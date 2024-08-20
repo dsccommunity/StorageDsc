@@ -51,7 +51,7 @@ function Get-TargetResource
     return @{
         FilePath   = $diskImage.ImagePath
         Attached   = $diskImage.Attached
-        Size       = $diskImage.Size
+        DiskSize   = $diskImage.Size
         DiskNumber = $diskImage.DiskNumber
         Ensure     = $ensure
     }

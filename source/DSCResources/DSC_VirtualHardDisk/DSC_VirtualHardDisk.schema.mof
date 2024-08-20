@@ -7,4 +7,6 @@ class DSC_VirtualHardDisk : OMI_BaseResource
     [Write, Description("Specifies the disk type of virtual hard disk to create if it doesn't exist and Ensure is present."), ValueMap{"Fixed","Dynamic"}, Values{"Fixed","Dynamic"}] String DiskType;
     [Write, Description("Specifies the disk format the virtual hard disk should use or create if it does not exist and Ensure is present. Defaults to Vhdx."), ValueMap{"Vhd","Vhdx"}, Values{"Vhd","Vhdx"}] String DiskFormat;
     [Write, Description("Determines whether the virtual hard disk should be created and attached or should be detached if it exists."), ValueMap{"Present","Absent"}, Values{"Present","Absent"}] String Ensure;
+    [Read, Description("Returns whether or not the virtual hard disk is mounted to the system.")] Boolean Attached;
+    [Read, Description("Returns the disk number of the virtual hard disk if it is mounted to the system.")] UInt32 DiskNumber;
 };
