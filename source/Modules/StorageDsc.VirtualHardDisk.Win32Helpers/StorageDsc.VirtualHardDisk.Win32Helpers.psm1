@@ -149,12 +149,12 @@ function Get-VirtDiskWin32HelperScript
 } # end function Get-VirtDiskWin32HelperScript
 
 <#
+    .SYNOPSIS
+        Creates a new virtual disk.
+
     .DESCRIPTION
         Calls the CreateVirtualDisk Win32 api to create a new virtual disk.
         This is used so we can mock this call easier.
-
-    .SYNOPSIS
-        Creates a new virtual disk.
 
     .PARAMETER VirtualStorageType
         Specifies the type and provider (vendor) of the virtual storage device.
@@ -243,12 +243,12 @@ function New-VirtualDiskUsingWin32
 } # end function New-VirtualDiskUsingWin32
 
 <#
+    .SYNOPSIS
+        Mounts an existing virtual disk to the system.
+
     .DESCRIPTION
         Calls the AttachVirtualDisk Win32 api to mount an existing virtual disk
         to the system. This is used so we can mock this call easier.
-
-    .SYNOPSIS
-        Mounts an existing virtual disk to the system.
 
     .PARAMETER Handle
         Specifies the reference to a handle to a virtual disk file.
@@ -312,12 +312,12 @@ function Add-VirtualDiskUsingWin32
 } # end function Add-VirtualDiskUsingWin32
 
 <#
+    .SYNOPSIS
+        Opens an existing virtual disk.
+
     .DESCRIPTION
         Calls the OpenVirtualDisk Win32 api to open an existing virtual disk.
         This is used so we can mock this call easier.
-
-    .SYNOPSIS
-        Opens an existing virtual disk.
 
     .PARAMETER VirtualStorageType
         Specifies the type and provider (vendor) of the virtual storage device.

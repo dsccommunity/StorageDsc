@@ -25,10 +25,37 @@ try
 
     Describe "$($script:dscResourceName)_CreateAndAttachFixedVhd_Integration" {
         Context 'Create and attach a fixed virtual disk' {
-            It 'Should compile and apply the MOF without throwing' {
+            $configData = @{
+                AllNodes = @(
+                    @{
+                        NodeName   = 'localhost'
+                        FilePath   = "$($pwd.drive.name):\newTestFixedVhd.vhd"
+                        Attached   = $true
+                        DiskSize   = 5GB
+                        DiskFormat = 'Vhd'
+                        DiskType   = 'Fixed'
+                        Ensure     = 'Present'
+                    }
+                )
+            }
+
+            It 'Should compile the MOF without throwing' {
                 {
-                    & "$($script:dscResourceName)_CreateAndAttachFixedVhd_Config" -OutputPath $TestDrive
-                    Start-DscConfiguration -Path $TestDrive -ComputerName localhost -Wait -Verbose -Force
+                    & "$($script:dscResourceName)_CreateAndAttachFixedVhd_Config" `
+                        -OutputPath $TestDrive `
+                        -ConfigurationData $configData
+                } | Should -Not -Throw
+            }
+
+            It 'Should apply the MOF without throwing' {
+                {
+                    Start-DscConfiguration `
+                        -Path $TestDrive `
+                        -ComputerName localhost `
+                        -Wait `
+                        -Verbose `
+                        -Force `
+                        -ErrorAction Stop
                 } | Should -Not -Throw
             }
 
@@ -40,24 +67,52 @@ try
                 $currentState = Get-DscConfiguration | Where-Object -FilterScript {
                     $_.ConfigurationName -eq "$($script:dscResourceName)_CreateAndAttachFixedVhd_Config"
                 }
-                $currentState.FilePath   | Should -Be $script:TestFixedVirtualHardDiskVhd.FilePath
-                $currentState.DiskSize   | Should -Be 5Gb
-                $currentState.Ensure     | Should -Be 'Present'
+                $currentState.FilePath   | Should -Be $configData.AllNodes.FilePath
+                $currentState.DiskSize   | Should -Be $configData.AllNodes.DiskSize
+                $currentState.Attached   | Should -Be $configData.AllNodes.Attached
+                $currentState.Ensure     | Should -Be $configData.AllNodes.Ensure
             }
 
             AfterAll {
-                Dismount-DiskImage -ImagePath $script:TestFixedVirtualHardDiskVhd.FilePath -StorageType VHD
-                Remove-Item -Path $script:TestFixedVirtualHardDiskVhd.FilePath -Force
+                Dismount-DiskImage -ImagePath $TestFixedVirtualHardDiskVhdPath -StorageType VHD
+                Remove-Item -Path $TestFixedVirtualHardDiskVhdPath -Force
             }
         }
     }
 
     Describe "$($script:dscResourceName)_CreateAndAttachDynamicallyExpandingVhdx_Integration" {
         Context 'Create and attach a dynamically expanding virtual disk' {
-            It 'Should compile and apply the MOF without throwing' {
+            $configData = @{
+                AllNodes = @(
+                    @{
+                        NodeName   = 'localhost'
+                        FilePath   = "$($pwd.drive.name):\newTestDynamicVhdx.vhdx"
+                        Attached   = $true
+                        DiskSize   = 10GB
+                        DiskFormat = 'Vhdx'
+                        DiskType   = 'Dynamic'
+                        Ensure     = 'Present'
+                    }
+                )
+            }
+
+            It 'Should compile the MOF without throwing' {
                 {
-                    & "$($script:dscResourceName)_CreateAndAttachDynamicallyExpandingVhdx_Config" -OutputPath $TestDrive
-                    Start-DscConfiguration -Path $TestDrive -ComputerName localhost -Wait -Verbose -Force
+                    & "$($script:dscResourceName)_CreateAndAttachDynamicallyExpandingVhdx_Config" `
+                        -OutputPath $TestDrive `
+                        -ConfigurationData $configData
+                } | Should -Not -Throw
+            }
+
+            It 'Should apply the MOF without throwing' {
+                {
+                    Start-DscConfiguration `
+                        -Path $TestDrive `
+                        -ComputerName localhost `
+                        -Wait `
+                        -Verbose `
+                        -Force `
+                        -ErrorAction Stop
                 } | Should -Not -Throw
             }
 
@@ -69,14 +124,15 @@ try
                 $currentState = Get-DscConfiguration | Where-Object -FilterScript {
                     $_.ConfigurationName -eq "$($script:dscResourceName)_CreateAndAttachDynamicallyExpandingVhdx_Config"
                 }
-                $currentState.FilePath   | Should -Be $script:TestDynamicVirtualHardDiskVhdx.FilePath
-                $currentState.DiskSize   | Should -Be 10Gb
-                $currentState.Ensure     | Should -Be 'Present'
+                $currentState.FilePath   | Should -Be $configData.AllNodes.FilePath
+                $currentState.DiskSize   | Should -Be $configData.AllNodes.DiskSize
+                $currentState.Attached   | Should -Be $configData.AllNodes.Attached
+                $currentState.Ensure     | Should -Be $configData.AllNodes.Ensure
             }
 
             AfterAll {
-                Dismount-DiskImage -ImagePath $script:TestDynamicVirtualHardDiskVhdx.FilePath -StorageType VHDX
-                Remove-Item -Path $script:TestDynamicVirtualHardDiskVhdx.FilePath -Force
+                Dismount-DiskImage -ImagePath $TestDynamicVirtualHardDiskVhdx -StorageType VHDX
+                Remove-Item -Path $TestDynamicVirtualHardDiskVhdx -Force
             }
         }
     }

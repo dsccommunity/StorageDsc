@@ -14,5 +14,5 @@ ConvertFrom-StringData @'
     VirtualHardDiskNoExtensionError = The path '{0}' does not contain an extension. Supported extension types are '.vhd' and '.vhdx'.
     GettingVirtualHardDisk = Getting virtual hard disk information for virtual hard disk located at '{0}.
     RemovingCreatedVirtualHardDiskFile = The virtual hard disk file at location '{0}' is being removed due to an error while attempting to mount it to the system.
-    VirtualDiskAdminError = Creating and mounting a virtual disk requires running PowerShell as an Administrator. Please launch PowerShell as Administrator and try again.
+    VirtualDiskAdminError = Creating and mounting a virtual disk requires running local Administrator permissions. Please ensure this resource is being applied with an account with local Administrator permissions.
 '@

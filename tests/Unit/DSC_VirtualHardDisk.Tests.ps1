@@ -134,14 +134,6 @@ try
             )
         }
 
-        function Test-RunningAsAdministrator
-        {
-            [CmdletBinding()]
-            [OutputType([System.Boolean])]
-            Param
-            ()
-        }
-
         Describe 'DSC_VirtualHardDisk\Get-TargetResource' {
             Context 'When file path does not exist or was never mounted' {
                 Mock `
@@ -172,7 +164,7 @@ try
                 }
             }
 
-            Context 'When file path does exist and was mounted at one point' {
+            Context 'When file path does exist and is currently mounted' {
                 Mock `
                     -CommandName Get-DiskImage `
                     -MockWith { $script:mockedDiskImageMountedVhdx } `
@@ -205,8 +197,7 @@ try
         Describe 'DSC_VirtualHardDisk\Set-TargetResource' {
             Context 'When file path is not fully qualified' {
                 Mock `
-                    -CommandName Test-RunningAsAdministrator `
-                    -MockWith { $true }
+                    -CommandName Assert-ElevatedUser
 
                 $errorRecord = Get-InvalidArgumentRecord `
                     -Message ($script:localizedData.VirtualHardDiskPathError -f `
@@ -227,8 +218,9 @@ try
 
             Context 'When not running as administrator' {
                 Mock `
-                    -CommandName Test-RunningAsAdministrator `
-                    -MockWith { $false }
+                    -CommandName Assert-ElevatedUser `
+                    -MockWith { throw [System.Exception]::new('User not elevated.')} `
+                    -Verifiable
 
                 $exception = [System.Exception]::new($script:localizedData.VirtualDiskAdminError)
 
@@ -246,8 +238,7 @@ try
 
             Context 'When file extension is not .vhd or .vhdx' {
                 Mock `
-                    -CommandName Test-RunningAsAdministrator `
-                    -MockWith { $true }
+                    -CommandName Assert-ElevatedUser
 
                 $extension = [System.IO.Path]::GetExtension($DiskImageNonVirtDiskPath).TrimStart('.')
                 $errorRecord = Get-InvalidArgumentRecord `
@@ -269,8 +260,7 @@ try
 
             Context 'When file extension does not match the disk format' {
                 Mock `
-                    -CommandName Test-RunningAsAdministrator `
-                    -MockWith { $true }
+                    -CommandName Assert-ElevatedUser
 
                 $extension = [System.IO.Path]::GetExtension($DiskImageGoodVhdPath).TrimStart('.')
                 $errorRecord = Get-InvalidArgumentRecord `
@@ -292,8 +282,7 @@ try
 
             Context 'When file extension is not present in the file path' {
                 Mock `
-                    -CommandName Test-RunningAsAdministrator `
-                    -MockWith { $true }
+                    -CommandName Assert-ElevatedUser
 
                 $errorRecord = Get-InvalidArgumentRecord `
                     -Message ($script:localizedData.VirtualHardDiskNoExtensionError -f `
@@ -314,8 +303,7 @@ try
 
             Context 'When size provided is less than the minimum size for the vhd format' {
                 Mock `
-                    -CommandName Test-RunningAsAdministrator `
-                    -MockWith { $true }
+                    -CommandName Assert-ElevatedUser
 
                 $minSizeInMbString = ($DiskImageSizeBelowVirtDiskMinimum / 1MB).ToString('0.00MB')
                 $errorRecord = Get-InvalidArgumentRecord `
@@ -337,8 +325,7 @@ try
 
             Context 'When size provided is less than the minimum size for the vhdx format' {
                 Mock `
-                    -CommandName Test-RunningAsAdministrator `
-                    -MockWith { $true }
+                    -CommandName Assert-ElevatedUser
 
                 $minSizeInMbString = ($DiskImageSizeBelowVirtDiskMinimum / 1MB).ToString('0.00MB')
                 $errorRecord = Get-InvalidArgumentRecord `
@@ -360,8 +347,7 @@ try
 
             Context 'When size provided is greater than the maximum size for the vhd format' {
                 Mock `
-                    -CommandName Test-RunningAsAdministrator `
-                    -MockWith { $true }
+                    -CommandName Assert-ElevatedUser
 
                 $maxSizeInTbString = ($DiskImageSizeAboveVhdMaximum / 1TB).ToString('0.00TB')
                 $errorRecord = Get-InvalidArgumentRecord `
@@ -383,8 +369,7 @@ try
 
             Context 'When size provided is greater than the maximum size for the vhdx format' {
                 Mock `
-                    -CommandName Test-RunningAsAdministrator `
-                    -MockWith { $true }
+                    -CommandName Assert-ElevatedUser
 
                 $maxSizeInTbString = ($DiskImageSizeAboveVhdxMaximum / 1TB).ToString('0.00TB')
                 $errorRecord = Get-InvalidArgumentRecord `
@@ -406,8 +391,7 @@ try
 
             Context 'When file path to vhdx file is fully qualified' {
                 Mock `
-                    -CommandName Test-RunningAsAdministrator `
-                    -MockWith { $true }
+                    -CommandName Assert-ElevatedUser
 
                 It 'Should not throw invalid argument error when path is fully qualified' {
                     {
@@ -423,8 +407,7 @@ try
 
             Context 'When file path to vhd is fully qualified' {
                 Mock `
-                    -CommandName Test-RunningAsAdministrator `
-                    -MockWith { $true }
+                    -CommandName Assert-ElevatedUser
 
                 It 'Should not throw invalid argument error when path is fully qualified' {
                     {
@@ -440,8 +423,7 @@ try
 
             Context 'Virtual disk is mounted and ensure set to present' {
                 Mock `
-                    -CommandName Test-RunningAsAdministrator `
-                    -MockWith { $true }
+                    -CommandName Assert-ElevatedUser
 
                 Mock `
                     -CommandName Get-DiskImage `
@@ -468,8 +450,7 @@ try
 
             Context 'Virtual disk is mounted and ensure set to absent, so it should be dismounted' {
                 Mock `
-                    -CommandName Test-RunningAsAdministrator `
-                    -MockWith { $true }
+                    -CommandName Assert-ElevatedUser
 
                 Mock `
                     -CommandName Get-DiskImage `
@@ -501,8 +482,7 @@ try
 
             Context 'Virtual disk is dismounted and ensure set to present, so it should be re-mounted' {
                 Mock `
-                    -CommandName Test-RunningAsAdministrator `
-                    -MockWith { $true }
+                    -CommandName Assert-ElevatedUser
 
                 Mock `
                     -CommandName Get-DiskImage `
@@ -534,8 +514,7 @@ try
 
             Context 'Virtual disk does not exist and ensure set to present, so a new one should be created and mounted' {
                 Mock `
-                    -CommandName Test-RunningAsAdministrator `
-                    -MockWith { $true }
+                    -CommandName Assert-ElevatedUser
 
                 Mock `
                     -CommandName Get-DiskImage `
@@ -567,8 +546,7 @@ try
 
             Context 'When folder does not exist in user provided path but an exception occurs after creating the virtual disk' {
                 Mock `
-                    -CommandName Test-RunningAsAdministrator `
-                    -MockWith { $true }
+                    -CommandName Assert-ElevatedUser
 
                 Mock `
                     -CommandName Get-DiskImage `

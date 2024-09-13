@@ -628,21 +628,6 @@ function Compare-SizeUsingGB
 
 }# end function Compare-SizeUsingGB
 
-<#
-    .SYNOPSIS
-        Gets a boolean indicating whether the script is running as Administrator or not.
-#>
-function Test-RunningAsAdministrator
-{
-    [CmdletBinding()]
-    [OutputType([System.Boolean])]
-    param
-    ()
-
-    $currentPrincipal = New-Object -TypeName Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())
-    return $currentPrincipal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
-} # end function Test-RunningAsAdministrator
-
 Export-ModuleMember -Function @(
     'Restart-ServiceIfExists',
     'Assert-DriveLetterValid',
@@ -657,6 +642,5 @@ Export-ModuleMember -Function @(
     'Get-DevDriveEnablementState',
     'Test-DevDriveVolume',
     'Invoke-DeviceIoControlWrapperForDevDriveQuery',
-    'Compare-SizeUsingGB',
-    'Test-RunningAsAdministrator'
+    'Compare-SizeUsingGB'
 )

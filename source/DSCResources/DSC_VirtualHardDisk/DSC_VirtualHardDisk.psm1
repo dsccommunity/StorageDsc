@@ -109,8 +109,13 @@ function Set-TargetResource
 
     Assert-ParametersValid -FilePath $FilePath -DiskSize $DiskSize -DiskFormat $DiskFormat
 
-    if (-not (Test-RunningAsAdministrator))
+    try
     {
+        Assert-ElevatedUser
+    }
+    catch
+    {
+        # Use a user friendly error message specific to the virtual disk dsc resource.
         throw $script:localizedData.VirtualDiskAdminError
     }
 
@@ -172,7 +177,7 @@ function Set-TargetResource
     }
     else
     {
-        # Detach the virtual hard disk if its not suppose to be attached.
+        # Detach the virtual hard disk if its not supposed to be attached.
         if ($currentState.Attached)
         {
             Write-Verbose -Message ( @(
