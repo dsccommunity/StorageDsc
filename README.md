@@ -39,6 +39,7 @@ The **StorageDsc** module contains the following resources:
     disk drive (e.g. a CDROM or DVD drive).  This resource ignores mounted ISOs.
 - **WaitForDisk** wait for a disk to become available.
 - **WaitForVolume** wait for a drive to be mounted and become available.
+- **VirtualHardDisk** used to create and attach a virtual hard disk.
 
 This project has adopted [this code of conduct](CODE_OF_CONDUCT.md).
 

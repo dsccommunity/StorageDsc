@@ -28,6 +28,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Fixed minor markdown linting issues in README.md and used to issue BREAKING
     CHANGE commit - Fixes [Issue #282](https://github.com/dsccommunity/StorageDsc/issues/282).
 - Updated tag from 'Dev Drive' to 'DevDrive' in manifest file - Fixes [Issue #280](https://github.com/dsccommunity/StorageDsc/issues/280).
+- Added DSC_VirtualHardDisk resource for creating virtual disks and tests - Fixes [Issue #277](https://github.com/dsccommunity/StorageDsc/issues/277)
 
 ### Changed
 
