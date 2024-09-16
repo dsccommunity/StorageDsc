@@ -343,6 +343,8 @@ function Set-TargetResource
     #>
     if ($DevDrive)
     {
+        Assert-ElevatedUserWithCustomErrorMessage -CustomErrorMessage $script:localizedData.DevDriveAdminError
+
         Assert-DevDriveFeatureAvailable
         Assert-FSFormatIsReFsWhenDevDriveFlagSetToTrue -FSFormat $FSFormat
 
@@ -1222,6 +1224,7 @@ function Test-TargetResource
             $($script:localizedData.CheckingDevDriveAssertions)
         ) -join '' )
 
+        Assert-ElevatedUserWithCustomErrorMessage -CustomErrorMessage $script:localizedData.DevDriveAdminError
         Assert-DevDriveFeatureAvailable
         Assert-FSFormatIsReFsWhenDevDriveFlagSetToTrue -FSFormat $FSFormat
 

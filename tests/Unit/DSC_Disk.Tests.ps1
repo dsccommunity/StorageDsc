@@ -710,6 +710,17 @@ try
             )
         }
 
+        function Assert-ElevatedUserWithCustomErrorMessageWithCustomErrorMessage
+        {
+            [CmdletBinding()]
+            param
+            (
+                [Parameter(Mandatory = $true)]
+                [System.String]
+                $CustomErrorMessage
+            )
+        }
+
         Describe 'DSC_Disk\Get-TargetResource' {
             Context 'When online GPT disk with a partition/volume and correct Drive Letter assigned using Disk Number' {
                 # verifiable (should be called) mocks
@@ -3040,6 +3051,9 @@ try
             Context 'When the DevDrive flag is true, the AllowDestructive flag is false and there is not enough space on the disk to create the partition' {
                 # verifiable (should be called) mocks
                 Mock `
+                    -CommandName Assert-ElevatedUserWithCustomErrorMessage
+
+                Mock `
                     -CommandName Get-DiskByIdentifier `
                     -ParameterFilter $script:parameterFilter_MockedDisk0Number `
                     -MockWith { $script:mockedDisk0GptForDevDriveResizeNotPossibleScenario } `
@@ -3090,6 +3104,9 @@ try
 
             Context 'When the DevDrive flag is true, AllowDestructive is false and there is enough space on the disk to create the partition' {
                 # verifiable (should be called) mocks
+                Mock `
+                    -CommandName Assert-ElevatedUserWithCustomErrorMessage
+
                 Mock `
                     -CommandName Get-DiskByIdentifier `
                     -ParameterFilter $script:parameterFilter_MockedDisk0Number `
@@ -3166,6 +3183,9 @@ try
             Context 'When the DevDrive flag is true, AllowDestructive flag is false and there is not enough unallocated disk space but a resize of a partition is possible to create new space' {
                 # verifiable (should be called) mocks
                 Mock `
+                    -CommandName Assert-ElevatedUserWithCustomErrorMessage
+
+                Mock `
                     -CommandName Get-DiskByIdentifier `
                     -ParameterFilter $script:parameterFilter_MockedDisk0Number `
                     -MockWith { $script:mockedDisk0GptForDevDriveResizePossibleScenario } `
@@ -3214,6 +3234,8 @@ try
 
             Context 'When the DevDrive flag is true, AllowDestructive flag is true and there is not enough unallocated disk space but a resize of a partition is possible to create new space' {
                 # verifiable (should be called) mocks
+                Mock `
+                    -CommandName Assert-ElevatedUserWithCustomErrorMessage
 
                 $script:amountOfTimesGetDiskByIdentifierIsCalled = 0
 
@@ -3314,6 +3336,9 @@ try
             Context 'When the DevDrive flag is true, AllowDestructive is true, and a Partition that matches the users drive letter exists' {
                 # verifiable (should be called) mocks
                 Mock `
+                    -CommandName Assert-ElevatedUserWithCustomErrorMessage
+
+                Mock `
                     -CommandName Get-DiskByIdentifier `
                     -ParameterFilter $script:parameterFilter_MockedDisk0Number `
                     -MockWith { $script:mockedDisk0GptForDevDriveResizeNotNeededScenario } `
@@ -3384,6 +3409,9 @@ try
             Context 'When the DevDrive flag is true, AllowDestructive is false, and a Partition that matches the users drive letter exists' {
                 # verifiable (should be called) mocks
                 Mock `
+                    -CommandName Assert-ElevatedUserWithCustomErrorMessage
+
+                Mock `
                     -CommandName Get-DiskByIdentifier `
                     -ParameterFilter $script:parameterFilter_MockedDisk0Number `
                     -MockWith { $script:mockedDisk0GptForDevDriveResizeNotNeededScenario } `
@@ -3444,6 +3472,41 @@ try
                         -ParameterFilter {
                         $DevDrive -eq $true
                     }
+                }
+            }
+
+            Context 'When the DevDrive flag is true, but the configuration is not ran with Administrator permissions' {
+                # verifiable (should be called) mocks
+                $exception = [System.Exception]::new($script:localizedData.DevDriveAdminError)
+
+                Mock `
+                    -CommandName Assert-ElevatedUserWithCustomErrorMessage `
+                    -MockWith { throw [System.Exception]::new($exception.Message)} `
+                    -Verifiable
+
+                Mock `
+                    -CommandName Get-DiskByIdentifier `
+                    -ParameterFilter $script:parameterFilter_MockedDisk0Number `
+                    -MockWith { $script:mockedDisk0GptForDevDriveResizeNotNeededScenario } `
+                    -Verifiable
+
+                It 'Should throw an exception' {
+                    {
+                        Set-TargetResource `
+                            -DiskId $script:mockedDisk0Gpt.Number `
+                            -Driveletter $script:testDriveLetterT `
+                            -Size $script:mockedPartitionSize50Gb `
+                            -FSLabel 'NewLabel' `
+                            -FSFormat 'ReFS' `
+                            -DevDrive $true `
+                            -Verbose
+                    } | Should -Throw -ExpectedMessage $exception.Message
+                }
+
+                It 'Should call the correct mocks' {
+                    Assert-VerifiableMock
+                    Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 1 `
+                        -ParameterFilter $script:parameterFilter_MockedDisk0Number
                 }
             }
         }
@@ -4509,6 +4572,9 @@ try
             Context 'When the DevDrive flag is true, and Size parameter is less than minimum required size for Dev Drive (50 Gb)' {
                 # verifiable (should be called) mocks
                 Mock `
+                    -CommandName Assert-ElevatedUserWithCustomErrorMessage
+
+                Mock `
                     -CommandName Get-DiskByIdentifier `
                     -ParameterFilter $script:parameterFilter_MockedDisk0Number `
                     -MockWith { $script:mockedDisk0Gpt } `
@@ -4546,6 +4612,9 @@ try
 
             Context 'When the DevDrive flag is true, but the partition is effectively the same size as user inputted size and volume is NTFS' {
                 # verifiable (should be called) mocks
+                Mock `
+                    -CommandName Assert-ElevatedUserWithCustomErrorMessage
+
                 Mock `
                     -CommandName Get-DiskByIdentifier `
                     -ParameterFilter $script:parameterFilter_MockedDisk0Number `
@@ -4594,6 +4663,9 @@ try
 
             Context 'When the DevDrive flag is true, but the partition is not the same size as user inputted size, volume is ReFS formatted but not Dev Drive volume' {
                 # verifiable (should be called) mocks
+                Mock `
+                    -CommandName Assert-ElevatedUserWithCustomErrorMessage
+
                 Mock `
                     -CommandName Get-DiskByIdentifier `
                     -ParameterFilter $script:parameterFilter_MockedDisk0Number `
@@ -4655,6 +4727,9 @@ try
             Context 'When the DevDrive flag is true, but the partition is effectively the same size as user inputted size, volume is ReFS formatted and is Dev Drive volume' {
                 # verifiable (should be called) mocks
                 Mock `
+                    -CommandName Assert-ElevatedUserWithCustomErrorMessage
+
+                Mock `
                     -CommandName Get-DiskByIdentifier `
                     -ParameterFilter $script:parameterFilter_MockedDisk0Number `
                     -MockWith { $script:mockedDisk0Gpt } `
@@ -4714,6 +4789,9 @@ try
             Context 'When the DevDrive flag is true, but the partition is effectively the same size as user inputted size, volume is ReFS formatted and is not Dev Drive volume' {
                 # verifiable (should be called) mocks
                 Mock `
+                    -CommandName Assert-ElevatedUserWithCustomErrorMessage
+
+                Mock `
                     -CommandName Get-DiskByIdentifier `
                     -ParameterFilter $script:parameterFilter_MockedDisk0Number `
                     -MockWith { $script:mockedDisk0Gpt } `
@@ -4768,6 +4846,54 @@ try
                     Assert-MockCalled -CommandName Test-DevDriveVolume -Exactly -Times 1
                     Assert-MockCalled -CommandName Assert-DevDriveFeatureAvailable -Exactly -Times 1
                 }
+            }
+        }
+
+        Context 'When the DevDrive flag is true, but the configuration is not run with Administrator permissions' {
+            # verifiable (should be called) mocks
+            $exception = [System.Exception]::new($script:localizedData.DevDriveAdminError)
+
+            Mock `
+                -CommandName Assert-ElevatedUserWithCustomErrorMessage `
+                -MockWith { throw [System.Exception]::new($exception.Message)} `
+                -Verifiable
+
+            Mock `
+                -CommandName Get-DiskByIdentifier `
+                -ParameterFilter $script:parameterFilter_MockedDisk0Number `
+                -MockWith { $script:mockedDisk0Gpt } `
+                -Verifiable
+
+            Mock `
+                -CommandName Get-Partition `
+                -MockWith { $script:mockedPartitionGDriveLetterAlternatePartition150Gb } `
+                -Verifiable
+
+            Mock `
+                -CommandName Get-Volume `
+                -MockWith { $script:mockedVolumeThatExistPriorToConfigurationRefs150Gb } `
+                -Verifiable
+
+            It 'Should throw an error message that the user should run resource as admin' {
+                {
+                    $script:result = Test-TargetResource `
+                        -DiskId $script:mockedDisk0Gpt.Number `
+                        -DriveLetter $script:testDriveLetterG `
+                        -AllocationUnitSize 4096 `
+                        -Size $script:userDesiredSize50Gb `
+                        -FSLabel $script:mockedVolume.FileSystemLabel `
+                        -FSFormat $script:mockedVolumeReFS.FileSystem `
+                        -DevDrive $true `
+                        -Verbose
+                } | Should -Throw -ExpectedMessage $exception.Message
+            }
+
+            It 'Should call the correct mocks' {
+                Assert-VerifiableMock
+                Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 1 `
+                    -ParameterFilter $script:parameterFilter_MockedDisk0Number
+                Assert-MockCalled -CommandName Get-Partition -Exactly -Times 1
+                Assert-MockCalled -CommandName Get-Volume -Exactly -Times 1
             }
         }
     }

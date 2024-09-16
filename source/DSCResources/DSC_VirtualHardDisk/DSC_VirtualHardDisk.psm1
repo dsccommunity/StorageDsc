@@ -109,16 +109,7 @@ function Set-TargetResource
 
     Assert-ParametersValid -FilePath $FilePath -DiskSize $DiskSize -DiskFormat $DiskFormat
 
-    try
-    {
-        Assert-ElevatedUser
-    }
-    catch
-    {
-        # Use a user friendly error message specific to the virtual disk dsc resource.
-        throw $script:localizedData.VirtualDiskAdminError
-    }
-
+    Assert-ElevatedUserWithCustomErrorMessage -CustomErrorMessage $script:localizedData.VirtualDiskAdminError
     $currentState = Get-TargetResource -FilePath $FilePath
 
     if ($Ensure -eq 'Present')

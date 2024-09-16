@@ -52,4 +52,5 @@
     CheckingDevDriveAssertions = Checking system meets requirements for the Dev Drive feature.
     TheVolumeIsNotConfiguredAsADevDriveVolume = The volume with path '{0}' and Drive letter '{1}' is not configured as a Dev Drive volume.
     TheVolumeIsCurrentlyConfiguredAsADevDriveVolume = The volume with path '{0}' and Drive letter '{1}' is currently configured as a Dev Drive volume.
+    DevDriveAdminError = Creating a Dev Drive volume requires running local Administrator permissions. Please ensure this resource is being applied with an account with local Administrator permissions.
 '@

@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [6.0.1] - 2024-06-11
 
+### Changed
+
+- Disk:
+  - Add check for elevated privileges when DevDrive flag is set to true -
+    Fixes [Issue #284](https://github.com/dsccommunity/StorageDsc/issues/284).
+
 ### Fixed
 
 - OpticalDiskDriveLetter:

@@ -27,16 +27,17 @@ table for the disk has been created.
 ## Dev Drive
 
 The Dev Drive feature is currently available on Windows 11 in builds 10.0.22621.2338
-or later. See [the Dev Drive documentation for the latest in formation](https://learn.microsoft.com/en-us/windows/dev-drive/).
+or later. See [the Dev Drive documentation for the latest in formation](https://learn.microsoft.com/windows/dev-drive/).
 
 ### What is a Dev Drive volume and how is it different from regular volumes?
 
 Dev Drive volumes from a storage perspective are just like regular ReFS volumes
-on a Windows machine. The difference However, is that most of the filter drivers
+on a Windows machine. The difference however, is that most of the filter drivers
 except the antivirus filter will not attach to the volume at boot time by default.
 This is a low-level concept that most users will never need to interact with but
-for further reading, see the documentation [here](https://learn.microsoft.com/en-us/windows/dev-drive/#how-do-i-configure-additional-filters-on-dev-drive)
-for further reading.
+for further reading, see the documentation [here](https://learn.microsoft.com/windows/dev-drive/#how-do-i-configure-additional-filters-on-dev-drive)
+for further reading. In order to create a Dev Drive your configuration must run with
+local administrator permissions or an error will be thrown by the Disk resource.
 
 ### What is the default state of the Dev Drive flag in this resource?
 
@@ -55,17 +56,17 @@ is `50 Gb`.
 
 ### If I have a non Dev Drive volume that is 50 Gb or more can it be reformatted as a Dev Drive volume?
 
-Yes, since the Dev Drive volume is just like any other volume storage wise to the
+Yes, since a Dev Drive volume is just like any other volume storage wise to the
 Windows operating system, a non Dev Drive ReFS volume can be reformatted as a
 Dev Drive volume. An NTFS volume can also be reformatted as a Dev Drive volume.
-Note, the Disk resource will throw an exception, should you also attempt to resize
-a ReFS volume while attempting to reformat it as a Dev Drive volume since ReFS
-volumes cannot be resized. As Dev Drive volumes are also ReFS volumes, they carry
-the same restrictions, see: [Resilient File System (ReFS) overview | Microsoft Learn](https://learn.microsoft.com/en-us/windows-server/storage/refs/refs-overview)
+Note, the Disk resource will throw an exception, should you attempt to resize
+a ReFS volume because ReFS
+volumes cannot be resized. Dev Drive volumes are also ReFS volumes, so they carry
+the same restrictions see: [Resilient File System (ReFS) overview | Microsoft Learn](https://learn.microsoft.com/windows-server/storage/refs/refs-overview)
 
 ### If I don't have any unallocated space available to create a Dev Drive volume, what will happen?
 
-The Disk resource uses the Get-PartitionSupportedSize cmdlet to know which
+The Disk resource uses the `Get-PartitionSupportedSize` cmdlet to know which
 volume can be be resized to a safe size to create enough unallocated space for
 the Dev Drive volume to be created. As long as the size parameter is used, the
 Disk resource will shrink the first non ReFS Drive whose (MaxSize - MinSize) is
@@ -77,7 +78,7 @@ needed, to add to the existing unallocated space so it can be equal to the size
 parameter. For example, if you wanted to create a new 50 Gb Dev Drive volume on
 disk 0, and let's say on disk 0 there was only a 'C' drive that was 800 Gb in size.
 Next to the 'C' drive there was only 40 Gb of free contiguous unallocated space.
-The Disk resource would shrink the 'C' drive by 10 Gb,  creating an addition 10
+The Disk resource would shrink the 'C' drive by 10 Gb,  creating an additional 10
 Gb of unallocated space. Now the unallocated space would be 50 Gb in size. The
 disk resource would then create a new partition and create the Dev Drive volume
 into this new partition.
@@ -98,15 +99,15 @@ There are only five requirements:
    > only prevent new Dev Drive volumes from being created. However, this could
    > affect the `idempotence` for the Drive. For example, changes to this drive
    > after disablement (e.g., reformatting the volume as an NTFS volume) would
-   > not be corrected by rerunning the configuration. Since the feature is
-   > disabled, attempting reformat the volume as a Dev Drive volume will throw an
+   > not be corrected by re-running the configuration. Since the feature is
+   > disabled, attempting to re-format the volume as a Dev Drive volume will throw an
    > error advising you that it is not possible due to the feature being disabled.
 1. If the `size` parameter is entered, the value must be greater than or equal to
    50 Gb in size. We assert that this is true in order to format a Dev Drive
    volume onto a partition.
-1. Currently today, if the `size` parameter is not entered then the Disk resource
+1. If the `size` parameter is not entered then the Disk resource
    will use the maximum space available on the Disk. When the `DevDrive` flag is
-   set to `$true`, then we assert that the maximum available free unallocated space
+   set to `$true`. We assert that the maximum available free unallocated contiguous space
    on the Disk should be `50 Gb or more in size`. This assertion only comes into
    play if the volume doesn't already exist.
 1. The `FSformat` parameter must be set to 'ReFS', when the `DevDrive` flag is
