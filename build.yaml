@@ -26,7 +26,7 @@ BuildWorkflow:
     - package_module_nupkg
 
   hqrmtest:
-    - DscResource_Tests_Stop_On_Fail
+    - Invoke_HQRM_Tests_Stop_On_Fail
 
   test:
     - Pester_Tests_Stop_On_Fail
@@ -40,7 +40,6 @@ BuildWorkflow:
     - publish_module_to_gallery
     - Publish_Release_To_GitHub
     - Publish_GitHub_Wiki_Content
-    - Create_ChangeLog_GitHub_PR
 
 ####################################################
 #          ModuleBuilder Configuration             #
@@ -88,15 +87,6 @@ NestedModule:
 #          Pester Configuration (Sampler)          #
 ####################################################
 Pester:
-  # Pester 4 configuration
-  Script:
-    - tests/Unit
-  ExcludeTag:
-  Tag:
-  CodeCoverageOutputFileEncoding: ascii
-  CodeCoverageThreshold: 80
-
-  # Pester 5 configuration
   Configuration:
     Run:
       Path:
@@ -106,7 +96,7 @@ Pester:
       StackTraceVerbosity: Full
       CIFormat: Auto
     CodeCoverage:
-      CoveragePercentTarget: 80
+      CoveragePercentTarget: 85
       OutputEncoding: ascii
       UseBreakpoints: false
     TestResult:
@@ -130,14 +120,27 @@ CodeCoverage:
 #      Pester Configuration (DscResource.Test)     #
 ####################################################
 DscTest:
-  OutputFormat: NUnitXML
-  ExcludeTag:
-    - 'Common Tests - New Error-Level Script Analyzer Rules'
-  ExcludeSourceFile:
-    - output
-  ExcludeModuleFile:
-    - Modules/DscResource.Common
-  MainGitBranch: main
+  Pester:
+    Configuration:
+      Filter:
+        ExcludeTag:
+          - "Common Tests - New Error-Level Script Analyzer Rules"
+      Output:
+        Verbosity: Detailed
+        CIFormat: Auto
+      TestResult:
+        Enabled: true
+        OutputFormat: NUnitXML
+        OutputEncoding: ascii
+        OutputPath: ./output/testResults/NUnitXml_HQRM_Tests.xml
+  Script:
+    ExcludeSourceFile:
+      - output
+    ExcludeModuleFile:
+      - Modules/DscResource.Common
+      # Must exclude built module file because it should not be tested like MOF-based resources
+      - StorageDsc.psm1
+    MainGitBranch: main
 
 ####################################################
 #              PSDepend Configuration              #
