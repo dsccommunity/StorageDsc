@@ -30,22 +30,19 @@ function Get-TargetResource
     param
     (
         [Parameter(Mandatory = $true)]
-        [String]
+        [System.String]
         $DriveLetter,
 
         [Parameter()]
-        [UInt32]
+        [System.UInt32]
         $RetryIntervalSec = 10,
 
         [Parameter()]
-        [UInt32]
+        [System.UInt32]
         $RetryCount = 60
     )
 
-    Write-Verbose -Message ( @(
-            "$($MyInvocation.MyCommand): "
-            $($script:localizedData.GettingWaitForVolumeStatusMessage -f $DriveLetter)
-        ) -join '' )
+    Write-Verbose -Message ($script:localizedData.GettingWaitForVolumeStatusMessage -f $DriveLetter)
 
     # Validate the DriveLetter parameter
     $DriveLetter = Assert-DriveLetterValid -DriveLetter $DriveLetter
@@ -55,6 +52,7 @@ function Get-TargetResource
         RetryIntervalSec = $RetryIntervalSec
         RetryCount       = $RetryCount
     }
+
     return $returnValue
 } # function Get-TargetResource
 
@@ -201,5 +199,3 @@ function Test-TargetResource
 
     return $false
 } # function Test-TargetResource
-
-Export-ModuleMember -Function *-TargetResource
