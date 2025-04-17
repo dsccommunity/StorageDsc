@@ -156,7 +156,6 @@ Describe 'StorageDsc.Common\Assert-DevDriveFeatureAvailable' {
         BeforeAll {
             Get-DevDriveWin32HelperScript
             $DevDriveEnablementType = [DevDrive.DevDriveHelper+DEVELOPER_DRIVE_ENABLEMENT_STATE]
-
             Mock -CommandName Invoke-IsApiSetImplemented -MockWith { $true }
             Mock -CommandName Get-DevDriveEnablementState -MockWith { $DevDriveEnablementType::DeveloperDriveEnabled }
         }
