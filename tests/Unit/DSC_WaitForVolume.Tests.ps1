@@ -98,88 +98,140 @@ Describe 'DSC_WaitForVolume\Get-TargetResource' -Tag 'Get' {
     }
 }
 
-# Describe 'DSC_WaitForVolume\Set-TargetResource' {
-#     Mock Start-Sleep
-#     Mock Get-PSDrive
+Describe 'DSC_WaitForVolume\Set-TargetResource' -Tag 'Set' {
+    Context 'When drive C is ready' {
+        BeforeAll {
+            Mock -CommandName Assert-DriveLetterValid -MockWith {
+                'C'
+            }
 
-#     Context 'drive C is ready' {
-#         Mock Get-Volume -MockWith { return $mockedDriveC } -Verifiable
+            Mock -CommandName Start-Sleep
+            Mock -CommandName Get-PSDrive
+            Mock -CommandName Get-Volume -MockWith {
+                @{
+                    DriveLetter = 'C'
+                }
+            }
+        }
 
-#         It 'Should not throw an exception' {
-#             { Set-targetResource @driveCParameters -Verbose } | Should -Not -Throw
-#         }
+        It 'Should not throw an exception' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
 
-#         It 'the correct mocks were called' {
-#             Assert-VerifiableMock
-#             Assert-MockCalled -CommandName Start-Sleep -Times 0
-#             Assert-MockCalled -CommandName Get-PSDrive -Times 0
-#             Assert-MockCalled -CommandName Get-Volume -Times 1
-#         }
-#     }
-#     Context 'drive C does not become ready' {
-#         Mock Get-Volume -MockWith { } -Verifiable
+                $driveCParameters = @{
+                    DriveLetter      = 'C'
+                    RetryIntervalSec = 5
+                    RetryCount       = 20
+                }
 
-#         $errorRecord = Get-InvalidOperationRecord `
-#             -Message $($LocalizedData.VolumeNotFoundAfterError `
-#                 -f $driveCParameters.DriveLetter, $driveCParameters.RetryCount)
+                { Set-TargetResource @driveCParameters } | Should -Not -Throw
 
-#         It 'should throw VolumeNotFoundAfterError' {
-#             { Set-targetResource @driveCParameters -Verbose } | Should -Throw $errorRecord
-#         }
+            }
 
-#         It 'the correct mocks were called' {
-#             Assert-VerifiableMock
-#             Assert-MockCalled -CommandName Start-Sleep -Times $driveCParameters.RetryCount
-#             Assert-MockCalled -CommandName Get-PSDrive -Times $driveCParameters.RetryCount
-#             Assert-MockCalled -CommandName Get-Volume -Times $driveCParameters.RetryCount
-#         }
-#     }
-# }
+            Should -Invoke -CommandName Assert-DriveLetterValid -Exactly -Times 1 -Scope It
+            Should -Invoke -CommandName Get-Volume -Exactly -Times 1 -Scope It
+            Should -Invoke -CommandName Start-Sleep -Exactly -Times 0 -Scope It
+            Should -Invoke -CommandName Get-PSDrive -Exactly -Times 0 -Scope It
+        }
+    }
 
-# Describe 'DSC_WaitForVolume\Test-TargetResource' {
-#     Mock Get-PSDrive
+    Context 'When drive C does not become ready' {
+        BeforeAll {
+            Mock -CommandName Assert-DriveLetterValid -MockWith {
+                'C'
+            }
 
-#     Context 'drive C is ready' {
-#         Mock Get-Volume -MockWith { return $mockedDriveC } -Verifiable
+            Mock -CommandName Start-Sleep
+            Mock -CommandName Get-PSDrive
+            Mock -CommandName Get-Volume
+        }
 
-#         $script:result = $null
+        It 'Should throw VolumeNotFoundAfterError' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
 
-#         It 'calling test Should Not Throw' {
-#             {
-#                 $script:result = Test-TargetResource @driveCParameters -Verbose
-#             } | Should -Not -Throw
-#         }
+                $driveCParameters = @{
+                    DriveLetter      = 'C'
+                    RetryIntervalSec = 5
+                    RetryCount       = 20
+                }
 
-#         It 'result Should Be true' {
-#             $script:result | Should -Be $true
-#         }
+                $errorRecord = Get-InvalidOperationRecord -Message (
+                    $script:localizedData.VolumeNotFoundAfterError -f $driveCParameters.DriveLetter, $driveCParameters.RetryCount
+                )
 
-#         It 'the correct mocks were called' {
-#             Assert-VerifiableMock
-#             Assert-MockCalled -CommandName Get-PSDrive -Times 1
-#             Assert-MockCalled -CommandName Get-Volume -Times 1
-#         }
-#     }
-#     Context 'drive C is not ready' {
-#         Mock Get-Volume -MockWith { } -Verifiable
+                { Set-TargetResource @driveCParameters } | Should -Throw $errorRecord
 
-#         $script:result = $null
+            }
 
-#         It 'calling test Should Not Throw' {
-#             {
-#                 $script:result = Test-TargetResource @driveCParameters -Verbose
-#             } | Should -Not -Throw
-#         }
+            Should -Invoke -CommandName Assert-DriveLetterValid -Exactly -Times 1 -Scope It
+            Should -Invoke -CommandName Get-Volume -Exactly -Times 20 -Scope It
+            Should -Invoke -CommandName Start-Sleep -Exactly -Times 20 -Scope It
+            Should -Invoke -CommandName Get-PSDrive -Exactly -Times 20 -Scope It
+        }
+    }
+}
 
-#         It 'result Should Be false' {
-#             $script:result | Should -Be $false
-#         }
+Describe 'DSC_WaitForVolume\Test-TargetResource' -Tag 'Test' {
+    Context 'When drive C is ready' {
+        BeforeAll {
+            Mock -CommandName Assert-DriveLetterValid -MockWith {
+                'C'
+            }
 
-#         It 'the correct mocks were called' {
-#             Assert-VerifiableMock
-#             Assert-MockCalled -CommandName Get-PSDrive -Times 1
-#             Assert-MockCalled -CommandName Get-Volume -Times 1
-#         }
-#     }
-# }
-#endregion
+            Mock -CommandName Get-PSDrive
+            Mock -CommandName Get-Volume -MockWith {
+                @{
+                    DriveLetter = 'C'
+                }
+            }
+        }
+
+        It 'Should return the correct result' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                $driveCParameters = @{
+                    DriveLetter      = 'C'
+                    RetryIntervalSec = 5
+                    RetryCount       = 20
+                }
+
+                Test-TargetResource @driveCParameters | Should -BeTrue
+            }
+
+            Should -Invoke -CommandName Assert-DriveLetterValid -Exactly -Times 1 -Scope It
+            Should -Invoke -CommandName Get-Volume -Exactly -Times 1 -Scope It
+            Should -Invoke -CommandName Get-PSDrive -Exactly -Times 1 -Scope It
+        }
+    }
+
+    Context 'When drive C is not ready' {
+        BeforeAll {
+            Mock -CommandName Assert-DriveLetterValid -MockWith {
+                'C'
+            }
+
+            Mock -CommandName Get-PSDrive
+            Mock -CommandName Get-Volume
+        }
+
+        It 'Should return the correct result' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                $driveCParameters = @{
+                    DriveLetter      = 'C'
+                    RetryIntervalSec = 5
+                    RetryCount       = 20
+                }
+
+                Test-TargetResource @driveCParameters | Should -BeFalse
+            }
+
+            Should -Invoke -CommandName Assert-DriveLetterValid -Exactly -Times 1 -Scope It
+            Should -Invoke -CommandName Get-Volume -Exactly -Times 1 -Scope It
+            Should -Invoke -CommandName Get-PSDrive -Exactly -Times 1 -Scope It
+        }
+    }
+}
