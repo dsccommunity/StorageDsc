@@ -44,7 +44,6 @@ BuildWorkflow:
 CopyPaths:
   - en-US
   - DSCResources
-  - Modules
 Encoding: UTF8
 VersionedOutputDirectory: true
 BuiltModuleSubdirectory: builtModule
@@ -77,6 +76,22 @@ NestedModule:
   DscResource.Common:
     CopyOnly: true
     Path: ./output/RequiredModules/DscResource.Common
+    AddToManifest: false
+    Exclude: PSGetModuleInfo.xml
+  StorageDsc.VirtualHardDisk.Win32Helpers:
+    Prefix: prefix.ps1
+    VersionedOutputDirectory: false
+    CopyPaths:
+      - en-US
+    Encoding: UTF8
+    AddToManifest: false
+    Exclude: PSGetModuleInfo.xml
+  StorageDsc.Common:
+    Prefix: prefix.ps1
+    VersionedOutputDirectory: false
+    CopyPaths:
+      - en-US
+    Encoding: UTF8
     AddToManifest: false
     Exclude: PSGetModuleInfo.xml
 
