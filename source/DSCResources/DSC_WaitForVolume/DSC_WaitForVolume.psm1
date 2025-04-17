@@ -75,22 +75,19 @@ function Set-TargetResource
     param
     (
         [Parameter(Mandatory = $true)]
-        [String]
+        [System.String]
         $DriveLetter,
 
         [Parameter()]
-        [UInt32]
+        [System.UInt32]
         $RetryIntervalSec = 10,
 
         [Parameter()]
-        [UInt32]
+        [System.UInt32]
         $RetryCount = 60
     )
 
-    Write-Verbose -Message ( @(
-            "$($MyInvocation.MyCommand): "
-            $($script:localizedData.CheckingForVolumeStatusMessage -f $DriveLetter)
-        ) -join '' )
+    Write-Verbose -Message ($script:localizedData.CheckingForVolumeStatusMessage -f $DriveLetter)
 
     # Validate the DriveLetter parameter
     $DriveLetter = Assert-DriveLetterValid -DriveLetter $DriveLetter
@@ -102,20 +99,14 @@ function Set-TargetResource
         $volume = Get-Volume -DriveLetter $DriveLetter -ErrorAction SilentlyContinue
         if ($volume)
         {
-            Write-Verbose -Message ( @(
-                    "$($MyInvocation.MyCommand): "
-                    $($script:localizedData.VolumeFoundMessage -f $DriveLetter)
-                ) -join '' )
+            Write-Verbose -Message ($script:localizedData.VolumeFoundMessage -f $DriveLetter)
 
             $volumeFound = $true
             break
         }
         else
         {
-            Write-Verbose -Message ( @(
-                    "$($MyInvocation.MyCommand): "
-                    $($script:localizedData.VolumeNotFoundRetryingMessage -f $DriveLetter,$RetryIntervalSec)
-                ) -join '' )
+            Write-Verbose -Message ($script:localizedData.VolumeNotFoundRetryingMessage -f $DriveLetter, $RetryIntervalSec)
 
             Start-Sleep -Seconds $RetryIntervalSec
 
@@ -129,8 +120,7 @@ function Set-TargetResource
 
     if (-not $volumeFound)
     {
-        New-InvalidOperationException `
-            -Message $($script:localizedData.VolumeNotFoundAfterError -f $DriveLetter,$RetryCount)
+        New-InvalidOperationException -Message ($script:localizedData.VolumeNotFoundAfterError -f $DriveLetter, $RetryCount)
     } # if
 } # function Set-TargetResource
 
@@ -154,22 +144,19 @@ function Test-TargetResource
     param
     (
         [Parameter(Mandatory = $true)]
-        [String]
+        [System.String]
         $DriveLetter,
 
         [Parameter()]
-        [UInt32]
+        [System.UInt32]
         $RetryIntervalSec = 10,
 
         [Parameter()]
-        [UInt32]
+        [System.UInt32]
         $RetryCount = 60
     )
 
-    Write-Verbose -Message ( @(
-            "$($MyInvocation.MyCommand): "
-            $($script:localizedData.CheckingForVolumeStatusMessage -f $DriveLetter)
-        ) -join '' )
+    Write-Verbose -Message ($script:localizedData.CheckingForVolumeStatusMessage -f $DriveLetter)
 
     # Validate the DriveLetter parameter
     $DriveLetter = Assert-DriveLetterValid -DriveLetter $DriveLetter
@@ -184,18 +171,12 @@ function Test-TargetResource
 
     if ($volume)
     {
-        Write-Verbose -Message ( @(
-                "$($MyInvocation.MyCommand): "
-                $($script:localizedData.VolumeFoundMessage -f $DriveLetter)
-            ) -join '' )
+        Write-Verbose -Message ($script:localizedData.VolumeFoundMessage -f $DriveLetter)
 
         return $true
     }
 
-    Write-Verbose -Message ( @(
-            "$($MyInvocation.MyCommand): "
-            $($script:localizedData.VolumeNotFoundMessage -f $DriveLetter)
-        ) -join '' )
+    Write-Verbose -Message ($script:localizedData.VolumeNotFoundMessage -f $DriveLetter)
 
     return $false
 } # function Test-TargetResource
