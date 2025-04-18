@@ -5,6 +5,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- Disk:
+  - Updated AllocationUnitSize in examples to be a valid UInt32 value instead of a String
+
 ## [6.0.1] - 2024-06-11
 
 ### Fixed
