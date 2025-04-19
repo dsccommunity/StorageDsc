@@ -182,7 +182,7 @@ stages:
       # Only Unit_2019 generates coverage artefact
       - job: Code_Coverage
         displayName: 'Publish Code Coverage'
-        dependsOn: Test_Matrix_Unit_2019 # matrix job name = job + '_' + key
+        dependsOn: Test_Matrix
         pool:
           vmImage: 'ubuntu-latest'
         timeoutInMinutes: 0
