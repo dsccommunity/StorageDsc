@@ -146,7 +146,7 @@ stages:
           # Only Integration tests need WinRM
           - task: PowerShell@2
             displayName: 'Configure WinRM'
-            condition: eq('${{ matrix.configureWinRM }}','true')
+            condition: eq(variables['configureWinRM'], 'true')
             inputs:
               targetType: inline
               script: winrm quickconfig -quiet
@@ -173,7 +173,7 @@ stages:
           # Only Unit_2019 generates coverage artefact
           - task: PublishPipelineArtifact@1
             displayName: 'Publish Test Artifact'
-            condition: eq('${{ matrix.publishArtifact }}','true')
+            condition: eq(variables['publishArtifact'], 'true')
             inputs:
               targetPath: '$(buildFolderName)/$(testResultFolderName)/'
               artifactName: $(testArtifactName)
