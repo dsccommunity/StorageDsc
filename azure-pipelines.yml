@@ -86,54 +86,30 @@ stages:
               testRunTitle: 'HQRM'
             condition: succeededOrFailed()
 
-      - job: Test_Matrix
-        displayName: 'Unit & Integration'
+      - job: Test_Unit_Matrix
+        displayName: 'Unit Tests'
         strategy:
           matrix:
             Unit_2019:
-              testType: Unit
               osImage: windows-2019
               pesterScript: tests/Unit
               testRunTitle: 'Unit (Windows Server 2019)'
-              configureWinRM: false
-              publishArtifact: true # Keep for code coverage
+              publishArtifact: true   # coverage artefact
             Unit_2022:
-              testType: Unit
               osImage: windows-2022
               pesterScript: tests/Unit
               testRunTitle: 'Unit (Windows Server 2022)'
-              configureWinRM: false
               publishArtifact: false
             Unit_2025:
-              testType: Unit
               osImage: windows-2025
               pesterScript: tests/Unit
               testRunTitle: 'Unit (Windows Server 2025)'
-              configureWinRM: false
               publishArtifact: false
-            Integration_2019:
-              testType: Integration
-              osImage: windows-2019
-              pesterScript: tests/Integration
-              testRunTitle: 'Integration (Windows Server 2019)'
-              configureWinRM: true
-              publishArtifact: false
-            Integration_2022:
-              testType: Integration
-              osImage: windows-2022
-              pesterScript: tests/Integration
-              testRunTitle: 'Integration (Windows Server 2022)'
-              configureWinRM: true
-              publishArtifact: false
-            Integration_2025:
-              testType: Integration
-              osImage: windows-2025
-              pesterScript: tests/Integration
-              testRunTitle: 'Integration (Windows Server 2025)'
-              configureWinRM: true
-              publishArtifact: false
+        variables:
+          testType: Unit
+          configureWinRM: false
         pool:
-          vmImage: $[ matrix.osImage ]
+          vmImage: $(osImage)
         timeoutInMinutes: 0
         steps:
           - task: DownloadPipelineArtifact@2
@@ -143,7 +119,64 @@ stages:
               artifactName: $(buildArtifactName)
               targetPath: '$(Build.SourcesDirectory)/$(buildArtifactName)'
 
-          # Only Integration tests need WinRM
+          - task: PowerShell@2
+            displayName: 'Run $(testRunTitle) Test'
+            inputs:
+              filePath: './build.ps1'
+              arguments: >
+                -Tasks test
+                -PesterScript "$(pesterScript)"
+                -CodeCoverageThreshold 0
+              pwsh: false
+
+          - task: PublishTestResults@2
+            displayName: 'Publish Test Results'
+            inputs:
+              testResultsFormat: NUnit
+              testResultsFiles: '$(buildFolderName)/$(testResultFolderName)/NUnit*.xml'
+              testRunTitle: '$(testRunTitle)'
+            condition: succeededOrFailed()
+
+          - task: PublishPipelineArtifact@1
+            displayName: 'Publish Test Artifact'
+            condition: eq(variables['publishArtifact'], 'true')
+            inputs:
+              targetPath: '$(buildFolderName)/$(testResultFolderName)/'
+              artifactName: $(testArtifactName)
+              parallel: true
+
+      - job: Test_Integration_Matrix
+        displayName: 'Integration Tests'
+        strategy:
+          matrix:
+            Integration_2019:
+              osImage: windows-2019
+              pesterScript: tests/Integration
+              testRunTitle: 'Integration (Windows Server 2019)'
+            Integration_2022:
+              osImage: windows-2022
+              pesterScript: tests/Integration
+              testRunTitle: 'Integration (Windows Server 2022)'
+            Integration_2025:
+              osImage: windows-2025
+              pesterScript: tests/Integration
+              testRunTitle: 'Integration (Windows Server 2025)'
+        variables:
+          testType: Integration
+          configureWinRM: true
+          publishArtifact: false
+        pool:
+          vmImage: $(osImage)
+        timeoutInMinutes: 0
+        steps:
+          - task: DownloadPipelineArtifact@2
+            displayName: 'Download Pipeline Artifact'
+            inputs:
+              buildType: current
+              artifactName: $(buildArtifactName)
+              targetPath: '$(Build.SourcesDirectory)/$(buildArtifactName)'
+
+          # Integration tests need WinRM
           - task: PowerShell@2
             displayName: 'Configure WinRM'
             condition: eq(variables['configureWinRM'], 'true')
@@ -170,19 +203,9 @@ stages:
               testRunTitle: '$(testRunTitle)'
             condition: succeededOrFailed()
 
-          # Only Unit_2019 generates coverage artefact
-          - task: PublishPipelineArtifact@1
-            displayName: 'Publish Test Artifact'
-            condition: eq(variables['publishArtifact'], 'true')
-            inputs:
-              targetPath: '$(buildFolderName)/$(testResultFolderName)/'
-              artifactName: $(testArtifactName)
-              parallel: true
-
-      # Only Unit_2019 generates coverage artefact
       - job: Code_Coverage
         displayName: 'Publish Code Coverage'
-        dependsOn: Test_Matrix
+        dependsOn: Test_Unit_Matrix
         pool:
           vmImage: 'ubuntu-latest'
         timeoutInMinutes: 0
