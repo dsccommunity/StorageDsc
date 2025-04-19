@@ -87,14 +87,14 @@ stages:
             condition: succeededOrFailed()
 
       - job: Test_Unit_Matrix
-        displayName: 'Unit Tests ($(testRunTitle))'
+        displayName: 'Unit Tests'
         strategy:
           matrix:
             Unit_Windows_Server_2019:
               osImage: windows-2019
               pesterScript: tests/Unit
               testRunTitle: 'Unit (Windows Server 2019)'
-              publishArtifact: true   # coverage artefact
+              publishArtifact: true # Publish the test artifact for code coverage
             Unit_Windows_Server_2022:
               osImage: windows-2022
               pesterScript: tests/Unit
@@ -126,7 +126,6 @@ stages:
               arguments: >
                 -Tasks test
                 -PesterScript "$(pesterScript)"
-                -CodeCoverageThreshold 0
               pwsh: false
 
           - task: PublishTestResults@2
@@ -146,7 +145,7 @@ stages:
               parallel: true
 
       - job: Test_Integration_Matrix
-        displayName: 'Integration Tests ($(testRunTitle))'
+        displayName: 'Integration Tests'
         strategy:
           matrix:
             Integration_Windows_Server_2019:
