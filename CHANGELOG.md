@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Azure DevOps Build Pipeline:
   - Update wiki generation to use `Generate_Markdown_For_DSC_Resources`.
   - Remove use of prefix.ps1 and suffix.ps1.
+  - Added testing on Windows Server 2025.
 
 ## [6.0.1] - 2024-06-11
 
