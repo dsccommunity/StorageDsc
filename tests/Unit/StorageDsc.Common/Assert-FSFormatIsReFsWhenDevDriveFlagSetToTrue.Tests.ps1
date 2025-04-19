@@ -1,6 +1,6 @@
 <#
     .SYNOPSIS
-        Unit test for Compare-SizeUsingGB.
+        Unit test for Assert-FSFormatIsReFsWhenDevDriveFlagSetToTrue.
 #>
 
 # Suppressing this rule because Script Analyzer does not understand Pester's syntax.
@@ -54,48 +54,35 @@ AfterAll {
     Get-Module -Name $script:subModuleName -All | Remove-Module -Force
 }
 
-Describe 'StorageDsc.Common\Compare-SizeUsingGB' {
-    Context 'When comparing whether SizeAInBytes is equal to SizeBInBytes when SizeAInBytes is effectively equal to SizeBInBytes when both are converted to Gb' {
-        It 'Should return true' {
+Describe 'StorageDsc.Common\Assert-FSFormatIsReFsWhenDevDriveFlagSetToTrue' {
+    Context 'When testing that only the ReFS file system is allowed' {
+        It 'Should throw invalid argument error if a filesystem other than ReFS is passed in' {
             InModuleScope -ScriptBlock {
                 Set-StrictMode -Version 1.0
 
+                $errorRecord = Get-InvalidArgumentRecord -Message (
+                    $script:localizedData.FSFormatNotReFSWhenDevDriveFlagIsTrueError
+                ) -ArgumentName 'FSFormat'
+
                 $testParams = @{
-                    SizeAInBytes = 150Gb
-                    SizeBInBytes = 161060225024
+                    FSFormat = 'test'
                 }
 
-                Compare-SizeUsingGB @testParams | Should -BeTrue
+                { Assert-FSFormatIsReFsWhenDevDriveFlagSetToTrue @testParams } | Should -Throw $errorRecord
             }
         }
     }
 
-    Context 'When comparing whether SizeAInBytes is equal to SizeBInBytes when SizeAInBytes is equal to SizeBInBytes when both are converted to Gb' {
-        It 'Should return true' {
+    Context 'When testing Exception not thrown in Assert-FSFormatIsReFsWhenDevDriveFlagSetToTrue when ReFS file system passed in' {
+        It 'Should not throw invalid argument error if ReFS filesystem is passed in' {
             InModuleScope -ScriptBlock {
                 Set-StrictMode -Version 1.0
 
                 $testParams = @{
-                    SizeAInBytes = 50Gb
-                    SizeBInBytes = 50Gb
+                    FSFormat = 'ReFS'
                 }
 
-                Compare-SizeUsingGB @testParams | Should -BeTrue
-            }
-        }
-    }
-
-    Context 'When comparing whether SizeAInBytes is equal to SizeBInBytes when SizeAInBytes is not equal to SizeBInBytes when both are converted to Gb' {
-        It 'Should return false' {
-            InModuleScope -ScriptBlock {
-                Set-StrictMode -Version 1.0
-
-                $testParams = @{
-                    SizeAInBytes = 50Gb
-                    SizeBInBytes = 49.99Gb
-                }
-
-                Compare-SizeUsingGB @testParams | Should -BeFalse
+                { Assert-FSFormatIsReFsWhenDevDriveFlagSetToTrue @testParams } | Should -Not -Throw
             }
         }
     }
