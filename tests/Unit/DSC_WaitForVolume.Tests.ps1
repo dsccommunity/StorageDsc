@@ -60,16 +60,6 @@ AfterAll {
     Get-Module -Name $script:dscResourceName -All | Remove-Module -Force
 }
 
-# $mockedDriveC = [pscustomobject] @{
-#     DriveLetter = 'C'
-# }
-
-# $driveCParameters = @{
-#     DriveLetter      = 'C'
-#     RetryIntervalSec = 5
-#     RetryCount       = 20
-# }
-
 Describe 'DSC_WaitForVolume\Get-TargetResource' -Tag 'Get' {
     BeforeAll {
         Mock -CommandName Assert-DriveLetterValid -MockWith {
