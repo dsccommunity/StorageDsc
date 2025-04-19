@@ -1,6 +1,6 @@
 <#
     .SYNOPSIS
-        Unit test for Compare-SizeUsingGB.
+        Unit test for Test-DevDriveVolume.
 #>
 
 # Suppressing this rule because Script Analyzer does not understand Pester's syntax.
@@ -54,49 +54,45 @@ AfterAll {
     Get-Module -Name $script:subModuleName -All | Remove-Module -Force
 }
 
-Describe 'StorageDsc.Common\Compare-SizeUsingGB' {
-    Context 'When comparing whether SizeAInBytes is equal to SizeBInBytes when SizeAInBytes is effectively equal to SizeBInBytes when both are converted to Gb' {
+Describe 'StorageDsc.Common\Test-DevDriveVolume' {
+    Context 'When testing whether a volume is a Dev Drive volume and the volume is a Dev Drive volume' {
+        BeforeAll {
+            Mock -CommandName Invoke-DeviceIoControlWrapperForDevDriveQuery -MockWith { $true }
+        }
+
         It 'Should return true' {
             InModuleScope -ScriptBlock {
                 Set-StrictMode -Version 1.0
 
                 $testParams = @{
-                    SizeAInBytes = 150Gb
-                    SizeBInBytes = 161060225024
+                    VolumeGuidPath = '\\?\Volume{3a244a32-efba-4b7e-9a19-7293fc7c7924}\'
                 }
 
-                Compare-SizeUsingGB @testParams | Should -BeTrue
+                Test-DevDriveVolume @testParams | Should -BeTrue
             }
+
+            Should -Invoke -CommandName Invoke-DeviceIoControlWrapperForDevDriveQuery -Exactly -Times 1 -Scope It
         }
     }
 
-    Context 'When comparing whether SizeAInBytes is equal to SizeBInBytes when SizeAInBytes is equal to SizeBInBytes when both are converted to Gb' {
-        It 'Should return true' {
-            InModuleScope -ScriptBlock {
-                Set-StrictMode -Version 1.0
-
-                $testParams = @{
-                    SizeAInBytes = 50Gb
-                    SizeBInBytes = 50Gb
-                }
-
-                Compare-SizeUsingGB @testParams | Should -BeTrue
-            }
+    Context 'When testing whether a volume is a Dev Drive volume and the volume is not a Dev Drive volume' {
+        BeforeAll {
+            Mock -CommandName Invoke-DeviceIoControlWrapperForDevDriveQuery -MockWith { $false }
         }
-    }
 
-    Context 'When comparing whether SizeAInBytes is equal to SizeBInBytes when SizeAInBytes is not equal to SizeBInBytes when both are converted to Gb' {
+
         It 'Should return false' {
             InModuleScope -ScriptBlock {
                 Set-StrictMode -Version 1.0
 
                 $testParams = @{
-                    SizeAInBytes = 50Gb
-                    SizeBInBytes = 49.99Gb
+                    VolumeGuidPath = '\\?\Volume{3a244a32-efba-4b7e-9a19-7293fc7c7924}\'
                 }
 
-                Compare-SizeUsingGB @testParams | Should -BeFalse
+                Test-DevDriveVolume @testParams | Should -BeFalse
             }
+
+            Should -Invoke -CommandName Invoke-DeviceIoControlWrapperForDevDriveQuery -Exactly -Times 1 -Scope It
         }
     }
 }
