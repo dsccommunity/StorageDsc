@@ -153,12 +153,12 @@ stages:
               pwsh: false
 
           - task: PowerShell@2
-            displayName: 'Run ${{ matrix.testType }} Test'
+            displayName: 'Run $(testRunTitle) Test'
             inputs:
               filePath: './build.ps1'
               arguments: >
                 -Tasks test
-                -PesterScript '${{ matrix.pesterScript }}'
+                -PesterScript "$(pesterScript)"
                 -CodeCoverageThreshold 0
               pwsh: false
 
@@ -167,7 +167,7 @@ stages:
             inputs:
               testResultsFormat: NUnit
               testResultsFiles: '$(buildFolderName)/$(testResultFolderName)/NUnit*.xml'
-              testRunTitle: '${{ matrix.testRunTitle }}'
+              testRunTitle: '$(testRunTitle)'
             condition: succeededOrFailed()
 
           # Only Unit_2019 generates coverage artefact
