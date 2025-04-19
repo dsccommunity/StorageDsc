@@ -92,17 +92,14 @@ stages:
           matrix:
             Unit_Windows_Server_2019:
               osImage: windows-2019
-              pesterScript: tests/Unit
               testRunTitle: 'Unit (Windows Server 2019)'
               publishArtifact: true # Publish the test artifact for code coverage
             Unit_Windows_Server_2022:
               osImage: windows-2022
-              pesterScript: tests/Unit
               testRunTitle: 'Unit (Windows Server 2022)'
               publishArtifact: false
             Unit_Windows_Server_2025:
               osImage: windows-2025
-              pesterScript: tests/Unit
               testRunTitle: 'Unit (Windows Server 2025)'
               publishArtifact: false
         variables:
@@ -123,9 +120,7 @@ stages:
             displayName: 'Run $(testRunTitle) Test'
             inputs:
               filePath: './build.ps1'
-              arguments: >
-                -Tasks test
-                -PesterScript "$(pesterScript)"
+              arguments: "-Tasks test -PesterScript 'tests/Unit'"
               pwsh: false
 
           - task: PublishTestResults@2
@@ -150,15 +145,12 @@ stages:
           matrix:
             Integration_Windows_Server_2019:
               osImage: windows-2019
-              pesterScript: tests/Integration
               testRunTitle: 'Integration (Windows Server 2019)'
             Integration_Windows_Server_2022:
               osImage: windows-2022
-              pesterScript: tests/Integration
               testRunTitle: 'Integration (Windows Server 2022)'
             Integration_Windows_Server_2025:
               osImage: windows-2025
-              pesterScript: tests/Integration
               testRunTitle: 'Integration (Windows Server 2025)'
         variables:
           testType: Integration
@@ -188,10 +180,7 @@ stages:
             displayName: 'Run $(testRunTitle) Test'
             inputs:
               filePath: './build.ps1'
-              arguments: >
-                -Tasks test
-                -PesterScript "$(pesterScript)"
-                -CodeCoverageThreshold 0
+              arguments: "-Tasks test -PesterScript 'tests/Integration' -CodeCoverageThreshold 0"
               pwsh: false
 
           - task: PublishTestResults@2
