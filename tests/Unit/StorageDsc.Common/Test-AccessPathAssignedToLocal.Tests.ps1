@@ -1,6 +1,6 @@
 <#
     .SYNOPSIS
-        Unit test for Compare-SizeUsingGB.
+        Unit test for Test-AccessPathAssignedToLocal.
 #>
 
 # Suppressing this rule because Script Analyzer does not understand Pester's syntax.
@@ -54,48 +54,59 @@ AfterAll {
     Get-Module -Name $script:subModuleName -All | Remove-Module -Force
 }
 
-Describe 'StorageDsc.Common\Compare-SizeUsingGB' {
-    Context 'When comparing whether SizeAInBytes is equal to SizeBInBytes when SizeAInBytes is effectively equal to SizeBInBytes when both are converted to Gb' {
-        It 'Should return true' {
+Describe 'StorageDsc.Common\Test-AccessPathAssignedToLocal' {
+    Context 'Contains a single access path that is local' {
+        It 'Should return $true' {
             InModuleScope -ScriptBlock {
                 Set-StrictMode -Version 1.0
 
                 $testParams = @{
-                    SizeAInBytes = 150Gb
-                    SizeBInBytes = 161060225024
+                    AccessPath = 'c:\MountPoint\'
                 }
 
-                Compare-SizeUsingGB @testParams | Should -BeTrue
+                Test-AccessPathAssignedToLocal @testParams | Should -BeTrue
             }
         }
     }
 
-    Context 'When comparing whether SizeAInBytes is equal to SizeBInBytes when SizeAInBytes is equal to SizeBInBytes when both are converted to Gb' {
-        It 'Should return true' {
+    Context 'Contains a single access path that is not local' {
+        It 'Should return $false' {
             InModuleScope -ScriptBlock {
                 Set-StrictMode -Version 1.0
 
                 $testParams = @{
-                    SizeAInBytes = 50Gb
-                    SizeBInBytes = 50Gb
+                    AccessPath = '\\?\Volume{905551f3-33a5-421d-ac24-c993fbfb3184}\'
                 }
 
-                Compare-SizeUsingGB @testParams | Should -BeTrue
+                Test-AccessPathAssignedToLocal @testParams | Should -BeFalse
             }
         }
     }
 
-    Context 'When comparing whether SizeAInBytes is equal to SizeBInBytes when SizeAInBytes is not equal to SizeBInBytes when both are converted to Gb' {
-        It 'Should return false' {
+    Context 'Contains multiple access paths where one is local' {
+        It 'Should return $true' {
             InModuleScope -ScriptBlock {
                 Set-StrictMode -Version 1.0
 
                 $testParams = @{
-                    SizeAInBytes = 50Gb
-                    SizeBInBytes = 49.99Gb
+                    AccessPath = @('c:\MountPoint\', '\\?\Volume{905551f3-33a5-421d-ac24-c993fbfb3184}\')
                 }
 
-                Compare-SizeUsingGB @testParams | Should -BeFalse
+                Test-AccessPathAssignedToLocal @testParams | Should -BeTrue
+            }
+        }
+    }
+
+    Context 'Contains multiple access paths where none are local' {
+        It 'Should return $false' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                $testParams = @{
+                    AccessPath = @('\\?\Volume{905551f3-33a5-421d-ac24-c993fbfb3184}\', '\\?\Volume{905551f3-33a5-421d-ac24-c993fbfb3184}\')
+                }
+
+                Test-AccessPathAssignedToLocal @testParams | Should -BeFalse
             }
         }
     }

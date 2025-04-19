@@ -1,6 +1,6 @@
 <#
     .SYNOPSIS
-        Unit test for Compare-SizeUsingGB.
+        Unit test for Assert-SizeMeetsMinimumDevDriveRequirement.
 #>
 
 # Suppressing this rule because Script Analyzer does not understand Pester's syntax.
@@ -54,48 +54,34 @@ AfterAll {
     Get-Module -Name $script:subModuleName -All | Remove-Module -Force
 }
 
-Describe 'StorageDsc.Common\Compare-SizeUsingGB' {
-    Context 'When comparing whether SizeAInBytes is equal to SizeBInBytes when SizeAInBytes is effectively equal to SizeBInBytes when both are converted to Gb' {
-        It 'Should return true' {
+Describe 'StorageDsc.Common\Assert-SizeMeetsMinimumDevDriveRequirement' {
+    Context 'When UserDesiredSize does not meet the minimum size for Dev Drive volumes' {
+        It 'Should throw invalid argument error' {
             InModuleScope -ScriptBlock {
                 Set-StrictMode -Version 1.0
 
+                $UserDesired10Gb = 10GB
+                $ExpectedMessage = ($script:localizedData.MinimumSizeNeededToCreateDevDriveVolumeError -f ([Math]::Round($UserDesired10Gb / 1GB, 2)))
+
                 $testParams = @{
-                    SizeAInBytes = 150Gb
-                    SizeBInBytes = 161060225024
+                    UserDesiredSize = $UserDesired10Gb
                 }
 
-                Compare-SizeUsingGB @testParams | Should -BeTrue
+                { Assert-SizeMeetsMinimumDevDriveRequirement @testParams } | Should -Throw -ExpectedMessage $ExpectedMessage
             }
         }
     }
 
-    Context 'When comparing whether SizeAInBytes is equal to SizeBInBytes when SizeAInBytes is equal to SizeBInBytes when both are converted to Gb' {
-        It 'Should return true' {
+    Context 'When UserDesiredSize meets the minimum size for Dev Drive volumes' {
+        It 'Should not throw invalid argument error' {
             InModuleScope -ScriptBlock {
                 Set-StrictMode -Version 1.0
 
                 $testParams = @{
-                    SizeAInBytes = 50Gb
-                    SizeBInBytes = 50Gb
+                    UserDesiredSize = 50GB
                 }
 
-                Compare-SizeUsingGB @testParams | Should -BeTrue
-            }
-        }
-    }
-
-    Context 'When comparing whether SizeAInBytes is equal to SizeBInBytes when SizeAInBytes is not equal to SizeBInBytes when both are converted to Gb' {
-        It 'Should return false' {
-            InModuleScope -ScriptBlock {
-                Set-StrictMode -Version 1.0
-
-                $testParams = @{
-                    SizeAInBytes = 50Gb
-                    SizeBInBytes = 49.99Gb
-                }
-
-                Compare-SizeUsingGB @testParams | Should -BeFalse
+                { Assert-SizeMeetsMinimumDevDriveRequirement @testParams } | Should -Not -Throw
             }
         }
     }

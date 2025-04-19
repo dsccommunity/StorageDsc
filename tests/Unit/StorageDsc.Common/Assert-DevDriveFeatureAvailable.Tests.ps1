@@ -16,7 +16,7 @@ BeforeDiscovery {
             if (-not (Get-Module -Name 'DscResource.Test' -ListAvailable))
             {
                 # Redirect all streams to $null, except the error stream (stream 2)
-                & "$PSScriptRoot/../../build.ps1" -Tasks 'noop' 3>&1 4>&1 5>&1 6>&1 > $null
+                & "$PSScriptRoot/../../../build.ps1" -Tasks 'noop' 3>&1 4>&1 5>&1 6>&1 > $null
             }
 
             # If the dependencies has not been resolved, this will throw an error.
@@ -156,7 +156,7 @@ Describe 'StorageDsc.Common\Assert-DevDriveFeatureAvailable' {
         BeforeAll {
             Get-DevDriveWin32HelperScript
             $DevDriveEnablementType = [DevDrive.DevDriveHelper+DEVELOPER_DRIVE_ENABLEMENT_STATE]
-            
+
             Mock -CommandName Invoke-IsApiSetImplemented -MockWith { $true }
             Mock -CommandName Get-DevDriveEnablementState -MockWith { $DevDriveEnablementType::DeveloperDriveEnabled }
         }
