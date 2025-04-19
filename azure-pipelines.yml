@@ -87,20 +87,20 @@ stages:
             condition: succeededOrFailed()
 
       - job: Test_Unit_Matrix
-        displayName: 'Unit Tests'
+        displayName: 'Unit Tests ($(testRunTitle))'
         strategy:
           matrix:
-            Unit_2019:
+            Unit_Windows_Server_2019:
               osImage: windows-2019
               pesterScript: tests/Unit
               testRunTitle: 'Unit (Windows Server 2019)'
               publishArtifact: true   # coverage artefact
-            Unit_2022:
+            Unit_Windows_Server_2022:
               osImage: windows-2022
               pesterScript: tests/Unit
               testRunTitle: 'Unit (Windows Server 2022)'
               publishArtifact: false
-            Unit_2025:
+            Unit_Windows_Server_2025:
               osImage: windows-2025
               pesterScript: tests/Unit
               testRunTitle: 'Unit (Windows Server 2025)'
@@ -146,18 +146,18 @@ stages:
               parallel: true
 
       - job: Test_Integration_Matrix
-        displayName: 'Integration Tests'
+        displayName: 'Integration Tests ($(testRunTitle))'
         strategy:
           matrix:
-            Integration_2019:
+            Integration_Windows_Server_2019:
               osImage: windows-2019
               pesterScript: tests/Integration
               testRunTitle: 'Integration (Windows Server 2019)'
-            Integration_2022:
+            Integration_Windows_Server_2022:
               osImage: windows-2022
               pesterScript: tests/Integration
               testRunTitle: 'Integration (Windows Server 2022)'
-            Integration_2025:
+            Integration_Windows_Server_2025:
               osImage: windows-2025
               pesterScript: tests/Integration
               testRunTitle: 'Integration (Windows Server 2025)'
