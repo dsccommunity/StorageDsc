@@ -1,4 +1,4 @@
-﻿ConvertFrom-StringData @'
+ConvertFrom-StringData @'
     GettingDiskMessage = Getting disk with {0} '{1}' status for access path '{2}'.
     SettingDiskMessage = Setting disk with {0} '{1}' status for access path '{2}'.
     SetDiskOnlineMessage = Setting disk with {0} '{1}' online.

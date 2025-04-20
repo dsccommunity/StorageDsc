@@ -29,7 +29,7 @@ function Assert-DriveLetterValid
     if (-not $matches)
     {
         # DriveLetter format is invalid
-        New-InvalidArgumentException `
+        New-ArgumentException `
             -Message $($script:localizedData.InvalidDriveLetterFormatError -f $DriveLetter) `
             -ArgumentName 'DriveLetter'
     }
