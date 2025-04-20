@@ -17,7 +17,7 @@ function Assert-FSFormatIsReFsWhenDevDriveFlagSetToTrue
 
     if ($FSFormat -ne 'ReFS')
     {
-        New-InvalidArgumentException `
+        New-ArgumentException `
             -Message $($script:localizedData.FSFormatNotReFSWhenDevDriveFlagIsTrueError -f 'ReFS', $FSFormat) `
             -ArgumentName 'FSFormat'
     }

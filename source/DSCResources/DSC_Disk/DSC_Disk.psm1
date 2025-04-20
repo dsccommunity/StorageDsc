@@ -709,7 +709,7 @@ function Set-TargetResource
 
                     if ($Size -gt $supportedSize.SizeMax)
                     {
-                        New-InvalidArgumentException -Message ( @(
+                        New-ArgumentException -Message ( @(
                                 "$($MyInvocation.MyCommand): "
                                 $($script:localizedData.FreeSpaceViolationError `
                                         -f $DriveLetter, $assignedPartition.Size, $Size, $supportedSize.SizeMax)

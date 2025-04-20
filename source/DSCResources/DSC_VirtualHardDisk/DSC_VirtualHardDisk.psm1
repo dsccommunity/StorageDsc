@@ -331,7 +331,7 @@ function Assert-ParametersValid
     if ($FilePath -notmatch '[a-zA-Z]:\\')
     {
         # AccessPath is invalid
-        New-InvalidArgumentException `
+        New-ArgumentException `
             -Message $($script:localizedData.VirtualHardDiskPathError -f $FilePath) `
             -ArgumentName 'FilePath'
     }
@@ -341,20 +341,20 @@ function Assert-ParametersValid
     {
         if (($extension -ne 'vhd') -and ($extension -ne 'vhdx'))
         {
-            New-InvalidArgumentException `
+            New-ArgumentException `
                 -Message $($script:localizedData.VirtualHardDiskUnsupportedFileType -f $extension) `
                 -ArgumentName 'FilePath'
         }
         elseif ($extension -ne $DiskFormat)
         {
-            New-InvalidArgumentException `
+            New-ArgumentException `
                 -Message $($script:localizedData.VirtualHardDiskExtensionAndFormatMismatchError -f $FilePath, $extension, $DiskFormat) `
                 -ArgumentName 'FilePath'
         }
     }
     else
     {
-        New-InvalidArgumentException `
+        New-ArgumentException `
             -Message $($script:localizedData.VirtualHardDiskNoExtensionError -f $FilePath) `
             -ArgumentName 'FilePath'
     }
@@ -384,7 +384,7 @@ function Assert-ParametersValid
             $invalidSizeMsg = $script:localizedData.VhdxFormatDiskSizeInvalid
         }
 
-        New-InvalidArgumentException `
+        New-ArgumentException `
             -Message $($invalidSizeMsg -f $diskSizeString) `
             -ArgumentName 'DiskSize'
     }
