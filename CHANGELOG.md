@@ -5,8 +5,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-- Disk:
-  - Updated AllocationUnitSize in examples to be a valid UInt32 value instead of a String
+### Fixed
+
+- Azure DevOps Build Pipeline:
+  - Update wiki generation to use `Generate_Markdown_For_DSC_Resources`.
+  - Remove use of prefix.ps1 and suffix.ps1.
+  - Added testing on Windows Server 2025.
+  - Updated Test stage to use matrix strategy to reduce code duplication.
+- `Disk`
+  - Updated AllocationUnitSize in examples to be a valid UInt32 value instead of a String.
 
 ## [6.0.1] - 2024-06-11
 
