@@ -10,13 +10,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Unit tests converted to Pester 5. Fixes [#265](https://github.com/dsccommunity/StorageDsc/issues/265).
 - Split bundled modules into buildable modules and separate files.
 
-### Removed
-
-- `CommonTestHelper`
-  - Use versions from `DscResource.Test`
-    - Get-InvalidArgumentRecord
-    - Get-InvalidOperationRecord
-
 ### Fixed
 
 - Azure DevOps Build Pipeline:
@@ -24,6 +17,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Remove use of prefix.ps1 and suffix.ps1.
   - Added testing on Windows Server 2025.
   - Updated Test stage to use matrix strategy to reduce code duplication.
+
+### Removed
+
+- `CommonTestHelper`
+  - Use versions from `DscResource.Test`
+    - Get-InvalidArgumentRecord
+    - Get-InvalidOperationRecord
 
 ## [6.0.1] - 2024-06-11
 
