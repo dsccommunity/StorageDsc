@@ -29,7 +29,7 @@ function Assert-AccessPathValid
     if (-not (Test-Path -Path $AccessPath -PathType Container))
     {
         # AccessPath is invalid
-        New-InvalidArgumentException `
+        New-ArgumentException `
             -Message $($script:localizedData.InvalidAccessPathError -f $AccessPath) `
             -ArgumentName 'AccessPath'
     } # if
