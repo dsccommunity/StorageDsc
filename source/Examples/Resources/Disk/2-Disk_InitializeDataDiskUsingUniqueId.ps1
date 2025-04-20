@@ -71,7 +71,7 @@ Configuration Disk_InitializeDataDiskUsingUniqueId
              DriveLetter = 'S'
              Size = 100GB
              FSFormat = 'ReFS'
-             AllocationUnitSize = 64KB
+             AllocationUnitSize = 65536
              DependsOn = '[WaitForDisk]Disk3'
         }
     }
