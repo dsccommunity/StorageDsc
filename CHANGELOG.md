@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Remove use of prefix.ps1 and suffix.ps1.
   - Added testing on Windows Server 2025.
   - Updated Test stage to use matrix strategy to reduce code duplication.
+  - Refactor pipeline to move integration to separate stage, add merge code coverage task.
 - `Disk`
   - Updated AllocationUnitSize in examples to be a valid UInt32 value instead of a String.
 
