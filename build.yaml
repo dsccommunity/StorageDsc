@@ -30,6 +30,7 @@ BuildWorkflow:
 
   test:
     - Pester_Tests_Stop_On_Fail
+    - Convert_Pester_Coverage
     - Pester_If_Code_Coverage_Under_Threshold
 
   merge:
@@ -92,7 +93,6 @@ Pester:
     - tests/Unit
   ExcludeTag:
   Tag:
-  CodeCoverageOutputFile: JaCoCo_coverage.xml
   CodeCoverageOutputFileEncoding: ascii
   CodeCoverageThreshold: 80
 
@@ -107,7 +107,6 @@ Pester:
       CIFormat: Auto
     CodeCoverage:
       CoveragePercentTarget: 80
-      OutputPath: JaCoCo_coverage.xml
       OutputEncoding: ascii
       UseBreakpoints: false
     TestResult:
