@@ -67,7 +67,7 @@ function Assert-DriveLetterValid
     if (-not $matches)
     {
         # DriveLetter format is invalid
-        New-InvalidArgumentException `
+        New-ArgumentException `
             -Message $($script:localizedData.InvalidDriveLetterFormatError -f $DriveLetter) `
             -ArgumentName 'DriveLetter'
     }
@@ -114,7 +114,7 @@ function Assert-AccessPathValid
     if (-not (Test-Path -Path $AccessPath -PathType Container))
     {
         # AccessPath is invalid
-        New-InvalidArgumentException `
+        New-ArgumentException `
             -Message $($script:localizedData.InvalidAccessPathError -f $AccessPath) `
             -ArgumentName 'AccessPath'
     } # if
@@ -441,7 +441,7 @@ function Assert-DevDriveFeatureAvailable
     param
     ()
 
-    $devDriveHelper = Get-DevDriveWin32HelperScript
+    $null = Get-DevDriveWin32HelperScript
     Write-Verbose -Message ($script:localizedData.CheckingDevDriveEnablementMessage)
 
     $IsApiSetImplemented = Invoke-IsApiSetImplemented('api-ms-win-core-sysinfo-l1-2-6')
@@ -510,7 +510,7 @@ function Assert-FSFormatIsReFsWhenDevDriveFlagSetToTrue
 
     if ($FSFormat -ne 'ReFS')
     {
-        New-InvalidArgumentException `
+        New-ArgumentException `
             -Message $($script:localizedData.FSFormatNotReFSWhenDevDriveFlagIsTrueError -f 'ReFS', $FSFormat) `
             -ArgumentName 'FSFormat'
     }
@@ -590,7 +590,7 @@ function Test-DevDriveVolume
         $VolumeGuidPath
     )
 
-    $devDriveHelper = Get-DevDriveWin32HelperScript
+    $null = Get-DevDriveWin32HelperScript
 
     return Invoke-DeviceIoControlWrapperForDevDriveQuery -VolumeGuidPath $VolumeGuidPath
 }# end function Test-DevDriveVolume

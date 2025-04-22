@@ -421,7 +421,7 @@ function New-SimpleVirtualDisk
     )
 
     Write-Verbose -Message ($script:localizedData.CreatingVirtualDiskMessage -f $VirtualDiskPath)
-    $vDiskHelper = Get-VirtDiskWin32HelperScript
+    $null = Get-VirtDiskWin32HelperScript
 
     # Get parameters for CreateVirtualDisk function
     [ref]$virtualStorageType = Get-VirtualStorageType -DiskFormat $DiskFormat
@@ -519,7 +519,7 @@ function Add-SimpleVirtualDisk
     {
         Write-Verbose -Message ($script:localizedData.MountingVirtualDiskMessage -f $VirtualDiskPath)
 
-        $vDiskHelper = Get-VirtDiskWin32HelperScript
+        $null = Get-VirtDiskWin32HelperScript
 
         # No handle passed in so we need to open the virtual disk first using $virtualDiskPath to get the handle.
         if ($null -eq $Handle)
@@ -605,7 +605,7 @@ function Get-VirtualDiskHandle
     )
 
     Write-Verbose -Message ($script:localizedData.OpeningVirtualBeforeMountingMessage)
-    $vDiskHelper = Get-VirtDiskWin32HelperScript
+    $null = Get-VirtDiskWin32HelperScript
 
     # Get parameters for OpenVirtualDisk function.
     [ref]$virtualStorageType = Get-VirtualStorageType -DiskFormat $DiskFormat
