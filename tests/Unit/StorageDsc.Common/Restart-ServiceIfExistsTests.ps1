@@ -1,6 +1,6 @@
 <#
     .SYNOPSIS
-        Unit test for Restart-SystemService.
+        Unit test for Restart-ServiceIfExists.
 #>
 
 # Suppressing this rule because Script Analyzer does not understand Pester's syntax.
@@ -54,7 +54,7 @@ AfterAll {
     Get-Module -Name $script:subModuleName -All | Remove-Module -Force
 }
 
-Describe 'StorageDsc.Common\Restart-SystemService' {
+Describe 'StorageDsc.Common\Restart-ServiceIfExists' {
     BeforeAll {
         Mock -CommandName Restart-Service
     }
