@@ -158,6 +158,7 @@ function Get-OpticalDiskDriveLetter
     )
 
     $driveLetter = $null
+    $deviceId = $null
 
     Write-Verbose -Message ( @(
             "$($MyInvocation.MyCommand): "
