@@ -628,6 +628,36 @@ function Compare-SizeUsingGB
 
 }# end function Compare-SizeUsingGB
 
+<#
+    .SYNOPSIS
+        Asserts that the configuration is running with local Administrator privileges.
+
+    .PARAMETER CustomErrorMessage
+        A user friendly error message specific to the caller.
+#>
+function Assert-ElevatedUserWithCustomErrorMessage
+{
+    [CmdletBinding()]
+    param
+    (
+        [Parameter(Mandatory = $true)]
+        [System.String]
+        $CustomErrorMessage
+    )
+
+    try
+    {
+        Assert-ElevatedUser
+
+    }
+    catch
+    {
+        # Use a user friendly error message specific to the caller
+        throw $CustomErrorMessage
+    }
+
+}# end function Assert-ElevatedUserWithCustomErrorMessage
+
 Export-ModuleMember -Function @(
     'Restart-ServiceIfExists',
     'Assert-DriveLetterValid',
@@ -642,5 +672,6 @@ Export-ModuleMember -Function @(
     'Get-DevDriveEnablementState',
     'Test-DevDriveVolume',
     'Invoke-DeviceIoControlWrapperForDevDriveQuery',
-    'Compare-SizeUsingGB'
+    'Compare-SizeUsingGB',
+    'Assert-ElevatedUserWithCustomErrorMessage'
 )
