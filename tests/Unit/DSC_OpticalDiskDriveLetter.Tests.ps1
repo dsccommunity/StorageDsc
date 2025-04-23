@@ -33,11 +33,11 @@ BeforeAll {
     $script:dscModuleName = 'StorageDsc'
     $script:dscResourceName = 'DSC_OpticalDiskDriveLetter'
 
-    $script:testEnvironment = Initialize-TestEnvironment `
-        -DSCModuleName $script:dscModuleName `
-        -DSCResourceName $script:dscResourceName `
-        -ResourceType 'Mof' `
-        -TestType 'Unit'
+#     $script:testEnvironment = Initialize-TestEnvironment `
+#         -DSCModuleName $script:dscModuleName `
+#         -DSCResourceName $script:dscResourceName `
+#         -ResourceType 'Mof' `
+#         -TestType 'Unit'
 
     Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath '..\TestHelpers\CommonTestHelper.psm1')
 
