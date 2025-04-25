@@ -36,7 +36,11 @@
         "keepachangelog",
         "notin",
         "pscmdlet",
-        "steppable"
+        "steppable",
+        "vhdx",
+        "cdrom",
+        "ntfs",
+        "PHYSICALDRIVE"
     ],
     "cSpell.ignorePaths": [
         ".git"
