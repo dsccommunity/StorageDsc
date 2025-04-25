@@ -78,7 +78,7 @@ Describe 'DSC_MountImage\Get-TargetResource' -Tag 'Get' {
                     $DiskNumber,
 
                     [Uint32]
-                    $ParitionNumber
+                    $PartitionNumber
                 )
             }
 
@@ -999,7 +999,7 @@ Describe 'DSC_MountImage\Mount-DiskImageToLetter' -Tag 'Helper' {
                     $DiskNumber,
 
                     [Uint32]
-                    $ParitionNumber
+                    $PartitionNumber
                 )
             }
 
