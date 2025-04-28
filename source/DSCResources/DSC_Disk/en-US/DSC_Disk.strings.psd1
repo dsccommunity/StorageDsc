@@ -33,7 +33,7 @@ ConvertFrom-StringData @'
     MatchingPartitionFoundMessage = Disk with {0} '{1}' already contains partitions, and partition '{2}' matches required size.
     DriveNotFoundOnPartitionMessage = Disk with {0} '{1}' does not contain a partition assigned to drive letter '{2}'.
     ClearingDiskMessage = Clearing disk with {0} '{1}' of all existing partitions and volumes.
-    NewParitionIsReadOnlyError = New partition '{2}' on disk with {0} '{1}' did not become writable in the expected time.
+    NewPartitionIsReadOnlyError = New partition '{2}' on disk with {0} '{1}' did not become writable in the expected time.
     VolumeFormatInProgressMessage = Switch AllowDestructive is specified. Attempting to format volume on {0} with '{2}', was '{1}'.
     SizeMismatchCorrectionMessage = Switch AllowDestructive is specified. Attempting to resize partition {0} from {1} to {2}.
     FreeSpaceViolationError = Attempted to resize partition {0} from {1} to {2} while maximum allowed size was {3}.

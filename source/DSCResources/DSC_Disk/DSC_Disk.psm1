@@ -657,7 +657,7 @@ function Set-TargetResource
         {
             # The partition is still readonly - throw an exception
             New-InvalidOperationException `
-                -Message ($script:localizedData.NewParitionIsReadOnlyError `
+                -Message ($script:localizedData.NewPartitionIsReadOnlyError `
                     -f $DiskIdType, $DiskId, $partition.PartitionNumber)
         } # if
 
