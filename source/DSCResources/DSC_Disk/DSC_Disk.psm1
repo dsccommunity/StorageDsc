@@ -636,6 +636,7 @@ function Set-TargetResource
             $timeAtStart = Get-Date
             $minimumTimeToWait = $timeAtStart + (New-TimeSpan -Second 3)
             $maximumTimeToWait = $timeAtStart + (New-TimeSpan -Second 30)
+            $partitionstate = $null
 
             while (($partitionstate.IsReadOnly -and (Get-Date) -lt $maximumTimeToWait) `
                 -or ((Get-Date) -lt $minimumTimeToWait))
