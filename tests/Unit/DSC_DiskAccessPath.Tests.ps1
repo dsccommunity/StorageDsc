@@ -726,8 +726,7 @@ Describe 'DSC_DiskAccessPath\Set-TargetResource' -Tag 'Set' {
             }
 
             Mock -CommandName Set-Partition
-            Mock -CommandName Get-Volume `
-                -MockWith {
+            Mock -CommandName Get-Volume -MockWith {
                 [PSCustomObject] @{
                     FileSystemLabel = ''
                     FileSystem      = ''
