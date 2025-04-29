@@ -329,7 +329,7 @@ AfterAll {
 # }
 
 # $script:mockedPartitionGDriveLetter40Gb = [PSCustomObject] @{
-#     DriveLetter     = [System.Char] $testDriveLetterG
+#     DriveLetter     = [System.Char] 'G'
 #     Size            = $script:mockedPartitionSize40Gb
 #     PartitionNumber = 1
 #     Type            = 'Basic'
@@ -337,7 +337,7 @@ AfterAll {
 # }
 
 # $script:mockedPartitionGDriveLetter50Gb = [PSCustomObject] @{
-#     DriveLetter     = [System.Char] $testDriveLetterG
+#     DriveLetter     = [System.Char] 'G'
 #     Size            = 50GB
 #     PartitionNumber = 1
 #     Type            = 'Basic'
@@ -345,16 +345,16 @@ AfterAll {
 # }
 
 # $script:mockedPartitionGDriveLetterAlternatePartition150Gb = [PSCustomObject] @{
-#     DriveLetter     = [System.Char] $testDriveLetterG
-#     Size            = $script:partitionFormattedByWindows150Gb
+#     DriveLetter     = [System.Char] 'G'
+#     Size            = 161060225024
 #     PartitionNumber = 1
 #     Type            = 'Basic'
 #     IsReadOnly      = $false
 # }
 
 # $script:mockedPartitionGDriveLetter150Gb = [PSCustomObject] @{
-#     DriveLetter     = [System.Char] $testDriveLetterG
-#     Size            = $script:userDesiredSize150Gb
+#     DriveLetter     = [System.Char] 'G'
+#     Size            = 150Gb
 #     PartitionNumber = 1
 #     Type            = 'Basic'
 #     IsReadOnly      = $false
@@ -427,7 +427,7 @@ AfterAll {
 #     FileSystem      = 'NTFS'
 #     DriveLetter     = 'T'
 #     UniqueId        = '\\?\Volume{3a244a32-efba-4b7e-9a19-7293fc7c7924}\'
-#     Size            = $script:userDesiredSize150Gb
+#     Size            = 150Gb
 # }
 
 # $script:mockedVolumeThatExistPriorToConfigurationRefs150Gb = [PSCustomObject] @{
@@ -435,7 +435,7 @@ AfterAll {
 #     FileSystem      = 'ReFS'
 #     DriveLetter     = 'T'
 #     UniqueId        = '\\?\Volume{3a244a32-efba-4b7e-9a19-7293fc7c7924}\'
-#     Size            = $script:userDesiredSize150Gb
+#     Size            = 150Gb
 # }
 
 # $script:parameterFilter_MockedDisk0Number = {
@@ -2138,7 +2138,16 @@ Describe 'DSC_Disk\Set-TargetResource' -Tag 'Set' {
     #         Mock `
     #             -CommandName Get-DiskByIdentifier `
     #             -ParameterFilter $script:parameterFilter_MockedDisk0Number `
-    #             -MockWith { $script:mockedDisk0GptReadonly } `
+    #             -MockWith { # $script:mockedDisk0GptReadonly = [PSCustomObject] @{
+    #     Number         = 1
+    #     UniqueId       = 'TESTDISKUNIQUEID'
+    #     FriendlyName   = 'TESTDISKFRIENDLYNAME'
+    #     SerialNumber   = 'TESTDISKSERIALNUMBER'
+    #     Guid           = [guid]::NewGuid()
+    #     IsOffline      = $false
+    #     IsReadOnly     = $true
+    #     PartitionStyle = 'GPT'
+    # } } `
     #             -Verifiable
 
     #         Mock `
@@ -4409,7 +4418,7 @@ Describe 'DSC_Disk\Test-TargetResource' -Tag 'Test' {
 
                 $result = Test-TargetResource @testParams
 
-                {$result} | Should -Not -Throw
+                { $result } | Should -Not -Throw
                 $result | Should -Be $false
             }
 
@@ -4421,1479 +4430,1569 @@ Describe 'DSC_Disk\Test-TargetResource' -Tag 'Test' {
         }
     }
 
-    #     Context 'When testing disk offline using Serial Number' {
-    #         # verifiable (should be called) mocks
-    #         Mock `
-    #             -CommandName Get-DiskByIdentifier `
-    #             -ParameterFilter { $DiskId -eq $script:mockedDisk0Gpt.SerialNumber -and $DiskIdType -eq 'SerialNumber' } `
-    #             -MockWith { # $script:mockedDisk0GptOffline = [PSCustomObject] @{
-    #     Number         = 1
-    #     UniqueId       =  'TESTDISKUNIQUEID'
-    #     FriendlyName   = 'TESTDISKFRIENDLYNAME'
-    #     SerialNumber   = 'TESTDISKSERIALNUMBER'
-    #     Guid           = [guid]::NewGuid()
-    #     IsOffline      = $true
-    #     IsReadOnly     = $false
-    #     PartitionStyle = 'GPT'
-    # }} `
-    #             -Verifiable
-
-    #         # mocks that should not be called
-    #         Mock -CommandName Get-Volume
-    #         Mock -CommandName Get-Partition
-    #         Mock -CommandName Get-CimInstance
-
-    #         $script:result = $null
-
-    #         It 'Should not throw an exception' {
-    #             {
-    #                 $script:result = Test-TargetResource `
-    #                     -DiskId $script:mockedDisk0GptOffline.SerialNumber `
-    #                     -DiskIdType 'SerialNumber' `
-    #                     -DriveLetter 'G' `
-    #                     -AllocationUnitSize 4096 `
-    #                     -Verbose
-    #             } | Should -Not -Throw
-    #         }
-
-    #         It 'Should be false' {
-    #             $script:result | Should -Be $false
-    #         }
-
-    #         It 'Should call the correct mocks' {
-    #             Assert-VerifiableMock
-    #             Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 1 `
-    #                 -ParameterFilter { $DiskId -eq $script:mockedDisk0GptOffline.SerialNumber -and $DiskIdType -eq 'SerialNumber' }
-    #             Assert-MockCalled -CommandName Get-Partition -Exactly -Times 0
-    #             Assert-MockCalled -CommandName Get-Volume -Exactly -Times 0
-    #             Assert-MockCalled -CommandName Get-CimInstance -Exactly -Times 0
-    #         }
-    #     }
-
-    #     Context 'When testing disk offline using Disk Guid' {
-    #         # verifiable (should be called) mocks
-    #         Mock `
-    #             -CommandName Get-DiskByIdentifier `
-    #             -ParameterFilter { $DiskId -eq $script:mockedDisk0Gpt.Guid -and $DiskIdType -eq 'Guid' } `
-    #             -MockWith { # $script:mockedDisk0GptOffline = [PSCustomObject] @{
-    #     Number         = 1
-    #     UniqueId       =  'TESTDISKUNIQUEID'
-    #     FriendlyName   = 'TESTDISKFRIENDLYNAME'
-    #     SerialNumber   = 'TESTDISKSERIALNUMBER'
-    #     Guid           = [guid]::NewGuid()
-    #     IsOffline      = $true
-    #     IsReadOnly     = $false
-    #     PartitionStyle = 'GPT'
-    # }} `
-    #             -Verifiable
-
-    #         # mocks that should not be called
-    #         Mock -CommandName Get-Volume
-    #         Mock -CommandName Get-Partition
-    #         Mock -CommandName Get-CimInstance
-
-    #         $script:result = $null
-
-    #         It 'Should not throw an exception' {
-    #             {
-    #                 $script:result = Test-TargetResource `
-    #                     -DiskId $script:mockedDisk0GptOffline.Guid `
-    #                     -DiskIdType 'Guid' `
-    #                     -DriveLetter 'G' `
-    #                     -AllocationUnitSize 4096 `
-    #                     -Verbose
-    #             } | Should -Not -Throw
-    #         }
-
-    #         It 'Should return false' {
-    #             $script:result | Should -Be $false
-    #         }
-
-    #         It 'Should call the correct mocks' {
-    #             Assert-VerifiableMock
-    #             Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 1 `
-    #                 -ParameterFilter { $DiskId -eq $script:mockedDisk0GptOffline.Guid -and $DiskIdType -eq 'Guid' }
-    #             Assert-MockCalled -CommandName Get-Partition -Exactly -Times 0
-    #             Assert-MockCalled -CommandName Get-Volume -Exactly -Times 0
-    #             Assert-MockCalled -CommandName Get-CimInstance -Exactly -Times 0
-    #         }
-    #     }
-
-    #     Context 'When testing disk read only using Disk Number' {
-    #         # verifiable (should be called) mocks
-    #         Mock `
-    #             -CommandName Get-DiskByIdentifier `
-    #             -ParameterFilter { $DiskId -eq $script:mockedDisk0GptReadonly.Number -and $DiskIdType -eq 'Number' } `
-    #             -MockWith { $script:mockedDisk0GptReadonly } `
-    #             -Verifiable
-
-    #         # mocks that should not be called
-    #         Mock -CommandName Get-Volume
-    #         Mock -CommandName Get-Partition
-    #         Mock -CommandName Get-CimInstance
-
-    #         $script:result = $null
-
-    #         It 'Should not throw an exception' {
-    #             {
-    #                 $script:result = Test-TargetResource `
-    #                     -DiskId $script:mockedDisk0GptReadonly.Number `
-    #                     -DriveLetter 'G' `
-    #                     -AllocationUnitSize 4096 `
-    #                     -Verbose
-    #             } | Should -Not -Throw
-    #         }
-
-    #         It 'Should be false' {
-    #             $script:result | Should -Be $false
-    #         }
-
-    #         It 'Should call the correct mocks' {
-    #             Assert-VerifiableMock
-    #             Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 1 `
-    #                 -ParameterFilter { $DiskId -eq $script:mockedDisk0GptReadonly.Number -and $DiskIdType -eq 'Number' }
-    #             Assert-MockCalled -CommandName Get-Partition -Exactly -Times 0
-    #             Assert-MockCalled -CommandName Get-Volume -Exactly -Times 0
-    #             Assert-MockCalled -CommandName Get-CimInstance -Exactly -Times 0
-    #         }
-    #     }
-
-    #     Context 'When testing online unformatted disk using Disk Number' {
-    #         # verifiable (should be called) mocks
-    #         Mock `
-    #             -CommandName Get-DiskByIdentifier `
-    #             -ParameterFilter $script:parameterFilter_MockedDisk0Number `
-    #             -MockWith { # $script:mockedDisk0Raw = [PSCustomObject] @{
-    #     Number         = 1
-    #     UniqueId       =  'TESTDISKUNIQUEID'
-    #     FriendlyName   = 'TESTDISKFRIENDLYNAME'
-    #     SerialNumber   = 'TESTDISKSERIALNUMBER'
-    #     Guid           = ''
-    #     IsOffline      = $false
-    #     IsReadOnly     = $false
-    #     PartitionStyle = 'RAW'
-    # } } `
-    #             -Verifiable
-
-    #         # mocks that should not be called
-    #         Mock -CommandName Get-Volume
-    #         Mock -CommandName Get-Partition
-    #         Mock -CommandName Get-CimInstance
-
-    #         $script:result = $null
-
-    #         It 'Should not throw an exception' {
-    #             {
-    #                 $script:result = Test-TargetResource `
-    #                     -DiskId $script:mockedDisk0Raw.Number `
-    #                     -DriveLetter 'G' `
-    #                     -AllocationUnitSize 4096 `
-    #                     -Verbose
-    #             } | Should -Not -Throw
-    #         }
-
-    #         It 'Should be false' {
-    #             $script:result | Should -Be $false
-    #         }
-
-    #         It 'Should call the correct mocks' {
-    #             Assert-VerifiableMock
-    #             Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 1 `
-    #                 -ParameterFilter $script:parameterFilter_MockedDisk0Number
-    #             Assert-MockCalled -CommandName Get-Partition -Exactly -Times 0
-    #             Assert-MockCalled -CommandName Get-Volume -Exactly -Times 0
-    #             Assert-MockCalled -CommandName Get-CimInstance -Exactly -Times 0
-    #         }
-    #     }
-
-    #     Context 'When testing online disk using Disk Number with partition style GPT but requiring MBR' {
-    #         # verifiable (should be called) mocks
-    #         Mock `
-    #             -CommandName Get-DiskByIdentifier `
-    #             -ParameterFilter $script:parameterFilter_MockedDisk0Number `
-    #             -MockWith { # $script:mockedDisk0Mbr = [PSCustomObject] @{
-    #     Number         = 1
-    #     UniqueId       =  'TESTDISKUNIQUEID'
-    #     FriendlyName   = 'TESTDISKFRIENDLYNAME'
-    #     SerialNumber   = 'TESTDISKSERIALNUMBER'
-    #     Guid           = ''
-    #     IsOffline      = $false
-    #     IsReadOnly     = $false
-    #     PartitionStyle = 'MBR'
-    # } } `
-    #             -Verifiable
-
-    #         # mocks that should not be called
-    #         Mock -CommandName Get-Volume
-    #         Mock -CommandName Get-Partition
-    #         Mock -CommandName Get-CimInstance
-
-    #         $errorRecord = Get-InvalidOperationRecord `
-    #             -Message ($LocalizedData.DiskInitializedWithWrongPartitionStyleError -f `
-    #                 'Number', $script:mockedDisk0Mbr.Number, $script:mockedDisk0Mbr.PartitionStyle, 'GPT')
-
-    #         It 'Should throw DiskInitializedWithWrongPartitionStyleError' {
-    #             {
-    #                 Test-TargetResource `
-    #                     -DiskId $script:mockedDisk0Mbr.Number `
-    #                     -DriveLetter 'G' `
-    #                     -AllocationUnitSize 4096 `
-    #                     -Verbose
-    #             } | Should -Throw $errorRecord
-    #         }
-
-    #         It 'Should call the correct mocks' {
-    #             Assert-VerifiableMock
-    #             Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 1 `
-    #                 -ParameterFilter $script:parameterFilter_MockedDisk0Number
-    #             Assert-MockCalled -CommandName Get-Partition -Exactly -Times 0
-    #             Assert-MockCalled -CommandName Get-Volume -Exactly -Times 0
-    #             Assert-MockCalled -CommandName Get-CimInstance -Exactly -Times 0
-    #         }
-    #     }
-
-    #     Context 'When testing online disk using Disk Number with partition style MBR but requiring GPT' {
-    #         # verifiable (should be called) mocks
-    #         Mock `
-    #             -CommandName Get-DiskByIdentifier `
-    #             -ParameterFilter $script:parameterFilter_MockedDisk0Number `
-    #             -MockWith { $script:mockedDisk0Gpt = [PSCustomObject] @{
-    #     Number         = 1
-    #     UniqueId       =  'TESTDISKUNIQUEID'
-    #     FriendlyName   = 'TESTDISKFRIENDLYNAME'
-    #     SerialNumber   = 'TESTDISKSERIALNUMBER'
-    #     Guid           = [guid]::NewGuid()
-    #     IsOffline      = $false
-    #     IsReadOnly     = $false
-    #     PartitionStyle = 'GPT'
-    # } } `
-    #             -Verifiable
-
-    #         # mocks that should not be called
-    #         Mock -CommandName Get-Volume
-    #         Mock -CommandName Get-Partition
-    #         Mock -CommandName Get-CimInstance
-
-    #         $errorRecord = Get-InvalidOperationRecord `
-    #             -Message ($LocalizedData.DiskInitializedWithWrongPartitionStyleError -f `
-    #                 'Number', $script:mockedDisk0Gpt.Number, $script:mockedDisk0Gpt.PartitionStyle, 'MBR')
-
-    #         It 'Should throw DiskInitializedWithWrongPartitionStyleError' {
-    #             {
-    #                 Test-TargetResource `
-    #                     -DiskId $script:mockedDisk0Gpt.Number `
-    #                     -DriveLetter 'G' `
-    #                     -AllocationUnitSize 4096 `
-    #                     -PartitionStyle 'MBR' `
-    #                     -Verbose
-    #             } | Should -Throw $errorRecord
-    #         }
-
-    #         It 'Should call the correct mocks' {
-    #             Assert-VerifiableMock
-    #             Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 1 `
-    #                 -ParameterFilter $script:parameterFilter_MockedDisk0Number
-    #             Assert-MockCalled -CommandName Get-Partition -Exactly -Times 0
-    #             Assert-MockCalled -CommandName Get-Volume -Exactly -Times 0
-    #             Assert-MockCalled -CommandName Get-CimInstance -Exactly -Times 0
-    #         }
-    #     }
-
-    #     Context 'When testing online disk using Disk Number with partition style MBR but requiring GPT and AllowDestructive and ClearDisk is True' {
-    #         # verifiable (should be called) mocks
-    #         Mock `
-    #             -CommandName Get-DiskByIdentifier `
-    #             -ParameterFilter $script:parameterFilter_MockedDisk0Number `
-    #             -MockWith { $script:mockedDisk0Gpt = [PSCustomObject] @{
-    #     Number         = 1
-    #     UniqueId       =  'TESTDISKUNIQUEID'
-    #     FriendlyName   = 'TESTDISKFRIENDLYNAME'
-    #     SerialNumber   = 'TESTDISKSERIALNUMBER'
-    #     Guid           = [guid]::NewGuid()
-    #     IsOffline      = $false
-    #     IsReadOnly     = $false
-    #     PartitionStyle = 'GPT'
-    # } } `
-    #             -Verifiable
-
-    #         # mocks that should not be called
-    #         Mock -CommandName Get-Volume
-    #         Mock -CommandName Get-Partition
-    #         Mock -CommandName Get-CimInstance
-
-    #         $script:result = $null
-
-    #         It 'Should not throw an exception' {
-    #             {
-    #                 $script:result = Test-TargetResource `
-    #                     -DiskId $script:mockedDisk0Gpt.Number `
-    #                     -DriveLetter 'G' `
-    #                     -AllocationUnitSize 4096 `
-    #                     -PartitionStyle 'MBR' `
-    #                     -AllowDestructive $true `
-    #                     -ClearDisk $true `
-    #                     -Verbose
-    #             } | Should -Not -Throw
-    #         }
-
-    #         It 'Should be false' {
-    #             $script:result | Should -Be $false
-    #         }
-
-    #         It 'Should call the correct mocks' {
-    #             Assert-VerifiableMock
-    #             Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 1 `
-    #                 -ParameterFilter $script:parameterFilter_MockedDisk0Number
-    #             Assert-MockCalled -CommandName Get-Partition -Exactly -Times 0
-    #             Assert-MockCalled -CommandName Get-Volume -Exactly -Times 0
-    #             Assert-MockCalled -CommandName Get-CimInstance -Exactly -Times 0
-    #         }
-    #     }
-
-    #     Context 'When testing mismatching partition size using Disk Number' {
-    #         # verifiable (should be called) mocks
-    #         Mock `
-    #             -CommandName Get-DiskByIdentifier `
-    #             -ParameterFilter $script:parameterFilter_MockedDisk0Number `
-    #             -MockWith { $script:mockedDisk0Gpt = [PSCustomObject] @{
-    #     Number         = 1
-    #     UniqueId       =  'TESTDISKUNIQUEID'
-    #     FriendlyName   = 'TESTDISKFRIENDLYNAME'
-    #     SerialNumber   = 'TESTDISKSERIALNUMBER'
-    #     Guid           = [guid]::NewGuid()
-    #     IsOffline      = $false
-    #     IsReadOnly     = $false
-    #     PartitionStyle = 'GPT'
-    # } } `
-    #             -Verifiable
-
-    #         Mock `
-    #             -CommandName Get-Partition `
-    #             -MockWith { #{ $script:mockedPartition = [PSCustomObject] @{
-    #     DriveLetter     = [System.Char] 'G'
-    #     Size            = 1GB
-    #     PartitionNumber = 1
-    #     Type            = 'Basic'
-    # } } `
-    #             -Verifiable
-
-    #         Mock `
-    #             -CommandName Get-Volume `
-    #             -MockWith { # $script:mockedVolume = [PSCustomObject] @{
-    #     FileSystemLabel = 'myLabel'
-    #     FileSystem      = 'NTFS'
-    #     DriveLetter     = 'G'
-    # } } `
-    #             -Verifiable
-
-    #         Mock `
-    #             -CommandName Get-CimInstance `
-    #             -MockWith { # $script:mockedCim = [PSCustomObject] @{
-    #     BlockSize = 4096
-    # } } `
-    #             -Verifiable
-
-    #         $script:result = $null
-
-    #         It 'Should not throw an exception' {
-    #             {
-    #                 $script:result = Test-TargetResource `
-    #                     -DiskId $script:mockedDisk0Gpt.Number `
-    #                     -DriveLetter 'G' `
-    #                     -AllocationUnitSize 4096 `
-    #                     -Size (1GB + 1MB) `
-    #                     -Verbose
-    #             } | Should -Not -Throw
-    #         }
-
-    #         It 'Should be true' {
-    #             $script:result | Should -Be $true
-    #         }
-
-    #         It 'Should call the correct mocks' {
-    #             Assert-VerifiableMock
-    #             Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 1 `
-    #                 -ParameterFilter $script:parameterFilter_MockedDisk0Number
-    #             Assert-MockCalled -CommandName Get-Partition -Exactly -Times 1
-    #             Assert-MockCalled -CommandName Get-Volume -Exactly -Times 1
-    #             Assert-MockCalled -CommandName Get-CimInstance -Exactly -Times 1
-    #         }
-    #     }
-
-    #     Context 'When testing mismatching partition size with AllowDestructive using Disk Number' {
-    #         # verifiable (should be called) mocks
-    #         Mock `
-    #             -CommandName Get-DiskByIdentifier `
-    #             -ParameterFilter $script:parameterFilter_MockedDisk0Number `
-    #             -MockWith { $script:mockedDisk0Gpt = [PSCustomObject] @{
-    #     Number         = 1
-    #     UniqueId       =  'TESTDISKUNIQUEID'
-    #     FriendlyName   = 'TESTDISKFRIENDLYNAME'
-    #     SerialNumber   = 'TESTDISKSERIALNUMBER'
-    #     Guid           = [guid]::NewGuid()
-    #     IsOffline      = $false
-    #     IsReadOnly     = $false
-    #     PartitionStyle = 'GPT'
-    # } } `
-    #             -Verifiable
-
-    #         Mock `
-    #             -CommandName Get-Partition `
-    #             -MockWith { #{ $script:mockedPartition = [PSCustomObject] @{
-    #     DriveLetter     = [System.Char] 'G'
-    #     Size            = 1GB
-    #     PartitionNumber = 1
-    #     Type            = 'Basic'
-    # } } `
-    #             -Verifiable
-
-    #         # mocks that should not be called
-    #         Mock -CommandName Get-PartitionSupportedSize
-    #         Mock -CommandName Get-Volume
-    #         Mock -CommandName Get-CimInstance
-
-    #         $script:result = $null
-
-    #         It 'Should not throw an exception' {
-    #             {
-    #                 $script:result = Test-TargetResource `
-    #                     -DiskId $script:mockedDisk0Gpt.Number `
-    #                     -DriveLetter 'G' `
-    #                     -AllocationUnitSize 4096 `
-    #                     -Size (1GB + 1MB) `
-    #                     -AllowDestructive $true `
-    #                     -Verbose
-    #             } | Should -Not -Throw
-    #         }
-
-    #         It 'Should be false' {
-    #             $script:result | Should -Be $false
-    #         }
-
-    #         It 'Should call the correct mocks' {
-    #             Assert-VerifiableMock
-    #             Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 1 `
-    #                 -ParameterFilter $script:parameterFilter_MockedDisk0Number
-    #             Assert-MockCalled -CommandName Get-Partition -Exactly -Times 1
-    #             Assert-MockCalled -CommandName Get-PartitionSupportedSize -Exactly -Times 0
-    #             Assert-MockCalled -CommandName Get-Volume -Exactly -Times 0
-    #             Assert-MockCalled -CommandName Get-CimInstance -Exactly -Times 0
-    #         }
-    #     }
-
-    #     Context 'When testing mismatching partition size without Size specified using Disk Number' {
-    #         # verifiable (should be called) mocks
-    #         Mock `
-    #             -CommandName Get-DiskByIdentifier `
-    #             -ParameterFilter $script:parameterFilter_MockedDisk0Number `
-    #             -MockWith { $script:mockedDisk0Gpt = [PSCustomObject] @{
-    #     Number         = 1
-    #     UniqueId       =  'TESTDISKUNIQUEID'
-    #     FriendlyName   = 'TESTDISKFRIENDLYNAME'
-    #     SerialNumber   = 'TESTDISKSERIALNUMBER'
-    #     Guid           = [guid]::NewGuid()
-    #     IsOffline      = $false
-    #     IsReadOnly     = $false
-    #     PartitionStyle = 'GPT'
-    # } } `
-    #             -Verifiable
-
-    #         Mock `
-    #             -CommandName Get-Partition `
-    #             -MockWith { #{ $script:mockedPartition = [PSCustomObject] @{
-    #     DriveLetter     = [System.Char] 'G'
-    #     Size            = 1GB
-    #     PartitionNumber = 1
-    #     Type            = 'Basic'
-    # } } `
-    #             -Verifiable
-
-    #         Mock `
-    #             -CommandName Get-PartitionSupportedSize `
-    #             -MockWith {
-    #             return @{
-    #                 SizeMin = 0
-    #                 # Adding >1MB, otherwise workaround for wrong SizeMax is triggered
-    #                 SizeMax = $script:mockedPartition.Size + 1.1MB
-    #             }
-    #         } `
-    #             -Verifiable
-
-    #         Mock `
-    #             -CommandName Get-Volume `
-    #             -MockWith { # $script:mockedVolume = [PSCustomObject] @{
-    #     FileSystemLabel = 'myLabel'
-    #     FileSystem      = 'NTFS'
-    #     DriveLetter     = 'G'
-    # } } `
-    #             -Verifiable
-
-    #         Mock `
-    #             -CommandName Get-CimInstance `
-    #             -MockWith { # $script:mockedCim = [PSCustomObject] @{
-    #     BlockSize = 4096
-    # } } `
-    #             -Verifiable
-
-    #         $script:result = $null
-
-    #         It 'Should not throw an exception' {
-    #             {
-    #                 $script:result = Test-TargetResource `
-    #                     -DiskId $script:mockedDisk0Gpt.Number `
-    #                     -DriveLetter 'G' `
-    #                     -AllocationUnitSize 4096 `
-    #                     -Verbose
-    #             } | Should -Not -Throw
-    #         }
-
-    #         It 'Should be true' {
-    #             $script:result | Should -Be $true
-    #         }
-
-    #         It 'Should call the correct mocks' {
-    #             Assert-VerifiableMock
-    #             Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 1 `
-    #                 -ParameterFilter $script:parameterFilter_MockedDisk0Number
-    #             Assert-MockCalled -CommandName Get-Partition -Exactly -Times 1
-    #             Assert-MockCalled -CommandName Get-PartitionSupportedSize -Exactly -Times 1
-    #             Assert-MockCalled -CommandName Get-Volume -Exactly -Times 1
-    #             Assert-MockCalled -CommandName Get-CimInstance -Exactly -Times 1
-    #         }
-    #     }
-
-    #     Context 'When testing mismatching partition size without Size specified using Disk Number with partition reported twice' {
-    #         # verifiable (should be called) mocks
-    #         Mock `
-    #             -CommandName Get-DiskByIdentifier `
-    #             -ParameterFilter $script:parameterFilter_MockedDisk0Number `
-    #             -MockWith { $script:mockedDisk0Gpt = [PSCustomObject] @{
-    #     Number         = 1
-    #     UniqueId       =  'TESTDISKUNIQUEID'
-    #     FriendlyName   = 'TESTDISKFRIENDLYNAME'
-    #     SerialNumber   = 'TESTDISKSERIALNUMBER'
-    #     Guid           = [guid]::NewGuid()
-    #     IsOffline      = $false
-    #     IsReadOnly     = $false
-    #     PartitionStyle = 'GPT'
-    # } } `
-    #             -Verifiable
-
-    #         Mock `
-    #             -CommandName Get-Partition `
-    #             -MockWith { $script:mockedPartitionMultiple } `
-    #             -Verifiable
-
-    #         Mock `
-    #             -CommandName Get-PartitionSupportedSize `
-    #             -MockWith {
-    #             return @{
-    #                 SizeMin = 0
-    #                 # Adding >1MB, otherwise workaround for wrong SizeMax is triggered
-    #                 SizeMax = $script:mockedPartition.Size + 1.1MB
-    #             }
-    #         } `
-    #             -Verifiable
-
-    #         Mock `
-    #             -CommandName Get-Volume `
-    #             -MockWith { # $script:mockedVolume = [PSCustomObject] @{
-    #     FileSystemLabel = 'myLabel'
-    #     FileSystem      = 'NTFS'
-    #     DriveLetter     = 'G'
-    # } } `
-    #             -Verifiable
-
-    #         Mock `
-    #             -CommandName Get-CimInstance `
-    #             -MockWith { # $script:mockedCim = [PSCustomObject] @{
-    #     BlockSize = 4096
-    # } } `
-    #             -Verifiable
-
-    #         $script:result = $null
-
-    #         It 'Should not throw an exception' {
-    #             {
-    #                 $script:result = Test-TargetResource `
-    #                     -DiskId $script:mockedDisk0Gpt.Number `
-    #                     -DriveLetter 'G' `
-    #                     -AllocationUnitSize 4096 `
-    #                     -Verbose
-    #             } | Should -Not -Throw
-    #         }
-
-    #         It 'Should be true' {
-    #             $script:result | Should -Be $true
-    #         }
-
-    #         It 'Should call the correct mocks' {
-    #             Assert-VerifiableMock
-    #             Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 1 `
-    #                 -ParameterFilter $script:parameterFilter_MockedDisk0Number
-    #             Assert-MockCalled -CommandName Get-Partition -Exactly -Times 1
-    #             Assert-MockCalled -CommandName Get-PartitionSupportedSize -Exactly -Times 1
-    #             Assert-MockCalled -CommandName Get-Volume -Exactly -Times 1
-    #             Assert-MockCalled -CommandName Get-CimInstance -Exactly -Times 1
-    #         }
-    #     }
-
-    #     Context 'When testing mismatching partition size with AllowDestructive and without Size specified using Disk Number' {
-    #         # verifiable (should be called) mocks
-    #         Mock `
-    #             -CommandName Get-DiskByIdentifier `
-    #             -ParameterFilter $script:parameterFilter_MockedDisk0Number `
-    #             -MockWith { $script:mockedDisk0Gpt = [PSCustomObject] @{
-    #     Number         = 1
-    #     UniqueId       =  'TESTDISKUNIQUEID'
-    #     FriendlyName   = 'TESTDISKFRIENDLYNAME'
-    #     SerialNumber   = 'TESTDISKSERIALNUMBER'
-    #     Guid           = [guid]::NewGuid()
-    #     IsOffline      = $false
-    #     IsReadOnly     = $false
-    #     PartitionStyle = 'GPT'
-    # } } `
-    #             -Verifiable
-
-    #         Mock `
-    #             -CommandName Get-Partition `
-    #             -MockWith { #{ $script:mockedPartition = [PSCustomObject] @{
-    #     DriveLetter     = [System.Char] 'G'
-    #     Size            = 1GB
-    #     PartitionNumber = 1
-    #     Type            = 'Basic'
-    # } } `
-    #             -Verifiable
-
-    #         Mock `
-    #             -CommandName Get-PartitionSupportedSize `
-    #             -MockWith {
-    #             return @{
-    #                 SizeMin = 0
-    #                 # Adding >1MB, otherwise workaround for wrong SizeMax is triggered
-    #                 SizeMax = $script:mockedPartition.Size + 1.1MB
-    #             }
-    #         } `
-    #             -Verifiable
-
-    #         # mocks that should not be called
-    #         Mock -CommandName Get-Volume
-    #         Mock -CommandName Get-CimInstance
-
-    #         $script:result = $null
-
-    #         It 'Should not throw an exception' {
-    #             {
-    #                 $script:result = Test-TargetResource `
-    #                     -DiskId $script:mockedDisk0Gpt.Number `
-    #                     -DriveLetter 'G' `
-    #                     -AllocationUnitSize 4096 `
-    #                     -AllowDestructive $true `
-    #                     -Verbose
-    #             } | Should -Not -Throw
-    #         }
-
-    #         It 'Should be false' {
-    #             $script:result | Should -Be $false
-    #         }
-
-    #         It 'Should call the correct mocks' {
-    #             Assert-VerifiableMock
-    #             Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 1 `
-    #                 -ParameterFilter $script:parameterFilter_MockedDisk0Number
-    #             Assert-MockCalled -CommandName Get-Partition -Exactly -Times 1
-    #             Assert-MockCalled -CommandName Get-PartitionSupportedSize -Exactly -Times 1
-    #             Assert-MockCalled -CommandName Get-Volume -Exactly -Times 0
-    #             Assert-MockCalled -CommandName Get-CimInstance -Exactly -Times 0
-    #         }
-    #     }
-
-    #     Context 'When testing matching partition size with a less than 1MB difference in desired size and with AllowDestructive and without Size specified using Disk Number' {
-    #         # verifiable (should be called) mocks
-    #         Mock `
-    #             -CommandName Get-DiskByIdentifier `
-    #             -ParameterFilter $script:parameterFilter_MockedDisk0Number `
-    #             -MockWith { $script:mockedDisk0Gpt = [PSCustomObject] @{
-    #     Number         = 1
-    #     UniqueId       =  'TESTDISKUNIQUEID'
-    #     FriendlyName   = 'TESTDISKFRIENDLYNAME'
-    #     SerialNumber   = 'TESTDISKSERIALNUMBER'
-    #     Guid           = [guid]::NewGuid()
-    #     IsOffline      = $false
-    #     IsReadOnly     = $false
-    #     PartitionStyle = 'GPT'
-    # } } `
-    #             -Verifiable
-
-    #         Mock `
-    #             -CommandName Get-Partition `
-    #             -MockWith { #{ $script:mockedPartition = [PSCustomObject] @{
-    #     DriveLetter     = [System.Char] 'G'
-    #     Size            = 1GB
-    #     PartitionNumber = 1
-    #     Type            = 'Basic'
-    # } } `
-    #             -Verifiable
-
-    #         Mock `
-    #             -CommandName Get-PartitionSupportedSize `
-    #             -MockWith {
-    #             return @{
-    #                 SizeMin = 0
-    #                 SizeMax = $script:mockedPartition.Size + 0.98MB
-    #             }
-    #         } `
-    #             -Verifiable
-    #         Mock -CommandName Get-Volume -Verifiable
-    #         Mock -CommandName Get-CimInstance -Verifiable
-
-    #         $script:result = $null
-
-    #         It 'Should not throw an exception' {
-    #             {
-    #                 $script:result = Test-TargetResource `
-    #                     -DiskId $script:mockedDisk0Gpt.Number `
-    #                     -DriveLetter 'G' `
-    #                     -AllocationUnitSize 4096 `
-    #                     -AllowDestructive $true `
-    #                     -Verbose
-    #             } | Should -Not -Throw
-    #         }
-
-    #         It 'Should be true' {
-    #             $script:result | Should -Be $true
-    #         }
-
-    #         It 'Should call the correct mocks' {
-    #             Assert-VerifiableMock
-    #             Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 1 `
-    #                 -ParameterFilter $script:parameterFilter_MockedDisk0Number
-    #             Assert-MockCalled -CommandName Get-Partition -Exactly -Times 1
-    #             Assert-MockCalled -CommandName Get-PartitionSupportedSize -Exactly -Times 1
-    #             Assert-MockCalled -CommandName Get-Volume -Exactly -Times 1
-    #             Assert-MockCalled -CommandName Get-CimInstance -Exactly -Times 1
-    #         }
-    #     }
-
-    #     Context 'When testing mismatched AllocationUnitSize using Disk Number' {
-    #         # verifiable (should be called) mocks
-    #         Mock `
-    #             -CommandName Get-DiskByIdentifier `
-    #             -MockWith { $script:mockedDisk0Gpt = [PSCustomObject] @{
-    #     Number         = 1
-    #     UniqueId       =  'TESTDISKUNIQUEID'
-    #     FriendlyName   = 'TESTDISKFRIENDLYNAME'
-    #     SerialNumber   = 'TESTDISKSERIALNUMBER'
-    #     Guid           = [guid]::NewGuid()
-    #     IsOffline      = $false
-    #     IsReadOnly     = $false
-    #     PartitionStyle = 'GPT'
-    # } } `
-    #             -Verifiable
-
-    #         Mock `
-    #             -CommandName Get-Partition `
-    #             -MockWith { #{ $script:mockedPartition = [PSCustomObject] @{
-    #     DriveLetter     = [System.Char] 'G'
-    #     Size            = 1GB
-    #     PartitionNumber = 1
-    #     Type            = 'Basic'
-    # } } `
-    #             -Verifiable
-
-    #         Mock `
-    #             -CommandName Get-CimInstance `
-    #             -MockWith { # $script:mockedCim = [PSCustomObject] @{
-    #     BlockSize = 4096
-    # } } `
-    #             -Verifiable
-
-    #         # mocks that should not be called
-    #         Mock -CommandName Get-Volume
-
-    #         $script:result = $null
-
-    #         It 'Should not throw an exception' {
-    #             {
-    #                 $script:result = Test-TargetResource `
-    #                     -DiskId $script:mockedDisk0Gpt.Number `
-    #                     -DriveLetter 'G' `
-    #                     -AllocationUnitSize 4097 `
-    #                     -AllowDestructive $true `
-    #                     -Verbose
-    #             } | Should -Not -Throw
-    #         }
-
-    #         It 'Should be false' {
-    #             $script:result | Should -Be $false
-    #         }
-
-    #         It 'Should call the correct mocks' {
-    #             Assert-VerifiableMock
-    #             Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 1
-    #             Assert-MockCalled -CommandName Get-Partition -Exactly -Times 1
-    #             Assert-MockCalled -CommandName Get-Volume -Exactly -Times 0
-    #             Assert-MockCalled -CommandName Get-CimInstance -Exactly -Times 1
-    #         }
-    #     }
-
-    #     Context 'When testing mismatching FSFormat using Disk Number' {
-    #         # verifiable (should be called) mocks
-    #         Mock `
-    #             -CommandName Get-DiskByIdentifier `
-    #             -ParameterFilter $script:parameterFilter_MockedDisk0Number `
-    #             -MockWith { $script:mockedDisk0Gpt = [PSCustomObject] @{
-    #     Number         = 1
-    #     UniqueId       =  'TESTDISKUNIQUEID'
-    #     FriendlyName   = 'TESTDISKFRIENDLYNAME'
-    #     SerialNumber   = 'TESTDISKSERIALNUMBER'
-    #     Guid           = [guid]::NewGuid()
-    #     IsOffline      = $false
-    #     IsReadOnly     = $false
-    #     PartitionStyle = 'GPT'
-    # } } `
-    #             -Verifiable
-
-    #         Mock `
-    #             -CommandName Get-Partition `
-    #             -MockWith { #{ $script:mockedPartition = [PSCustomObject] @{
-    #     DriveLetter     = [System.Char] 'G'
-    #     Size            = 1GB
-    #     PartitionNumber = 1
-    #     Type            = 'Basic'
-    # } } `
-    #             -Verifiable
-
-    #         Mock `
-    #             -CommandName Get-Volume `
-    #             -MockWith { # $script:mockedVolume = [PSCustomObject] @{
-    #     FileSystemLabel = 'myLabel'
-    #     FileSystem      = 'NTFS'
-    #     DriveLetter     = 'G'
-    # } } `
-    #             -Verifiable
-
-    #         Mock `
-    #             -CommandName Get-CimInstance `
-    #             -MockWith { # $script:mockedCim = [PSCustomObject] @{
-    #     BlockSize = 4096
-    # } } `
-    #             -Verifiable
-
-    #         $script:result = $null
-
-    #         It 'Should not throw an exception' {
-    #             {
-    #                 $script:result = Test-TargetResource `
-    #                     -DiskId $script:mockedDisk0Gpt.Number `
-    #                     -DriveLetter 'G' `
-    #                     -FSFormat 'ReFS' `
-    #                     -Verbose
-    #             } | Should -Not -Throw
-    #         }
-
-    #         It 'Should be true' {
-    #             $script:result | Should -Be $true
-    #         }
-
-    #         It 'Should call the correct mocks' {
-    #             Assert-VerifiableMock
-    #             Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 1 `
-    #                 -ParameterFilter $script:parameterFilter_MockedDisk0Number
-    #             Assert-MockCalled -CommandName Get-Partition -Exactly -Times 1
-    #             Assert-MockCalled -CommandName Get-Volume -Exactly -Times 1
-    #             Assert-MockCalled -CommandName Get-CimInstance -Exactly -Times 1
-    #         }
-    #     }
-
-    #     Context 'When testing mismatching FSFormat using Disk Number and AllowDestructive' {
-    #         # verifiable (should be called) mocks
-    #         Mock `
-    #             -CommandName Get-DiskByIdentifier `
-    #             -ParameterFilter $script:parameterFilter_MockedDisk0Number `
-    #             -MockWith { $script:mockedDisk0Gpt = [PSCustomObject] @{
-    #     Number         = 1
-    #     UniqueId       =  'TESTDISKUNIQUEID'
-    #     FriendlyName   = 'TESTDISKFRIENDLYNAME'
-    #     SerialNumber   = 'TESTDISKSERIALNUMBER'
-    #     Guid           = [guid]::NewGuid()
-    #     IsOffline      = $false
-    #     IsReadOnly     = $false
-    #     PartitionStyle = 'GPT'
-    # } } `
-    #             -Verifiable
-
-    #         Mock `
-    #             -CommandName Get-Partition `
-    #             -MockWith { #{ $script:mockedPartition = [PSCustomObject] @{
-    #     DriveLetter     = [System.Char] 'G'
-    #     Size            = 1GB
-    #     PartitionNumber = 1
-    #     Type            = 'Basic'
-    # } } `
-    #             -Verifiable
-
-    #         Mock `
-    #             -CommandName Get-Volume `
-    #             -MockWith { # $script:mockedVolume = [PSCustomObject] @{
-    #     FileSystemLabel = 'myLabel'
-    #     FileSystem      = 'NTFS'
-    #     DriveLetter     = 'G'
-    # } } `
-    #             -Verifiable
-
-    #         Mock `
-    #             -CommandName Get-CimInstance `
-    #             -MockWith { # $script:mockedCim = [PSCustomObject] @{
-    #     BlockSize = 4096
-    # } } `
-    #             -Verifiable
-
-    #         $script:result = $null
-
-    #         It 'Should not throw an exception' {
-    #             {
-    #                 $script:result = Test-TargetResource `
-    #                     -DiskId $script:mockedDisk0Gpt.Number `
-    #                     -DriveLetter 'G' `
-    #                     -FSFormat 'ReFS' `
-    #                     -AllowDestructive $true `
-    #                     -Verbose
-    #             } | Should -Not -Throw
-    #         }
-
-    #         It 'Should be false' {
-    #             $script:result | Should -Be $false
-    #         }
-
-    #         It 'Should call the correct mocks' {
-    #             Assert-VerifiableMock
-    #             Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 1 `
-    #                 -ParameterFilter $script:parameterFilter_MockedDisk0Number
-    #             Assert-MockCalled -CommandName Get-Partition -Exactly -Times 1
-    #             Assert-MockCalled -CommandName Get-Volume -Exactly -Times 1
-    #             Assert-MockCalled -CommandName Get-CimInstance -Exactly -Times 1
-    #         }
-    #     }
-
-    #     Context 'When testing mismatching FSLabel using Disk Number' {
-    #         # verifiable (should be called) mocks
-    #         Mock `
-    #             -CommandName Get-DiskByIdentifier `
-    #             -ParameterFilter $script:parameterFilter_MockedDisk0Number `
-    #             -MockWith { $script:mockedDisk0Gpt = [PSCustomObject] @{
-    #     Number         = 1
-    #     UniqueId       =  'TESTDISKUNIQUEID'
-    #     FriendlyName   = 'TESTDISKFRIENDLYNAME'
-    #     SerialNumber   = 'TESTDISKSERIALNUMBER'
-    #     Guid           = [guid]::NewGuid()
-    #     IsOffline      = $false
-    #     IsReadOnly     = $false
-    #     PartitionStyle = 'GPT'
-    # } } `
-    #             -Verifiable
-
-    #         Mock `
-    #             -CommandName Get-Partition `
-    #             -MockWith { #{ $script:mockedPartition = [PSCustomObject] @{
-    #     DriveLetter     = [System.Char] 'G'
-    #     Size            = 1GB
-    #     PartitionNumber = 1
-    #     Type            = 'Basic'
-    # } } `
-    #             -Verifiable
-
-    #         Mock `
-    #             -CommandName Get-Volume `
-    #             -MockWith { # $script:mockedVolume = [PSCustomObject] @{
-    #     FileSystemLabel = 'myLabel'
-    #     FileSystem      = 'NTFS'
-    #     DriveLetter     = 'G'
-    # } } `
-    #             -Verifiable
-
-    #         Mock `
-    #             -CommandName Get-CimInstance `
-    #             -MockWith { # $script:mockedCim = [PSCustomObject] @{
-    #     BlockSize = 4096
-    # } } `
-    #             -Verifiable
-
-    #         $script:result = $null
-
-    #         It 'Should not throw an exception' {
-    #             {
-    #                 $script:result = Test-TargetResource `
-    #                     -DiskId $script:mockedDisk0Gpt.Number `
-    #                     -DriveLetter 'G' `
-    #                     -FSLabel 'NewLabel' `
-    #                     -Verbose
-    #             } | Should -Not -Throw
-    #         }
-
-    #         It 'Should be false' {
-    #             $script:result | Should -Be $false
-    #         }
-
-    #         It 'Should call the correct mocks' {
-    #             Assert-VerifiableMock
-    #             Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 1 `
-    #                 -ParameterFilter $script:parameterFilter_MockedDisk0Number
-    #             Assert-MockCalled -CommandName Get-Partition -Exactly -Times 1
-    #             Assert-MockCalled -CommandName Get-Volume -Exactly -Times 1
-    #             Assert-MockCalled -CommandName Get-CimInstance -Exactly -Times 1
-    #         }
-    #     }
-
-    #     Context 'When testing mismatching DriveLetter using Disk Number' {
-    #         # verifiable (should be called) mocks
-    #         Mock `
-    #             -CommandName Get-DiskByIdentifier `
-    #             -ParameterFilter $script:parameterFilter_MockedDisk0Number `
-    #             -MockWith { $script:mockedDisk0Gpt = [PSCustomObject] @{
-    #     Number         = 1
-    #     UniqueId       =  'TESTDISKUNIQUEID'
-    #     FriendlyName   = 'TESTDISKFRIENDLYNAME'
-    #     SerialNumber   = 'TESTDISKSERIALNUMBER'
-    #     Guid           = [guid]::NewGuid()
-    #     IsOffline      = $false
-    #     IsReadOnly     = $false
-    #     PartitionStyle = 'GPT'
-    # } } `
-    #             -Verifiable
-
-    #         Mock `
-    #             -CommandName Get-Partition `
-    #             -MockWith { #{ $script:mockedPartition = [PSCustomObject] @{
-    #     DriveLetter     = [System.Char] 'G'
-    #     Size            = 1GB
-    #     PartitionNumber = 1
-    #     Type            = 'Basic'
-    # } } `
-    #             -Verifiable
-
-    #         Mock `
-    #             -CommandName Get-Volume `
-    #             -MockWith { # $script:mockedVolume = [PSCustomObject] @{
-    #     FileSystemLabel = 'myLabel'
-    #     FileSystem      = 'NTFS'
-    #     DriveLetter     = 'G'
-    # } }
-
-    #         Mock `
-    #             -CommandName Get-CimInstance `
-    #             -MockWith { # $script:mockedCim = [PSCustomObject] @{
-    #     BlockSize = 4096
-    # } }
-
-    #         $script:result = $null
-
-    #         It 'Should not throw an exception' {
-    #             {
-    #                 $script:result = Test-TargetResource `
-    #                     -DiskId $script:mockedDisk0Gpt.Number `
-    #                     -DriveLetter 'Z' `
-    #                     -Verbose
-    #             } | Should -Not -Throw
-    #         }
-
-    #         It 'Should be false' {
-    #             $script:result | Should -Be $false
-    #         }
-
-    #         It 'Should call the correct mocks' {
-    #             Assert-VerifiableMock
-    #             Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 1 `
-    #                 -ParameterFilter $script:parameterFilter_MockedDisk0Number
-    #             Assert-MockCalled -CommandName Get-Partition -Exactly -Times 1
-    #             Assert-MockCalled -CommandName Get-Volume -Exactly -Times 0
-    #             Assert-MockCalled -CommandName Get-CimInstance -Exactly -Times 0
-    #         }
-    #     }
-
-    #     Context 'When testing all disk properties matching using Disk Number' {
-    #         # verifiable (should be called) mocks
-    #         Mock `
-    #             -CommandName Get-DiskByIdentifier `
-    #             -ParameterFilter $script:parameterFilter_MockedDisk0Number `
-    #             -MockWith { $script:mockedDisk0Gpt = [PSCustomObject] @{
-    #     Number         = 1
-    #     UniqueId       =  'TESTDISKUNIQUEID'
-    #     FriendlyName   = 'TESTDISKFRIENDLYNAME'
-    #     SerialNumber   = 'TESTDISKSERIALNUMBER'
-    #     Guid           = [guid]::NewGuid()
-    #     IsOffline      = $false
-    #     IsReadOnly     = $false
-    #     PartitionStyle = 'GPT'
-    # } } `
-    #             -Verifiable
-
-    #         Mock `
-    #             -CommandName Get-Partition `
-    #             -MockWith { #{ $script:mockedPartition = [PSCustomObject] @{
-    #     DriveLetter     = [System.Char] 'G'
-    #     Size            = 1GB
-    #     PartitionNumber = 1
-    #     Type            = 'Basic'
-    # } } `
-    #             -Verifiable
-
-    #         Mock `
-    #             -CommandName Get-Volume `
-    #             -MockWith { # $script:mockedVolume = [PSCustomObject] @{
-    #     FileSystemLabel = 'myLabel'
-    #     FileSystem      = 'NTFS'
-    #     DriveLetter     = 'G'
-    # } } `
-    #             -Verifiable
-
-    #         Mock `
-    #             -CommandName Get-CimInstance `
-    #             -MockWith { # $script:mockedCim = [PSCustomObject] @{
-    #     BlockSize = 4096
-    # } } `
-    #             -Verifiable
-
-    #         $script:result = $null
-
-    #         It 'Should not throw an exception' {
-    #             {
-    #                 $script:result = Test-TargetResource `
-    #                     -DiskId $script:mockedDisk0Gpt.Number `
-    #                     -DriveLetter 'G' `
-    #                     -AllocationUnitSize 4096 `
-    #                     -Size $script:mockedPartition.Size `
-    #                     -FSLabel $script:mockedVolume.FileSystemLabel `
-    #                     -FSFormat $script:mockedVolume.FileSystem `
-    #                     -Verbose
-    #             } | Should -Not -Throw
-    #         }
-
-    #         It 'Should be true' {
-    #             $script:result | Should -Be $true
-    #         }
-
-    #         It 'Should call the correct mocks' {
-    #             Assert-VerifiableMock
-    #             Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 1 `
-    #                 -ParameterFilter $script:parameterFilter_MockedDisk0Number
-    #             Assert-MockCalled -CommandName Get-Partition -Exactly -Times 1
-    #             Assert-MockCalled -CommandName Get-Volume -Exactly -Times 1
-    #             Assert-MockCalled -CommandName Get-CimInstance -Exactly -Times 1
-    #         }
-    #     }
-
-    #     Context 'When the DevDrive flag is true, and Size parameter is less than minimum required size for Dev Drive (50 Gb)' {
-    #         # verifiable (should be called) mocks
-    #         Mock `
-    #             -CommandName Get-DiskByIdentifier `
-    #             -ParameterFilter $script:parameterFilter_MockedDisk0Number `
-    #             -MockWith { $script:mockedDisk0Gpt = [PSCustomObject] @{
-    #     Number         = 1
-    #     UniqueId       =  'TESTDISKUNIQUEID'
-    #     FriendlyName   = 'TESTDISKFRIENDLYNAME'
-    #     SerialNumber   = 'TESTDISKSERIALNUMBER'
-    #     Guid           = [guid]::NewGuid()
-    #     IsOffline      = $false
-    #     IsReadOnly     = $false
-    #     PartitionStyle = 'GPT'
-    # } } `
-    #             -Verifiable
-
-    #         Mock `
-    #             -CommandName Get-Partition `
-    #             -MockWith { $mockedPartitionGDriveLetter40Gb } `
-    #             -Verifiable
-
-    #         $userDesiredSizeInGb = [Math]::Round($script:userDesiredSize40Gb / 1GB, 2)
-
-    #         It 'Should throw an exception as size does not meet minimum requirement' {
-    #             {
-    #                 $script:result = Test-TargetResource `
-    #                     -DiskId $script:mockedDisk0Gpt.Number `
-    #                     -DriveLetter 'G' `
-    #                     -AllocationUnitSize 4096 `
-    #                     -Size $script:userDesiredSize40Gb `
-    #                     -FSLabel $script:mockedVolume.FileSystemLabel `
-    #                     -FSFormat $script:mockedVolumeReFS.FileSystem `
-    #                     -DevDrive $true `
-    #                     -AllowDestructive $true `
-    #                     -Verbose
-    #             } | Should -Throw -ExpectedMessage ($script:localizedCommonStrings.MinimumSizeNeededToCreateDevDriveVolumeError -f $userDesiredSizeInGb)
-    #         }
-
-    #         It 'Should call the correct mocks' {
-    #             Assert-VerifiableMock
-    #             Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 1 `
-    #                 -ParameterFilter $script:parameterFilter_MockedDisk0Number
-    #             Assert-MockCalled -CommandName Get-Partition -Exactly -Times 1
-    #         }
-    #     }
-
-    #     Context 'When the DevDrive flag is true, but the partition is effectively the same size as user inputted size and volume is NTFS' {
-    #         # verifiable (should be called) mocks
-    #         Mock `
-    #             -CommandName Get-DiskByIdentifier `
-    #             -ParameterFilter $script:parameterFilter_MockedDisk0Number `
-    #             -MockWith { $script:mockedDisk0Gpt = [PSCustomObject] @{
-    #     Number         = 1
-    #     UniqueId       =  'TESTDISKUNIQUEID'
-    #     FriendlyName   = 'TESTDISKFRIENDLYNAME'
-    #     SerialNumber   = 'TESTDISKSERIALNUMBER'
-    #     Guid           = [guid]::NewGuid()
-    #     IsOffline      = $false
-    #     IsReadOnly     = $false
-    #     PartitionStyle = 'GPT'
-    # } } `
-    #             -Verifiable
-
-    #         Mock `
-    #             -CommandName Get-Partition `
-    #             -MockWith { $script:mockedPartitionGDriveLetterAlternatePartition150Gb } `
-    #             -Verifiable
-
-    #         Mock `
-    #             -CommandName Get-Volume `
-    #             -MockWith { $script:mockedVolumeThatExistPriorToConfigurationNtfs150Gb } `
-    #             -Verifiable
-
-    #         $script:result = $null
-
-    #         It 'Should not throw an exception' {
-    #             {
-    #                 $script:result = Test-TargetResource `
-    #                     -DiskId $script:mockedDisk0Gpt.Number `
-    #                     -DriveLetter 'G' `
-    #                     -AllocationUnitSize 4096 `
-    #                     -Size $script:userDesiredSize50Gb `
-    #                     -FSLabel $script:mockedVolume.FileSystemLabel `
-    #                     -FSFormat $script:mockedVolumeReFS.FileSystem `
-    #                     -DevDrive $true `
-    #                     -AllowDestructive $true `
-    #                     -Verbose
-    #             } | Should -Not -Throw
-    #         }
-
-    #         It 'Should be false' {
-    #             $script:result | Should -BeFalse
-    #         }
-
-    #         It 'Should call the correct mocks' {
-    #             Assert-VerifiableMock
-    #             Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 1 `
-    #                 -ParameterFilter $script:parameterFilter_MockedDisk0Number
-    #             Assert-MockCalled -CommandName Get-Partition -Exactly -Times 1
-    #             Assert-MockCalled -CommandName Get-Volume -Exactly -Times 1
-    #         }
-    #     }
-
-    #     Context 'When the DevDrive flag is true, but the partition is not the same size as user inputted size, volume is ReFS formatted but not Dev Drive volume' {
-    #         # verifiable (should be called) mocks
-    #         Mock `
-    #             -CommandName Get-DiskByIdentifier `
-    #             -ParameterFilter $script:parameterFilter_MockedDisk0Number `
-    #             -MockWith { $script:mockedDisk0Gpt = [PSCustomObject] @{
-    #     Number         = 1
-    #     UniqueId       =  'TESTDISKUNIQUEID'
-    #     FriendlyName   = 'TESTDISKFRIENDLYNAME'
-    #     SerialNumber   = 'TESTDISKSERIALNUMBER'
-    #     Guid           = [guid]::NewGuid()
-    #     IsOffline      = $false
-    #     IsReadOnly     = $false
-    #     PartitionStyle = 'GPT'
-    # } } `
-    #             -Verifiable
-
-    #         Mock `
-    #             -CommandName Get-Partition `
-    #             -MockWith { $script:mockedPartitionGDriveLetterAlternatePartition150Gb } `
-    #             -Verifiable
-
-    #         Mock `
-    #             -CommandName Get-Volume `
-    #             -MockWith { $script:mockedVolumeThatExistPriorToConfigurationReFS } `
-    #             -Verifiable
-
-
-    #         Mock `
-    #             -CommandName Assert-DevDriveFeatureAvailable `
-    #             -Verifiable
-
-    #         Mock `
-    #             -CommandName Test-DevDriveVolume `
-    #             -MockWith { $false } `
-    #             -Verifiable
-
-    #         $script:result = $null
-
-    #         It 'Should not throw an exception' {
-    #             {
-    #                 $script:result = Test-TargetResource `
-    #                     -DiskId $script:mockedDisk0Gpt.Number `
-    #                     -DriveLetter 'G' `
-    #                     -AllocationUnitSize 4096 `
-    #                     -Size $script:userDesiredSize50Gb `
-    #                     -FSLabel $script:mockedVolume.FileSystemLabel `
-    #                     -FSFormat $script:mockedVolumeReFS.FileSystem `
-    #                     -DevDrive $true `
-    #                     -AllowDestructive $true `
-    #                     -Verbose
-    #             } | Should -Not -Throw
-    #         }
-
-    #         It 'Should be false' {
-    #             $script:result | Should -BeFalse
-    #         }
-
-    #         It 'Should call the correct mocks' {
-    #             Assert-VerifiableMock
-    #             Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 1 `
-    #                 -ParameterFilter $script:parameterFilter_MockedDisk0Number
-    #             Assert-MockCalled -CommandName Get-Partition -Exactly -Times 1
-    #             Assert-MockCalled -CommandName Get-Volume -Exactly -Times 2
-    #             Assert-MockCalled -CommandName Test-DevDriveVolume -Exactly -Times 1
-    #             Assert-MockCalled -CommandName Assert-DevDriveFeatureAvailable -Exactly -Times 1
-    #         }
-    #     }
-
-    #     Context 'When the DevDrive flag is true, but the partition is effectively the same size as user inputted size, volume is ReFS formatted and is Dev Drive volume' {
-    #         # verifiable (should be called) mocks
-    #         Mock `
-    #             -CommandName Get-DiskByIdentifier `
-    #             -ParameterFilter $script:parameterFilter_MockedDisk0Number `
-    #             -MockWith { $script:mockedDisk0Gpt = [PSCustomObject] @{
-    #     Number         = 1
-    #     UniqueId       =  'TESTDISKUNIQUEID'
-    #     FriendlyName   = 'TESTDISKFRIENDLYNAME'
-    #     SerialNumber   = 'TESTDISKSERIALNUMBER'
-    #     Guid           = [guid]::NewGuid()
-    #     IsOffline      = $false
-    #     IsReadOnly     = $false
-    #     PartitionStyle = 'GPT'
-    # } } `
-    #             -Verifiable
-
-    #         Mock `
-    #             -CommandName Get-Partition `
-    #             -MockWith { $script:mockedPartitionGDriveLetterAlternatePartition150Gb } `
-    #             -Verifiable
-
-    #         Mock `
-    #             -CommandName Get-Volume `
-    #             -MockWith { # $script:mockedVolumeDevDrive = [PSCustomObject] @{
-    #     FileSystemLabel = 'myLabel'
-    #     FileSystem      = 'ReFS'
-    #     DriveLetter     = 'G'
-    #     UniqueId        = '\\?\Volume{3a244a32-efba-4b7e-9a19-7293fc7c7924}\'
-    # } } `
-    #             -Verifiable
-
-    #         Mock `
-    #             -CommandName Assert-DevDriveFeatureAvailable `
-    #             -Verifiable
-
-    #         Mock `
-    #             -CommandName Test-DevDriveVolume `
-    #             -MockWith { $true } `
-    #             -Verifiable
-
-    #         $script:result = $null
-
-    #         It 'Should not throw an exception' {
-    #             {
-    #                 $script:result = Test-TargetResource `
-    #                     -DiskId $script:mockedDisk0Gpt.Number `
-    #                     -DriveLetter 'G' `
-    #                     -AllocationUnitSize 4096 `
-    #                     -Size $script:userDesiredSize50Gb `
-    #                     -FSLabel $script:mockedVolume.FileSystemLabel `
-    #                     -FSFormat $script:mockedVolumeReFS.FileSystem `
-    #                     -DevDrive $true `
-    #                     -AllowDestructive $true `
-    #                     -Verbose
-    #             } | Should -Not -Throw
-    #         }
-
-    #         It 'Should be true' {
-    #             $script:result | Should -BeTrue
-    #         }
-
-    #         It 'Should call the correct mocks' {
-    #             Assert-VerifiableMock
-    #             Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 1 `
-    #                 -ParameterFilter $script:parameterFilter_MockedDisk0Number
-    #             Assert-MockCalled -CommandName Get-Partition -Exactly -Times 1
-    #             Assert-MockCalled -CommandName Get-Volume -Exactly -Times 2
-    #             Assert-MockCalled -CommandName Test-DevDriveVolume -Exactly -Times 1
-    #             Assert-MockCalled -CommandName Assert-DevDriveFeatureAvailable -Exactly -Times 1
-    #         }
-    #     }
-
-    #     Context 'When the DevDrive flag is true, but the partition is effectively the same size as user inputted size, volume is ReFS formatted and is not Dev Drive volume' {
-    #         # verifiable (should be called) mocks
-    #         Mock `
-    #             -CommandName Get-DiskByIdentifier `
-    #             -ParameterFilter $script:parameterFilter_MockedDisk0Number `
-    #             -MockWith { $script:mockedDisk0Gpt = [PSCustomObject] @{
-    #     Number         = 1
-    #     UniqueId       =  'TESTDISKUNIQUEID'
-    #     FriendlyName   = 'TESTDISKFRIENDLYNAME'
-    #     SerialNumber   = 'TESTDISKSERIALNUMBER'
-    #     Guid           = [guid]::NewGuid()
-    #     IsOffline      = $false
-    #     IsReadOnly     = $false
-    #     PartitionStyle = 'GPT'
-    # } } `
-    #             -Verifiable
-
-    #         Mock `
-    #             -CommandName Get-Partition `
-    #             -MockWith { $script:mockedPartitionGDriveLetterAlternatePartition150Gb } `
-    #             -Verifiable
-
-    #         Mock `
-    #             -CommandName Get-Volume `
-    #             -MockWith { $script:mockedVolumeThatExistPriorToConfigurationRefs150Gb } `
-    #             -Verifiable
-
-    #         Mock `
-    #             -CommandName Assert-DevDriveFeatureAvailable `
-    #             -Verifiable
-
-    #         Mock `
-    #             -CommandName Test-DevDriveVolume `
-    #             -MockWith { $false } `
-    #             -Verifiable
-
-    #         $script:result = $null
-
-    #         It 'Should not throw an exception' {
-    #             {
-    #                 $script:result = Test-TargetResource `
-    #                     -DiskId $script:mockedDisk0Gpt.Number `
-    #                     -DriveLetter 'G' `
-    #                     -AllocationUnitSize 4096 `
-    #                     -Size $script:userDesiredSize50Gb `
-    #                     -FSLabel $script:mockedVolume.FileSystemLabel `
-    #                     -FSFormat $script:mockedVolumeReFS.FileSystem `
-    #                     -DevDrive $true `
-    #                     -AllowDestructive $true `
-    #                     -Verbose
-    #             } | Should -Not -Throw
-    #         }
-
-    #         It 'Should be false' {
-    #             $script:result | Should -BeFalse
-    #         }
-
-    #         It 'Should call the correct mocks' {
-    #             Assert-VerifiableMock
-    #             Assert-MockCalled -CommandName Get-DiskByIdentifier -Exactly -Times 1 `
-    #                 -ParameterFilter $script:parameterFilter_MockedDisk0Number
-    #             Assert-MockCalled -CommandName Get-Partition -Exactly -Times 1
-    #             Assert-MockCalled -CommandName Get-Volume -Exactly -Times 2
-    #             Assert-MockCalled -CommandName Test-DevDriveVolume -Exactly -Times 1
-    #             Assert-MockCalled -CommandName Assert-DevDriveFeatureAvailable -Exactly -Times 1
-    #         }
-    #     }
+    Context 'When testing disk offline using Serial Number' {
+        BeforeAll {
+            Mock -CommandName Assert-DriveLetterValid -MockWith {
+                'G'
+            }
+
+            Mock -CommandName Get-DiskByIdentifier -MockWith {
+                [PSCustomObject] @{
+                    Number         = 1
+                    UniqueId       = 'TESTDISKUNIQUEID'
+                    FriendlyName   = 'TESTDISKFRIENDLYNAME'
+                    SerialNumber   = 'TESTDISKSERIALNUMBER'
+                    Guid           = [guid]::NewGuid()
+                    IsOffline      = $true
+                    IsReadOnly     = $false
+                    PartitionStyle = 'GPT'
+                }
+            }
+
+            # mocks that should not be called
+            Mock -CommandName Get-Volume
+            Mock -CommandName Get-Partition
+            Mock -CommandName Get-CimInstance -MockWith {
+                [PSCustomObject] @{
+                    BlockSize = 4096
+                }
+            }
+        }
+
+        It 'Should return the correct result' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+                $testParams = @{
+                    DiskId             = 'TESTDISKSERIALNUMBER'
+                    DiskIdType         = 'SerialNumber'
+                    DriveLetter        = 'G'
+                    AllocationUnitSize = 4096
+                }
+
+                $result = Test-TargetResource @testParams
+
+                { $result } | Should -Not -Throw
+                $result | Should -BeFalse
+            }
+
+            Should -Invoke -CommandName Assert-DriveLetterValid -Exactly -Times 1 -Scope It
+            Should -Invoke -CommandName Get-DiskByIdentifier -Exactly -Times 1 -Scope It
+            Should -Invoke -CommandName Get-Partition -Exactly -Times 0 -Scope It
+            Should -Invoke -CommandName Get-Volume -Exactly -Times 0 -Scope It
+            Should -Invoke -CommandName Get-CimInstance -Exactly -Times 0 -Scope It
+        }
+    }
+
+    Context 'When testing disk offline using Disk Guid' {
+        BeforeAll {
+            Mock -CommandName Assert-DriveLetterValid -MockWith {
+                'G'
+            }
+
+            Mock -CommandName Get-DiskByIdentifier -MockWith {
+                [PSCustomObject] @{
+                    Number         = 1
+                    UniqueId       = 'TESTDISKUNIQUEID'
+                    FriendlyName   = 'TESTDISKFRIENDLYNAME'
+                    SerialNumber   = 'TESTDISKSERIALNUMBER'
+                    Guid           = 'f82e9a28-430d-49ac-a633-910d9104f177'
+                    IsOffline      = $true
+                    IsReadOnly     = $false
+                    PartitionStyle = 'GPT'
+                }
+            }
+
+            # mocks that should not be called
+            Mock -CommandName Get-Volume
+            Mock -CommandName Get-Partition
+            Mock -CommandName Get-CimInstance -MockWith {
+                [PSCustomObject] @{
+                    BlockSize = 4096
+                }
+            }
+        }
+
+        It 'Should return the correct result' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                $testParams = @{
+                    DiskId             = 'f82e9a28-430d-49ac-a633-910d9104f177'
+                    DiskIdType         = 'Guid'
+                    DriveLetter        = 'G'
+                    AllocationUnitSize = 4096
+                }
+
+                $result = Test-TargetResource @testParams
+
+                { $result } | Should -Not -Throw
+                $result | Should -BeFalse
+            }
+
+            Should -Invoke -CommandName Assert-DriveLetterValid -Exactly -Times 1 -Scope It
+            Should -Invoke -CommandName Get-DiskByIdentifier -Exactly -Times 1 -Scope It
+            Should -Invoke -CommandName Get-Partition -Exactly -Times 0 -Scope It
+            Should -Invoke -CommandName Get-Volume -Exactly -Times 0 -Scope It
+            Should -Invoke -CommandName Get-CimInstance -Exactly -Times 0 -Scope It
+        }
+    }
+
+    Context 'When testing disk read only using Disk Number' {
+        BeforeAll {
+            Mock -CommandName Assert-DriveLetterValid -MockWith {
+                'G'
+            }
+
+            Mock -CommandName Get-DiskByIdentifier -MockWith {
+                [PSCustomObject] @{
+                    Number         = 1
+                    UniqueId       = 'TESTDISKUNIQUEID'
+                    FriendlyName   = 'TESTDISKFRIENDLYNAME'
+                    SerialNumber   = 'TESTDISKSERIALNUMBER'
+                    Guid           = [guid]::NewGuid()
+                    IsOffline      = $false
+                    IsReadOnly     = $true
+                    PartitionStyle = 'GPT'
+                }
+            }
+
+            # mocks that should not be called
+            Mock -CommandName Get-Volume
+            Mock -CommandName Get-Partition
+            Mock -CommandName Get-CimInstance -MockWith {
+                [PSCustomObject] @{
+                    BlockSize = 4096
+                }
+            }
+        }
+
+        It 'Should return the correct result' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                $testParams = @{
+                    DiskId             = 1
+                    DriveLetter        = 'G'
+                    AllocationUnitSize = 4096
+                }
+
+                $result = Test-TargetResource @testParams
+
+                { $result } | Should -Not -Throw
+                $result | Should -BeFalse
+            }
+
+            Should -Invoke -CommandName Assert-DriveLetterValid -Exactly -Times 1 -Scope It
+            Should -Invoke -CommandName Get-DiskByIdentifier -Exactly -Times 1 -Scope It
+            Should -Invoke -CommandName Get-Partition -Exactly -Times 0 -Scope It
+            Should -Invoke -CommandName Get-Volume -Exactly -Times 0 -Scope It
+            Should -Invoke -CommandName Get-CimInstance -Exactly -Times 0 -Scope It
+        }
+    }
+
+    Context 'When testing online unformatted disk using Disk Number' {
+        BeforeAll {
+            Mock -CommandName Assert-DriveLetterValid -MockWith {
+                'G'
+            }
+
+            Mock -CommandName Get-DiskByIdentifier -MockWith {
+                [PSCustomObject] @{
+                    Number         = 1
+                    UniqueId       = 'TESTDISKUNIQUEID'
+                    FriendlyName   = 'TESTDISKFRIENDLYNAME'
+                    SerialNumber   = 'TESTDISKSERIALNUMBER'
+                    Guid           = ''
+                    IsOffline      = $false
+                    IsReadOnly     = $false
+                    PartitionStyle = 'RAW'
+                }
+            }
+
+            # mocks that should not be called
+            Mock -CommandName Get-Volume
+            Mock -CommandName Get-Partition
+            Mock -CommandName Get-CimInstance -MockWith {
+                [PSCustomObject] @{
+                    BlockSize = 4096
+                }
+            }
+        }
+
+        It 'Should return the correct result' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                $testParams = @{
+                    DiskId             = 1
+                    DriveLetter        = 'G'
+                    AllocationUnitSize = 4096
+                }
+
+                $result = Test-TargetResource @testParams
+
+                { $result } | Should -Not -Throw
+                $result | Should -BeFalse
+            }
+
+            Should -Invoke -CommandName Assert-DriveLetterValid -Exactly -Times 1 -Scope It
+            Should -Invoke -CommandName Get-DiskByIdentifier -Exactly -Times 1 -Scope It
+            Should -Invoke -CommandName Get-Partition -Exactly -Times 0 -Scope It
+            Should -Invoke -CommandName Get-Volume -Exactly -Times 0 -Scope It
+            Should -Invoke -CommandName Get-CimInstance -Exactly -Times 0 -Scope It
+        }
+    }
+
+    Context 'When testing online disk using Disk Number with partition style GPT but requiring MBR' {
+        BeforeAll {
+            Mock -CommandName Assert-DriveLetterValid -MockWith {
+                'G'
+            }
+
+            Mock -CommandName Get-DiskByIdentifier -MockWith {
+                [PSCustomObject] @{
+                    Number         = 1
+                    UniqueId       = 'TESTDISKUNIQUEID'
+                    FriendlyName   = 'TESTDISKFRIENDLYNAME'
+                    SerialNumber   = 'TESTDISKSERIALNUMBER'
+                    Guid           = ''
+                    IsOffline      = $false
+                    IsReadOnly     = $false
+                    PartitionStyle = 'MBR'
+                }
+            }
+
+            # mocks that should not be called
+            Mock -CommandName Get-Volume
+            Mock -CommandName Get-Partition
+            Mock -CommandName Get-CimInstance -MockWith {
+                [PSCustomObject] @{
+                    BlockSize = 4096
+                }
+            }
+        }
+
+        It 'Should throw the correct exception' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                $testParams = @{
+                    DiskId             = 1
+                    DriveLetter        = 'G'
+                    AllocationUnitSize = 4096
+                }
+
+                $errorRecord = Get-InvalidOperationRecord -Message (
+                    $script:localizedData.DiskInitializedWithWrongPartitionStyleError -f 'Number', $testParams.DiskId , 'MBR', 'GPT'
+                )
+
+                { Test-TargetResource @testParams } | Should -Throw $errorRecord
+            }
+
+            Should -Invoke -CommandName Assert-DriveLetterValid -Exactly -Times 1 -Scope It
+            Should -Invoke -CommandName Get-DiskByIdentifier -Exactly -Times 1 -Scope It
+            Should -Invoke -CommandName Get-Partition -Exactly -Times 0 -Scope It
+            Should -Invoke -CommandName Get-Volume -Exactly -Times 0 -Scope It
+            Should -Invoke -CommandName Get-CimInstance -Exactly -Times 0 -Scope It
+        }
+    }
+
+    Context 'When testing online disk using Disk Number with partition style MBR but requiring GPT' {
+        BeforeAll {
+            Mock -CommandName Assert-DriveLetterValid -MockWith {
+                'G'
+            }
+
+            Mock -CommandName Get-DiskByIdentifier -MockWith {
+                [PSCustomObject] @{
+                    Number         = 1
+                    UniqueId       = 'TESTDISKUNIQUEID'
+                    FriendlyName   = 'TESTDISKFRIENDLYNAME'
+                    SerialNumber   = 'TESTDISKSERIALNUMBER'
+                    Guid           = [guid]::NewGuid()
+                    IsOffline      = $false
+                    IsReadOnly     = $false
+                    PartitionStyle = 'GPT'
+                }
+            }
+
+            # mocks that should not be called
+            Mock -CommandName Get-Volume
+            Mock -CommandName Get-Partition
+            Mock -CommandName Get-CimInstance -MockWith {
+                [PSCustomObject] @{
+                    BlockSize = 4096
+                }
+            }
+        }
+
+        It 'Should throw the correct exception' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                $testParams = @{
+                    DiskId             = 1
+                    DriveLetter        = 'G'
+                    AllocationUnitSize = 4096
+                    PartitionStyle     = 'MBR'
+                }
+
+                $errorRecord = Get-InvalidOperationRecord -Message (
+                    $script:localizedData.DiskInitializedWithWrongPartitionStyleError -f 'Number',
+                    $testParams.DiskId,
+                    'GPT',
+                    'MBR'
+                )
+
+                { Test-TargetResource @testParams } | Should -Throw $errorRecord
+            }
+
+            Should -Invoke -CommandName Assert-DriveLetterValid -Exactly -Times 1 -Scope It
+            Should -Invoke -CommandName Get-DiskByIdentifier -Exactly -Times 1 -Scope It
+            Should -Invoke -CommandName Get-Partition -Exactly -Times 0 -Scope It
+            Should -Invoke -CommandName Get-Volume -Exactly -Times 0 -Scope It
+            Should -Invoke -CommandName Get-CimInstance -Exactly -Times 0 -Scope It
+        }
+    }
+
+    Context 'When testing online disk using Disk Number with partition style MBR but requiring GPT and AllowDestructive and ClearDisk is True' {
+        BeforeAll {
+            Mock -CommandName Assert-DriveLetterValid -MockWith {
+                'G'
+            }
+
+            Mock -CommandName Get-DiskByIdentifier -MockWith {
+                [PSCustomObject] @{
+                    Number         = 1
+                    UniqueId       = 'TESTDISKUNIQUEID'
+                    FriendlyName   = 'TESTDISKFRIENDLYNAME'
+                    SerialNumber   = 'TESTDISKSERIALNUMBER'
+                    Guid           = [guid]::NewGuid()
+                    IsOffline      = $false
+                    IsReadOnly     = $false
+                    PartitionStyle = 'GPT'
+                }
+            }
+
+            # mocks that should not be called
+            Mock -CommandName Get-Volume
+            Mock -CommandName Get-Partition
+            Mock -CommandName Get-CimInstance -MockWith {
+                [PSCustomObject] @{
+                    BlockSize = 4096
+                }
+            }
+        }
+
+        It 'Should return the correct result' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                $testParams = @{
+                    DiskId             = 1
+                    DriveLetter        = 'G'
+                    AllocationUnitSize = 4096
+                    PartitionStyle     = 'MBR'
+                    AllowDestructive   = $true
+                    ClearDisk          = $true
+                }
+
+                $result = Test-TargetResource @testParams
+
+                { $result } | Should -Not -Throw
+                $result | Should -BeFalse
+            }
+
+            Should -Invoke -CommandName Assert-DriveLetterValid -Exactly -Times 1 -Scope It
+            Should -Invoke -CommandName Get-DiskByIdentifier -Exactly -Times 1 -Scope It
+            Should -Invoke -CommandName Get-Partition -Exactly -Times 0 -Scope It
+            Should -Invoke -CommandName Get-Volume -Exactly -Times 0 -Scope It
+            Should -Invoke -CommandName Get-CimInstance -Exactly -Times 0 -Scope It
+        }
+    }
+
+    Context 'When testing mismatching partition size using Disk Number' {
+        BeforeAll {
+            Mock -CommandName Assert-DriveLetterValid -MockWith {
+                'G'
+            }
+
+            Mock -CommandName Get-DiskByIdentifier -MockWith {
+                [PSCustomObject] @{
+                    Number         = 1
+                    UniqueId       = 'TESTDISKUNIQUEID'
+                    FriendlyName   = 'TESTDISKFRIENDLYNAME'
+                    SerialNumber   = 'TESTDISKSERIALNUMBER'
+                    Guid           = [guid]::NewGuid()
+                    IsOffline      = $false
+                    IsReadOnly     = $false
+                    PartitionStyle = 'GPT'
+                }
+            }
+
+            Mock -CommandName Get-Partition -MockWith {
+                [PSCustomObject] @{
+                    DriveLetter     = [System.Char] 'G'
+                    Size            = 1GB
+                    PartitionNumber = 1
+                    Type            = 'Basic'
+                }
+            }
+
+            Mock -CommandName Get-Volume -MockWith {
+                [PSCustomObject] @{
+                    FileSystemLabel = 'myLabel'
+                    FileSystem      = 'NTFS'
+                    DriveLetter     = 'G'
+                }
+            }
+
+            Mock -CommandName Get-CimInstance -MockWith {
+                [PSCustomObject] @{
+                    BlockSize = 4096
+                }
+            }
+        }
+
+        It 'Should return the correct result' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                $testParams = @{
+                    DiskId             = 1
+                    DriveLetter        = 'G'
+                    AllocationUnitSize = 4096
+                    Size               = (1GB + 1MB)
+                }
+
+                $result = Test-TargetResource @testParams
+
+                { $result } | Should -Not -Throw
+                $result | Should -BeTrue
+            }
+
+            Should -Invoke -CommandName Assert-DriveLetterValid -Exactly -Times 1 -Scope It
+            Should -Invoke -CommandName Get-DiskByIdentifier -Exactly -Times 1 -Scope It
+            Should -Invoke -CommandName Get-Partition -Exactly -Times 1 -Scope It
+            Should -Invoke -CommandName Get-Volume -Exactly -Times 1 -Scope It
+            Should -Invoke -CommandName Get-CimInstance -Exactly -Times 1 -Scope It
+        }
+    }
+
+    Context 'When testing mismatching partition size with AllowDestructive using Disk Number' {
+        BeforeAll {
+            Mock -CommandName Assert-DriveLetterValid -MockWith {
+                'G'
+            }
+
+            Mock -CommandName Get-DiskByIdentifier -MockWith {
+                [PSCustomObject] @{
+                    Number         = 1
+                    UniqueId       = 'TESTDISKUNIQUEID'
+                    FriendlyName   = 'TESTDISKFRIENDLYNAME'
+                    SerialNumber   = 'TESTDISKSERIALNUMBER'
+                    Guid           = [guid]::NewGuid()
+                    IsOffline      = $false
+                    IsReadOnly     = $false
+                    PartitionStyle = 'GPT'
+                }
+            }
+
+            Mock -CommandName Get-Partition -MockWith {
+                [PSCustomObject] @{
+                    DriveLetter     = [System.Char] 'G'
+                    Size            = 1GB
+                    PartitionNumber = 1
+                    Type            = 'Basic'
+                }
+            }
+
+            # mocks that should not be called
+            Mock -CommandName Get-PartitionSupportedSize
+            Mock -CommandName Get-Volume
+            Mock -CommandName Get-CimInstance -MockWith {
+                [PSCustomObject] @{
+                    BlockSize = 4096
+                }
+            }
+        }
+
+        It 'Should return the correct result' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                $testParams = @{
+                    DiskId             = 1
+                    DriveLetter        = 'G'
+                    AllocationUnitSize = 4096
+                    Size               = (1GB + 1MB)
+                    AllowDestructive   = $true
+                }
+
+                $result = Test-TargetResource @testParams
+
+                { $result } | Should -Not -Throw
+                $result | Should -BeFalse
+            }
+
+            Should -Invoke -CommandName Assert-DriveLetterValid -Exactly -Times 1 -Scope It
+            Should -Invoke -CommandName Get-DiskByIdentifier -Exactly -Times 1 -Scope It
+            Should -Invoke -CommandName Get-Partition -Exactly -Times 1 -Scope It
+            Should -Invoke -CommandName Get-PartitionSupportedSize -Exactly -Times 0 -Scope It
+            Should -Invoke -CommandName Get-Volume -Exactly -Times 0 -Scope It
+            Should -Invoke -CommandName Get-CimInstance -Exactly -Times 0 -Scope It
+        }
+    }
+
+    Context 'When testing mismatching partition size without Size specified using Disk Number' {
+        BeforeAll {
+            Mock -CommandName Assert-DriveLetterValid -MockWith {
+                'G'
+            }
+
+            Mock -CommandName Get-DiskByIdentifier -MockWith {
+                [PSCustomObject] @{
+                    Number         = 1
+                    UniqueId       = 'TESTDISKUNIQUEID'
+                    FriendlyName   = 'TESTDISKFRIENDLYNAME'
+                    SerialNumber   = 'TESTDISKSERIALNUMBER'
+                    Guid           = [guid]::NewGuid()
+                    IsOffline      = $false
+                    IsReadOnly     = $false
+                    PartitionStyle = 'GPT'
+                }
+            }
+
+            Mock -CommandName Get-Partition -MockWith {
+                [PSCustomObject] @{
+                    DriveLetter     = [System.Char] 'G'
+                    Size            = 1GB
+                    PartitionNumber = 1
+                    Type            = 'Basic'
+                }
+            }
+
+            Mock -CommandName Get-PartitionSupportedSize -MockWith {
+                return @{
+                    SizeMin = 0
+                    # Adding >1MB, otherwise workaround for wrong SizeMax is triggered
+                    SizeMax = $script:mockedPartition.Size + 1.1MB
+                }
+            }
+
+            Mock -CommandName Get-Volume -MockWith {
+                [PSCustomObject] @{
+                    FileSystemLabel = 'myLabel'
+                    FileSystem      = 'NTFS'
+                    DriveLetter     = 'G'
+                }
+            }
+
+            Mock -CommandName Get-CimInstance -MockWith {
+                [PSCustomObject] @{
+                    BlockSize = 4096
+                }
+            }
+        }
+
+        It 'Should return the correct result' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                $testParams = @{
+                    DiskId             = 1
+                    DriveLetter        = 'G'
+                    AllocationUnitSize = 4096
+                }
+
+                $result = Test-TargetResource @testParams
+
+                { $result } | Should -Not -Throw
+                $result | Should -BeTrue
+            }
+
+            Should -Invoke -CommandName Assert-DriveLetterValid -Exactly -Times 1 -Scope It
+            Should -Invoke -CommandName Get-DiskByIdentifier -Exactly -Times 1 -Scope It
+            Should -Invoke -CommandName Get-Partition -Exactly -Times 1 -Scope It
+            Should -Invoke -CommandName Get-PartitionSupportedSize -Exactly -Times 1 -Scope It
+            Should -Invoke -CommandName Get-Volume -Exactly -Times 1 -Scope It
+            Should -Invoke -CommandName Get-CimInstance -Exactly -Times 1 -Scope It
+        }
+    }
+
+    Context 'When testing mismatching partition size without Size specified using Disk Number with partition reported twice' {
+        BeforeAll {
+            Mock -CommandName Assert-DriveLetterValid -MockWith {
+                'G'
+            }
+
+            Mock -CommandName Get-DiskByIdentifier -MockWith {
+                [PSCustomObject] @{
+                    Number         = 1
+                    UniqueId       = 'TESTDISKUNIQUEID'
+                    FriendlyName   = 'TESTDISKFRIENDLYNAME'
+                    SerialNumber   = 'TESTDISKSERIALNUMBER'
+                    Guid           = [guid]::NewGuid()
+                    IsOffline      = $false
+                    IsReadOnly     = $false
+                    PartitionStyle = 'GPT'
+                }
+            }
+
+            Mock -CommandName Get-Partition -MockWith {
+                <#
+                    This condition seems to occur in some systems where the
+                    same partition is reported twice with the same drive letter.
+                #>
+                @(
+                    [PSCustomObject] @{
+                        DriveLetter     = [System.Char] 'G'
+                        Size            = 1GB
+                        PartitionNumber = 1
+                        Type            = 'Basic'
+                    },
+                    [PSCustomObject] @{
+                        DriveLetter     = [System.Char] 'G'
+                        Size            = 1GB
+                        PartitionNumber = 1
+                        Type            = 'Basic'
+                    }
+                )
+            }
+
+            Mock -CommandName Get-PartitionSupportedSize -MockWith {
+                return @{
+                    SizeMin = 0
+                    # Adding >1MB, otherwise workaround for wrong SizeMax is triggered
+                    SizeMax = $script:mockedPartition.Size + 1.1MB
+                }
+            }
+
+            Mock -CommandName Get-Volume -MockWith {
+                [PSCustomObject] @{
+                    FileSystemLabel = 'myLabel'
+                    FileSystem      = 'NTFS'
+                    DriveLetter     = 'G'
+                }
+            }
+
+            Mock -CommandName Get-CimInstance -MockWith {
+                [PSCustomObject] @{
+                    BlockSize = 4096
+                }
+            }
+        }
+
+        It 'Should return the correct result' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                $testParams = @{
+                    DiskId             = 1
+                    DriveLetter        = 'G'
+                    AllocationUnitSize = 4096
+                }
+
+                $result = Test-TargetResource @testParams
+
+                { $result } | Should -Not -Throw
+                $result | Should -BeTrue
+            }
+
+            Should -Invoke -CommandName Assert-DriveLetterValid -Exactly -Times 1 -Scope It
+            Should -Invoke -CommandName Get-DiskByIdentifier -Exactly -Times 1 -Scope It
+            Should -Invoke -CommandName Get-Partition -Exactly -Times 1 -Scope It
+            Should -Invoke -CommandName Get-PartitionSupportedSize -Exactly -Times 1 -Scope It
+            Should -Invoke -CommandName Get-Volume -Exactly -Times 1 -Scope It
+            Should -Invoke -CommandName Get-CimInstance -Exactly -Times 1 -Scope It
+        }
+    }
+
+    Context 'When testing mismatching partition size with AllowDestructive and without Size specified using Disk Number' {
+        BeforeAll {
+            Mock -CommandName Assert-DriveLetterValid -MockWith {
+                'G'
+            }
+
+            Mock -CommandName Get-DiskByIdentifier -MockWith {
+                [PSCustomObject] @{
+                    Number         = 1
+                    UniqueId       = 'TESTDISKUNIQUEID'
+                    FriendlyName   = 'TESTDISKFRIENDLYNAME'
+                    SerialNumber   = 'TESTDISKSERIALNUMBER'
+                    Guid           = [guid]::NewGuid()
+                    IsOffline      = $false
+                    IsReadOnly     = $false
+                    PartitionStyle = 'GPT'
+                }
+            }
+
+            Mock -CommandName Get-Partition -MockWith {
+                [PSCustomObject] @{
+                    DriveLetter     = [System.Char] 'G'
+                    Size            = 1GB
+                    PartitionNumber = 1
+                    Type            = 'Basic'
+                }
+            }
+
+            Mock -CommandName Get-PartitionSupportedSize -MockWith {
+                return @{
+                    SizeMin = 0
+                    # Adding >1MB, otherwise workaround for wrong SizeMax is triggered
+                    SizeMax = 1GB + 1.1MB
+                }
+            }
+
+            # mocks that should not be called
+            Mock -CommandName Get-Volume
+            Mock -CommandName Get-CimInstance -MockWith {
+                [PSCustomObject] @{
+                    BlockSize = 4096
+                }
+            }
+        }
+
+        It 'Should return the correct result' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                $testParams = @{
+                    DiskId             = 1
+                    DriveLetter        = 'G'
+                    AllocationUnitSize = 4096
+                    AllowDestructive   = $true
+                }
+
+                $result = Test-TargetResource @testParams
+
+                { $result } | Should -Not -Throw
+                $result | Should -BeFalse
+            }
+
+            Should -Invoke -CommandName Assert-DriveLetterValid -Exactly -Times 1 -Scope It
+            Should -Invoke -CommandName Get-DiskByIdentifier -Exactly -Times 1 -Scope It
+            Should -Invoke -CommandName Get-Partition -Exactly -Times 1 -Scope It
+            Should -Invoke -CommandName Get-PartitionSupportedSize -Exactly -Times 1 -Scope It
+            Should -Invoke -CommandName Get-Volume -Exactly -Times 0 -Scope It
+            Should -Invoke -CommandName Get-CimInstance -Exactly -Times 0 -Scope It
+        }
+    }
+
+    Context 'When testing matching partition size with a less than 1MB difference in desired size and with AllowDestructive and without Size specified using Disk Number' {
+        BeforeAll {
+            Mock -CommandName Assert-DriveLetterValid -MockWith {
+                'G'
+            }
+
+            Mock -CommandName Get-DiskByIdentifier -MockWith {
+                [PSCustomObject] @{
+                    Number         = 1
+                    UniqueId       = 'TESTDISKUNIQUEID'
+                    FriendlyName   = 'TESTDISKFRIENDLYNAME'
+                    SerialNumber   = 'TESTDISKSERIALNUMBER'
+                    Guid           = [guid]::NewGuid()
+                    IsOffline      = $false
+                    IsReadOnly     = $false
+                    PartitionStyle = 'GPT'
+                }
+            }
+
+            Mock -CommandName Get-Partition -MockWith {
+                [PSCustomObject] @{
+                    DriveLetter     = [System.Char] 'G'
+                    Size            = 1GB
+                    PartitionNumber = 1
+                    Type            = 'Basic'
+                }
+            }
+
+            Mock -CommandName Get-PartitionSupportedSize -MockWith {
+                return @{
+                    SizeMin = 0
+                    SizeMax = 1GB + 0.98MB
+                }
+            }
+
+            Mock -CommandName Get-Volume
+            Mock -CommandName Get-CimInstance -MockWith {
+                [PSCustomObject] @{
+                    BlockSize = 4096
+                }
+            }
+        }
+
+        It 'Should return the correct result' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                $testParams = @{
+                    DiskId             = 1
+                    DriveLetter        = 'G'
+                    AllocationUnitSize = 4096
+                    AllowDestructive   = $true
+                }
+
+                $result = Test-TargetResource @testParams
+
+
+                { $result } | Should -Not -Throw
+                $result | Should -BeTrue
+            }
+
+            Should -Invoke -CommandName Assert-DriveLetterValid -Exactly -Times 1 -Scope It
+            Should -Invoke -CommandName Get-DiskByIdentifier -Exactly -Times 1 -Scope It
+            Should -Invoke -CommandName Get-Partition -Exactly -Times 1 -Scope It
+            Should -Invoke -CommandName Get-PartitionSupportedSize -Exactly -Times 1 -Scope It
+            Should -Invoke -CommandName Get-Volume -Exactly -Times 1 -Scope It
+            Should -Invoke -CommandName Get-CimInstance -Exactly -Times 1 -Scope It
+        }
+    }
+
+    Context 'When testing mismatched AllocationUnitSize using Disk Number' {
+        BeforeAll {
+            Mock -CommandName Assert-DriveLetterValid -MockWith {
+                'G'
+            }
+
+            Mock -CommandName Get-DiskByIdentifier -MockWith {
+                [PSCustomObject] @{
+                    Number         = 1
+                    UniqueId       = 'TESTDISKUNIQUEID'
+                    FriendlyName   = 'TESTDISKFRIENDLYNAME'
+                    SerialNumber   = 'TESTDISKSERIALNUMBER'
+                    Guid           = [guid]::NewGuid()
+                    IsOffline      = $false
+                    IsReadOnly     = $false
+                    PartitionStyle = 'GPT'
+                }
+            }
+
+            Mock -CommandName Get-Partition -MockWith {
+                [PSCustomObject] @{
+                    DriveLetter     = [System.Char] 'G'
+                    Size            = 1GB
+                    PartitionNumber = 1
+                    Type            = 'Basic'
+                }
+            }
+
+            Mock -CommandName Get-CimInstance -MockWith {
+                [PSCustomObject] @{
+                    BlockSize = 4096
+                }
+            }
+
+            # mocks that should not be called
+            Mock -CommandName Get-Volume
+        }
+
+
+        It 'Should return the correct result' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                $testParams = @{
+                    DiskId             = 1
+                    DriveLetter        = 'G'
+                    AllocationUnitSize = 4097
+                    AllowDestructive   = $true
+                }
+
+                $result = Test-TargetResource @testParams
+
+                { $result } | Should -Not -Throw
+                $result | Should -BeFalse
+            }
+
+            Should -Invoke -CommandName Assert-DriveLetterValid -Exactly -Times 1 -Scope It
+            Should -Invoke -CommandName Get-DiskByIdentifier -Exactly -Times 1 -Scope It
+            Should -Invoke -CommandName Get-Partition -Exactly -Times 1 -Scope It
+            Should -Invoke -CommandName Get-Volume -Exactly -Times 0 -Scope It
+            Should -Invoke -CommandName Get-CimInstance -Exactly -Times 1 -Scope It
+        }
+    }
+
+    Context 'When testing mismatching FSFormat using Disk Number' {
+        BeforeAll {
+            Mock -CommandName Assert-DriveLetterValid -MockWith {
+                'G'
+            }
+
+            Mock -CommandName Get-DiskByIdentifier -MockWith {
+                [PSCustomObject] @{
+                    Number         = 1
+                    UniqueId       = 'TESTDISKUNIQUEID'
+                    FriendlyName   = 'TESTDISKFRIENDLYNAME'
+                    SerialNumber   = 'TESTDISKSERIALNUMBER'
+                    Guid           = [guid]::NewGuid()
+                    IsOffline      = $false
+                    IsReadOnly     = $false
+                    PartitionStyle = 'GPT'
+                }
+            }
+
+            Mock -CommandName Get-Partition -MockWith {
+                [PSCustomObject] @{
+                    DriveLetter     = [System.Char] 'G'
+                    Size            = 1GB
+                    PartitionNumber = 1
+                    Type            = 'Basic'
+                }
+            }
+
+            Mock -CommandName Get-Volume -MockWith {
+                [PSCustomObject] @{
+                    FileSystemLabel = 'myLabel'
+                    FileSystem      = 'NTFS'
+                    DriveLetter     = 'G'
+                }
+            }
+
+            Mock -CommandName Get-CimInstance -MockWith {
+                [PSCustomObject] @{
+                    BlockSize = 4096
+                }
+            }
+        }
+
+        It 'Should return the correct result' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                $testParams = @{
+                    DiskId      = 1
+                    DriveLetter = 'G'
+                    FSFormat    = 'ReFS'
+                }
+
+                $result = Test-TargetResource @testParams
+
+                { $result } | Should -Not -Throw
+                $result | Should -BeTrue
+            }
+
+            Should -Invoke -CommandName Assert-DriveLetterValid -Exactly -Times 1 -Scope It
+            Should -Invoke -CommandName Get-DiskByIdentifier -Exactly -Times 1 -Scope It
+            Should -Invoke -CommandName Get-Partition -Exactly -Times 1 -Scope It
+            Should -Invoke -CommandName Get-Volume -Exactly -Times 1 -Scope It
+            Should -Invoke -CommandName Get-CimInstance -Exactly -Times 1 -Scope It
+        }
+    }
+
+    Context 'When testing mismatching FSFormat using Disk Number and AllowDestructive' {
+        BeforeAll {
+            Mock -CommandName Assert-DriveLetterValid -MockWith {
+                'G'
+            }
+
+            Mock -CommandName Get-DiskByIdentifier -MockWith {
+                [PSCustomObject] @{
+                    Number         = 1
+                    UniqueId       = 'TESTDISKUNIQUEID'
+                    FriendlyName   = 'TESTDISKFRIENDLYNAME'
+                    SerialNumber   = 'TESTDISKSERIALNUMBER'
+                    Guid           = [guid]::NewGuid()
+                    IsOffline      = $false
+                    IsReadOnly     = $false
+                    PartitionStyle = 'GPT'
+                }
+            }
+
+            Mock -CommandName Get-Partition -MockWith {
+                [PSCustomObject] @{
+                    DriveLetter     = [System.Char] 'G'
+                    Size            = 1GB
+                    PartitionNumber = 1
+                    Type            = 'Basic'
+                }
+            }
+
+            Mock -CommandName Get-Volume -MockWith {
+                [PSCustomObject] @{
+                    FileSystemLabel = 'myLabel'
+                    FileSystem      = 'NTFS'
+                    DriveLetter     = 'G'
+                }
+            }
+
+            Mock -CommandName Get-CimInstance -MockWith {
+                [PSCustomObject] @{
+                    BlockSize = 4096
+                }
+            }
+        }
+
+        It 'Should return the correct result' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                $testParams = @{
+                    DiskId           = 1
+                    DriveLetter      = 'G'
+                    FSFormat         = 'ReFS'
+                    AllowDestructive = $true
+                }
+
+                $result = Test-TargetResource @testParams
+
+                { $result } | Should -Not -Throw
+                $result | Should -BeFalse
+            }
+
+            Should -Invoke -CommandName Assert-DriveLetterValid -Exactly -Times 1 -Scope It
+            Should -Invoke -CommandName Get-DiskByIdentifier -Exactly -Times 1 -Scope It
+            Should -Invoke -CommandName Get-Partition -Exactly -Times 1 -Scope It
+            Should -Invoke -CommandName Get-Volume -Exactly -Times 1 -Scope It
+            Should -Invoke -CommandName Get-CimInstance -Exactly -Times 1 -Scope It
+        }
+    }
+
+    Context 'When testing mismatching FSLabel using Disk Number' {
+        BeforeAll {
+            Mock -CommandName Assert-DriveLetterValid -MockWith {
+                'G'
+            }
+
+            Mock -CommandName Get-DiskByIdentifier -MockWith {
+                [PSCustomObject] @{
+                    Number         = 1
+                    UniqueId       = 'TESTDISKUNIQUEID'
+                    FriendlyName   = 'TESTDISKFRIENDLYNAME'
+                    SerialNumber   = 'TESTDISKSERIALNUMBER'
+                    Guid           = [guid]::NewGuid()
+                    IsOffline      = $false
+                    IsReadOnly     = $false
+                    PartitionStyle = 'GPT'
+                }
+            }
+
+            Mock -CommandName Get-Partition -MockWith {
+                [PSCustomObject] @{
+                    DriveLetter     = [System.Char] 'G'
+                    Size            = 1GB
+                    PartitionNumber = 1
+                    Type            = 'Basic'
+                }
+            }
+
+            Mock -CommandName Get-Volume -MockWith {
+                [PSCustomObject] @{
+                    FileSystemLabel = 'myLabel'
+                    FileSystem      = 'NTFS'
+                    DriveLetter     = 'G'
+                }
+            }
+
+            Mock -CommandName Get-CimInstance -MockWith {
+                [PSCustomObject] @{
+                    BlockSize = 4096
+                }
+            }
+        }
+
+        It 'Should return the correct result' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                $testParams = @{
+                    DiskId      = 1
+                    DriveLetter = 'G'
+                    FSLabel     = 'NewLabel'
+                }
+
+                $result = Test-TargetResource @testParams
+
+                { $result } | Should -Not -Throw
+                $result | Should -BeFalse
+            }
+
+            Should -Invoke -CommandName Assert-DriveLetterValid -Exactly -Times 1 -Scope It
+            Should -Invoke -CommandName Get-DiskByIdentifier -Exactly -Times 1 -Scope It
+            Should -Invoke -CommandName Get-Partition -Exactly -Times 1 -Scope It
+            Should -Invoke -CommandName Get-Volume -Exactly -Times 1 -Scope It
+            Should -Invoke -CommandName Get-CimInstance -Exactly -Times 1 -Scope It
+        }
+    }
+
+    Context 'When testing mismatching DriveLetter using Disk Number' {
+        BeforeAll {
+            Mock -CommandName Assert-DriveLetterValid -MockWith {
+                'Z'
+            }
+
+            Mock -CommandName Get-DiskByIdentifier -MockWith {
+                [PSCustomObject] @{
+                    Number         = 1
+                    UniqueId       = 'TESTDISKUNIQUEID'
+                    FriendlyName   = 'TESTDISKFRIENDLYNAME'
+                    SerialNumber   = 'TESTDISKSERIALNUMBER'
+                    Guid           = [guid]::NewGuid()
+                    IsOffline      = $false
+                    IsReadOnly     = $false
+                    PartitionStyle = 'GPT'
+                }
+            }
+
+            Mock -CommandName Get-Partition -MockWith {
+                [PSCustomObject] @{
+                    DriveLetter     = [System.Char] 'G'
+                    Size            = 1GB
+                    PartitionNumber = 1
+                    Type            = 'Basic'
+                }
+            }
+
+            Mock -CommandName Get-Volume -MockWith {
+                [PSCustomObject] @{
+                    FileSystemLabel = 'myLabel'
+                    FileSystem      = 'NTFS'
+                    DriveLetter     = 'G'
+                }
+            }
+
+            Mock -CommandName Get-CimInstance -MockWith {
+                [PSCustomObject] @{
+                    BlockSize = 4096
+                }
+            }
+        }
+
+        It 'Should return the correct result' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                $testParams = @{
+                    DiskId      = 1
+                    DriveLetter = 'Z'
+                }
+
+                $result = Test-TargetResource @testParams
+
+                { $result } | Should -Not -Throw
+                $result | Should -BeFalse
+            }
+
+            Should -Invoke -CommandName Assert-DriveLetterValid -Exactly -Times 1 -Scope It
+            Should -Invoke -CommandName Get-DiskByIdentifier -Exactly -Times 1 -Scope It
+            Should -Invoke -CommandName Get-Partition -Exactly -Times 1 -Scope It
+            Should -Invoke -CommandName Get-Volume -Exactly -Times 0 -Scope It
+            Should -Invoke -CommandName Get-CimInstance -Exactly -Times 0 -Scope It
+        }
+    }
+
+    Context 'When testing all disk properties matching using Disk Number' {
+        BeforeAll {
+            Mock -CommandName Assert-DriveLetterValid -MockWith {
+                'G'
+            }
+
+            Mock -CommandName Get-DiskByIdentifier -MockWith {
+                [PSCustomObject] @{
+                    Number         = 1
+                    UniqueId       = 'TESTDISKUNIQUEID'
+                    FriendlyName   = 'TESTDISKFRIENDLYNAME'
+                    SerialNumber   = 'TESTDISKSERIALNUMBER'
+                    Guid           = [guid]::NewGuid()
+                    IsOffline      = $false
+                    IsReadOnly     = $false
+                    PartitionStyle = 'GPT'
+                }
+            }
+
+            Mock -CommandName Get-Partition -MockWith {
+                [PSCustomObject] @{
+                    DriveLetter     = [System.Char] 'G'
+                    Size            = 1GB
+                    PartitionNumber = 1
+                    Type            = 'Basic'
+                }
+            }
+
+            Mock -CommandName Get-Volume -MockWith {
+                [PSCustomObject] @{
+                    FileSystemLabel = 'myLabel'
+                    FileSystem      = 'NTFS'
+                    DriveLetter     = 'G'
+                }
+            }
+
+            Mock -CommandName Get-CimInstance -MockWith {
+                [PSCustomObject] @{
+                    BlockSize = 4096
+                }
+            }
+        }
+
+        It 'Should return the correct result' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                $testParams = @{
+                    DiskId             = 1
+                    DriveLetter        = 'G'
+                    AllocationUnitSize = 4096
+                    Size               = 1GB
+                    FSLabel            = 'myLabel'
+                    FSFormat           = 'NTFS'
+                }
+
+                $result = Test-TargetResource @testParams
+
+                { $result } | Should -Not -Throw
+                $result | Should -BeTrue
+            }
+
+            Should -Invoke -CommandName Assert-DriveLetterValid -Exactly -Times 1 -Scope It
+            Should -Invoke -CommandName Get-DiskByIdentifier -Exactly -Times 1 -Scope It
+            Should -Invoke -CommandName Get-Partition -Exactly -Times 1 -Scope It
+            Should -Invoke -CommandName Get-Volume -Exactly -Times 1 -Scope It
+            Should -Invoke -CommandName Get-CimInstance -Exactly -Times 1 -Scope It
+        }
+    }
+
+    Context 'When the DevDrive flag is true, and Size parameter is less than minimum required size for Dev Drive (50 Gb)' {
+        BeforeAll {
+            Mock -CommandName Assert-DriveLetterValid -MockWith {
+                'G'
+            }
+
+            Mock -CommandName Get-DiskByIdentifier -MockWith {
+                [PSCustomObject] @{
+                    Number         = 1
+                    UniqueId       = 'TESTDISKUNIQUEID'
+                    FriendlyName   = 'TESTDISKFRIENDLYNAME'
+                    SerialNumber   = 'TESTDISKSERIALNUMBER'
+                    Guid           = [guid]::NewGuid()
+                    IsOffline      = $false
+                    IsReadOnly     = $false
+                    PartitionStyle = 'GPT'
+                }
+            }
+
+            Mock -CommandName Get-Partition -MockWith {
+                [PSCustomObject] @{
+                    DriveLetter     = [System.Char] 'G'
+                    Size            = 40GB
+                    PartitionNumber = 1
+                    Type            = 'Basic'
+                    IsReadOnly      = $false
+                }
+            }
+
+            Mock -CommandName Assert-SizeMeetsMinimumDevDriveRequirement -MockWith {
+                throw
+            }
+        }
+
+        It 'Should throw an exception' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                $testParams = @{
+                    DiskId             = 1
+                    DriveLetter        = 'G'
+                    AllocationUnitSize = 4096
+                    Size               = 40Gb
+                    FSLabel            = 'myLabel'
+                    FSFormat           = 'ReFS'
+                    DevDrive           = $true
+                    AllowDestructive   = $true
+                }
+
+                { Test-TargetResource @testParams } | Should -Throw
+            }
+
+            Should -Invoke -CommandName Assert-DriveLetterValid -Exactly -Times 1 -Scope It
+            Should -Invoke -CommandName Get-DiskByIdentifier -Exactly -Times 1 -Scope It
+            Should -Invoke -CommandName Get-Partition -Exactly -Times 1 -Scope It
+            Should -Invoke -CommandName Assert-SizeMeetsMinimumDevDriveRequirement -Exactly -Times 1 -Scope It
+        }
+    }
+
+    Context 'When the DevDrive flag is true, but the partition is effectively the same size as user inputted size and volume is NTFS' {
+        BeforeAll {
+            Mock -CommandName Assert-DriveLetterValid -MockWith {
+                'G'
+            }
+
+            Mock -CommandName Get-DiskByIdentifier -MockWith {
+                [PSCustomObject] @{
+                    Number         = 1
+                    UniqueId       = 'TESTDISKUNIQUEID'
+                    FriendlyName   = 'TESTDISKFRIENDLYNAME'
+                    SerialNumber   = 'TESTDISKSERIALNUMBER'
+                    Guid           = [guid]::NewGuid()
+                    IsOffline      = $false
+                    IsReadOnly     = $false
+                    PartitionStyle = 'GPT'
+                }
+            }
+
+            Mock -CommandName Get-Partition -MockWith {
+                [PSCustomObject] @{
+                    DriveLetter     = [System.Char] 'G'
+                    Size            = 161060225024
+                    PartitionNumber = 1
+                    Type            = 'Basic'
+                    IsReadOnly      = $false
+                }
+            }
+
+            Mock -CommandName Get-Volume -MockWith {
+                [PSCustomObject] @{
+                    FileSystemLabel = 'myLabel'
+                    FileSystem      = 'NTFS'
+                    DriveLetter     = 'T'
+                    UniqueId        = '\\?\Volume{3a244a32-efba-4b7e-9a19-7293fc7c7924}\'
+                    Size            = 150Gb
+                }
+            }
+        }
+
+        It 'Should return the correct result' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                $testParams = @{
+                    DiskId             = 1
+                    DriveLetter        = 'G'
+                    AllocationUnitSize = 4096
+                    Size               = 50GB
+                    FSLabel            = 'myLabel'
+                    FSFormat           = 'NTFS'
+                    DevDrive           = $true
+                    AllowDestructive   = $true
+                }
+
+                $result = Test-TargetResource @testParams
+
+                { $result } | Should -Not -Throw
+                $result | Should -BeFalse
+            }
+
+            Should -Invoke -CommandName Assert-DriveLetterValid -Exactly -Times 1 -Scope It
+            Should -Invoke -CommandName Get-DiskByIdentifier -Exactly -Times 1 -Scope It
+            Should -Invoke -CommandName Get-Partition -Exactly -Times 1 -Scope It
+            Should -Invoke -CommandName Get-Volume -Exactly -Times 1 -Scope It
+        }
+    }
+
+    Context 'When the DevDrive flag is true, but the partition is not the same size as user inputted size, volume is ReFS formatted but not Dev Drive volume' {
+        BeforeAll {
+            Mock -CommandName Assert-DriveLetterValid -MockWith {
+                'G'
+            }
+
+            Mock -CommandName Get-DiskByIdentifier -MockWith {
+                [PSCustomObject] @{
+                    Number         = 1
+                    UniqueId       = 'TESTDISKUNIQUEID'
+                    FriendlyName   = 'TESTDISKFRIENDLYNAME'
+                    SerialNumber   = 'TESTDISKSERIALNUMBER'
+                    Guid           = [guid]::NewGuid()
+                    IsOffline      = $false
+                    IsReadOnly     = $false
+                    PartitionStyle = 'GPT'
+                }
+            }
+
+            Mock -CommandName Get-Partition -MockWith {
+                [PSCustomObject] @{
+                    DriveLetter     = [System.Char] 'G'
+                    Size            = 161060225024
+                    PartitionNumber = 1
+                    Type            = 'Basic'
+                    IsReadOnly      = $false
+                }
+            }
+
+            Mock -CommandName Get-Volume -MockWith {
+                [PSCustomObject] @{
+                    FileSystemLabel = 'myLabel'
+                    FileSystem      = 'ReFS'
+                    DriveLetter     = 'T'
+                    UniqueId        = '\\?\Volume{3a244a32-efba-4b7e-9a19-7293fc7c7924}\'
+                    Size            = 50GB
+                }
+            }
+
+            Mock -CommandName Assert-DevDriveFeatureAvailable
+            Mock -CommandName Test-DevDriveVolume -MockWith { $false }
+        }
+
+        It 'Should return the correct result' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                $testParams = @{
+                    DiskId             = 1
+                    DriveLetter        = 'G'
+                    AllocationUnitSize = 4096
+                    Size               = 50GB
+                    FSLabel            = 'myLabel'
+                    FSFormat           = 'ReFS'
+                    DevDrive           = $true
+                    AllowDestructive   = $true
+                }
+
+                $result = Test-TargetResource @testParams
+
+                { $result } | Should -Not -Throw
+                $result | Should -BeFalse
+            }
+
+            Should -Invoke -CommandName Assert-DriveLetterValid -Exactly -Times 1 -Scope It
+            Should -Invoke -CommandName Get-DiskByIdentifier -Exactly -Times 1 -Scope It
+            Should -Invoke -CommandName Get-Partition -Exactly -Times 1 -Scope It
+            Should -Invoke -CommandName Get-Volume -Exactly -Times 2 -Scope It
+            Should -Invoke -CommandName Test-DevDriveVolume -Exactly -Times 1 -Scope It
+            Should -Invoke -CommandName Assert-DevDriveFeatureAvailable -Exactly -Times 1 -Scope It
+        }
+    }
+
+    Context 'When the DevDrive flag is true, but the partition is effectively the same size as user inputted size, volume is ReFS formatted and is Dev Drive volume' {
+        BeforeAll {
+            Mock -CommandName Assert-DriveLetterValid -MockWith {
+                'G'
+            }
+
+            Mock -CommandName Get-DiskByIdentifier -MockWith {
+                [PSCustomObject] @{
+                    Number         = 1
+                    UniqueId       = 'TESTDISKUNIQUEID'
+                    FriendlyName   = 'TESTDISKFRIENDLYNAME'
+                    SerialNumber   = 'TESTDISKSERIALNUMBER'
+                    Guid           = [guid]::NewGuid()
+                    IsOffline      = $false
+                    IsReadOnly     = $false
+                    PartitionStyle = 'GPT'
+                }
+            }
+
+            Mock -CommandName Get-Partition -MockWith {
+                [PSCustomObject] @{
+                    DriveLetter     = [System.Char] 'G'
+                    Size            = 161060225024
+                    PartitionNumber = 1
+                    Type            = 'Basic'
+                    IsReadOnly      = $false
+                }
+            }
+
+            Mock -CommandName Get-Volume -MockWith {
+                [PSCustomObject] @{
+                    FileSystemLabel = 'myLabel'
+                    FileSystem      = 'ReFS'
+                    DriveLetter     = 'G'
+                    UniqueId        = '\\?\Volume{3a244a32-efba-4b7e-9a19-7293fc7c7924}\'
+                }
+            }
+
+            Mock -CommandName Assert-DevDriveFeatureAvailable
+            Mock -CommandName Test-DevDriveVolume -MockWith { $true }
+        }
+
+        It 'Should return the correct result' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                $testParams = @{
+                    DiskId             = 1
+                    DriveLetter        = 'G'
+                    AllocationUnitSize = 4096
+                    Size               = 50Gb
+                    FSLabel            = 'myLabel'
+                    FSFormat           = 'ReFS'
+                    DevDrive           = $true
+                    AllowDestructive   = $true
+                }
+
+                $result = Test-TargetResource @testParams
+
+                { $result } | Should -Not -Throw
+                $result | Should -BeTrue
+            }
+
+            Should -Invoke -CommandName Assert-DriveLetterValid -Exactly -Times 1 -Scope It
+            Should -Invoke -CommandName Get-DiskByIdentifier -Exactly -Times 1 -Scope It
+            Should -Invoke -CommandName Get-Partition -Exactly -Times 1 -Scope It
+            Should -Invoke -CommandName Get-Volume -Exactly -Times 2 -Scope It
+            Should -Invoke -CommandName Test-DevDriveVolume -Exactly -Times 1 -Scope It
+            Should -Invoke -CommandName Assert-DevDriveFeatureAvailable -Exactly -Times 1 -Scope It
+        }
+    }
+
+    Context 'When the DevDrive flag is true, but the partition is effectively the same size as user inputted size, volume is ReFS formatted and is not Dev Drive volume' {
+        BeforeAll {
+            Mock -CommandName Assert-DriveLetterValid -MockWith {
+                'G'
+            }
+
+            Mock -CommandName Get-DiskByIdentifier -MockWith {
+                [PSCustomObject] @{
+                    Number         = 1
+                    UniqueId       = 'TESTDISKUNIQUEID'
+                    FriendlyName   = 'TESTDISKFRIENDLYNAME'
+                    SerialNumber   = 'TESTDISKSERIALNUMBER'
+                    Guid           = [guid]::NewGuid()
+                    IsOffline      = $false
+                    IsReadOnly     = $false
+                    PartitionStyle = 'GPT'
+                }
+            }
+
+            Mock -CommandName Get-Partition -MockWith {
+                [PSCustomObject] @{
+                    DriveLetter     = [System.Char] 'G'
+                    Size            = 161060225024
+                    PartitionNumber = 1
+                    Type            = 'Basic'
+                    IsReadOnly      = $false
+                }
+            }
+
+            Mock -CommandName Get-Volume -MockWith {
+                [PSCustomObject] @{
+                    FileSystemLabel = 'myLabel'
+                    FileSystem      = 'ReFS'
+                    DriveLetter     = 'T'
+                    UniqueId        = '\\?\Volume{3a244a32-efba-4b7e-9a19-7293fc7c7924}\'
+                    Size            = 150Gb
+                }
+            }
+
+            Mock -CommandName Assert-DevDriveFeatureAvailable
+            Mock -CommandName Test-DevDriveVolume -MockWith { $false }
+        }
+
+        It 'Should return the correct result' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                $testParams = @{
+                    DiskId             = 1
+                    DriveLetter        = 'G'
+                    AllocationUnitSize = 4096
+                    Size               = 50GB
+                    FSLabel            = 'myLabel'
+                    FSFormat           = 'ReFS'
+                    DevDrive           = $true
+                    AllowDestructive   = $true
+                }
+
+                $result = Test-TargetResource @testParams
+
+                { $result } | Should -Not -Throw
+                $result | Should -BeFalse
+            }
+
+            Should -Invoke -CommandName Assert-DriveLetterValid -Exactly -Times 1 -Scope It
+            Should -Invoke -CommandName Get-DiskByIdentifier -Exactly -Times 1 -Scope It
+            Should -Invoke -CommandName Get-Partition -Exactly -Times 1 -Scope It
+            Should -Invoke -CommandName Get-Volume -Exactly -Times 2 -Scope It
+            Should -Invoke -CommandName Test-DevDriveVolume -Exactly -Times 1 -Scope It
+            Should -Invoke -CommandName Assert-DevDriveFeatureAvailable -Exactly -Times 1 -Scope It
+        }
+    }
 }
