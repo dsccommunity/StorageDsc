@@ -37,6 +37,14 @@ BeforeDiscovery {
     #>
     $script:dscResourceFriendlyName = 'MountImage'
     $script:dscResourceName = "DSC_$($script:dscResourceFriendlyName)"
+
+    $ISOPath = Join-Path -Path $PSScriptRoot -ChildPath 'test.iso'
+
+    # Ensure that the ISO tests can be performed on this computer
+    if (-not (Test-Path -Path $ISOPath))
+    {
+        $skip = $true
+    } # if
 }
 
 BeforeAll {
@@ -78,7 +86,7 @@ AfterAll {
     Restore-TestEnvironment -TestEnvironment $script:testEnvironment
 }
 
-Describe "$($script:dscResourceName)_MountISO_Integration" {
+Describe "$($script:dscResourceName)_MountISO_Integration" -Skip:$skip {
     BeforeAll {
         # Mount ISO
         $configFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:dscResourceName)_mount.config.ps1"
@@ -113,7 +121,7 @@ Describe "$($script:dscResourceName)_MountISO_Integration" {
     }
 }
 
-Describe "$($script:dscResourceName)_DismountISO_Integration" {
+Describe "$($script:dscResourceName)_DismountISO_Integration" -Skip:$skip {
     BeforeAll {
         # Dismount ISO
         $configFile = Join-Path -Path $PSScriptRoot -ChildPath "$($script:dscResourceName)_dismount.config.ps1"
