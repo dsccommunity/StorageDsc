@@ -110,7 +110,7 @@ Describe 'DSC_VirtualHardDisk\Get-TargetResource' -Tag 'Get' {
 
                 $currentState.DiskNumber | Should -Be 2
                 $currentState.FilePath | Should -Be 'C:\test.vhdx'
-                $currentState.Attached | Should -Be $true
+                $currentState.Attached | Should -BeTrue
                 $currentState.DiskSize | Should -Be 100GB
                 $currentState.Ensure | Should -Be 'Present'
             }

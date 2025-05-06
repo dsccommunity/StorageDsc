@@ -3813,7 +3813,7 @@ Describe 'DSC_Disk\Test-TargetResource' -Tag 'Test' {
                 $result = Test-TargetResource @testParams
 
                 { $result } | Should -Not -Throw
-                $result | Should -Be $false
+                $result | Should -BeFalse
             }
 
             Should -Invoke -CommandName Assert-DriveLetterValid -Exactly -Times 1 -Scope It
