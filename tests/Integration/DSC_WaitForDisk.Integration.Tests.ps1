@@ -100,7 +100,7 @@ Describe "$($script:dscResourceName)_Integration" {
             $current.DiskId           | Should -Be $disk.Number
             $current.RetryIntervalSec | Should -Be 1
             $current.RetryCount       | Should -Be 5
-            $current.IsAvailable      | Should -Be $true
+            $current.IsAvailable      | Should -BeTrue
         }
     }
 
@@ -138,7 +138,7 @@ Describe "$($script:dscResourceName)_Integration" {
             $current.DiskId           | Should -Be $disk.UniqueId
             $current.RetryIntervalSec | Should -Be 1
             $current.RetryCount       | Should -Be 5
-            $current.IsAvailable      | Should -Be $true
+            $current.IsAvailable      | Should -BeTrue
         }
     }
 
@@ -176,7 +176,7 @@ Describe "$($script:dscResourceName)_Integration" {
             $current.DiskId           | Should -Be $disk.Guid
             $current.RetryIntervalSec | Should -Be 1
             $current.RetryCount       | Should -Be 5
-            $current.IsAvailable      | Should -Be $true
+            $current.IsAvailable      | Should -BeTrue
         }
     }
 

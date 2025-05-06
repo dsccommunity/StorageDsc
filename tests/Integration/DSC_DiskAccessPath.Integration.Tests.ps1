@@ -61,8 +61,7 @@ Describe "$($script:dscResourceName)_Integration" {
     Context 'Partition and format newly provisioned disk using Disk Number with two volumes and assign Access Paths' {
         BeforeAll {
             # Create a VHD and attach it to the computer
-            $VHDPath = Join-Path -Path $TestDrive `
-                -ChildPath 'TestDisk.vhd'
+            $VHDPath = Join-Path -Path $TestDrive -ChildPath 'TestDisk.vhd'
             $null = New-VDisk -Path $VHDPath -SizeInMB 1024 -Verbose
             $null = Mount-DiskImage -ImagePath $VHDPath -StorageType VHD -NoDriveLetter
             $diskImage = Get-DiskImage -ImagePath $VHDPath
@@ -129,21 +128,24 @@ Describe "$($script:dscResourceName)_Integration" {
                 $current.Size             | Should -Be 100MB
             }
         }
-        # Create a file on the new disk to ensure it still exists after reattach
-        $testFilePath = Join-Path -Path $accessPathA -ChildPath 'IntTestFile.txt'
-        Set-Content `
-            -Path $testFilePath `
-            -Value 'Test' `
-            -NoNewline
 
-        # This test will ensure the disk can be remounted if the access path is removed.
-        Remove-PartitionAccessPath `
-            -DiskNumber $disk.Number `
-            -PartitionNumber 2 `
-            -AccessPath $accessPathA `
-            -ErrorAction SilentlyContinue
+        Context "Remount first volume on Disk Number" {
+            BeforeAll {
+                # Create a file on the new disk to ensure it still exists after reattach
+                $testFilePath = Join-Path -Path $accessPathA -ChildPath 'IntTestFile.txt'
+                Set-Content `
+                    -Path $testFilePath `
+                    -Value 'Test' `
+                    -NoNewline
 
-        Context "Remount first volume on Disk Number $($disk.Number)" {
+                # This test will ensure the disk can be remounted if the access path is removed.
+                Remove-PartitionAccessPath `
+                    -DiskNumber $disk.Number `
+                    -PartitionNumber 2 `
+                    -AccessPath $accessPathA `
+                    -ErrorAction SilentlyContinue
+            }
+
             It 'Should compile and apply the MOF without throwing' {
                 {
                     # This is to pass to the Config
@@ -189,11 +191,11 @@ Describe "$($script:dscResourceName)_Integration" {
             }
 
             It 'Should contain the test file' {
-                Test-Path -Path $testFilePath        | Should -Be $true
+                Test-Path -Path $testFilePath        | Should -BeTrue
                 Get-Content -Path $testFilePath -Raw | Should -Be 'Test'
             }
 
-            Context "Create second volume on Disk Number $($disk.Number)" {
+            Context "Create second volume on Disk Number" {
                 It 'Should compile and apply the MOF without throwing' {
                     {
                         # This is to pass to the Config
@@ -297,7 +299,7 @@ Describe "$($script:dscResourceName)_Integration" {
             } # if
         }
 
-        Context "Create first volume on Disk Unique Id $($disk.UniqueId)" {
+        Context "Create first volume on Disk Unique Id" {
             It 'Should compile and apply the MOF without throwing' {
                 {
                     # This is to pass to the Config
@@ -343,20 +345,22 @@ Describe "$($script:dscResourceName)_Integration" {
             }
         }
 
-        # Create a file on the new disk to ensure it still exists after reattach
-        $testFilePath = Join-Path -Path $accessPathA -ChildPath 'IntTestFile.txt'
-        Set-Content `
-            -Path $testFilePath `
-            -Value 'Test' `
-            -NoNewline
+        Context 'Remount first volume on Disk Unique Id' {
+            BeforeAll {
+                # Create a file on the new disk to ensure it still exists after reattach
+                $testFilePath = Join-Path -Path $accessPathA -ChildPath 'IntTestFile.txt'
+                Set-Content `
+                    -Path $testFilePath `
+                    -Value 'Test' `
+                    -NoNewline
 
-        # This test will ensure the disk can be remounted if the access path is removed.
-        Remove-PartitionAccessPath `
-            -DiskNumber $disk.Number `
-            -PartitionNumber 2 `
-            -AccessPath $accessPathA
+                # This test will ensure the disk can be remounted if the access path is removed.
+                Remove-PartitionAccessPath `
+                    -DiskNumber $disk.Number `
+                    -PartitionNumber 2 `
+                    -AccessPath $accessPathA
+            }
 
-        Context "Remount first volume on Disk Unique Id $($disk.UniqueId)" {
             It 'Should compile and apply the MOF without throwing' {
                 {
                     # This is to pass to the Config
@@ -402,11 +406,11 @@ Describe "$($script:dscResourceName)_Integration" {
             }
 
             It 'Should contain the test file' {
-                Test-Path -Path $testFilePath        | Should -Be $true
+                Test-Path -Path $testFilePath        | Should -BeTrue
                 Get-Content -Path $testFilePath -Raw | Should -Be 'Test'
             }
 
-            Context "Create second volume on Disk Unique Id $($disk.UniqueId)" {
+            Context 'Create second volume on Disk Unique Id' {
                 It 'Should compile and apply the MOF without throwing' {
                     {
                         # This is to pass to the Config
@@ -510,7 +514,7 @@ Describe "$($script:dscResourceName)_Integration" {
             } # if
         }
 
-        Context "Create first volume on Disk Guid $($disk.Guid)" {
+        Context "Create first volume on Disk Guid" {
             It 'Should compile and apply the MOF without throwing' {
                 {
                     # This is to pass to the Config
@@ -556,21 +560,23 @@ Describe "$($script:dscResourceName)_Integration" {
             }
         }
 
-        # Create a file on the new disk to ensure it still exists after reattach
-        $testFilePath = Join-Path -Path $accessPathA -ChildPath 'IntTestFile.txt'
-        Set-Content `
-            -Path $testFilePath `
-            -Value 'Test' `
-            -NoNewline
+        Context 'Remount first volume on Disk Guid' {
+            BeforeAll {
+                # Create a file on the new disk to ensure it still exists after reattach
+                $testFilePath = Join-Path -Path $accessPathA -ChildPath 'IntTestFile.txt'
+                Set-Content `
+                    -Path $testFilePath `
+                    -Value 'Test' `
+                    -NoNewline
 
-        # This test will ensure the disk can be remounted if the access path is removed.
-        Remove-PartitionAccessPath `
-            -DiskNumber $disk.Number `
-            -PartitionNumber 2 `
-            -AccessPath $accessPathA `
-            -ErrorAction SilentlyContinue
+                # This test will ensure the disk can be remounted if the access path is removed.
+                Remove-PartitionAccessPath `
+                    -DiskNumber $disk.Number `
+                    -PartitionNumber 2 `
+                    -AccessPath $accessPathA `
+                    -ErrorAction SilentlyContinue
+            }
 
-        Context "Remount first volume on Disk Guid $($disk.Guid)" {
             It 'Should compile and apply the MOF without throwing' {
                 {
                     # This is to pass to the Config
@@ -616,11 +622,11 @@ Describe "$($script:dscResourceName)_Integration" {
             }
 
             It 'Should contain the test file' {
-                Test-Path -Path $testFilePath        | Should -Be $true
+                Test-Path -Path $testFilePath        | Should -BeTrue
                 Get-Content -Path $testFilePath -Raw | Should -Be 'Test'
             }
 
-            Context "Create second volume on Disk Guid $($disk.Guid)" {
+            Context "Create second volume on Disk Guid" {
                 It 'Should compile and apply the MOF without throwing' {
                     {
                         # This is to pass to the Config
@@ -698,7 +704,7 @@ Describe "$($script:dscResourceName)_Integration" {
         }
     }
 
-    Context 'Partition a disk using Disk Number with a single volume using the whole disk, dismount the volume then reprovision it' {
+    Context 'Partition a disk using Disk Number with a single volume using the whole disk, dismount the volume then re-provision it' {
         BeforeAll {
             # Create a VHD and attach it to the computer
             $VHDPath = Join-Path -Path $TestDrive `
@@ -717,7 +723,7 @@ Describe "$($script:dscResourceName)_Integration" {
             } # if
         }
 
-        Context "Create first volume on Disk Number $($disk.Number)" {
+        Context "Create first volume on Disk Number" {
             It 'Should compile and apply the MOF without throwing' {
                 {
                     # This is to pass to the Config
@@ -760,7 +766,10 @@ Describe "$($script:dscResourceName)_Integration" {
                 $current.FSLabel          | Should -Be $FSLabelA
             }
         }
-        # Create a file on the new disk to ensure it still exists after reattach
+
+        Context "Remount first volume on Disk Number" {
+            BeforeAll {
+                        # Create a file on the new disk to ensure it still exists after reattach
         $testFilePath = Join-Path -Path $accessPathA -ChildPath 'IntTestFile.txt'
         Set-Content `
             -Path $testFilePath `
@@ -772,8 +781,8 @@ Describe "$($script:dscResourceName)_Integration" {
             -DiskNumber $disk.Number `
             -PartitionNumber 2 `
             -AccessPath $accessPathA
+            }
 
-        Context "Remount first volume on Disk Number $($disk.Number)" {
             It 'Should compile and apply the MOF without throwing' {
                 {
                     # This is to pass to the Config
@@ -817,7 +826,7 @@ Describe "$($script:dscResourceName)_Integration" {
             }
 
             It 'Should contain the test file' {
-                Test-Path -Path $testFilePath        | Should -Be $true
+                Test-Path -Path $testFilePath        | Should -BeTrue
                 Get-Content -Path $testFilePath -Raw | Should -Be 'Test'
             }
         }
