@@ -55,24 +55,6 @@ AfterAll {
 }
 
 Describe 'StorageDsc.Common\Get-DiskByIdentifier' {
-    BeforeAll {
-        # $testDiskNumber = 10
-        # $testDiskUniqueId = 'DiskUniqueId'
-        # $testDiskFriendlyName = 'DiskFriendlyName'
-        # $testDiskSerialNumber = 'DiskSerialNumber'
-        # $testDiskGuid = [Guid]::NewGuid().ToString()
-        # $testDiskLocation = 'Integrated : Adapter 0 : Port 0 : Target 0 : LUN 10'
-
-        # $mockedDisk = [pscustomobject] @{
-        #     Number       = 10
-        #     UniqueId     = 'DiskUniqueId'
-        #     FriendlyName = 'DiskFriendlyName'
-        #     SerialNumber = 'DiskSerialNumber'
-        #     Guid         = [Guid]::NewGuid().ToString()
-        #     Location     = 'Integrated : Adapter 0 : Port 0 : Target 0 : LUN 10'
-        # }
-    }
-
     Context 'Disk exists that matches the specified Disk Number' {
         BeforeAll {
             Mock -CommandName Get-Disk -MockWith {

@@ -2139,83 +2139,85 @@ Describe 'DSC_Disk\Set-TargetResource' -Tag 'Set' {
         }
     }
 
-    # Context 'When online GPT disk with a partition/volume and wrong Drive Letter assigned using Disk Number' {
-    #     BeforeAll {
-    #         Mock -CommandName Assert-DriveLetterValid -MockWith {
-    #             'G'
-    #         }
+    Context 'When online GPT disk with a partition/volume and wrong Drive Letter assigned using Disk Number' {
+        BeforeAll {
+            Mock -CommandName Assert-DriveLetterValid -MockWith {
+                'H'
+            }
 
-    #         Mock -CommandName Get-DiskByIdentifier -MockWith {
-    #             [PSCustomObject] @{
-    #                 Number         = 1
-    #                 UniqueId       = 'TESTDISKUNIQUEID'
-    #                 FriendlyName   = 'TESTDISKFRIENDLYNAME'
-    #                 SerialNumber   = 'TESTDISKSERIALNUMBER'
-    #                 Guid           = [guid]::NewGuid()
-    #                 IsOffline      = $false
-    #                 IsReadOnly     = $false
-    #                 PartitionStyle = 'GPT'
-    #             }
-    #         }
+            Mock -CommandName Get-DiskByIdentifier -MockWith {
+                [PSCustomObject] @{
+                    Number         = 1
+                    UniqueId       = 'TESTDISKUNIQUEID'
+                    FriendlyName   = 'TESTDISKFRIENDLYNAME'
+                    SerialNumber   = 'TESTDISKSERIALNUMBER'
+                    Guid           = [guid]::NewGuid()
+                    IsOffline      = $false
+                    IsReadOnly     = $false
+                    PartitionStyle = 'GPT'
+                }
+            }
 
-    #         Mock -CommandName Get-Partition -MockWith {
-    #             [PSCustomObject] @{
-    #                 DriveLetter     = [System.Char] 'G'
-    #                 Size            = 1GB
-    #                 PartitionNumber = 1
-    #                 Type            = 'Basic'
-    #             }
-    #         }
+            Mock -CommandName Get-Partition -MockWith {
+                [PSCustomObject] @{
+                    DriveLetter     = [System.Char] 'G'
+                    Size            = 1GB
+                    PartitionNumber = 1
+                    Type            = 'Basic'
+                }
+            }
 
-    #         Mock -CommandName Get-Volume -MockWith {
-    #             [PSCustomObject] @{
-    #                 FileSystemLabel = 'myLabel'
-    #                 FileSystem      = 'NTFS'
-    #                 DriveLetter     = 'G'
-    #             }
-    #         }
+            Mock -CommandName Get-Volume -MockWith {
+                [PSCustomObject] @{
+                    FileSystemLabel = 'myLabel'
+                    FileSystem      = 'NTFS'
+                    DriveLetter     = 'G'
+                }
+            }
 
-    #         Mock -CommandName New-Partition -MockWith {
-    #             [PSCustomObject] @{
-    #                 DriveLetter     = [System.Char] $null
-    #                 Size            = 1GB
-    #                 PartitionNumber = 1
-    #                 Type            = 'Basic'
-    #                 IsReadOnly      = $false
-    #             }
-    #         }
+            Mock -CommandName New-Partition -ParameterFilter {
+                $DriveLetter -eq 'H'
+            } -MockWith {
+                [PSCustomObject] @{
+                    DriveLetter     = [System.Char] $null
+                    Size            = 1GB
+                    PartitionNumber = 1
+                    Type            = 'Basic'
+                    IsReadOnly      = $false
+                }
+            }
 
-    #         Mock -CommandName Set-Partition
+            Mock -CommandName Set-Partition
 
-    #         # mocks that should not be called
-    #         Mock -CommandName Set-Disk
-    #         Mock -CommandName Initialize-Disk
-    #         Mock -CommandName New-Partition
-    #         Mock -CommandName Format-Volume
-    #     }
+            # mocks that should not be called
+            Mock -CommandName Set-Disk
+            Mock -CommandName Initialize-Disk
+            Mock -CommandName New-Partition
+            Mock -CommandName Format-Volume
+        }
 
-    #     It 'Should not throw an exception' {
-    #         InModuleScope -ScriptBlock {
-    #             Set-StrictMode -Version 1.0
+        It 'Should not throw an exception' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
 
-    #             $testParams = @{
-    #                 DiskId      = 1
-    #                 DriveLetter = 'H'
-    #             }
+                $testParams = @{
+                    DiskId      = 1
+                    DriveLetter = 'H'
+                }
 
-    #             { Set-TargetResource @testParams } | Should -Not -Throw
-    #         }
+                { Set-TargetResource @testParams } | Should -Not -Throw
+            }
 
-    #         Should -Invoke -CommandName Get-DiskByIdentifier -Exactly -Times 1 -Scope It
-    #         Should -Invoke -CommandName Set-Disk -Exactly -Times 0 -Scope It
-    #         Should -Invoke -CommandName Initialize-Disk -Exactly -Times 0 -Scope It
-    #         Should -Invoke -CommandName Get-Partition -Exactly -Times 1 -Scope It
-    #         Should -Invoke -CommandName Get-Volume -Exactly -Times 1 -Scope It
-    #         Should -Invoke -CommandName New-Partition -Exactly -Times 1 -Scope It
-    #         Should -Invoke -CommandName Format-Volume -Exactly -Times 0 -Scope It
-    #         Should -Invoke -CommandName Set-Partition -Exactly -Times 1 -Scope It
-    #     }
-    # }
+            Should -Invoke -CommandName Get-DiskByIdentifier -Exactly -Times 1 -Scope It
+            Should -Invoke -CommandName Set-Disk -Exactly -Times 0 -Scope It
+            Should -Invoke -CommandName Initialize-Disk -Exactly -Times 0 -Scope It
+            Should -Invoke -CommandName Get-Partition -Exactly -Times 4 -Scope It
+            Should -Invoke -CommandName Get-Volume -Exactly -Times 1 -Scope It
+            Should -Invoke -CommandName New-Partition -Exactly -Times 1 -Scope It
+            Should -Invoke -CommandName Format-Volume -Exactly -Times 0 -Scope It
+            Should -Invoke -CommandName Set-Partition -Exactly -Times 1 -Scope It
+        }
+    }
 
     Context 'When online GPT disk with a partition/volume and no Drive Letter assigned using Disk Number' {
         BeforeAll {
