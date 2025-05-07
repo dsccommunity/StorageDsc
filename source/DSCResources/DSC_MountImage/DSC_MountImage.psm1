@@ -461,7 +461,7 @@ function Test-ParameterValid
         if ($PSBoundParameters.ContainsKey('DriveLetter'))
         {
             # Test the Drive Letter to ensure it is valid
-            $normalizedDriveLetter = Assert-DriveLetterValid -DriveLetter $DriveLetter
+            Assert-DriveLetterValid -DriveLetter $DriveLetter
         }
         else
         {

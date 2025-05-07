@@ -158,6 +158,7 @@ function Get-OpticalDiskDriveLetter
     )
 
     $driveLetter = $null
+    $deviceId = $null
 
     Write-Verbose -Message ( @(
             "$($MyInvocation.MyCommand): "
@@ -454,7 +455,7 @@ function Test-TargetResource
         # Throw an exception if the desired optical disk does not exist
         if ([System.String]::IsNullOrEmpty($currentDriveInfo.DeviceId))
         {
-            New-InvalidArgumentException `
+            New-ArgumentException `
                 -Message ($script:localizedData.NoOpticalDiskDriveError -f $DiskId) `
                 -ArgumentName 'DiskId'
         }

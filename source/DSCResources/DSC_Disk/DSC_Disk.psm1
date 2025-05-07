@@ -372,7 +372,7 @@ function Set-TargetResource
     # Check if existing partition already has file system on it
     if ($null -eq $assignedPartition)
     {
-        # There is no partiton with this drive letter
+        # There is no partition with this drive letter
         Write-Verbose -Message ( @(
                 "$($MyInvocation.MyCommand): "
                 $($script:localizedData.DriveNotFoundOnPartitionMessage `
@@ -631,11 +631,12 @@ function Set-TargetResource
 
             <#
                 After creating the partition it can take a few seconds for it to become writeable
-                Wait for up to 30 seconds for the parition to become writeable
+                Wait for up to 30 seconds for the partition to become writeable
             #>
             $timeAtStart = Get-Date
-            $minimumTimeToWait = $timeAtStart + (New-Timespan -Second 3)
-            $maximumTimeToWait = $timeAtStart + (New-Timespan -Second 30)
+            $minimumTimeToWait = $timeAtStart + (New-TimeSpan -Second 3)
+            $maximumTimeToWait = $timeAtStart + (New-TimeSpan -Second 30)
+            $partitionstate = $null
 
             while (($partitionstate.IsReadOnly -and (Get-Date) -lt $maximumTimeToWait) `
                 -or ((Get-Date) -lt $minimumTimeToWait))
@@ -657,7 +658,7 @@ function Set-TargetResource
         {
             # The partition is still readonly - throw an exception
             New-InvalidOperationException `
-                -Message ($script:localizedData.NewParitionIsReadOnlyError `
+                -Message ($script:localizedData.NewPartitionIsReadOnlyError `
                     -f $DiskIdType, $DiskId, $partition.PartitionNumber)
         } # if
 
@@ -709,7 +710,7 @@ function Set-TargetResource
 
                     if ($Size -gt $supportedSize.SizeMax)
                     {
-                        New-InvalidArgumentException -Message ( @(
+                        New-ArgumentException -Message ( @(
                                 "$($MyInvocation.MyCommand): "
                                 $($script:localizedData.FreeSpaceViolationError `
                                         -f $DriveLetter, $assignedPartition.Size, $Size, $supportedSize.SizeMax)
@@ -837,7 +838,7 @@ function Set-TargetResource
             # The volume should have a label assigned
             if ($volume.FileSystemLabel -ne $FSLabel)
             {
-                # The volume lable needs to be changed because it is different.
+                # The volume label needs to be changed because it is different.
                 Write-Verbose -Message ( @(
                         "$($MyInvocation.MyCommand): "
                         $($script:localizedData.ChangingVolumeLabelMessage `
@@ -891,7 +892,7 @@ function Set-TargetResource
 
 <#
     .SYNOPSIS
-        Tests if the disk is initialized, the partion exists and the drive letter is assigned.
+        Tests if the disk is initialized, the partition exists and the drive letter is assigned.
 
     .PARAMETER DriveLetter
         Specifies the preferred letter to assign to the disk volume.
@@ -1074,7 +1075,7 @@ function Test-TargetResource
             If the difference in size between the supported partition size
             and the current partition size is less than 1MB then set the
             desired partition size to the current size. This will prevent
-            any size difference less than 1MB from trying to contiuously
+            any size difference less than 1MB from trying to continuously
             resize. See https://github.com/dsccommunity/StorageDsc/issues/181
         #>
         if (($supportedSize.SizeMax - $partition.Size) -lt 1MB)
@@ -1114,7 +1115,7 @@ function Test-TargetResource
                         https://learn.microsoft.com/en-us/windows-hardware/drivers/storage/createpartition-msft-disk
                         for more information. But to some it up, what the user enters and what the New-Partition
                         cmdlet is able to allocate can be different in bytes. So to keep idempotence, we only
-                        return false when they arent the same in GB. Also if the volume already is formatted as
+                        return false when they are not the same in GB. Also if the volume already is formatted as
                         a ReFS, there is no point in returning false for size mismatches since they can't be
                         resized with resize-partition.
                     #>
