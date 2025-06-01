@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Unit tests converted to Pester 5. Fixes [#265](https://github.com/dsccommunity/StorageDsc/issues/265).
 - Split bundled modules into buildable modules and separate files.
+- `azure-pipelines.yml`
+  - Remove `windows-2019` image fixes [#302](https://github.com/dsccommunity/StorageDsc/issues/302).
 
 ### Removed
 

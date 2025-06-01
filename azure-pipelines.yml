@@ -174,8 +174,6 @@ stages:
         displayName: 'Integration'
         strategy:
           matrix:
-            Windows Server 2019:
-              vmImage: windows-2019
             Windows Server 2022:
               vmImage: windows-2022
             Windows Server 2025:
